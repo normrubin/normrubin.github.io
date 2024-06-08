@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024</title>
+<title>EECE7398 Fall 2024 - Representation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,25 +20,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../../../">
-<script src="../../../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -66,264 +100,379 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7398 Fall 2024 - Representation">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body class="nav-sidebar docked fullcontent">
+<body class="fullcontent">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      EECE7398 Fall 2024
-      </li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
-    </div>
-  </nav>
-</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-center sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="../../../../">EECE7398 Fall 2024</a> 
-    </div>
-      </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true">
- <span class="menu-text">EECS 7398</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false">
- <span class="menu-text">Class Overview</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">About</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Schedule</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
- <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/1_compiler_overview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Compiler Overview</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12_memory.qmd</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">13_dynamic_compielrs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">14_gpu_compilers</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/2a_performance_measurement.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Performance and Measurement</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/2b_representation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Representation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/3.local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3.Local Analysis &amp; Optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/3b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3b local value numbering</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-      </ul>
-  </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril Documentation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril github</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Representation</h1>
+</div>
 
 
 
-<section id="syntax-reference" class="level1">
-<h1>Syntax Reference</h1>
-<p>Bril programs are JSON objects that directly represent abstract syntax. This chapter exhaustively describes the structure of that syntax. All objects are JSON values of one sort or another.</p>
-<section id="program" class="level2">
-<h2 class="anchored" data-anchor-id="program">Program</h2>
-<pre><code>{ "functions": [&lt;Function&gt;, ...] }</code></pre>
-<p>A Program is the top-level object. It has one key:</p>
-<ul>
-<li><code>functions</code>, a list of Function objects.</li>
-</ul>
-</section>
-<section id="type" class="level2">
-<h2 class="anchored" data-anchor-id="type">Type</h2>
-<pre><code>"&lt;string&gt;"
-{"&lt;string&gt;": &lt;Type&gt;}</code></pre>
-<p>There are two kinds of types: primitive types, whose syntax is just a string, and parameterized types, which wrap a smaller type. The semantics chapters list the particular types that are available—for example, <a href="../../../../src/briltxt/docs/lang/core.html">core Bril</a> defines the basic primitive types <code>int</code> and <code>bool</code> and the <a href="../../../../src/briltxt/docs/lang/memory.html">memory extension</a> defines a parameterized pointer type.</p>
-</section>
-<section id="function" class="level2">
-<h2 class="anchored" data-anchor-id="function">Function</h2>
-<pre><code>{
-  "name": "&lt;string&gt;",
-  "args": [{"name": "&lt;string&gt;", "type": &lt;Type&gt;}, ...]?,
-  "type": &lt;Type&gt;?,
-  "instrs": [&lt;Instruction&gt;, ...]
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="how-do-we-represent-programs" class="level1">
+<h1>How do we represent programs</h1>
+<p>The representation of a program - is what we read in and read out when transforming a program. What kind of properties make a good representation?</p>
+<p>One possible representation is called <strong><em>concrete syntax form</em></strong> Programs are text - surface syntax- just what you would type into an editor.</p>
+<div id="cell-4" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>value <span class="op">=</span> <span class="dv">8</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(value):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  result <span class="op">=</span> result <span class="op">+</span> i</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>29</code></pre>
+</div>
+</div>
+<p>What is good and what is bad about this representation?</p>
+<p>What is the level of abstraction? How do you understand the semantics.</p>
+<p>Form 2 - <strong><em>Abstract syntax form</em></strong></p>
+<p>Tree structure - Nodes are parts of the program, edges show how they are connected. We can write this as a list or a graph</p>
+<div id="cell-6" class="cell" data-execution_count="29">
+<div class="cell-output cell-output-stdout">
+<pre><code>FunctionDef(
+    name='pgm',
+    args=arguments(
+        posonlyargs=[],
+        args=[],
+        kwonlyargs=[],
+        kw_defaults=[],
+        defaults=[]),
+    body=[
+        Assign(
+            targets=[
+                Name(id='value', ctx=Store())],
+            value=Constant(value=8)),
+        Assign(
+            targets=[
+                Name(id='result', ctx=Store())],
+            value=Constant(value=1)),
+        For(
+            target=Name(id='i', ctx=Store()),
+            iter=Call(
+                func=Name(id='range', ctx=Load()),
+                args=[
+                    Name(id='value', ctx=Load())],
+                keywords=[]),
+            body=[
+                Assign(
+                    targets=[
+                        Name(id='result', ctx=Store())],
+                    value=BinOp(
+                        left=Name(id='result', ctx=Load()),
+                        op=Mult(),
+                        right=Name(id='i', ctx=Load())))],
+            orelse=[]),
+        Expr(
+            value=Call(
+                func=Name(id='print', ctx=Load()),
+                args=[
+                    Name(id='result', ctx=Load())],
+                keywords=[]))],
+    decorator_list=[])</code></pre>
+</div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dot_dia</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<div>
+<figure class="figure">
+<p><img src="representation_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>AST tree representation An AST is a tree structure, nodes like if, test, body, assign Each node is one concept from the program</p>
+<p>Recursive function can walk over the tree, one chunk of code for each node.</p>
+<ol type="1">
+<li>Good - each type of node is different, making special cases are easy</li>
+<li>Bad - each type of node is different so analysis has to know about every type, making general cases hard</li>
+</ol>
+<p>This is the classic way to write an interpreter. Simple (non optimizing) compilers often use this format.</p>
+<section id="a-more-regular-representation" class="level2">
+<h2 class="anchored" data-anchor-id="a-more-regular-representation">A more regular representation</h2>
+<p>Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.</p>
+<div class="columns">
+<div class="column" style="width:45%;">
+<pre><code>    let value = 8
+    let result = 1
+    for (let i = 0;i &lt; value;i = i+ 1)
+    {
+        result = result * i
+    }
+    console.log(result )</code></pre>
+</div><div class="column" style="width:5%;">
+<!-- empty column to create gap -->
+</div><div class="column" style="width:40%;">
+<pre><code>@main {
+  v0: float = const 8;
+  value: float = id v0;
+  v1: float = const 1;
+  result: float = id v1;
+  v3: float = const 0;
+  i: float = id v3;
+.for.cond.2:
+  v4: float = id i;
+  v5: float = id value;
+  v6: bool = flt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: float = id result;
+  v8: float = id i;
+  v9: float = fmul v7 v8;
+  result: float = id v9;
+  v10: float = id i;
+  v11: float = const 1;
+  v12: float = fadd v10 v11;
+  i: float = id v12;
+  jmp .for.cond.2;
+.for.end.2:
+  v13: float = id result;
+  print v13;
+  v14: int = const 0;
+}
+</code></pre>
+</div>
+</div>
+<div id="cell-11" class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>os.system(<span class="st">'ts2bril images/toy.ts | bril2txt'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>@main {
+  v0: float = const 8;
+  value: float = id v0;
+  v1: float = const 1;
+  result: float = id v1;
+  v3: float = const 0;
+  i: float = id v3;
+.for.cond.2:
+  v4: float = id i;
+  v5: float = id value;
+  v6: bool = flt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: float = id result;
+  v8: float = id i;
+  v9: float = fmul v7 v8;
+  result: float = id v9;
+  v10: float = id i;
+  v11: float = const 1;
+  v12: float = fadd v10 v11;
+  i: float = id v12;
+  jmp .for.cond.2;
+.for.end.2:
+  v13: float = id result;
+  print v13;
+  v14: int = const 0;
 }</code></pre>
-<p>A Function object represents a (first-order) procedure consisting of a sequence of instructions. There are four fields:</p>
-<ul>
-<li><code>name</code>, a string.</li>
-<li><code>args</code>, optionally, a list of arguments, which consist of a <code>name</code> and a <code>type</code>. Missing <code>args</code> is the same as an empty list.</li>
-<li>Optionally, <code>type</code>, a Type object: the function’s return type, if any.</li>
-<li><code>instrs</code>, a list of Label and Instruction objects.</li>
-</ul>
-<p>When a function runs, it creates an activation record and transfers control to the first instruction in the sequence.</p>
-<p>A Bril program is executable if it contains a function named <code>main</code>. When execution starts, this function will be invoked. The <code>main</code> function can have arguments (which implementations may supply using command-line arguments) but must not have a return <code>type</code>.</p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>0</code></pre>
+</div>
+</div>
+<p>Looks like assembly but no limit on registers, no condition codes. fully typed, no complex addressing modes.</p>
+<p>syntax-</p>
+<p>Declare functions, labels, instructions</p>
+<p>instruction:<br>
+1) variable type = opcode arguments 2) opcode list of arguments</p>
 </section>
-<section id="label" class="level2">
-<h2 class="anchored" data-anchor-id="label">Label</h2>
-<pre><code>{ "label": "&lt;string&gt;" }</code></pre>
-<p>A Label marks a position in an instruction sequence as a destination for control transfers. It only has one key:</p>
-<ul>
-<li><code>label</code>, a string. This is the name that jump and branch instructions will use to transfer control to this position and proceed to execute the following instruction.</li>
-</ul>
+<section id="what-is-good-and-what-is-about-this-reorientation" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-good-and-what-is-about-this-reorientation">what is good and what is about this reorientation?</h2>
+<p>What is the abstract syntax form for this?</p>
 </section>
-<section id="instruction" class="level2">
-<h2 class="anchored" data-anchor-id="instruction">Instruction</h2>
-<pre><code>{ "op": "&lt;string&gt;", ... }</code></pre>
-<p>An Instruction represents a unit of computational work. Every instruction must have this field:</p>
-<ul>
-<li><code>op</code>, a string: the <em>opcode</em> that determines what the instruction does. (See the <a href="../../../../src/briltxt/docs/lang/core.html"><em>Core Language</em></a> section and the subsequent extension sections for listings of the available opcodes.)</li>
-</ul>
-<p>Depending on the opcode, the instruction might also have:</p>
-<ul>
-<li><code>dest</code>, a string: the name of the variable where the operation’s result is stored.</li>
-<li><code>type</code>, a Type object: the type of the destination variable.</li>
-<li><code>args</code>, a list of strings: the arguments to the operation. These are names of variables.</li>
-<li><code>funcs</code>, a list of strings: any names of functions referenced by the instruction.</li>
-<li><code>labels</code>, a list of strings: any label names referenced by the instruction.</li>
-</ul>
-<p>There are three kinds of instructions: constants, value operations, and effect operations.</p>
-<section id="constant" class="level3">
-<h3 class="anchored" data-anchor-id="constant">Constant</h3>
-<pre><code>{ "op": "const", "dest": "&lt;string&gt;", "type": &lt;Type&gt;,
-  "value": &lt;literal&gt; }</code></pre>
-<p>A Constant is an instruction that produces a literal value. Its <code>op</code> field must be the string <code>"const"</code>. It has the <code>dest</code> and <code>type</code> fields described above, and also:</p>
-<ul>
-<li><code>value</code>, the literal value for the constant. This is either a JSON number or a JSON Boolean value. The <code>type</code> field must match—i.e., it must be “int” or “bool”, respectively.</li>
-</ul>
+<section id="extract-info-from-this-repreentation." class="level2">
+<h2 class="anchored" data-anchor-id="extract-info-from-this-repreentation.">extract info from this repreentation.</h2>
+<section id="control-flow-graph-cfg-version-1" class="level3">
+<h3 class="anchored" data-anchor-id="control-flow-graph-cfg-version-1">control flow graph (CFG) (version 1)</h3>
+<p>Representation is a directed graph. Nodes are instructions, edges indicate <strong><em>possible</em></strong> flow of control, one entry and one exit node.</p>
+<p>Here is a simple program:</p>
+<pre><code>    @main {
+        v: int = const 5;
+        print v;
+    }</code></pre>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[const] --&gt; B[print]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>a second example</p>
+<pre><code>    @main {
+        v: int = const 4;
+        jmp  .somewhere;
+        v: int = const 2;
+        .somewhere;
+        print v;
+    }</code></pre>
+<p>What does the control flow graph look like?</p>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[const 4] --&gt; B[jmp]
+  B --&gt; C[print]
+  D[const 2] --&gt; C
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>notice label does not produce a node</p>
+<p>Easy to see a dead instruction.</p>
+<p>Third example:</p>
+<pre><code>    @main {
+        v: int = const 4;
+        b: bool = const false;
+        br b .there .here;
+    .here:
+        v: int = const 2;
+    .there;
+        print v;
+    }</code></pre>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[v: int const 4] --&gt; B[b: bool const false]
+  B --&gt; C[br b .there, .false]
+  C --&gt; D[v: const 2]
+  C --&gt; E[print v]
+  D --&gt; E
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>which is the true and which is the false, could mark the edges or use a convention</p>
+<p>Which is the entry, which is the exit?</p>
+<p>There is a long chain of instructions entered at the top, exit at the bottom, no branches inside.</p>
+<p>Basic blocks (cfg form 2) 1) nodes can be a sequence of instructions. 1) jumps and branches can only be at the end of a sequence 1) only label has to be at the start 1) every instruction in the sequence executes the same number of times</p>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[v: int const 4\nb : bool\n br ] 
+  A --&gt; D[v: const 2]
+  A --&gt; E[print v]
+  D --&gt; E
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>As we construct basic blocks, we can add instructions up till something that ends the block (<strong><em>terminator</em></strong>)</p>
+<p>Option: do all blocks end in a terminator or not?</p>
+<p>given a block b, the <strong><em>predecessors</em></strong> of b are the blocks b_in where there is an edge bin-&gt;b. And the <strong><em>successors</em></strong> of B are the b_out where b-&gt;b_out is an edge</p>
 </section>
-<section id="value-operation" class="level3">
-<h3 class="anchored" data-anchor-id="value-operation">Value Operation</h3>
-<pre><code>{ "op": "&lt;string&gt;", "dest": "&lt;string&gt;", "type": &lt;Type&gt;,
-  "args": ["&lt;string&gt;", ...]?,
-  "funcs": ["&lt;string&gt;", ...]?,
-  "labels": ["&lt;string&gt;", ...]? }</code></pre>
-<p>A Value Operation is an instruction that takes arguments, does some computation, and produces a value. Like a Constant, it has the <code>dest</code> and <code>type</code> fields described above, and also any of these three optional fields:</p>
-<ul>
-<li><code>args</code>, a list of strings. These are variable names defined elsewhere in the same function.</li>
-<li><code>funcs</code>, a list of strings. The names of any functions that this instruction references. For example, <a href="../../../../src/briltxt/docs/lang/core.html">core Bril</a>’s call instruction takes one function name.</li>
-<li><code>labels</code>, a list of strings. The names of any labels within the current function that the instruction references. For example, <a href="../../../../src/briltxt/docs/lang/core.html">core Bril</a>’s jump and branch instructions have target labels.</li>
-</ul>
-<p>In all three cases, these keys may be missing and the semantics are identical to mapping to an empty list.</p>
 </section>
-<section id="effect-operation" class="level3">
-<h3 class="anchored" data-anchor-id="effect-operation">Effect Operation</h3>
-<pre><code>{ "op": "&lt;string&gt;",
-  "args": ["&lt;string&gt;", ...]?,
-  "funcs": ["&lt;string&gt;", ...]?,
-  "labels": ["&lt;string&gt;", ...]? }</code></pre>
-<p>An Effect Operation is like a Value Operation but it does not produce a value. It also has the optional <code>args</code>, <code>funcs</code>, and <code>labels</code> fields.</p>
-</section>
-</section>
-<section id="source-positions" class="level2">
-<h2 class="anchored" data-anchor-id="source-positions">Source Positions</h2>
-<p>Any syntax object may optionally have position fields to reflect a source position:</p>
-<pre><code>{ ..., "pos": {"row": &lt;int&gt;, "col": &lt;int&gt;},
-       "pos_end": {"row": &lt;int&gt;, "col": &lt;int&gt;}?,
-       "src": "&lt;string&gt;"? }</code></pre>
-<p>The <code>pos</code> and <code>pos_end</code> objects have two keys: <code>row</code> (the line number) and <code>col</code> (the column number within the line). The <code>src</code> object can optionally provide the absolute path to a file which is referenced to by the source position. If <code>pos_end</code> is provided, it must be equal to or greater than <code>pos</code>. Front-end compilers that generate Bril code may add this information to help with debugging. The <a href="../../../../src/briltxt/docs/tools/text.html">text format parser</a>, for example, can optionally add source positions. However, tools can’t require positions to exist, to consistently exist or not on all syntax objects in a program, or to follow any particular rules.</p>
+<section id="what-is-an-algorithm-that-forms-a-cfg" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-an-algorithm-that-forms-a-cfg">What is an algorithm that forms a cfg</h2>
+<ol type="1">
+<li>just find all the basic blocks</li>
+<li>add the control flow edges</li>
+</ol>
+<p>psuedo code</p>
+<ol type="1">
+<li>in: instructions - list of instructions</li>
+<li>out blocks - list of lists of instructions</li>
+</ol>
+<pre><code>current_block = []
+for i in instructions:
+    if i is not a label:
+       block.append(i)
+    if i is a label or terminator:
+        blocks.append(current_block)
+        current_block = []</code></pre>
+<p>step 2 we need a map from labels to basic blocks</p>
+<ol type="1">
+<li>in: instructions - list of instructions</li>
+<li>out blocks - list of lists of instructions</li>
+</ol>
+<pre><code>current_block = []
+for i in instructions:
+    if i is not a label:
+       block.append(i)
+    if i is a label or terminator:
+        blocks.append(current_block)
+        current_block = []
+    
+
+for block in blocks:
+   last = block[-1]
+   if last is a jmp (one successor)
+      add edge from block to last.dest 
+   else if last is a br (two successors)
+      add two edges from block to last.true, last.false 
+   else  fall through 
+      add edge to next block (if it exists)</code></pre>
+<div id="cell-18" class="cell" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  bril_program <span class="op">=</span> f.read()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(bril_program)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
+        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
+        { "op": "add", "type": "int", "dest": "v2",
+          "args": ["v0", "v1"] },
+        { "op": "print", "args": ["v2"] }
+      ],
+      "args": []
+    }
+  ]
+}
+</code></pre>
+</div>
+</div>
 
 
 </section>
@@ -747,7 +896,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/src/briltxt/docs/lang/syntax.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.dev/normrubin/normrubin.github.io/blob/main/notebooks/representation.ipynb" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>

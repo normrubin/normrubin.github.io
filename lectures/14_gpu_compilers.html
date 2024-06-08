@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024</title>
+<title>EECE7398 Fall 2024 - 14_gpu_compilers</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../../../">
-<script src="../../../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/2a_performance_measurement.html" rel="next">
+<link href="../lectures/13_dynamic_compilers.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -68,8 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="EECE7398 Fall 2024">
-<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
+<meta property="og:title" content="EECE7398 Fall 2024 - 14_gpu_compilers">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
@@ -82,9 +83,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      EECE7398 Fall 2024
-      </li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/1_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/14_gpu_compilers.html">14_gpu_compilers</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -99,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../../../../">EECE7398 Fall 2024</a> 
+      <a href="../">EECE7398 Fall 2024</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -129,13 +128,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
+  <a href="../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">About</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
+  <a href="../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Schedule</span></a>
   </div>
 </li>
@@ -143,58 +142,58 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
  <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/1_compiler_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/1_compiler_overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">12_memory.qmd</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">13_dynamic_compielrs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">14_gpu_compilers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/2a_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/2a_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/2b_representation.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/2b_representation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Representation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/3.local.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/3.local.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">3.Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/3b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/3b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">3b local value numbering</span></a>
   </div>
 </li>
@@ -223,111 +222,40 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/1_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/14_gpu_compilers.html">14_gpu_compilers</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">14_gpu_compilers</h1>
+</div>
 
 
 
-<section id="syntax-reference" class="level1">
-<h1>Syntax Reference</h1>
-<p>Bril programs are JSON objects that directly represent abstract syntax. This chapter exhaustively describes the structure of that syntax. All objects are JSON values of one sort or another.</p>
-<section id="program" class="level2">
-<h2 class="anchored" data-anchor-id="program">Program</h2>
-<pre><code>{ "functions": [&lt;Function&gt;, ...] }</code></pre>
-<p>A Program is the top-level object. It has one key:</p>
-<ul>
-<li><code>functions</code>, a list of Function objects.</li>
-</ul>
-</section>
-<section id="type" class="level2">
-<h2 class="anchored" data-anchor-id="type">Type</h2>
-<pre><code>"&lt;string&gt;"
-{"&lt;string&gt;": &lt;Type&gt;}</code></pre>
-<p>There are two kinds of types: primitive types, whose syntax is just a string, and parameterized types, which wrap a smaller type. The semantics chapters list the particular types that are available—for example, <a href="../../../../src/briltxt/docs/lang/core.html">core Bril</a> defines the basic primitive types <code>int</code> and <code>bool</code> and the <a href="../../../../src/briltxt/docs/lang/memory.html">memory extension</a> defines a parameterized pointer type.</p>
-</section>
-<section id="function" class="level2">
-<h2 class="anchored" data-anchor-id="function">Function</h2>
-<pre><code>{
-  "name": "&lt;string&gt;",
-  "args": [{"name": "&lt;string&gt;", "type": &lt;Type&gt;}, ...]?,
-  "type": &lt;Type&gt;?,
-  "instrs": [&lt;Instruction&gt;, ...]
-}</code></pre>
-<p>A Function object represents a (first-order) procedure consisting of a sequence of instructions. There are four fields:</p>
-<ul>
-<li><code>name</code>, a string.</li>
-<li><code>args</code>, optionally, a list of arguments, which consist of a <code>name</code> and a <code>type</code>. Missing <code>args</code> is the same as an empty list.</li>
-<li>Optionally, <code>type</code>, a Type object: the function’s return type, if any.</li>
-<li><code>instrs</code>, a list of Label and Instruction objects.</li>
-</ul>
-<p>When a function runs, it creates an activation record and transfers control to the first instruction in the sequence.</p>
-<p>A Bril program is executable if it contains a function named <code>main</code>. When execution starts, this function will be invoked. The <code>main</code> function can have arguments (which implementations may supply using command-line arguments) but must not have a return <code>type</code>.</p>
-</section>
-<section id="label" class="level2">
-<h2 class="anchored" data-anchor-id="label">Label</h2>
-<pre><code>{ "label": "&lt;string&gt;" }</code></pre>
-<p>A Label marks a position in an instruction sequence as a destination for control transfers. It only has one key:</p>
-<ul>
-<li><code>label</code>, a string. This is the name that jump and branch instructions will use to transfer control to this position and proceed to execute the following instruction.</li>
-</ul>
-</section>
-<section id="instruction" class="level2">
-<h2 class="anchored" data-anchor-id="instruction">Instruction</h2>
-<pre><code>{ "op": "&lt;string&gt;", ... }</code></pre>
-<p>An Instruction represents a unit of computational work. Every instruction must have this field:</p>
-<ul>
-<li><code>op</code>, a string: the <em>opcode</em> that determines what the instruction does. (See the <a href="../../../../src/briltxt/docs/lang/core.html"><em>Core Language</em></a> section and the subsequent extension sections for listings of the available opcodes.)</li>
-</ul>
-<p>Depending on the opcode, the instruction might also have:</p>
-<ul>
-<li><code>dest</code>, a string: the name of the variable where the operation’s result is stored.</li>
-<li><code>type</code>, a Type object: the type of the destination variable.</li>
-<li><code>args</code>, a list of strings: the arguments to the operation. These are names of variables.</li>
-<li><code>funcs</code>, a list of strings: any names of functions referenced by the instruction.</li>
-<li><code>labels</code>, a list of strings: any label names referenced by the instruction.</li>
-</ul>
-<p>There are three kinds of instructions: constants, value operations, and effect operations.</p>
-<section id="constant" class="level3">
-<h3 class="anchored" data-anchor-id="constant">Constant</h3>
-<pre><code>{ "op": "const", "dest": "&lt;string&gt;", "type": &lt;Type&gt;,
-  "value": &lt;literal&gt; }</code></pre>
-<p>A Constant is an instruction that produces a literal value. Its <code>op</code> field must be the string <code>"const"</code>. It has the <code>dest</code> and <code>type</code> fields described above, and also:</p>
-<ul>
-<li><code>value</code>, the literal value for the constant. This is either a JSON number or a JSON Boolean value. The <code>type</code> field must match—i.e., it must be “int” or “bool”, respectively.</li>
-</ul>
-</section>
-<section id="value-operation" class="level3">
-<h3 class="anchored" data-anchor-id="value-operation">Value Operation</h3>
-<pre><code>{ "op": "&lt;string&gt;", "dest": "&lt;string&gt;", "type": &lt;Type&gt;,
-  "args": ["&lt;string&gt;", ...]?,
-  "funcs": ["&lt;string&gt;", ...]?,
-  "labels": ["&lt;string&gt;", ...]? }</code></pre>
-<p>A Value Operation is an instruction that takes arguments, does some computation, and produces a value. Like a Constant, it has the <code>dest</code> and <code>type</code> fields described above, and also any of these three optional fields:</p>
-<ul>
-<li><code>args</code>, a list of strings. These are variable names defined elsewhere in the same function.</li>
-<li><code>funcs</code>, a list of strings. The names of any functions that this instruction references. For example, <a href="../../../../src/briltxt/docs/lang/core.html">core Bril</a>’s call instruction takes one function name.</li>
-<li><code>labels</code>, a list of strings. The names of any labels within the current function that the instruction references. For example, <a href="../../../../src/briltxt/docs/lang/core.html">core Bril</a>’s jump and branch instructions have target labels.</li>
-</ul>
-<p>In all three cases, these keys may be missing and the semantics are identical to mapping to an empty list.</p>
-</section>
-<section id="effect-operation" class="level3">
-<h3 class="anchored" data-anchor-id="effect-operation">Effect Operation</h3>
-<pre><code>{ "op": "&lt;string&gt;",
-  "args": ["&lt;string&gt;", ...]?,
-  "funcs": ["&lt;string&gt;", ...]?,
-  "labels": ["&lt;string&gt;", ...]? }</code></pre>
-<p>An Effect Operation is like a Value Operation but it does not produce a value. It also has the optional <code>args</code>, <code>funcs</code>, and <code>labels</code> fields.</p>
-</section>
-</section>
-<section id="source-positions" class="level2">
-<h2 class="anchored" data-anchor-id="source-positions">Source Positions</h2>
-<p>Any syntax object may optionally have position fields to reflect a source position:</p>
-<pre><code>{ ..., "pos": {"row": &lt;int&gt;, "col": &lt;int&gt;},
-       "pos_end": {"row": &lt;int&gt;, "col": &lt;int&gt;}?,
-       "src": "&lt;string&gt;"? }</code></pre>
-<p>The <code>pos</code> and <code>pos_end</code> objects have two keys: <code>row</code> (the line number) and <code>col</code> (the column number within the line). The <code>src</code> object can optionally provide the absolute path to a file which is referenced to by the source position. If <code>pos_end</code> is provided, it must be equal to or greater than <code>pos</code>. Front-end compilers that generate Bril code may add this information to help with debugging. The <a href="../../../../src/briltxt/docs/tools/text.html">text format parser</a>, for example, can optionally add source positions. However, tools can’t require positions to exist, to consistently exist or not on all syntax objects in a program, or to follow any particular rules.</p>
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-</section>
-</section>
+</header>
+
+
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>not done</p>
+</div>
+</div>
+
+
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -739,6 +667,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../lectures/13_dynamic_compilers.html" class="pagination-link" aria-label="13_dynamic_compielrs">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">13_dynamic_compielrs</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../lectures/2a_performance_measurement.html" class="pagination-link" aria-label="Performance and Measurement">
+        <span class="nav-page-text">Performance and Measurement</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -747,7 +687,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/src/briltxt/docs/lang/syntax.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/14_gpu_compilers.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>
