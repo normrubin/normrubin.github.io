@@ -2,49 +2,49 @@
   {
     "objectID": "lectures/1_compiler_overview.html",
     "href": "lectures/1_compiler_overview.html",
-    "title": "Compiler Overview",
+    "title": "1. Compiler Overview",
     "section": "",
     "text": "A compiler writer builds bridges between people and machines, and this task is each day more challenging.\n\nSoftware engineers want abstractions\n\nHardware engineers want efficiency\n\nOriginally, a compiler was a person doing calculations.\nIn 1952, she had an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”\n[]\nIn 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).\nTheir paper is located at https://dl.acm.org/doi/10.1145/1455567.1455599. The name stands for formula translation. It’s in upper case because at that time, compilers did not support lower case.\nThe FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM’s next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan. The goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.\nFORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.\nIn these early years, the development model was:\n\nbuild a new machine\ndesign a new language\nimplement a compiler\n\nVendors sometimes built compilers but often used small startup compiler companies.\nCompilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.\n\n\n\n\n\ngraph LR;\nA[Front end]--IR--&gt; B[Middle end];\nB--IR--&gt; C[Back end];\nA--IR--&gt; C;\n\n\n\n\n\n\n\nFront end - parse the program into IR\nMiddle end - machine independent optimizations and analyses\nBack end - machine specific stuff where machine code is generated\n\nThis course focuses on part 2\nA goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.\n There are many ways to compare the performance of programs:\n– Time\n– Space – Energy consumption\nIn 1987, GCC was released. It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR. Adding an optimization or reordering optimizations is quite hard.\nVendors could use one front end, one middle end and only need to write a new back end.\nThis ended almost all the compiler startups. Free front end, middle end.\nIn gcc the IR is somewhat C based, for instance there are pointers but there is no way to talk about garbage collection without hacks.\nin about 2006 LLVM (low level virtual machine) appeared. This changed the model to look like a library.\nThe core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.\n\n\n\n\n\ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;\n\n\n\n\n\n\nOptimizations form passes. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments.\nIn this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.\n\n\n\n\n\ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[ASSIGNMENT] --&gt; B2[BRIL interpreter];\n\n\n\n\n\n\n\n\nCompilers are massive and expensive to build.\n\n\n\nCompiler\nYear Started\nDevelopers\nLines Of Code\nEst Cost $\n\n\n\n\nGCC 9.2.0\n1988\n617\n5,591,759\n425,747,279\n\n\nLLVM 8.0.1\n2001\n1,210\n6,877,489\n529,894,190\n\n\nOpenJDK 14+10\n2007\n883\n7,955,827\n616,517,789\n\n\nv8 7.8.112\n2008\n736\n3,043,793\n225,195,832\n\n\nRust 1.37.0\n2010\n2,737\n852,877\n59,109,425\n\n\nSwift\n2010\n857\n665,238\n45,535,689\n\n\nIntel Graphics 1.0.10\n2018\n149\n694,688\n46,934,626\n\n\n\nFrom CGO 2022 keynote\nSome observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.\n\n\n\n\nThe time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.\nUsers are ok with large programs taking minutes to compile\nCompilers run on machines that are memory-limited.\nCompilers run on single-threaded machines.\nMost targets are C-like.\n\nSome changes since early 2000’s:\n\nIntegrated development environments. When you type a.b what has to happen?\nDSL (Doman specific languages for AI)\nMore kinds of hardware\n\n\n\n\nAt the scale of datacenters, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.\n\n\nCompiler Advances Double Computing Power Every 18 Years.\nwhile hardware computing horsepower doubles every 18 months\nHow would you prove this?",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "Compiler Overview"
+      "1. Compiler Overview"
     ]
   },
   {
     "objectID": "lectures/1_compiler_overview.html#cost-of-a-compiler.",
     "href": "lectures/1_compiler_overview.html#cost-of-a-compiler.",
-    "title": "Compiler Overview",
+    "title": "1. Compiler Overview",
     "section": "",
     "text": "Compilers are massive and expensive to build.\n\n\n\nCompiler\nYear Started\nDevelopers\nLines Of Code\nEst Cost $\n\n\n\n\nGCC 9.2.0\n1988\n617\n5,591,759\n425,747,279\n\n\nLLVM 8.0.1\n2001\n1,210\n6,877,489\n529,894,190\n\n\nOpenJDK 14+10\n2007\n883\n7,955,827\n616,517,789\n\n\nv8 7.8.112\n2008\n736\n3,043,793\n225,195,832\n\n\nRust 1.37.0\n2010\n2,737\n852,877\n59,109,425\n\n\nSwift\n2010\n857\n665,238\n45,535,689\n\n\nIntel Graphics 1.0.10\n2018\n149\n694,688\n46,934,626\n\n\n\nFrom CGO 2022 keynote\nSome observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "Compiler Overview"
+      "1. Compiler Overview"
     ]
   },
   {
     "objectID": "lectures/1_compiler_overview.html#compiler-assumptions-lets-talk-about-how-many-are-still-true",
     "href": "lectures/1_compiler_overview.html#compiler-assumptions-lets-talk-about-how-many-are-still-true",
-    "title": "Compiler Overview",
+    "title": "1. Compiler Overview",
     "section": "",
     "text": "The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.\nUsers are ok with large programs taking minutes to compile\nCompilers run on machines that are memory-limited.\nCompilers run on single-threaded machines.\nMost targets are C-like.\n\nSome changes since early 2000’s:\n\nIntegrated development environments. When you type a.b what has to happen?\nDSL (Doman specific languages for AI)\nMore kinds of hardware",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "Compiler Overview"
+      "1. Compiler Overview"
     ]
   },
   {
     "objectID": "lectures/1_compiler_overview.html#how-well-do-compilers-do",
     "href": "lectures/1_compiler_overview.html#how-well-do-compilers-do",
-    "title": "Compiler Overview",
+    "title": "1. Compiler Overview",
     "section": "",
     "text": "At the scale of datacenters, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.\n\n\nCompiler Advances Double Computing Power Every 18 Years.\nwhile hardware computing horsepower doubles every 18 months\nHow would you prove this?",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "Compiler Overview"
+      "1. Compiler Overview"
     ]
   },
   {
