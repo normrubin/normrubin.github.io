@@ -1,0 +1,185 @@
+---
+title: "3.Local Analysis & Optimization"
+format: html
+sidebar: false 
+---
+
+
+I want to separate 3 flavors of optimization.
+
+1) local meaning within one basic block
+1) global meaning within one function (not really global)
+1) inter-procedural over the entire program
+
+Usually an optimization takes time that is more then linear in some property, For example a local optimization might take time $n^2$ in the number of instructions in the block.
+a global optimization might take much longer, and an inter-procedural longer still.  To keep compile time reasonable many compilers limit the number of global optimizations and skip inter-procedural optimizations. As a consequence many more optimizations get published but not used in production.
+
+For a local optimization,
+ instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.
+
+ For a global optimization, two instructions are ordered by a path from one block to another 
+ and different paths through the program give different orders.
+
+One special case is JIT (just in time) compilers, where programs get compiled at the start of execution.  GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called ***Hotspot*** compiling.  Some JIT compilers use ***hot/cold*** compiling, where they only run the fancy compiler on basic blocks that are hotl, i.e., execute a lot.
+
+```{mermaid}
+flowchart LR
+A[application] -- offline --> B[byte code/ptx]
+B --> C[quick run time compiler/ finalizer]
+C --> D[isa]
+B --> C1[fancy compiler - only run on long running functions];
+C1 --> D;
+
+```
+
+We are going to consider several versions of ***trivial dead code elimination***.  Trivial because we are going to hold off on control flow related optimizations till later. Sometimes people call this DCE or trivial DCE.
+
+For each case, we start by defining what we mean by dead code.  
+
+example 1
+```
+@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 1;
+  d: int = add a b;
+  print d;
+}
+```
+What instruction is dead? (meaning get the same answer if we delete the instruction)
+What is your definition? Is this meaning of dead code local or global?
+
+Why would you ever have dead code in a program?  One reason is that have DCE as a separate pass means other optimizations do not have to clean up.  
+
+## Definition 1- Dead if instruction writes a variable and the variable is never used.
+
+An instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels no not write a variable so they get deleted as well.
+
+What is the pseudo code to find dead instructions using this definition?
+
+```
+used = empty set 
+for instr in func 
+   used += instr.args 
+for instd in func
+    if instr has a dest and dest in not in used 
+       delete instr
+```
+
+
+example 2 
+
+```
+@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 1;  
+  d: int = add a b;
+  e: int = add c d; 
+  print d;
+}
+```
+
+The code so far only deletes one instruction, but we would like to get rid of two. Instruction c should also be dead.
+How do we change the definition
+
+## Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.
+
+A slow way to do this. - iterating till convergence
+
+~~~
+while changes:
+       run one pass of tdce above
+~~~
+
+what would be faster?  What is some pseudo code for the change
+
+example 3 
+
+```
+@main {
+  a: int = const 4;
+  a: int = const 200;
+  print a;
+}
+```
+
+## Definition? An instruction is dead if that instruction writes a variable v and no path starting at that instruction reaches a use of v
+
+this talks about paths (control flow paths)
+
+```
+@main {
+  a: int = const 4;
+     br input .then .else 
+  .then
+  a: int = const 200;
+  .else 
+  print a;
+}
+```
+
+for now we want to skip control flow, so we 
+
+## Definition: An instruction is dead if that instruction writes a variable v and no  path within the block  starting at that instruction reaches a use of v in the same block or reaches the exit of the block
+
+``` 
+cands are the variables that are defined but not used 
+last_def = {}  variables -> instructions 
+this is a mapping variables that have been defined but not used
+
+   for instr in block:
+      each arg (use) removes arg from last def 
+      if the instr has a dest 
+          if the dest is in last_def, 
+      add dest->instr to last def
+  
+```
+
+and as you might expect, we need to interate this till convergence
+
+Does running dce make compilation time go up?
+
+Compilers often run dce more then once- why? 
+
+
+testing out dce 
+
+1) program should get the same answer 
+
+1) program should run less instructions 
+
+Some test cases:
+
+1) [`simple.bril`](https://github.com/sampsyo/bril/blob/main/examples/test/tdce/simple.bril), 
+
+1) [`reassign.bril`](https://github.com/sampsyo/bril/blob/main/examples/test/tdce/reassign.bril),
+
+1) other examples in [the DCE test directory](https://github.com/sampsyo/bril/tree/main/examples/test/tdce) 
+
+
+
+  bril2json < bench.bril | python3 tdce.py | bril2txt
+
+  Next, try using `wc` to check static code size differences:
+
+  bril2json < bench.bril | wc -l
+
+  bril2json < bench.bril | python3 tdce.py | wc -l
+
+Then profiling to measure dynamic instruction count:
+The bril interpreter has a flag -p which prints the number of dynamcially executed instructions.  How good a measure is this for real programs?
+
+
+
+    bril2json < bench.bril | brili -p
+    
+    bril2json < bench.bril | python3 tdce.py | brili -p
+
+
+
+
+name = "slides from Phil Gibbons at CMU"
+url = "http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/lectures/L3-Local-Opts.pdf"
+details = "for more details and context on LVN
+
