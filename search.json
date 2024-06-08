@@ -1,0 +1,527 @@
+[
+  {
+    "objectID": "src/briltxt/docs/lang/memory.html",
+    "href": "src/briltxt/docs/lang/memory.html",
+    "title": "Manually Managed Memory",
+    "section": "",
+    "text": "While core Bril only has simple scalar stack values, the memory extension adds a manually managed heap of array-like allocations. You can create regions, like with malloc in C, and it is the program’s responsibility to delete them, like with free. Programs can manipulate pointers within these regions; a pointer indicates a particular offset within a particular allocated region.\nYou can read more about the memory extension from its creators, Drew Zagieboylo and Ryan Doenges.\n\n\nThe memory extension adds a parameterized ptr type to Bril:\n{\"ptr\": &lt;Type&gt;}\nA pointer value represents a reference to a specific offset within a uniformly-typed region of values.\n\n\n\nThese are the operations that manipulate memory allocations:\n\nalloc: Create a new memory region. One argument: the number of values to allocate (an integer). The result type is a pointer; the type of the instruction decides the type of the memory region to allocate. For example, this instruction allocates a region of integers:\n{\n    \"op\": \"alloc\",\n    \"args\": [\"size\"],\n    \"dest\": \"myptr\",\n    \"type\": {\"ptr\": \"int\"}\n}\nfree: Delete an allocation. One argument: a pointer produced by alloc. No return value.\nstore: Write into a memory region. Two arguments: a pointer and a value. The pointer type must agree with the value type (e.g., if the second argument is an int, the first argument must be a ptr&lt;int&gt;). No return value.\nload: Read from memory. One argument: a pointer. The return type is the pointed-to type for that pointer.\nptradd: Adjust the offset for a pointer, producing a new pointer to a different location in the same memory region. Two arguments: a pointer and an offset (an integer, which may be negative). The return type is the same as the original pointer type.\n\nIt is an error to access or free a region that has already been freed. It is also an error to access (load or store) a pointer that is out of bounds, i.e., outside the range of valid indices for a given allocation. (Doing a ptradd to produce an out-of-bounds pointer is not an error; subsequently accessing that pointer is.)\n\n\n\nIt is not an error to use the core print operation on pointers, but the output is not specified. Implementations can choose to print any representation of the pointer that they deem helpful."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/memory.html#types",
+    "href": "src/briltxt/docs/lang/memory.html#types",
+    "title": "Manually Managed Memory",
+    "section": "",
+    "text": "The memory extension adds a parameterized ptr type to Bril:\n{\"ptr\": &lt;Type&gt;}\nA pointer value represents a reference to a specific offset within a uniformly-typed region of values."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/memory.html#operations",
+    "href": "src/briltxt/docs/lang/memory.html#operations",
+    "title": "Manually Managed Memory",
+    "section": "",
+    "text": "These are the operations that manipulate memory allocations:\n\nalloc: Create a new memory region. One argument: the number of values to allocate (an integer). The result type is a pointer; the type of the instruction decides the type of the memory region to allocate. For example, this instruction allocates a region of integers:\n{\n    \"op\": \"alloc\",\n    \"args\": [\"size\"],\n    \"dest\": \"myptr\",\n    \"type\": {\"ptr\": \"int\"}\n}\nfree: Delete an allocation. One argument: a pointer produced by alloc. No return value.\nstore: Write into a memory region. Two arguments: a pointer and a value. The pointer type must agree with the value type (e.g., if the second argument is an int, the first argument must be a ptr&lt;int&gt;). No return value.\nload: Read from memory. One argument: a pointer. The return type is the pointed-to type for that pointer.\nptradd: Adjust the offset for a pointer, producing a new pointer to a different location in the same memory region. Two arguments: a pointer and an offset (an integer, which may be negative). The return type is the same as the original pointer type.\n\nIt is an error to access or free a region that has already been freed. It is also an error to access (load or store) a pointer that is out of bounds, i.e., outside the range of valid indices for a given allocation. (Doing a ptradd to produce an out-of-bounds pointer is not an error; subsequently accessing that pointer is.)"
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/memory.html#printing",
+    "href": "src/briltxt/docs/lang/memory.html#printing",
+    "title": "Manually Managed Memory",
+    "section": "",
+    "text": "It is not an error to use the core print operation on pointers, but the output is not specified. Implementations can choose to print any representation of the pointer that they deem helpful."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/ssa.html",
+    "href": "src/briltxt/docs/lang/ssa.html",
+    "title": "Static Single Assignment (SSA) Form",
+    "section": "",
+    "text": "This language extension lets you represent Bril programs in static single assignment (SSA) form. As in the standard definition, an SSA-form Bril program contains only one assignment per variable, globally—that is, variables within a function cannot be reassigned. This extension adds ϕ-nodes to the language.\n\n\nThere is one new instruction:\n\nphi: Takes n labels and n arguments, for any n. Copies the value of the ith argument, where i is the index of the second-most-recently-executed label. (It is an error to use a phi instruction when two labels have not yet executed, or when the instruction does not contain an entry for the second-most-recently-executed label.)\n\nIntuitively, a phi instruction takes its value according to the current basic block’s predecessor.\n\n\n\nIn the text format, you can write phi instructions like this:\nx: int = phi a .here b .there;\nThe text format doesn’t care how you interleave arguments and labels, so this is equivalent to (but more readable than) phi a b .here .there. The “second-most-recent label” rule means that the labels refer to predecessor basic blocks, if you imagine blocks being “named” by their labels.\nHere’s a small example:\n.top:\n  a: int = const 5;\n  br cond .here .there;\n.here:\n  b: int = const 7;\n.there:\n  c: int = phi a .top b .here;\n  print c;\nA phi instruction is sensitive to the incoming CFG edge that execution took to arrive at the current block. The phi instruction in this program, for example, gets its value from a if control came from the .top block and b if control came from the .here block.\nThe reference interpreter can supports programs in SSA form because it can faithfully execute the phi instruction."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/ssa.html#operations",
+    "href": "src/briltxt/docs/lang/ssa.html#operations",
+    "title": "Static Single Assignment (SSA) Form",
+    "section": "",
+    "text": "There is one new instruction:\n\nphi: Takes n labels and n arguments, for any n. Copies the value of the ith argument, where i is the index of the second-most-recently-executed label. (It is an error to use a phi instruction when two labels have not yet executed, or when the instruction does not contain an entry for the second-most-recently-executed label.)\n\nIntuitively, a phi instruction takes its value according to the current basic block’s predecessor."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/ssa.html#examples",
+    "href": "src/briltxt/docs/lang/ssa.html#examples",
+    "title": "Static Single Assignment (SSA) Form",
+    "section": "",
+    "text": "In the text format, you can write phi instructions like this:\nx: int = phi a .here b .there;\nThe text format doesn’t care how you interleave arguments and labels, so this is equivalent to (but more readable than) phi a b .here .there. The “second-most-recent label” rule means that the labels refer to predecessor basic blocks, if you imagine blocks being “named” by their labels.\nHere’s a small example:\n.top:\n  a: int = const 5;\n  br cond .here .there;\n.here:\n  b: int = const 7;\n.there:\n  c: int = phi a .top b .here;\n  print c;\nA phi instruction is sensitive to the incoming CFG edge that execution took to arrive at the current block. The phi instruction in this program, for example, gets its value from a if control came from the .top block and b if control came from the .here block.\nThe reference interpreter can supports programs in SSA form because it can faithfully execute the phi instruction."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/spec.html",
+    "href": "src/briltxt/docs/lang/spec.html",
+    "title": "Speculative Execution",
+    "section": "",
+    "text": "This extension lets Bril programs use a form of explicit speculative execution with rollback.\nIn general, speculation is when programs perform work that might not actually be necessary or even correct, under the assumption that it is likely to be right and useful. If this assumption turns out to be wrong, speculation typically needs some rollback mechanism to undo incorrect side effects and recover to a correct state.\nIn this Bril extension, programs can explicitly enter a speculative mode, where variable assignments are temporary. Then, they can either abort or commit those assignments, discarding them or making them permanent.\n\n\n\nspeculate: Enter a speculative execution context. No arguments.\ncommit: End the current speculative context, committing the current speculative state as the “real” state. No arguments.\nguard: Check a condition and possibly abort the current speculative context. One argument, the Boolean condition, and one label, to which control is transferred on abort. If the condition is true, this is a no-op. If the condition is false, speculation aborts: the program state rolls back to the state at the corresponding speculate instruction, execution jumps to the specified label.\n\nSpeculation can be nested, in which case aborting or committing a child context returns execution to the parent context. Aborting speculation rolls back normal variable assignments, but it does not affect the memory extension’s heap—any changes there remain. It is an error to commit or abort outside of speculation. It is not an error to perform side effects like print during speculation, but it is probably a bad idea.\n\n\n\nCommitting a speculative update makes it behave like normal:\nv: int = const 4;\nspeculate;\nv: int = const 2;\ncommit;\nprint v;\nSo this example prints 2. However, when a guard fails, it rolls back any modifications that happened since the last speculate instruction:\n  b: bool = const false;\n\n  v: int = const 4;\n  speculate;\n  v: int = const 2;\n  guard b .failed;\n  commit;\n\n.failed:\n  print v;\nThe guard here fails because b is false, then v gets restored to its pre-speculation value, and then control transfers to the .failed label. So this example prints 4. You can think of the code at .failed as the “recovery routine” that handles exceptional conditions.\n\n\n\nThe reference interpreter supports speculative execution. However, it does not support function calls during speculation, so you will get an error if you try to use a call or ret instruction while speculating."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/spec.html#operations",
+    "href": "src/briltxt/docs/lang/spec.html#operations",
+    "title": "Speculative Execution",
+    "section": "",
+    "text": "speculate: Enter a speculative execution context. No arguments.\ncommit: End the current speculative context, committing the current speculative state as the “real” state. No arguments.\nguard: Check a condition and possibly abort the current speculative context. One argument, the Boolean condition, and one label, to which control is transferred on abort. If the condition is true, this is a no-op. If the condition is false, speculation aborts: the program state rolls back to the state at the corresponding speculate instruction, execution jumps to the specified label.\n\nSpeculation can be nested, in which case aborting or committing a child context returns execution to the parent context. Aborting speculation rolls back normal variable assignments, but it does not affect the memory extension’s heap—any changes there remain. It is an error to commit or abort outside of speculation. It is not an error to perform side effects like print during speculation, but it is probably a bad idea."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/spec.html#examples",
+    "href": "src/briltxt/docs/lang/spec.html#examples",
+    "title": "Speculative Execution",
+    "section": "",
+    "text": "Committing a speculative update makes it behave like normal:\nv: int = const 4;\nspeculate;\nv: int = const 2;\ncommit;\nprint v;\nSo this example prints 2. However, when a guard fails, it rolls back any modifications that happened since the last speculate instruction:\n  b: bool = const false;\n\n  v: int = const 4;\n  speculate;\n  v: int = const 2;\n  guard b .failed;\n  commit;\n\n.failed:\n  print v;\nThe guard here fails because b is false, then v gets restored to its pre-speculation value, and then control transfers to the .failed label. So this example prints 4. You can think of the code at .failed as the “recovery routine” that handles exceptional conditions."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/spec.html#interpreter",
+    "href": "src/briltxt/docs/lang/spec.html#interpreter",
+    "title": "Speculative Execution",
+    "section": "",
+    "text": "The reference interpreter supports speculative execution. However, it does not support function calls during speculation, so you will get an error if you try to use a call or ret instruction while speculating."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/wellformed.html",
+    "href": "src/briltxt/docs/lang/wellformed.html",
+    "title": "Well Formedness",
+    "section": "",
+    "text": "Well Formedness\nNot every syntactically complete Bril program is well formed. Here is an incomplete list of rules that well-formed Bril programs must follow:\n\nInstructions may name variables as arguments when they are defined elsewhere in the function. Similarly, they may only refer to labels that exist within the same function, and they can only refer to functions defined somewhere in the same file.\nDynamically speaking, during execution, instructions may refer only to variables that have already been defined earlier in execution. (This is a dynamic property, not a static property.)\nEvery variable may have only a single type within a function. It is illegal to have two assignments to the same variable with different types, even if the function’s logic guarantees that it is impossible to execute both instructions in a single call.\nMany operations have constraints on the types of arguments they can take; well-formed programs always provide the right type of value.\n\nTools do not need to handle ill-formed Bril programs. As someone working with Bril, you never need to check for well-formedness and can do anything when fed with ill-formed code, including silently working just fine, producing ill-formed output, or crashing and burning.\nTo help check for well-formedness, the reference interpreter has many dynamic checks and the type inference tool can check types statically."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/import.html",
+    "href": "src/briltxt/docs/lang/import.html",
+    "title": "Import",
+    "section": "",
+    "text": "Typically, Bril programs are self-contained: they only use functions defined elsewhere in the same program. This import extension lets Bril code use functions defined in other files.\nA Bril import refers to a file and lists the functions to import from it, like this:\n{\n    \"path\": \"my_library.json\",\n    \"functions\": [{\"name\": \"libfunc\"}]\n}\nThis import assumes that there’s a Bril file called my_library.json, and that it declares a function @libfunc. The current Bril file may now invoke @libfunc as if it were defined locally.\n\n\nThe top-level Bril program is extended with an imports field:\n{ \"functions\": [&lt;Function&gt;, ...], \"imports\": [&lt;Import&gt;, ...] }\nEach import object has this syntax:\n{\n    \"path\": \"&lt;string&gt;\",\n    \"functions\": [\n        { \"name\": \"&lt;string&gt;\", \"alias\": \"&lt;string&gt;\"? },\n        ...\n    ]\n}\nThe path is a relative reference to a Bril JSON file containing the functions to import. In the objects in the functions list, the name is the original name of the function, and the optional alias is the local name that the program will use to refer to the function. A missing alias makes the local name equal to the original name.\nIt is an error to refer to functions that do not exist, or to create naming conflicts between imports and local functions (or between different imports). Import cycles are allowed.\n\n\n\nIn Bril’s text format, the import syntax looks like this:\nfrom \"something.json\" import @libfunc, @otherfunc as @myfunc;\n\n\n\nWe do not define the exact mechanism for using the path string to find the file to import. Reasonable options include:\n\nResolve the path relative to the file the import appears in.\nUse a pre-defined set of library search paths.\n\nWe only specify what it means to import JSON files; implementations can choose to allow importing other kinds of files too (e.g., text-format source code)."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/import.html#syntax",
+    "href": "src/briltxt/docs/lang/import.html#syntax",
+    "title": "Import",
+    "section": "",
+    "text": "The top-level Bril program is extended with an imports field:\n{ \"functions\": [&lt;Function&gt;, ...], \"imports\": [&lt;Import&gt;, ...] }\nEach import object has this syntax:\n{\n    \"path\": \"&lt;string&gt;\",\n    \"functions\": [\n        { \"name\": \"&lt;string&gt;\", \"alias\": \"&lt;string&gt;\"? },\n        ...\n    ]\n}\nThe path is a relative reference to a Bril JSON file containing the functions to import. In the objects in the functions list, the name is the original name of the function, and the optional alias is the local name that the program will use to refer to the function. A missing alias makes the local name equal to the original name.\nIt is an error to refer to functions that do not exist, or to create naming conflicts between imports and local functions (or between different imports). Import cycles are allowed."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/import.html#text-format",
+    "href": "src/briltxt/docs/lang/import.html#text-format",
+    "title": "Import",
+    "section": "",
+    "text": "In Bril’s text format, the import syntax looks like this:\nfrom \"something.json\" import @libfunc, @otherfunc as @myfunc;"
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/import.html#search-paths",
+    "href": "src/briltxt/docs/lang/import.html#search-paths",
+    "title": "Import",
+    "section": "",
+    "text": "We do not define the exact mechanism for using the path string to find the file to import. Reasonable options include:\n\nResolve the path relative to the file the import appears in.\nUse a pre-defined set of library search paths.\n\nWe only specify what it means to import JSON files; implementations can choose to allow importing other kinds of files too (e.g., text-format source code)."
+  },
+  {
+    "objectID": "src/briltxt/docs/SUMMARY.html",
+    "href": "src/briltxt/docs/SUMMARY.html",
+    "title": "Summary",
+    "section": "",
+    "text": "Summary\nIntroduction\n\nLanguage Reference\n\nSyntax\nWell Formedness\nCore\nStatic Single Assignment\nMemory\nFloating Point\nSpeculative Execution\nImport\nCharacter\n\nTools\n\nInterpreter\nText Representation\nTypeScript Compiler\nFast Interpreter\nEditor Plugin\nType Inference\nType Checker\nBenchmarks\nTypeScript Library\nOCaml Library\nRust Library\nBenchmark Runner\nCompiler\nWeb Playground"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/text.html",
+    "href": "src/briltxt/docs/tools/text.html",
+    "title": "Bril Text Format",
+    "section": "",
+    "text": "While Bril’s canonical representation is a JSON AST, humans don’t like to read and write JSON. To accommodate our human foibles, we also have a simple textual representation. There is a parser and pretty printer tool that can convert the text representation to and from JSON.\nFor example, this Bril program in JSON:\n{\n  \"functions\": [{\n    \"name\": \"main\",\n    \"instrs\": [\n      { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n      { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n      { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\", \"args\": [\"v0\", \"v1\"] },\n      { \"op\": \"print\", \"args\": [\"v2\"] },\n      { \"op\": \"alloc\", \"type\": { \"ptr\" : \"int\" }, \"dest\": \"v3\", \"args\": [\"v0\"] },\n      { \"op\": \"free\", \"args\": [\"v3\"] },\n    ]\n  }]\n}\nGets represented in text like this:\n@main {\n  v0: int = const 1;\n  v1: int = const 2;\n  v2: int = add v0 v1;\n  print v2;\n  v3: ptr&lt;int&gt; = alloc v0;\n  free v3;\n}\n\n\nThe bril-txt parser & pretty printer are written in Python. You can install them with Flit by doing something like:\n$ pip install --user flit\n$ cd bril-txt\n$ flit install --symlink --user\nYou’ll now have tools called bril2json and bril2txt. Both read from standard input and write to standard output. You can try a “round trip” like this, for example:\n$ bril2json &lt; test/parse/add.bril | bril2txt\nThe bril2json parser also supports a -p flag to include source positions."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/text.html#tools",
+    "href": "src/briltxt/docs/tools/text.html#tools",
+    "title": "Bril Text Format",
+    "section": "",
+    "text": "The bril-txt parser & pretty printer are written in Python. You can install them with Flit by doing something like:\n$ pip install --user flit\n$ cd bril-txt\n$ flit install --symlink --user\nYou’ll now have tools called bril2json and bril2txt. Both read from standard input and write to standard output. You can try a “round trip” like this, for example:\n$ bril2json &lt; test/parse/add.bril | bril2txt\nThe bril2json parser also supports a -p flag to include source positions."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilift.html",
+    "href": "src/briltxt/docs/tools/brilift.html",
+    "title": "Cranelift Compiler",
+    "section": "",
+    "text": "Brilift is a ahead-of-time or just-in-time compiler from Bril to native code using the Cranelift code generator. It supports core Bril, floating point, and the memory extension.\nIn AOT mode, Brilift emits .o files and also provides a simple run-time library. By linking these together, you get a complete native executable. In JIT mode, Brilift mimics an interpreter.\n\n\nBrilift is a Rust project using the bril-rs library. You can build it using Cargo:\n$ cd brilift\n$ cargo run -- --help\n$ cargo install --path .  # If you want the executable on your $PATH.\n\n\n\nProvide the brilift executable with a Bril JSON program:\n$ bril2json &lt; something.bril | brilift\nBy default, Brilift produces a file bril.o. (You can pick your own output filename with -o something.o; see the full list of options below.)\nA complete executable will also need our runtime library, which is in rt.c. There is a convenient Makefile rule to produce rt.o:\n$ make rt.o\nThen, you will want to link rt.o and bril.o to produce an executable:\n$ cc bril.o rt.o -o myprog\nIf your Bril @main function takes arguments, those are now command-line arguments to the myprog executable.\n\n\n\nUse the -j flag to compile and run the program immediately:\n$ bril2json &lt; something.bril | brilift -j\nPass any arguments to the Bril @main function as command-line arguments to Brilift. For example, if you have a function @main(foo: int, bar: bool), you can type brilift -j 42 true.\n\n\n\nType brilift --help to see the full list of options:\n\n-j: JIT-compile the code and run it immediately, instead of AOT-compiling an object file (the default).\n-O [none|speed|speed_and_size]: An optimization level, according to Cranelift. The default is none.\n-v: Enable lots of logging from the Cranelift library.\n-d: Dump the Cranelift IR text for debugging.\n\nThese options are only relevant in AOT mode:\n\n-o &lt;FILE&gt;: Place the output object file in &lt;FILE&gt; instead of bril.o (the default).\n-t &lt;TARGET&gt;: Specify the target triple, as interpreted by Cranelift. These triples resemble the target triples that LLVM also understands, for example. For instance, x86_64-unknown-darwin-macho is the triple for macOS on Intel processors."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilift.html#build",
+    "href": "src/briltxt/docs/tools/brilift.html#build",
+    "title": "Cranelift Compiler",
+    "section": "",
+    "text": "Brilift is a Rust project using the bril-rs library. You can build it using Cargo:\n$ cd brilift\n$ cargo run -- --help\n$ cargo install --path .  # If you want the executable on your $PATH."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilift.html#ahead-of-time-compilation",
+    "href": "src/briltxt/docs/tools/brilift.html#ahead-of-time-compilation",
+    "title": "Cranelift Compiler",
+    "section": "",
+    "text": "Provide the brilift executable with a Bril JSON program:\n$ bril2json &lt; something.bril | brilift\nBy default, Brilift produces a file bril.o. (You can pick your own output filename with -o something.o; see the full list of options below.)\nA complete executable will also need our runtime library, which is in rt.c. There is a convenient Makefile rule to produce rt.o:\n$ make rt.o\nThen, you will want to link rt.o and bril.o to produce an executable:\n$ cc bril.o rt.o -o myprog\nIf your Bril @main function takes arguments, those are now command-line arguments to the myprog executable."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilift.html#just-in-time-compilation",
+    "href": "src/briltxt/docs/tools/brilift.html#just-in-time-compilation",
+    "title": "Cranelift Compiler",
+    "section": "",
+    "text": "Use the -j flag to compile and run the program immediately:\n$ bril2json &lt; something.bril | brilift -j\nPass any arguments to the Bril @main function as command-line arguments to Brilift. For example, if you have a function @main(foo: int, bar: bool), you can type brilift -j 42 true."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilift.html#options",
+    "href": "src/briltxt/docs/tools/brilift.html#options",
+    "title": "Cranelift Compiler",
+    "section": "",
+    "text": "Type brilift --help to see the full list of options:\n\n-j: JIT-compile the code and run it immediately, instead of AOT-compiling an object file (the default).\n-O [none|speed|speed_and_size]: An optimization level, according to Cranelift. The default is none.\n-v: Enable lots of logging from the Cranelift library.\n-d: Dump the Cranelift IR text for debugging.\n\nThese options are only relevant in AOT mode:\n\n-o &lt;FILE&gt;: Place the output object file in &lt;FILE&gt; instead of bril.o (the default).\n-t &lt;TARGET&gt;: Specify the target triple, as interpreted by Cranelift. These triples resemble the target triples that LLVM also understands, for example. For instance, x86_64-unknown-darwin-macho is the triple for macOS on Intel processors."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/interp.html",
+    "href": "src/briltxt/docs/tools/interp.html",
+    "title": "Interpreter",
+    "section": "",
+    "text": "brili is the reference interpreter for Bril. It is written in TypeScript. You can find brili in the bril-ts directory in the Bril repository.\nThe interpreter supports core Bril along with the memory, floating point, SSA, and speculation extensions.\n\n\nTo use the interpreter, you will need Deno. Just run:\n$ deno install brili.ts\nAs Deno tells you, you will then need to add $HOME/.deno/bin to your $PATH.\nRun\n\nThe brili program takes a Bril program as a JSON file on standard input:\n$ brili &lt; my_program.json\nIt emits any print outputs to standard output. To provide inputs to the main function, you can write them as command-line arguments:\n$ brili 37 5 &lt; add.json\n42\n\n\n\nThe interpreter has a rudimentary profiling mode. Add a -p flag to print out a total number of dynamic instructions executed to stderr:\n$ brili -p 37 5 &lt; add.json\n42\ntotal_dyn_inst: 9"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/interp.html#install",
+    "href": "src/briltxt/docs/tools/interp.html#install",
+    "title": "Interpreter",
+    "section": "",
+    "text": "To use the interpreter, you will need Deno. Just run:\n$ deno install brili.ts\nAs Deno tells you, you will then need to add $HOME/.deno/bin to your $PATH.\nRun\n\nThe brili program takes a Bril program as a JSON file on standard input:\n$ brili &lt; my_program.json\nIt emits any print outputs to standard output. To provide inputs to the main function, you can write them as command-line arguments:\n$ brili 37 5 &lt; add.json\n42"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/interp.html#profiling",
+    "href": "src/briltxt/docs/tools/interp.html#profiling",
+    "title": "Interpreter",
+    "section": "",
+    "text": "The interpreter has a rudimentary profiling mode. Add a -p flag to print out a total number of dynamic instructions executed to stderr:\n$ brili -p 37 5 &lt; add.json\n42\ntotal_dyn_inst: 9"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/rust.html",
+    "href": "src/briltxt/docs/tools/rust.html",
+    "title": "Rust Library",
+    "section": "",
+    "text": "This is a no-frills interface between Bril’s JSON and your Rust code. It supports the Bril core along with the SSA, memory, floating point, speculative execution, char, and source positions extensions.\nUse\n\nInclude this by adding the following to your Cargo.toml:\n[dependencies.bril-rs]\nversion = \"0.1.0\"\npath = \"../bril-rs\"\nfeatures = [\"ssa\", \"memory\", \"float\", \"speculate\", \"position\"]\nEach of the extensions to Bril core is feature gated. To ignore an extension, remove its corresponding string from the features list.\nThere are two helper functions: load_program will read a valid Bril program from stdin, and output_program will write your Bril program to stdout. Otherwise, this library can be treated like any other serde JSON representation.\n\n\nThis library supports fully compatible Rust implementations of bril2txt and bril2json. This library also implements the import extension with a static linker called brild.\nThis library is used in a Rust compiler called rs2bril which supports generating core, float, and memory Bril from a subset of valid Rust.\nThis library is used in a Bril-to-LLVM IR compiler called brillvm which supports core, float, memory, and ssa.\nFor ease of use, these tools can be installed and added to your path by running the following in bril-rs/:\n$ make install\nMake sure that ~/.cargo/bin is on your path. Each of these tools supports the --help flag which specifies some helpful flags.\n\n\n\nTo maintain consistency and cleanliness, run:\ncargo fmt\ncargo clippy\ncargo doc\nmake test\nmake features"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/rust.html#tools",
+    "href": "src/briltxt/docs/tools/rust.html#tools",
+    "title": "Rust Library",
+    "section": "",
+    "text": "This library supports fully compatible Rust implementations of bril2txt and bril2json. This library also implements the import extension with a static linker called brild.\nThis library is used in a Rust compiler called rs2bril which supports generating core, float, and memory Bril from a subset of valid Rust.\nThis library is used in a Bril-to-LLVM IR compiler called brillvm which supports core, float, memory, and ssa.\nFor ease of use, these tools can be installed and added to your path by running the following in bril-rs/:\n$ make install\nMake sure that ~/.cargo/bin is on your path. Each of these tools supports the --help flag which specifies some helpful flags."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/rust.html#development",
+    "href": "src/briltxt/docs/tools/rust.html#development",
+    "title": "Rust Library",
+    "section": "",
+    "text": "To maintain consistency and cleanliness, run:\ncargo fmt\ncargo clippy\ncargo doc\nmake test\nmake features"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/bench.html",
+    "href": "src/briltxt/docs/tools/bench.html",
+    "title": "Benchmarks",
+    "section": "",
+    "text": "Benchmarks\nThe bench directory in the Bril repository contains a fledgling suite of microbenchmarks that you can use to measure the impact of your optimizations. (Benchmarks are different from tests because they are meant to actually calculate something instead of just exercising a language feature.)\nThe current benchmarks are:\n\nackermann: Print the value of Ack(m, n), the two-argument Ackermann–Péter function.\nadj2csr: Convert a graph in adjacency matrix format (dense representation) to Compressed Sparse Row (CSR) format (sparse representation). The random graph is generated using the same linear congruential generator.\nadler32: Computes the Adler-32 Checksum of an integer array.\narmstrong: Determines if the input is an Armstrong number, a number that is the sum of its own digits each raised to the power of the number of digits.\nbinary-fmt: Print the binary format for the given positive integer.\nbinary-search: Search a target integer within an integer array, outputs the index of target.\nbirthday: Simulation of the birthday paradox with an input of n people in a given room.\nbitwise-ops: Computes the OR, AND, or XOR between two 64-bit integers. (Three modes: 0 = AND, 1 = OR, 2 = XOR)\nbitshift: Computes the LEFTSHIFT and RIGHTSHIFT for any integer, also implements an efficient pow function for integers\nbubblesort: Sorting algorithm that works by repeatedly swapping the adjacent elements if they are in wrong order.\ncatalan: Print the nth term in the Catalan sequence, compute using recursive function calls.\ncheck-primes: Check the first n natural numbers for primality, printing out a 1 if the number is prime and a 0 if it’s not.\ncholesky: Perform Cholesky decomposition of a Hermitian and positive definite matrix. The result is validated by comparing with Python’s scipy.linalg.cholesky.\ncollatz: Print the Collatz sequence starting at n. Note: it is not known whether this will terminate for all n.\nconjugate-gradient: Uses conjugate gradients to solve Ax=b for any arbitrary positive semidefinite A.\ncordic: Print an approximation of sine(radians) using 8 iterations of the CORDIC algorithm.\ncsrmv: Multiply a sparse matrix in the Compressed Sparse Row (CSR) format with a dense vector. The matrix and input vector are generated using a Linear Feedback Shift Register random number generator.\ndigial-root: Computes the digital root of the input number.\ndead-branch: Repeatedly call a br instruction whose condition always evaluates to false. The dead branch should be pruned by a smart compiler.\ndot-product: Computes the dot product of two vectors.\neight-queens: Counts the number of solutions for n queens problem, a generalization of Eight queens puzzle.\neuclid: Calculates the greatest common divisor between two large numbers using the Euclidean Algorithm with a helper function for the modulo operator.\neuler: Approximates Euler’s number using the Taylor series.\nfact: Prints the factorial of n, computing it recursively.\nfactors: Print the factors of the n using the trial division method.\nfib: Calculate the nth Fibonacci number by allocating and filling an array of numbers up to that point.\nfizz-buzz: The infamous programming test.\nfunction_call: For benchmarking the overhead of simple function calls.\ngcd: Calculate Greatest Common Divisor (GCD) of two input positive integer using Euclidean algorithm.\nhanoi: Print the solution to the n-disk Tower of Hanoi puzzle.\nis-decreasing: Print if a number contains strictly decreasing digits.\nlcm: Compute LCM for two numbers using a very inefficient loop.\nloopfact: Compute n! imperatively using a loop.\nmajor-elm: Find the majority element in an array using a linear time voting algorithm.\nmandelbrot: Generates a really low resolution, ascii, mandelbrot set.\nmat-inv : Calculates the inverse of a 3x3 matrix and prints it out.\nmat-mul: Multiplies two nxn matrices using the naive matrix multiplication algorithm. The matrices are randomly generated using a linear congruential generator.\nmax-subarray: solution to the classic Maximum Subarray problem.\nmod_inv: Calculates the modular inverse of n under to a prime modulus p.\nnewton: Calculate the square root of 99,999 using the newton method\nnorm: Calculate the euclidean norm of a vector\nn_root: Calculate nth root of a float using newton’s method.\norders: Compute the order ord(u) for each u in a cyclic group &lt;Zn,+&gt; of integers modulo n under the group operation + (modulo n). Set the second argument is_lcm to true if you would like to compute the orders using the lowest common multiple and otherwise the program will use the greatest common divisor.\npascals-row: Computes a row in Pascal’s Triangle.\npalindrome: Outputs a 0-1 value indicating whether the input is a palindrome number.\nperfect: Check if input argument is a perfect number. Returns output as Unix style return code.\npow: Computes the n^th power of a given (float) number.\nprimes-between: Print the primes in the interval [a, b].\nprimitive-root: Computes a primitive root modulo a prime number input.\npythagorean_triple: Prints all Pythagorean triples with the given c, if such triples exist. An intentionally very naive implementation.\nquadratic: The quadratic formula, including a hand-rolled implementation of square root.\nquickselect: Find the kth smallest element in an array using the quickselect algorithm.\nquicksort: Quicksort using the Lomuto partition scheme.\nquicksort-hoare: Quicksort using Hoare partioning and median of three pivot selection.\nrecfact: Compute n! using recursive function calls.\nrectangles-area-difference: Output the difference between the areas of rectangles (as a positive value) given their respective side lengths.\nfitsinside: Output whether or not a rectangle fits inside of another rectangle given the width and height lengths.\nrelative-primes: Print all numbers relatively prime to n using Euclidean algorithm.\nriemann: Prints the left, midpoint, and right Riemann Sums for a specified function, which is the square function in this benchmark.\nsieve: Print all prime numbers up to n using the Sieve of Eratosthenes.\nsqrt: Implements the Newton–Raphson Method of approximating the square root of a number to arbitrary precision\nsum-bit: Print the number of 1-bits in the binary representation of the input integer.\nsum-check: Compute the sum of [1, n] by both loop and formula, and check if the result is the same.\nsum-divisors: Prints the positive integer divisors of the input integer, followed by the sum of the divisors.\nsum-sq-diff: Output the difference between the sum of the squares of the first n natural numbers and the square of their sum.\ntotient: Computes Euler’s totient function on an input integer n.\ntwo-sum: Print the indices of two distinct elements in the list [2, 7, 11, 13] whose sum equals the input.\nup-arrow: Computes Knuth’s up arrow notation, with the first argument being the number, the second argument being the number of Knuth’s up arrows, and the third argument being the number of repeats.\nvsmul: Multiplies a constant scalar to each element of a large array. Tests the performance of vectorization optimizations.\nreverse: Compute number with reversed digits (e.g. 123 -&gt; 321).\n\nCredit for several of these benchmarks goes to Alexa VanHattum and Gregory Yauney, who implemented them for their global value numbering project."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilirs.html",
+    "href": "src/briltxt/docs/tools/brilirs.html",
+    "title": "Fast Interpreter in Rust",
+    "section": "",
+    "text": "The brilirs directory contains a fast Bril interpreter written in Rust. It is a drop-in replacement for the reference interpreter that prioritizes speed over completeness and hackability. It implements core Bril along with the SSA, memory, char, and floating point extensions.\nRead more about the implementation, which is originally by Wil Thomason and Daniel Glus.\n\n\nTo use brilirs you will need to install Rust. Use echo $PATH to check that $HOME/.cargo/bin is on your path.\nIn the brilirs directory, install the interpreter with:\n$ cargo install --path .\nDuring installation, brilirs will attempt to create a tab completions file for current shell. If this of interest, follow the instructions provided as a warning to finish enabling this.\nRun a program by piping a JSON Bril program into it:\n$ bril2json &lt; myprogram.bril | brilirs\nor\n$ brilirs --text --file myprogram.bril\nSimilar to brilck, brilirs can be used to typecheck and validate your Bril JSON program by passing the --check flag (similar to cargo --check).\nTo see all of the supported flags, run:\n$ brilirs --help"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilirs.html#install",
+    "href": "src/briltxt/docs/tools/brilirs.html#install",
+    "title": "Fast Interpreter in Rust",
+    "section": "",
+    "text": "To use brilirs you will need to install Rust. Use echo $PATH to check that $HOME/.cargo/bin is on your path.\nIn the brilirs directory, install the interpreter with:\n$ cargo install --path .\nDuring installation, brilirs will attempt to create a tab completions file for current shell. If this of interest, follow the instructions provided as a warning to finish enabling this.\nRun a program by piping a JSON Bril program into it:\n$ bril2json &lt; myprogram.bril | brilirs\nor\n$ brilirs --text --file myprogram.bril\nSimilar to brilck, brilirs can be used to typecheck and validate your Bril JSON program by passing the --check flag (similar to cargo --check).\nTo see all of the supported flags, run:\n$ brilirs --help"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/ts.html",
+    "href": "src/briltxt/docs/tools/ts.html",
+    "title": "TypeScript Library",
+    "section": "",
+    "text": "TypeScript Library\nbril-ts is a TypeScript library for interacting with Bril programs. It is the basis for the reference interpreter and the included type checker, but it is also useful on its own.\nThe library includes:\n\nbril.ts: Type definitions for the Bril language. Parsing a JSON file produces a value of type Program from this module.\nbuilder.ts: A builder class that makes it more convenient to generate Bril programs from front-end compilers.\ntypes.ts: A description of the type signatures for Bril operations, including the core language and all currently known extensions."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "/home/norm/compiler_course_2024fa",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/plugin.html",
+    "href": "src/briltxt/docs/tools/plugin.html",
+    "title": "Syntax Plugin for Text Editors",
+    "section": "",
+    "text": "Syntax Plugin for Text Editors\nThere is a Vim syntax highlighting plugin for Bril’s text format available in bril-vim. You can use it with a Vim plugin manager. For example, if you use vim-plug, you can add this to your .vimrc:\nPlug 'sampsyo/bril', { 'for': 'bril', 'rtp': 'bril-vim' }\nYou can read more about the plugin, which is originally by Edwin Peguero."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/swift.html",
+    "href": "src/briltxt/docs/tools/swift.html",
+    "title": "Swift Library",
+    "section": "",
+    "text": "Swift Library\nThe Swift bril library, which lives in the bril-swift directory, provides a Swift interface for Bril’s JSON files. It supports the Bril core and the SSA extension.\nUse\n\nTo use this package in a SwiftPM project, add a dependency to your Package.swift:\nlet package = Package(\n  name: \"MyPackage\",\n  dependencies: [\n    .package(name: \"Bril\", path: \"../bril-swift\"),\n  ]\n)\nand add \"Bril\" to the dependencies array for any target that needs it:\ntargets: [\n    .target(\n        name: \"MyTarget\",\n        dependencies: [\"Bril\"]),\n// ...\nThe Bril objects conform to Decodable. Instantiate a program from data as follows:\nimport Bril\n\n/// to read from stdin:\n/// let data = FileHandle.standardInput.availableData\n\n/// or from a string:\n/// let data = \"&lt;Bril JSON&gt;\".data(using: .utf8)!\n\nlet program = try JSONDecoder().decode(Program.self, from: data)\nThe models conform to CustomStringConvertible so printing the Bril representation is simply:\nprint(program)"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/ts2bril.html",
+    "href": "src/briltxt/docs/tools/ts2bril.html",
+    "title": "TypeScript-to-Bril Compiler",
+    "section": "",
+    "text": "Bril comes with a compiler from a very small subset of TypeScript to Bril called ts2bril.\nIt is not supposed to make it easy to port existing JavaScript code to Bril; it is a convenient way to write larger, more interesting programs without manually fiddling with Bril directly. It also emits somewhat obviously inefficient code to keep the compiler simple; some obvious optimizations can go a long way.\n\n\nThe TypeScript compiler uses Deno. Type this:\n$ deno install --allow-env --allow-read ts2bril.ts\nIf you haven’t already, you will then need to add $HOME/.deno/bin to [your $PATH][path].\nUse\n\nCompile a TypeScript program to Bril by giving a filename on the command line:\n$ ts2bril mycode.ts\nThe compiler supports both integers (from core Bril) and floating point numbers. Perhaps somewhat surprisingly, plain JavaScript numbers and the TypeScript number type map to float in Bril. For integers, use JavaScript big integers whenever you need an integer, like this:\nvar x: bigint = 5n;\nprintInt(x);\n\nfunction printInt(x: bigint) {\n    console.log(x);\n}\nThe n suffix on literals distinguishes integer literals, and the bigint type in TypeScript reflects them."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/ts2bril.html#install",
+    "href": "src/briltxt/docs/tools/ts2bril.html#install",
+    "title": "TypeScript-to-Bril Compiler",
+    "section": "",
+    "text": "The TypeScript compiler uses Deno. Type this:\n$ deno install --allow-env --allow-read ts2bril.ts\nIf you haven’t already, you will then need to add $HOME/.deno/bin to [your $PATH][path].\nUse\n\nCompile a TypeScript program to Bril by giving a filename on the command line:\n$ ts2bril mycode.ts\nThe compiler supports both integers (from core Bril) and floating point numbers. Perhaps somewhat surprisingly, plain JavaScript numbers and the TypeScript number type map to float in Bril. For integers, use JavaScript big integers whenever you need an integer, like this:\nvar x: bigint = 5n;\nprintInt(x);\n\nfunction printInt(x: bigint) {\n    console.log(x);\n}\nThe n suffix on literals distinguishes integer literals, and the bigint type in TypeScript reflects them."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/ocaml.html",
+    "href": "src/briltxt/docs/tools/ocaml.html",
+    "title": "OCaml Library",
+    "section": "",
+    "text": "The OCaml bril library, which lives in the bril-ocaml directory, provides an OCaml interface and parser for Bril’s JSON files.\n\n\nTo build the library, you first need to install OCaml. Then, install the dependencies with opam install core yojson.\nTo install the bril-ocaml library:\ngit clone https://github.com/sampsyo/bril path/to/my/bril\nopam pin add -k path bril path/to/brill/bril-ocaml\nopam install bril\nThat’s it! You can include it in your Dune files as bril, like any other OCaml library.\nUse\n\nThe interface for the library can be found in bril.mli—good starting points are from_string, from_file, and to_string. A small code example for the library lives in the count subdirectory.\nIf you wish to make changes to the bril OCaml library, simply hack on the git clone.\nWhen you are done, simply reinstall the package with opam reinstall bril. Restart the build of your local project to pick up changes made to bril-ocaml.\n\n\n\nocamlformat is recommended for style consistency. The dune documentation on Automatic Formatting has information about using ocamlformat with dune."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/ocaml.html#install",
+    "href": "src/briltxt/docs/tools/ocaml.html#install",
+    "title": "OCaml Library",
+    "section": "",
+    "text": "To build the library, you first need to install OCaml. Then, install the dependencies with opam install core yojson.\nTo install the bril-ocaml library:\ngit clone https://github.com/sampsyo/bril path/to/my/bril\nopam pin add -k path bril path/to/brill/bril-ocaml\nopam install bril\nThat’s it! You can include it in your Dune files as bril, like any other OCaml library.\nUse\n\nThe interface for the library can be found in bril.mli—good starting points are from_string, from_file, and to_string. A small code example for the library lives in the count subdirectory.\nIf you wish to make changes to the bril OCaml library, simply hack on the git clone.\nWhen you are done, simply reinstall the package with opam reinstall bril. Restart the build of your local project to pick up changes made to bril-ocaml."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/ocaml.html#for-development",
+    "href": "src/briltxt/docs/tools/ocaml.html#for-development",
+    "title": "OCaml Library",
+    "section": "",
+    "text": "ocamlformat is recommended for style consistency. The dune documentation on Automatic Formatting has information about using ocamlformat with dune."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brench.html",
+    "href": "src/briltxt/docs/tools/brench.html",
+    "title": "Brench",
+    "section": "",
+    "text": "Brench is a simple benchmark runner to help you measure the impact of optimizations. It can run the same set of benchmarks under multiple treatments, check that they still produce the correct answer, and report their performance under every condition.\n\n\nBrench is a Python tool. There is a brench/ subdirectory in the Bril repository. Get Flit and then type:\n$ flit install --symlink --user\n\n\n\nWrite a configuration file using TOML. Start with something like this:\nextract = 'total_dyn_inst: (\\d+)'\nbenchmarks = '../benchmarks/*.bril'\n\n[runs.baseline]\npipeline = [\n    \"bril2json\",\n    \"brili -p {args}\",\n]\n\n[runs.myopt]\npipeline = [\n    \"bril2json\",\n    \"myopt\",\n    \"brili -p {args}\",\n]\nThe global options are:\n\nextract: A regular expression to extract the figure of merit from a given run of a given benchmark. The example above gets the simple profiling output from the Bril interpreter in -p mode.\nbenchmarks (optional): A shell glob matching the benchmark files to run. You can also specify the files on the command line (see below).\ntimeout (optional): The timeout of each benchmark run in seconds. Default of 5 seconds.\n\nThen, define an map of runs, which are the different treatments you want to give to each benchmark. Each one needs a pipeline, which is a list of shell commands to run in a pipelined fashion on the benchmark file, which Brench will send to the first command’s standard input. The first run constitutes the “golden” output; subsequent runs will need to match this output.\nRun\n\nJust give Brench your config file and it will give you results as a CSV:\n$ brench example.toml &gt; results.csv\nYou can also specify a list of files after the configuration file to run a specified list of benchmarks, ignoring the pre-configured glob in the configuration file.\nThe command has only one command-line option:\n\n--jobs or -j: The number of parallel jobs to run. Set to 1 to run everything sequentially. By default, Brench tries to guess an adequate number of threads to fill up your machine.\n\nThe output CSV has three columns: benchmark, run, and result. The latter is the value extracted from the run’s standard output and standard error using the extract regular expression or one of these three status indicators:\n\nincorrect: The output did not match the “golden” output (from the first run).\ntimeout: Execution took too long.\nmissing: The extract regex did not match in the final pipeline stage’s standard output or standard error.\n\nTo check that a run’s output is “correct,” Brench compares its standard output to that of the first run (baseline in the above example, but it’s whichever run configuration comes first). The comparison is an exact string match."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brench.html#set-up",
+    "href": "src/briltxt/docs/tools/brench.html#set-up",
+    "title": "Brench",
+    "section": "",
+    "text": "Brench is a Python tool. There is a brench/ subdirectory in the Bril repository. Get Flit and then type:\n$ flit install --symlink --user"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brench.html#configure",
+    "href": "src/briltxt/docs/tools/brench.html#configure",
+    "title": "Brench",
+    "section": "",
+    "text": "Write a configuration file using TOML. Start with something like this:\nextract = 'total_dyn_inst: (\\d+)'\nbenchmarks = '../benchmarks/*.bril'\n\n[runs.baseline]\npipeline = [\n    \"bril2json\",\n    \"brili -p {args}\",\n]\n\n[runs.myopt]\npipeline = [\n    \"bril2json\",\n    \"myopt\",\n    \"brili -p {args}\",\n]\nThe global options are:\n\nextract: A regular expression to extract the figure of merit from a given run of a given benchmark. The example above gets the simple profiling output from the Bril interpreter in -p mode.\nbenchmarks (optional): A shell glob matching the benchmark files to run. You can also specify the files on the command line (see below).\ntimeout (optional): The timeout of each benchmark run in seconds. Default of 5 seconds.\n\nThen, define an map of runs, which are the different treatments you want to give to each benchmark. Each one needs a pipeline, which is a list of shell commands to run in a pipelined fashion on the benchmark file, which Brench will send to the first command’s standard input. The first run constitutes the “golden” output; subsequent runs will need to match this output.\nRun\n\nJust give Brench your config file and it will give you results as a CSV:\n$ brench example.toml &gt; results.csv\nYou can also specify a list of files after the configuration file to run a specified list of benchmarks, ignoring the pre-configured glob in the configuration file.\nThe command has only one command-line option:\n\n--jobs or -j: The number of parallel jobs to run. Set to 1 to run everything sequentially. By default, Brench tries to guess an adequate number of threads to fill up your machine.\n\nThe output CSV has three columns: benchmark, run, and result. The latter is the value extracted from the run’s standard output and standard error using the extract regular expression or one of these three status indicators:\n\nincorrect: The output did not match the “golden” output (from the first run).\ntimeout: Execution took too long.\nmissing: The extract regex did not match in the final pipeline stage’s standard output or standard error.\n\nTo check that a run’s output is “correct,” Brench compares its standard output to that of the first run (baseline in the above example, but it’s whichever run configuration comes first). The comparison is an exact string match."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilck.html",
+    "href": "src/briltxt/docs/tools/brilck.html",
+    "title": "Type Checker",
+    "section": "",
+    "text": "Bril comes with a simple type checker to catch errors statically. It checks the types of instructions in the core language and the floating point, SSA, memory, and speculation extensions. It also checks calls and return values and the labels used in control flow.\n\n\nThe brilck tool uses Deno. Type this:\n$ deno install brilck.ts\nIf you haven’t already, you will then need to add $HOME/.deno/bin to [your $PATH][path].\n\n\n\nJust pipe a Bril program into brilck:\nbril2json &lt; benchmarks/fizz-buzz.bril | brilck\nIt will print any problems it finds to standard error. (If it doesn’t find any problems, it doesn’t print anything at all.)\nYou can optionally provide a filename as a (sole) command-line argument. This filename will appear in any error messages for easier parsing when many files are involved.\nConsider supplying the -p flag to the bril2json parser to get source positions in the error messages."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilck.html#install",
+    "href": "src/briltxt/docs/tools/brilck.html#install",
+    "title": "Type Checker",
+    "section": "",
+    "text": "The brilck tool uses Deno. Type this:\n$ deno install brilck.ts\nIf you haven’t already, you will then need to add $HOME/.deno/bin to [your $PATH][path]."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/brilck.html#check",
+    "href": "src/briltxt/docs/tools/brilck.html#check",
+    "title": "Type Checker",
+    "section": "",
+    "text": "Just pipe a Bril program into brilck:\nbril2json &lt; benchmarks/fizz-buzz.bril | brilck\nIt will print any problems it finds to standard error. (If it doesn’t find any problems, it doesn’t print anything at all.)\nYou can optionally provide a filename as a (sole) command-line argument. This filename will appear in any error messages for easier parsing when many files are involved.\nConsider supplying the -p flag to the bril2json parser to get source positions in the error messages."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/infer.html",
+    "href": "src/briltxt/docs/tools/infer.html",
+    "title": "Type Inference",
+    "section": "",
+    "text": "Type Inference\nBril requires exhaustive type annotations on every instruction, which can quickly get tedious. The type-infer directory contains a simple global type inference tool that fills in missing type annotations. For example, it can turn this easier-to-write program:\n@main(arg: int) {\n  five = const 5;\n  ten = const 10;\n  res = add arg five;\n  cond = le res ten;\n  br cond .then .else;\n.then:\n  print res;\n.else:\n}\nInto this actually executable program:\n@main(arg: int) {\n  five: int = const 5;\n  ten: int = const 10;\n  res: int = add arg five;\n  cond: bool = le res ten;\n  br cond .then .else;\n.then:\n  print res;\n.else:\n}\nThe tool is a simple Python program, infer.py, that takes JSON programs that are missing types and adds types to them. It is also useful even on fully-typed programs as a type checker to rule out common run-time errors. The included text format tools support missing types for both parsing and printing, so here’s a shell pipeline that adds types to your text-format Bril program:\ncat myprog.bril | bril2json | python type-infer/infer.py | bril2txt\nYou can read more about the inference tool, which is originally by Christopher Roman."
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/web-playground.html",
+    "href": "src/briltxt/docs/tools/web-playground.html",
+    "title": "Web Playground",
+    "section": "",
+    "text": "Web playground is available for Bril.\nFeatures: - Code evaluation using the reference interpreter - CFG visualization - Dominator visualization - SSA transformation\n\n\nhttps://github.com/agentcooper/bril-playground"
+  },
+  {
+    "objectID": "src/briltxt/docs/tools/web-playground.html#source-code",
+    "href": "src/briltxt/docs/tools/web-playground.html#source-code",
+    "title": "Web Playground",
+    "section": "",
+    "text": "https://github.com/agentcooper/bril-playground"
+  },
+  {
+    "objectID": "src/briltxt/docs/intro.html",
+    "href": "src/briltxt/docs/intro.html",
+    "title": "Bril: A Compiler Intermediate Representation for Learning",
+    "section": "",
+    "text": "Bril: A Compiler Intermediate Representation for Learning\nBril, the Big Red Intermediate Language, is a programming language for learning about compilers. It’s the intermediate representation we use in CS 6120, a PhD-level compilers course. Bril’s design tenets include:\n\nBril is an instruction-oriented language, like most good IRs.\nThe core is minimal and ruthlessly regular. Extensions make it interesting.\nThe tooling is language agnostic. Bril programs are just JSON.\nBril is typed.\n\nSee the language reference for the complete language specification and the tool documentation for details on the “batteries included” monorepo."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/core.html",
+    "href": "src/briltxt/docs/lang/core.html",
+    "title": "Core Language",
+    "section": "",
+    "text": "This section describes the core Bril instructions. Any self-respecting Bril tool must support all of these operations; other extensions are more optional.\n\n\nCore Bril defines two primitive types:\n\nint: 64-bit, two’s complement, signed integers.\nbool: True or false.\n\n\n\n\nThese instructions are the obvious binary integer arithmetic operations. They all take two arguments, which must be names of variables of type int, and produce a result of type int:\n\nadd: x + y.\nmul: x × y.\nsub: x - y.\ndiv: x ÷ y.\n\nIn each case, overflow follows two’s complement rules. It is an error to div by zero.\n\n\n\nThese instructions compare integers. They all take two arguments of type int and produce a result of type bool:\n\neq: Equal.\nlt: Less than.\ngt: Greater than.\nle: Less than or equal to.\nge: Greater than or equal to.\n\n\n\n\nThese are the basic Boolean logic operators. They take arguments of type bool and produce a result of type bool:\n\nnot (1 argument)\nand (2 arguments)\nor (2 arguments)\n\n\n\n\nThese are the control flow operations. Unlike the value operations above, they take labels and functions in addition to normal arguments.\n\njmp: Unconditional jump. One label: the label to jump to.\nbr: Conditional branch. One argument: a variable of type bool. Two labels: a true label and a false label. Transfer control to one of the two labels depending on the value of the variable.\ncall: Function invocation. Takes the name of the function to call and, as its arguments, the function parameters. The call instruction can be a Value Operation or an Effect Operation, depending on whether the function returns a value.\nret: Function return. Stop executing the current activation record and return to the parent (or exit the program if this is the top-level main activation record). It has one optional argument: the return value for the function.\n\nOnly call may (optionally) produce a result; the rest appear only as Effect Operations.\n\n\n\n\nid: A type-insensitive identity. Takes one argument, which is a variable of any type, and produces the same value (which must have the same type, obvi).\nprint: Output values to the console (with a newline). Takes any number of arguments of any type and does not produce a result.\nnop: Do nothing. Takes no arguments and produces no result."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/core.html#types",
+    "href": "src/briltxt/docs/lang/core.html#types",
+    "title": "Core Language",
+    "section": "",
+    "text": "Core Bril defines two primitive types:\n\nint: 64-bit, two’s complement, signed integers.\nbool: True or false."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/core.html#arithmetic",
+    "href": "src/briltxt/docs/lang/core.html#arithmetic",
+    "title": "Core Language",
+    "section": "",
+    "text": "These instructions are the obvious binary integer arithmetic operations. They all take two arguments, which must be names of variables of type int, and produce a result of type int:\n\nadd: x + y.\nmul: x × y.\nsub: x - y.\ndiv: x ÷ y.\n\nIn each case, overflow follows two’s complement rules. It is an error to div by zero."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/core.html#comparison",
+    "href": "src/briltxt/docs/lang/core.html#comparison",
+    "title": "Core Language",
+    "section": "",
+    "text": "These instructions compare integers. They all take two arguments of type int and produce a result of type bool:\n\neq: Equal.\nlt: Less than.\ngt: Greater than.\nle: Less than or equal to.\nge: Greater than or equal to."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/core.html#logic",
+    "href": "src/briltxt/docs/lang/core.html#logic",
+    "title": "Core Language",
+    "section": "",
+    "text": "These are the basic Boolean logic operators. They take arguments of type bool and produce a result of type bool:\n\nnot (1 argument)\nand (2 arguments)\nor (2 arguments)"
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/core.html#control",
+    "href": "src/briltxt/docs/lang/core.html#control",
+    "title": "Core Language",
+    "section": "",
+    "text": "These are the control flow operations. Unlike the value operations above, they take labels and functions in addition to normal arguments.\n\njmp: Unconditional jump. One label: the label to jump to.\nbr: Conditional branch. One argument: a variable of type bool. Two labels: a true label and a false label. Transfer control to one of the two labels depending on the value of the variable.\ncall: Function invocation. Takes the name of the function to call and, as its arguments, the function parameters. The call instruction can be a Value Operation or an Effect Operation, depending on whether the function returns a value.\nret: Function return. Stop executing the current activation record and return to the parent (or exit the program if this is the top-level main activation record). It has one optional argument: the return value for the function.\n\nOnly call may (optionally) produce a result; the rest appear only as Effect Operations."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/core.html#miscellaneous",
+    "href": "src/briltxt/docs/lang/core.html#miscellaneous",
+    "title": "Core Language",
+    "section": "",
+    "text": "id: A type-insensitive identity. Takes one argument, which is a variable of any type, and produces the same value (which must have the same type, obvi).\nprint: Output values to the console (with a newline). Takes any number of arguments of any type and does not produce a result.\nnop: Do nothing. Takes no arguments and produces no result."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/syntax.html",
+    "href": "src/briltxt/docs/lang/syntax.html",
+    "title": "Syntax Reference",
+    "section": "",
+    "text": "Bril programs are JSON objects that directly represent abstract syntax. This chapter exhaustively describes the structure of that syntax. All objects are JSON values of one sort or another.\n\n\n{ \"functions\": [&lt;Function&gt;, ...] }\nA Program is the top-level object. It has one key:\n\nfunctions, a list of Function objects.\n\n\n\n\n\"&lt;string&gt;\"\n{\"&lt;string&gt;\": &lt;Type&gt;}\nThere are two kinds of types: primitive types, whose syntax is just a string, and parameterized types, which wrap a smaller type. The semantics chapters list the particular types that are available—for example, core Bril defines the basic primitive types int and bool and the memory extension defines a parameterized pointer type.\n\n\n\n{\n  \"name\": \"&lt;string&gt;\",\n  \"args\": [{\"name\": \"&lt;string&gt;\", \"type\": &lt;Type&gt;}, ...]?,\n  \"type\": &lt;Type&gt;?,\n  \"instrs\": [&lt;Instruction&gt;, ...]\n}\nA Function object represents a (first-order) procedure consisting of a sequence of instructions. There are four fields:\n\nname, a string.\nargs, optionally, a list of arguments, which consist of a name and a type. Missing args is the same as an empty list.\nOptionally, type, a Type object: the function’s return type, if any.\ninstrs, a list of Label and Instruction objects.\n\nWhen a function runs, it creates an activation record and transfers control to the first instruction in the sequence.\nA Bril program is executable if it contains a function named main. When execution starts, this function will be invoked. The main function can have arguments (which implementations may supply using command-line arguments) but must not have a return type.\n\n\n\n{ \"label\": \"&lt;string&gt;\" }\nA Label marks a position in an instruction sequence as a destination for control transfers. It only has one key:\n\nlabel, a string. This is the name that jump and branch instructions will use to transfer control to this position and proceed to execute the following instruction.\n\n\n\n\n{ \"op\": \"&lt;string&gt;\", ... }\nAn Instruction represents a unit of computational work. Every instruction must have this field:\n\nop, a string: the opcode that determines what the instruction does. (See the Core Language section and the subsequent extension sections for listings of the available opcodes.)\n\nDepending on the opcode, the instruction might also have:\n\ndest, a string: the name of the variable where the operation’s result is stored.\ntype, a Type object: the type of the destination variable.\nargs, a list of strings: the arguments to the operation. These are names of variables.\nfuncs, a list of strings: any names of functions referenced by the instruction.\nlabels, a list of strings: any label names referenced by the instruction.\n\nThere are three kinds of instructions: constants, value operations, and effect operations.\n\n\n{ \"op\": \"const\", \"dest\": \"&lt;string&gt;\", \"type\": &lt;Type&gt;,\n  \"value\": &lt;literal&gt; }\nA Constant is an instruction that produces a literal value. Its op field must be the string \"const\". It has the dest and type fields described above, and also:\n\nvalue, the literal value for the constant. This is either a JSON number or a JSON Boolean value. The type field must match—i.e., it must be “int” or “bool”, respectively.\n\n\n\n\n{ \"op\": \"&lt;string&gt;\", \"dest\": \"&lt;string&gt;\", \"type\": &lt;Type&gt;,\n  \"args\": [\"&lt;string&gt;\", ...]?,\n  \"funcs\": [\"&lt;string&gt;\", ...]?,\n  \"labels\": [\"&lt;string&gt;\", ...]? }\nA Value Operation is an instruction that takes arguments, does some computation, and produces a value. Like a Constant, it has the dest and type fields described above, and also any of these three optional fields:\n\nargs, a list of strings. These are variable names defined elsewhere in the same function.\nfuncs, a list of strings. The names of any functions that this instruction references. For example, core Bril’s call instruction takes one function name.\nlabels, a list of strings. The names of any labels within the current function that the instruction references. For example, core Bril’s jump and branch instructions have target labels.\n\nIn all three cases, these keys may be missing and the semantics are identical to mapping to an empty list.\n\n\n\n{ \"op\": \"&lt;string&gt;\",\n  \"args\": [\"&lt;string&gt;\", ...]?,\n  \"funcs\": [\"&lt;string&gt;\", ...]?,\n  \"labels\": [\"&lt;string&gt;\", ...]? }\nAn Effect Operation is like a Value Operation but it does not produce a value. It also has the optional args, funcs, and labels fields.\n\n\n\n\nAny syntax object may optionally have position fields to reflect a source position:\n{ ..., \"pos\": {\"row\": &lt;int&gt;, \"col\": &lt;int&gt;},\n       \"pos_end\": {\"row\": &lt;int&gt;, \"col\": &lt;int&gt;}?,\n       \"src\": \"&lt;string&gt;\"? }\nThe pos and pos_end objects have two keys: row (the line number) and col (the column number within the line). The src object can optionally provide the absolute path to a file which is referenced to by the source position. If pos_end is provided, it must be equal to or greater than pos. Front-end compilers that generate Bril code may add this information to help with debugging. The text format parser, for example, can optionally add source positions. However, tools can’t require positions to exist, to consistently exist or not on all syntax objects in a program, or to follow any particular rules."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/syntax.html#program",
+    "href": "src/briltxt/docs/lang/syntax.html#program",
+    "title": "Syntax Reference",
+    "section": "",
+    "text": "{ \"functions\": [&lt;Function&gt;, ...] }\nA Program is the top-level object. It has one key:\n\nfunctions, a list of Function objects."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/syntax.html#type",
+    "href": "src/briltxt/docs/lang/syntax.html#type",
+    "title": "Syntax Reference",
+    "section": "",
+    "text": "\"&lt;string&gt;\"\n{\"&lt;string&gt;\": &lt;Type&gt;}\nThere are two kinds of types: primitive types, whose syntax is just a string, and parameterized types, which wrap a smaller type. The semantics chapters list the particular types that are available—for example, core Bril defines the basic primitive types int and bool and the memory extension defines a parameterized pointer type."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/syntax.html#function",
+    "href": "src/briltxt/docs/lang/syntax.html#function",
+    "title": "Syntax Reference",
+    "section": "",
+    "text": "{\n  \"name\": \"&lt;string&gt;\",\n  \"args\": [{\"name\": \"&lt;string&gt;\", \"type\": &lt;Type&gt;}, ...]?,\n  \"type\": &lt;Type&gt;?,\n  \"instrs\": [&lt;Instruction&gt;, ...]\n}\nA Function object represents a (first-order) procedure consisting of a sequence of instructions. There are four fields:\n\nname, a string.\nargs, optionally, a list of arguments, which consist of a name and a type. Missing args is the same as an empty list.\nOptionally, type, a Type object: the function’s return type, if any.\ninstrs, a list of Label and Instruction objects.\n\nWhen a function runs, it creates an activation record and transfers control to the first instruction in the sequence.\nA Bril program is executable if it contains a function named main. When execution starts, this function will be invoked. The main function can have arguments (which implementations may supply using command-line arguments) but must not have a return type."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/syntax.html#label",
+    "href": "src/briltxt/docs/lang/syntax.html#label",
+    "title": "Syntax Reference",
+    "section": "",
+    "text": "{ \"label\": \"&lt;string&gt;\" }\nA Label marks a position in an instruction sequence as a destination for control transfers. It only has one key:\n\nlabel, a string. This is the name that jump and branch instructions will use to transfer control to this position and proceed to execute the following instruction."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/syntax.html#instruction",
+    "href": "src/briltxt/docs/lang/syntax.html#instruction",
+    "title": "Syntax Reference",
+    "section": "",
+    "text": "{ \"op\": \"&lt;string&gt;\", ... }\nAn Instruction represents a unit of computational work. Every instruction must have this field:\n\nop, a string: the opcode that determines what the instruction does. (See the Core Language section and the subsequent extension sections for listings of the available opcodes.)\n\nDepending on the opcode, the instruction might also have:\n\ndest, a string: the name of the variable where the operation’s result is stored.\ntype, a Type object: the type of the destination variable.\nargs, a list of strings: the arguments to the operation. These are names of variables.\nfuncs, a list of strings: any names of functions referenced by the instruction.\nlabels, a list of strings: any label names referenced by the instruction.\n\nThere are three kinds of instructions: constants, value operations, and effect operations.\n\n\n{ \"op\": \"const\", \"dest\": \"&lt;string&gt;\", \"type\": &lt;Type&gt;,\n  \"value\": &lt;literal&gt; }\nA Constant is an instruction that produces a literal value. Its op field must be the string \"const\". It has the dest and type fields described above, and also:\n\nvalue, the literal value for the constant. This is either a JSON number or a JSON Boolean value. The type field must match—i.e., it must be “int” or “bool”, respectively.\n\n\n\n\n{ \"op\": \"&lt;string&gt;\", \"dest\": \"&lt;string&gt;\", \"type\": &lt;Type&gt;,\n  \"args\": [\"&lt;string&gt;\", ...]?,\n  \"funcs\": [\"&lt;string&gt;\", ...]?,\n  \"labels\": [\"&lt;string&gt;\", ...]? }\nA Value Operation is an instruction that takes arguments, does some computation, and produces a value. Like a Constant, it has the dest and type fields described above, and also any of these three optional fields:\n\nargs, a list of strings. These are variable names defined elsewhere in the same function.\nfuncs, a list of strings. The names of any functions that this instruction references. For example, core Bril’s call instruction takes one function name.\nlabels, a list of strings. The names of any labels within the current function that the instruction references. For example, core Bril’s jump and branch instructions have target labels.\n\nIn all three cases, these keys may be missing and the semantics are identical to mapping to an empty list.\n\n\n\n{ \"op\": \"&lt;string&gt;\",\n  \"args\": [\"&lt;string&gt;\", ...]?,\n  \"funcs\": [\"&lt;string&gt;\", ...]?,\n  \"labels\": [\"&lt;string&gt;\", ...]? }\nAn Effect Operation is like a Value Operation but it does not produce a value. It also has the optional args, funcs, and labels fields."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/syntax.html#source-positions",
+    "href": "src/briltxt/docs/lang/syntax.html#source-positions",
+    "title": "Syntax Reference",
+    "section": "",
+    "text": "Any syntax object may optionally have position fields to reflect a source position:\n{ ..., \"pos\": {\"row\": &lt;int&gt;, \"col\": &lt;int&gt;},\n       \"pos_end\": {\"row\": &lt;int&gt;, \"col\": &lt;int&gt;}?,\n       \"src\": \"&lt;string&gt;\"? }\nThe pos and pos_end objects have two keys: row (the line number) and col (the column number within the line). The src object can optionally provide the absolute path to a file which is referenced to by the source position. If pos_end is provided, it must be equal to or greater than pos. Front-end compilers that generate Bril code may add this information to help with debugging. The text format parser, for example, can optionally add source positions. However, tools can’t require positions to exist, to consistently exist or not on all syntax objects in a program, or to follow any particular rules."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/char.html",
+    "href": "src/briltxt/docs/lang/char.html",
+    "title": "Character",
+    "section": "",
+    "text": "The character extension adds one new base type:\n\"char\"\nCharacters are a singular Unicode character.\n\n\n\nComparison operators, which take two char values and produce a bool:\n\nceq\nclt\ncle\ncgt\ncge\n\nConversion operators:\n\nchar2int: One argument: a variable of type char. Returns an integer representing the Unicode code point of the given value.\nint2char: One argument: a variable of type int. Returns the corresponding Unicode character. Throws if the value does not correspond to a valid Unicode code point.\n\n\n\n\nThe core print operation prints char values."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/char.html#types",
+    "href": "src/briltxt/docs/lang/char.html#types",
+    "title": "Character",
+    "section": "",
+    "text": "The character extension adds one new base type:\n\"char\"\nCharacters are a singular Unicode character."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/char.html#operations",
+    "href": "src/briltxt/docs/lang/char.html#operations",
+    "title": "Character",
+    "section": "",
+    "text": "Comparison operators, which take two char values and produce a bool:\n\nceq\nclt\ncle\ncgt\ncge\n\nConversion operators:\n\nchar2int: One argument: a variable of type char. Returns an integer representing the Unicode code point of the given value.\nint2char: One argument: a variable of type int. Returns the corresponding Unicode character. Throws if the value does not correspond to a valid Unicode code point."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/char.html#printing",
+    "href": "src/briltxt/docs/lang/char.html#printing",
+    "title": "Character",
+    "section": "",
+    "text": "The core print operation prints char values."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/float.html",
+    "href": "src/briltxt/docs/lang/float.html",
+    "title": "Floating Point",
+    "section": "",
+    "text": "Bril has an extension for computing on floating-point numbers.\nYou can read more about the extension, which is originally by Dietrich Geisler and originally included two FP precision levels.\n\n\nThe floating point extension adds one new base type:\n\"float\"\nFloating point numbers are 64-bit, double-precision IEEE 754 values. (There is no single-precision type.)\n\n\n\nThere are the standard arithmetic operations, which take two float values and produce a new float value:\n\nfadd\nfmul\nfsub\nfdiv\n\nIt is not an error to fdiv by zero; as in IEEE 754, the result is infinity.\nThere are also comparison operators, which take two float values and produce a bool:\n\nfeq\nflt\nfle\nfgt\nfge\n\n\n\n\nThe core print operation prints float values with 17 decimal digits of precision, including trailing zeros. (This is like using the %.17lf format specifier in C’s printf.) Positive and negative zero, while they are equal according to feq, look different when printed. Not-a-number values are printed as NaN; infinite values are printed as the strings Infinity or -Infinity."
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/float.html#types",
+    "href": "src/briltxt/docs/lang/float.html#types",
+    "title": "Floating Point",
+    "section": "",
+    "text": "The floating point extension adds one new base type:\n\"float\"\nFloating point numbers are 64-bit, double-precision IEEE 754 values. (There is no single-precision type.)"
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/float.html#operations",
+    "href": "src/briltxt/docs/lang/float.html#operations",
+    "title": "Floating Point",
+    "section": "",
+    "text": "There are the standard arithmetic operations, which take two float values and produce a new float value:\n\nfadd\nfmul\nfsub\nfdiv\n\nIt is not an error to fdiv by zero; as in IEEE 754, the result is infinity.\nThere are also comparison operators, which take two float values and produce a bool:\n\nfeq\nflt\nfle\nfgt\nfge"
+  },
+  {
+    "objectID": "src/briltxt/docs/lang/float.html#printing",
+    "href": "src/briltxt/docs/lang/float.html#printing",
+    "title": "Floating Point",
+    "section": "",
+    "text": "The core print operation prints float values with 17 decimal digits of precision, including trailing zeros. (This is like using the %.17lf format specifier in C’s printf.) Positive and negative zero, while they are equal according to feq, look different when printed. Not-a-number values are printed as NaN; infinite values are printed as the strings Infinity or -Infinity."
+  }
+]
