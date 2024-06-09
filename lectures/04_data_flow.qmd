@@ -177,7 +177,7 @@ while (Changed != emptyset)
 
     // init IN[n] to be empty
     IN[n] = emptyset;
-
+  
     // calculate IN[n] from predecessors' OUT[p]
     for all nodes p in predecessors(n)
          IN[n] = IN[n] Union OUT[p];
