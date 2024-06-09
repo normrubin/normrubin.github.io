@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024 - Representation</title>
+<title>EECE7398 Fall 2024 - 1 Compiler Overview</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/3.local.html" rel="next">
-<link href="../lectures/2a_performance_measurement.html" rel="prev">
+<link href="../lectures/02a_performance_measurement.html" rel="next">
+<link href="../Class_Overview/schedule.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -107,7 +73,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="EECE7398 Fall 2024 - Representation">
+<meta property="og:title" content="EECE7398 Fall 2024 - 1 Compiler Overview">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -123,9 +89,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/1_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/2b_representation.html">Representation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">1 Compiler Overview</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Representation</h1>
+<h1 class="title">1 Compiler Overview</h1>
 </div>
 
 
@@ -142,341 +108,184 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="how-do-we-represent-programs" class="level1">
-<h1>How do we represent programs</h1>
-<p>The representation of a program - is what we read in and read out when transforming a program. What kind of properties make a good representation?</p>
-<p>One possible representation is called <strong><em>concrete syntax form</em></strong> Programs are text - surface syntax- just what you would type into an editor.</p>
-<div id="cell-4" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>value <span class="op">=</span> <span class="dv">8</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(value):</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  result <span class="op">=</span> result <span class="op">+</span> i</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>29</code></pre>
-</div>
-</div>
-<p>What is good and what is bad about this representation?</p>
-<p>What is the level of abstraction? How do you understand the semantics.</p>
-<p>Form 2 - <strong><em>Abstract syntax form</em></strong></p>
-<p>Tree structure - Nodes are parts of the program, edges show how they are connected. We can write this as a list or a graph</p>
-<div id="cell-6" class="cell" data-execution_count="29">
-<div class="cell-output cell-output-stdout">
-<pre><code>FunctionDef(
-    name='pgm',
-    args=arguments(
-        posonlyargs=[],
-        args=[],
-        kwonlyargs=[],
-        kw_defaults=[],
-        defaults=[]),
-    body=[
-        Assign(
-            targets=[
-                Name(id='value', ctx=Store())],
-            value=Constant(value=8)),
-        Assign(
-            targets=[
-                Name(id='result', ctx=Store())],
-            value=Constant(value=1)),
-        For(
-            target=Name(id='i', ctx=Store()),
-            iter=Call(
-                func=Name(id='range', ctx=Load()),
-                args=[
-                    Name(id='value', ctx=Load())],
-                keywords=[]),
-            body=[
-                Assign(
-                    targets=[
-                        Name(id='result', ctx=Store())],
-                    value=BinOp(
-                        left=Name(id='result', ctx=Load()),
-                        op=Mult(),
-                        right=Name(id='i', ctx=Load())))],
-            orelse=[]),
-        Expr(
-            value=Call(
-                func=Name(id='print', ctx=Load()),
-                args=[
-                    Name(id='result', ctx=Load())],
-                keywords=[]))],
-    decorator_list=[])</code></pre>
-</div>
-</div>
-<div id="cell-7" class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dot_dia</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="30">
-<div>
-<figure class="figure">
-<p><img src="2b_representation_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>AST tree representation An AST is a tree structure, nodes like if, test, body, assign Each node is one concept from the program</p>
-<p>Recursive function can walk over the tree, one chunk of code for each node.</p>
-<ol type="1">
-<li>Good - each type of node is different, making special cases are easy</li>
-<li>Bad - each type of node is different so analysis has to know about every type, making general cases hard</li>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>A compiler writer builds bridges between people and machines, and this task is each day more challenging.</p>
+<ol type="a">
+<li>Software engineers want abstractions<br>
+</li>
+<li>Hardware engineers want efficiency</li>
 </ol>
-<p>This is the classic way to write an interpreter. Simple (non optimizing) compilers often use this format.</p>
-<section id="a-more-regular-representation" class="level2">
-<h2 class="anchored" data-anchor-id="a-more-regular-representation">A more regular representation</h2>
-<p>Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.</p>
-<div class="columns">
-<div class="column" style="width:45%;">
-<pre><code>    let value = 8
-    let result = 1
-    for (let i = 0;i &lt; value;i = i+ 1)
-    {
-        result = result * i
-    }
-    console.log(result )</code></pre>
-</div><div class="column" style="width:5%;">
-<!-- empty column to create gap -->
-</div><div class="column" style="width:40%;">
-<pre><code>@main {
-  v0: float = const 8;
-  value: float = id v0;
-  v1: float = const 1;
-  result: float = id v1;
-  v3: float = const 0;
-  i: float = id v3;
-.for.cond.2:
-  v4: float = id i;
-  v5: float = id value;
-  v6: bool = flt v4 v5;
-  br v6 .for.body.2 .for.end.2;
-.for.body.2:
-  v7: float = id result;
-  v8: float = id i;
-  v9: float = fmul v7 v8;
-  result: float = id v9;
-  v10: float = id i;
-  v11: float = const 1;
-  v12: float = fadd v10 v11;
-  i: float = id v12;
-  jmp .for.cond.2;
-.for.end.2:
-  v13: float = id result;
-  print v13;
-  v14: int = const 0;
-}
-</code></pre>
-</div>
-</div>
-<div id="cell-11" class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>os.system(<span class="st">'ts2bril images/toy.ts | bril2txt'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>@main {
-  v0: float = const 8;
-  value: float = id v0;
-  v1: float = const 1;
-  result: float = id v1;
-  v3: float = const 0;
-  i: float = id v3;
-.for.cond.2:
-  v4: float = id i;
-  v5: float = id value;
-  v6: bool = flt v4 v5;
-  br v6 .for.body.2 .for.end.2;
-.for.body.2:
-  v7: float = id result;
-  v8: float = id i;
-  v9: float = fmul v7 v8;
-  result: float = id v9;
-  v10: float = id i;
-  v11: float = const 1;
-  v12: float = fadd v10 v11;
-  i: float = id v12;
-  jmp .for.cond.2;
-.for.end.2:
-  v13: float = id result;
-  print v13;
-  v14: int = const 0;
-}</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="35">
-<pre><code>0</code></pre>
-</div>
-</div>
-<p>Looks like assembly but no limit on registers, no condition codes. fully typed, no complex addressing modes.</p>
-<p>syntax-</p>
-<p>Declare functions, labels, instructions</p>
-<p>instruction:<br>
-1) variable type = opcode arguments 2) opcode list of arguments</p>
-</section>
-<section id="what-is-good-and-what-is-about-this-reorientation" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-good-and-what-is-about-this-reorientation">what is good and what is about this reorientation?</h2>
-<p>What is the abstract syntax form for this?</p>
-</section>
-<section id="extract-info-from-this-repreentation." class="level2">
-<h2 class="anchored" data-anchor-id="extract-info-from-this-repreentation.">extract info from this repreentation.</h2>
-<section id="control-flow-graph-cfg-version-1" class="level3">
-<h3 class="anchored" data-anchor-id="control-flow-graph-cfg-version-1">control flow graph (CFG) (version 1)</h3>
-<p>Representation is a directed graph. Nodes are instructions, edges indicate <strong><em>possible</em></strong> flow of control, one entry and one exit node.</p>
-<p>Here is a simple program:</p>
-<pre><code>    @main {
-        v: int = const 5;
-        print v;
-    }</code></pre>
-<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<p>Originally, a compiler was a person doing calculations.</p>
+<p>In 1952, she had an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”</p>
+<p>[<img src="images/Grace_Hopper_and_UNIVAC.jpg" class="img-fluid" alt="hopper">]</p>
+<p>In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).</p>
+<p>Their paper is located at <a href="https://dl.acm.org/doi/10.1145/1455567.1455599" class="uri">https://dl.acm.org/doi/10.1145/1455567.1455599</a>. The name stands for formula translation. It’s in upper case because at that time, compilers did not support lower case.</p>
+<p>The FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM’s next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan. The goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.</p>
+<p>FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.</p>
+<p>In these early years, the development model was:</p>
+<ol type="1">
+<li>build a new machine</li>
+<li>design a new language</li>
+<li>implement a compiler</li>
+</ol>
+<p>Vendors sometimes built compilers but often used small startup compiler companies.</p>
+<p>Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.</p>
+<div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[const] --&gt; B[print]
+<pre class="mermaid mermaid-js">graph LR;
+A[Front end]--IR--&gt; B[Middle end];
+B--IR--&gt; C[Back end];
+A--IR--&gt; C;
 </pre>
 </div>
 <p></p></figure><p></p>
 </div>
 </div>
 </div>
-<p>a second example</p>
-<pre><code>    @main {
-        v: int = const 4;
-        jmp  .somewhere;
-        v: int = const 2;
-        .somewhere;
-        print v;
-    }</code></pre>
-<p>What does the control flow graph look like?</p>
-<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<ol type="1">
+<li>Front end - parse the program into IR</li>
+<li>Middle end - machine independent optimizations and analyses</li>
+<li>Back end - machine specific stuff where machine code is generated</li>
+</ol>
+<p>This course focuses on part 2</p>
+<p>A goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.</p>
+<p> There are many ways to compare the performance of programs:<br>
+– Time<br>
+– Space – Energy consumption</p>
+<p>In 1987, GCC was released. It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR. Adding an optimization or reordering optimizations is quite hard.</p>
+<p>Vendors could use one front end, one middle end and only need to write a new back end.</p>
+<p>This ended almost all the compiler startups. Free front end, middle end.</p>
+<p>In gcc the IR is somewhat C based, for instance there are pointers but there is no way to talk about garbage collection without hacks.</p>
+<p>in about 2006 LLVM (low level virtual machine) appeared. This changed the model to look like a library.</p>
+<p>The core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.</p>
+<div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[const 4] --&gt; B[jmp]
-  B --&gt; C[print]
-  D[const 2] --&gt; C
+<pre class="mermaid mermaid-js">graph LR;
+A[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};
+A--IR--&gt; C;
 </pre>
 </div>
 <p></p></figure><p></p>
 </div>
 </div>
 </div>
-<p>notice label does not produce a node</p>
-<p>Easy to see a dead instruction.</p>
-<p>Third example:</p>
-<pre><code>    @main {
-        v: int = const 4;
-        b: bool = const false;
-        br b .there .here;
-    .here:
-        v: int = const 2;
-    .there;
-        print v;
-    }</code></pre>
-<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<p>Optimizations form <em>passes</em>. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments.</p>
+<p>In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.</p>
+<div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[v: int const 4] --&gt; B[b: bool const false]
-  B --&gt; C[br b .there, .false]
-  C --&gt; D[v: const 2]
-  C --&gt; E[print v]
-  D --&gt; E
+<pre class="mermaid mermaid-js">graph TB;
+A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[ASSIGNMENT] --&gt; B2[BRIL interpreter];
 </pre>
 </div>
 <p></p></figure><p></p>
 </div>
 </div>
 </div>
-<p>which is the true and which is the false, could mark the edges or use a convention</p>
-<p>Which is the entry, which is the exit?</p>
-<p>There is a long chain of instructions entered at the top, exit at the bottom, no branches inside.</p>
-<p>Basic blocks (cfg form 2) 1) nodes can be a sequence of instructions. 1) jumps and branches can only be at the end of a sequence 1) only label has to be at the start 1) every instruction in the sequence executes the same number of times</p>
-<div class="cell" data-fig-width="6.5" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[v: int const 4\nb : bool\n br ] 
-  A --&gt; D[v: const 2]
-  A --&gt; E[print v]
-  D --&gt; E
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<p>As we construct basic blocks, we can add instructions up till something that ends the block (<strong><em>terminator</em></strong>)</p>
-<p>Option: do all blocks end in a terminator or not?</p>
-<p>given a block b, the <strong><em>predecessors</em></strong> of b are the blocks b_in where there is an edge bin-&gt;b. And the <strong><em>successors</em></strong> of B are the b_out where b-&gt;b_out is an edge</p>
+<section id="cost-of-a-compiler." class="level2">
+<h2 class="anchored" data-anchor-id="cost-of-a-compiler.">Cost of a compiler.</h2>
+<p>Compilers are massive and expensive to build.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Compiler</th>
+<th style="text-align: right;">Year Started</th>
+<th style="text-align: right;">Developers</th>
+<th style="text-align: right;">Lines Of Code</th>
+<th style="text-align: right;">Est Cost $</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GCC 9.2.0</td>
+<td style="text-align: right;">1988</td>
+<td style="text-align: right;">617</td>
+<td style="text-align: right;">5,591,759</td>
+<td style="text-align: right;">425,747,279</td>
+</tr>
+<tr class="even">
+<td>LLVM 8.0.1</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: right;">1,210</td>
+<td style="text-align: right;">6,877,489</td>
+<td style="text-align: right;">529,894,190</td>
+</tr>
+<tr class="odd">
+<td>OpenJDK 14+10</td>
+<td style="text-align: right;">2007</td>
+<td style="text-align: right;">883</td>
+<td style="text-align: right;">7,955,827</td>
+<td style="text-align: right;">616,517,789</td>
+</tr>
+<tr class="even">
+<td>v8 7.8.112</td>
+<td style="text-align: right;">2008</td>
+<td style="text-align: right;">736</td>
+<td style="text-align: right;">3,043,793</td>
+<td style="text-align: right;">225,195,832</td>
+</tr>
+<tr class="odd">
+<td>Rust 1.37.0</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">2,737</td>
+<td style="text-align: right;">852,877</td>
+<td style="text-align: right;">59,109,425</td>
+</tr>
+<tr class="even">
+<td>Swift</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">857</td>
+<td style="text-align: right;">665,238</td>
+<td style="text-align: right;">45,535,689</td>
+</tr>
+<tr class="odd">
+<td>Intel Graphics 1.0.10</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">694,688</td>
+<td style="text-align: right;">46,934,626</td>
+</tr>
+</tbody>
+</table>
+<p>From CGO 2022 keynote</p>
+<p>Some observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.</p>
 </section>
+<section id="compiler-assumptions-lets-talk-about-how-many-are-still-true" class="level2">
+<h2 class="anchored" data-anchor-id="compiler-assumptions-lets-talk-about-how-many-are-still-true">Compiler Assumptions (Let’s talk about how many are still true)</h2>
+<ol type="1">
+<li>The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.</li>
+<li>Users are ok with large programs taking minutes to compile</li>
+<li>Compilers run on machines that are memory-limited.</li>
+<li>Compilers run on single-threaded machines.</li>
+<li>Most targets are C-like.</li>
+</ol>
+<p>Some changes since early 2000’s:</p>
+<ol type="1">
+<li>Integrated development environments. When you type a.b what has to happen?</li>
+<li>DSL (Doman specific languages for AI)</li>
+<li>More kinds of hardware</li>
+</ol>
 </section>
-<section id="what-is-an-algorithm-that-forms-a-cfg" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-an-algorithm-that-forms-a-cfg">What is an algorithm that forms a cfg</h2>
-<ol type="1">
-<li>just find all the basic blocks</li>
-<li>add the control flow edges</li>
-</ol>
-<p>psuedo code</p>
-<ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
-</ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []</code></pre>
-<p>step 2 we need a map from labels to basic blocks</p>
-<ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
-</ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []
-    
-
-for block in blocks:
-   last = block[-1]
-   if last is a jmp (one successor)
-      add edge from block to last.dest 
-   else if last is a br (two successors)
-      add two edges from block to last.true, last.false 
-   else  fall through 
-      add edge to next block (if it exists)</code></pre>
-<div id="cell-18" class="cell" data-execution_count="45">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  bril_program <span class="op">=</span> f.read()</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(bril_program)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
-        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
-        { "op": "add", "type": "int", "dest": "v2",
-          "args": ["v0", "v1"] },
-        { "op": "print", "args": ["v2"] }
-      ],
-      "args": []
-    }
-  ]
-}
-</code></pre>
-</div>
-</div>
+<section id="how-well-do-compilers-do" class="level2">
+<h2 class="anchored" data-anchor-id="how-well-do-compilers-do">How well do compilers do</h2>
+<p>At the scale of datacenters, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
+<section id="proebstings-law" class="level3">
+<h3 class="anchored" data-anchor-id="proebstings-law">Proebsting’s law</h3>
+<p>Compiler Advances Double Computing Power Every 18 Years.<br>
+while hardware computing horsepower doubles every 18 months</p>
+<p>How would you prove this?</p>
 
 
+</section>
 </section>
 </section>
 
@@ -892,13 +701,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/2a_performance_measurement.html" class="pagination-link" aria-label="Performance and Measurement">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Performance and Measurement</span>
+      <a href="../Class_Overview/schedule.html" class="pagination-link" aria-label="Schedule">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Schedule</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/3.local.html" class="pagination-link" aria-label="3.Local Analysis &amp; Optimization">
-        <span class="nav-page-text">3.Local Analysis &amp; Optimization</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/02a_performance_measurement.html" class="pagination-link" aria-label="2a Performance and Measurement">
+        <span class="nav-page-text">2a Performance and Measurement</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -910,7 +719,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.dev/normrubin/normrubin.github.io/blob/main/lectures/2b_representation.ipynb" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/010_compiler_overview.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>

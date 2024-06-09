@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024 - 3.Local Analysis &amp; Optimization</title>
+<title>EECE7398 Fall 2024 - 4. Data Flow</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/3b_local_value_numbering.html" rel="next">
-<link href="../lectures/2b_representation.html" rel="prev">
+<link href="../lectures/12_memory.html" rel="next">
+<link href="../lectures/03b_local_value_numbering.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -72,37 +72,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
 <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta property="og:title" content="EECE7398 Fall 2024 - 3.Local Analysis &amp; Optimization">
+<meta property="og:title" content="EECE7398 Fall 2024 - 4. Data Flow">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -118,9 +89,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/1_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/3.local.html">3.Local Analysis &amp; Optimization</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/04_data_flow.html">4. Data Flow</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">3.Local Analysis &amp; Optimization</h1>
+<h1 class="title">4. Data Flow</h1>
 </div>
 
 
@@ -137,130 +108,246 @@ window.Quarto = {
 </header>
 
 
-<p>I want to separate 3 flavors of optimization.</p>
-<ol type="1">
-<li>local meaning within one basic block</li>
-<li>global meaning within one function (not really global)</li>
-<li>inter-procedural over the entire program</li>
-</ol>
-<p>Usually an optimization takes time that is more then linear in some property, For example a local optimization might take time <span class="math inline">\(n^2\)</span> in the number of instructions in the block. a global optimization might take much longer, and an inter-procedural longer still. To keep compile time reasonable many compilers limit the number of global optimizations and skip inter-procedural optimizations. As a consequence many more optimizations get published but not used in production.</p>
-<p>For a local optimization, instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.</p>
-<p>For a global optimization, two instructions are ordered by a path from one block to another and different paths through the program give different orders.</p>
-<p>One special case is JIT (just in time) compilers, where programs get compiled at the start of execution. GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called <strong><em>Hotspot</em></strong> compiling. Some JIT compilers use <strong><em>hot/cold</em></strong> compiling, where they only run the fancy compiler on basic blocks that are hotl, i.e., execute a lot.</p>
+<section id="reasoning-about-data-flow-global-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="reasoning-about-data-flow-global-analysis">reasoning about data flow (global analysis)</h2>
+<p>We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.</p>
+<p>There is some theory to look at for this. How do we know if the algorithm will converge for any possible cfg.</p>
+<p>and some naming for each kind of problem</p>
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
-A[application] -- offline --&gt; B[byte code/ptx]
-B --&gt; C[quick run time compiler/ finalizer]
-C --&gt; D[isa]
-B --&gt; C1[fancy compiler - only run on long running functions];
-C1 --&gt; D;
-
+<pre class="mermaid mermaid-js">graph TD
+style A text-align: left
+style B  text-align: left
+%% nodes 
+     A["1: main cond
+   2: a int = const 47
+   3: b :int = const 42
+   4:br cond .left .right"] 
+   
+   B["5: b: int = const 1
+   6 c:int = const 5 
+   7 jmp .end"]
+  
+   C["8: a :int = const 2
+   9: c: int = const 10
+   10 jmp .end"]
+    D["11: d: int sub  a b
+    12 print d
+    13 ret"]
+%% edges
+    A  -- true --&gt; B
+    A  --false --&gt; C
+    B --&gt; D
+    C --&gt; D
 </pre>
 </div>
 <p></p></figure><p></p>
 </div>
 </div>
 </div>
-<p>We are going to consider several versions of <strong><em>trivial dead code elimination</em></strong>. Trivial because we are going to hold off on control flow related optimizations till later. Sometimes people call this DCE or trivial DCE.</p>
-<p>For each case, we start by defining what we mean by dead code.</p>
-<p>example 1</p>
-<pre><code>@main {
-  a: int = const 4;
-  b: int = const 2;
-  c: int = const 1;
-  d: int = add a b;
-  print d;
-}</code></pre>
-<p>What instruction is dead? (meaning get the same answer if we delete the instruction) What is your definition? Is this meaning of dead code local or global?</p>
-<p>Why would you ever have dead code in a program? One reason is that have DCE as a separate pass means other optimizations do not have to clean up.</p>
-<section id="definition-1--dead-if-instruction-writes-a-variable-and-the-variable-is-never-used." class="level2">
-<h2 class="anchored" data-anchor-id="definition-1--dead-if-instruction-writes-a-variable-and-the-variable-is-never-used.">Definition 1- Dead if instruction writes a variable and the variable is never used.</h2>
-<p>An instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels no not write a variable so they get deleted as well.</p>
-<p>What is the pseudo code to find dead instructions using this definition?</p>
-<pre><code>used = empty set 
-for instr in func 
-   used += instr.args 
-for instd in func
-    if instr has a dest and dest in not in used 
-       delete instr</code></pre>
-<p>example 2</p>
-<pre><code>@main {
-  a: int = const 4;
-  b: int = const 2;
-  c: int = const 1;  
-  d: int = add a b;
-  e: int = add c d; 
-  print d;
-}</code></pre>
-<p>The code so far only deletes one instruction, but we would like to get rid of two. Instruction c should also be dead. How do we change the definition</p>
 </section>
-<section id="definition-2--dead-if-instruction-writes-a-variable-and-the-variable-is-either-never-used-or-only-used-in-dead-instructions." class="level2">
-<h2 class="anchored" data-anchor-id="definition-2--dead-if-instruction-writes-a-variable-and-the-variable-is-either-never-used-or-only-used-in-dead-instructions.">Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.</h2>
-<p>A slow way to do this. - iterating till convergence</p>
-<pre><code>while changes:
-       run one pass of tdce above</code></pre>
-<p>what would be faster? What is some pseudo code for the change</p>
-<p>example 3</p>
-<pre><code>@main {
-  a: int = const 4;
-  a: int = const 200;
-  print a;
-}</code></pre>
-</section>
-<section id="definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-starting-at-that-instruction-reaches-a-use-of-v" class="level2">
-<h2 class="anchored" data-anchor-id="definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-starting-at-that-instruction-reaches-a-use-of-v">Definition? An instruction is dead if that instruction writes a variable v and no path starting at that instruction reaches a use of v</h2>
-<p>this talks about paths (control flow paths)</p>
-<pre><code>@main {
-  a: int = const 4;
-     br input .then .else 
-  .then
-  a: int = const 200;
-  .else 
-  print a;
-}</code></pre>
-<p>for now we want to skip control flow, so we</p>
-</section>
-<section id="definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-within-the-block-starting-at-that-instruction-reaches-a-use-of-v-in-the-same-block-or-reaches-the-exit-of-the-block" class="level2">
-<h2 class="anchored" data-anchor-id="definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-within-the-block-starting-at-that-instruction-reaches-a-use-of-v-in-the-same-block-or-reaches-the-exit-of-the-block">Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block</h2>
-<pre><code>cands are the variables that are defined but not used 
-last_def = {}  variables -&gt; instructions 
-this is a mapping variables that have been defined but not used
-
-   for instr in block:
-      each arg (use) removes arg from last def 
-      if the instr has a dest 
-          if the dest is in last_def, 
-      add dest-&gt;instr to last def
-  </code></pre>
-<p>and as you might expect, we need to interate this till convergence</p>
-<p>Does running dce make compilation time go up?</p>
-<p>Compilers often run dce more then once- why?</p>
-<p>testing out dce</p>
+<section id="first-we-are-going-to-look-at-a-fg-specific-problem-reaching-definitions" class="level2">
+<h2 class="anchored" data-anchor-id="first-we-are-going-to-look-at-a-fg-specific-problem-reaching-definitions">first we are going to look at a fg specific problem “reaching definitions”</h2>
+<p><em>Reaching definitions</em> are an example of a global property that require you to look at an entire CFG.</p>
+<p><strong><em>Use:</em></strong> An instruction uses all of its arguments. (So any instruction with arguments is a “use.”), a binary instruction is two uses.</p>
+<p>A <strong><em>definition</em></strong> is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest or an argument)</p>
+<p>The above program has 8 definitions, Which we could represent by a bit vector of size 8.</p>
+<p>A definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and the variable in D is not overwritten on the path.</p>
+<p><strong><em>Available:</em></strong> Definitions that reach a given point in the program are available at that point.</p>
+<p>if an instruction writes a variable it <strong><em>kills</em></strong> all prior definitions that write the same variable</p>
+<section id="reaching-definitions-problem-determine-which-definitions-reach-which-uses." class="level3">
+<h3 class="anchored" data-anchor-id="reaching-definitions-problem-determine-which-definitions-reach-which-uses.">Reaching definitions problem determine which definitions reach which uses.</h3>
+<p>We could build a 2d matrix - definitions by uses, where a 1 bit indicates that this definition reaches this use. As a matrix this would be very sparse, later when we do ssa forms will see a very cool compression technique. Algorithms that use this kind of matrix are called bit-vector methods.</p>
+<p>A <strong><em>program point</em></strong> is an instruction</p>
+<p>a definition of a variable v reaches a program point p if and only if:</p>
 <ol type="1">
-<li><p>program should get the same answer</p></li>
-<li><p>program should run less instructions</p></li>
+<li>the definition reaches the point just before p</li>
+<li>the variable v is not redefined at p</li>
 </ol>
-<p>Some test cases:</p>
+<p>or</p>
 <ol type="1">
-<li><p><a href="https://github.com/sampsyo/bril/blob/main/examples/test/tdce/simple.bril"><code>simple.bril</code></a>,</p></li>
-<li><p><a href="https://github.com/sampsyo/bril/blob/main/examples/test/tdce/reassign.bril"><code>reassign.bril</code></a>,</p></li>
-<li><p>other examples in <a href="https://github.com/sampsyo/bril/tree/main/examples/test/tdce">the DCE test directory</a></p></li>
+<li>the variable v is defined at p.</li>
 </ol>
-<p>bril2json &lt; bench.bril | python3 tdce.py | bril2txt</p>
-<p>Next, try using <code>wc</code> to check static code size differences:</p>
-<p>bril2json &lt; bench.bril | wc -l</p>
-<p>bril2json &lt; bench.bril | python3 tdce.py | wc -l</p>
-<p>Then profiling to measure dynamic instruction count: The bril interpreter has a flag -p which prints the number of dynamcially executed instructions. How good a measure is this for real programs?</p>
-<pre><code>bril2json &lt; bench.bril | brili -p
+<p>What about multiple predecessors? p is the first instruction of a block with multiple preds.</p>
+<p>If a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p. This is a <strong><em>union</em></strong> operation.</p>
+<p>We are moving information down from definition. This is called <strong><em>forward</em></strong> propagation</p>
+<p>Define two sets IN and OUT that hold definitions</p>
+<p>IN is the set of definitions that reach a point immediately before p</p>
+<p>OUT is the set of definitions that reach a point immediately after p</p>
+<p>To illustrate this, I”ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+style A text-align: left
+style B  text-align: left
+%% nodes 
+A_IN["A_IN={}"]
+A_OUT["A_OUT={(cond,1),(a,2),(b,3)}"]
 
-bril2json &lt; bench.bril | python3 tdce.py | brili -p</code></pre>
-<p>name = “slides from Phil Gibbons at CMU” url = “http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/lectures/L3-Local-Opts.pdf” details = “for more details and context on LVN</p>
+B_IN["B_IN={(cond,1),(a,2),(b,3)}"]
+B_OUT["B_OUT={(cond,1),(a,2),(b,5),(c,6)}"]
+
+C_IN["IN={(cond,1),(a,2),(b,3)}"]
+C_OUT["OUT={(cond,1),(a,8),(b,3,(c,9)}"]
+
+D_IN["IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}"]
+
+  A["blk a
+    1: main cond
+   2: a int = const 47
+   3: b :int = const 42
+   4:br cond .left .right"] 
+   
+   B["blk b
+   5: b: int = const 1
+   6 c:int = const 5 
+   7 jmp .end"]
+  
+   C["blk c
+     8: a :int = const 2
+   9: c: int = const 10
+   10 jmp .end"]
+    D["11: d: int sub  a b
+    12 print d
+    13 ret"]
+%% edges
+    A_IN --&gt; A 
+    A --&gt; A_OUT
+    A_OUT  -- true --&gt; B_IN
+    B_IN --&gt; B
+    B --&gt; B_OUT
+    A_OUT --false --&gt; C_IN
+    C_IN --&gt; C
+    C--&gt;   C_OUT
+    B_OUT--&gt; D_IN
+    C_OUT--&gt; D_IN
+    D_IN --&gt; D
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>For a given block b, we can compute two sets:</p>
+<ol type="1">
+<li>kill(b) = all defs in the program that assign to y, and there is a def of y in b<br>
+</li>
+<li>gen(b) = definitions in b that reach the bottom of b</li>
+</ol>
+<p>And now globally:</p>
+<ol type="1">
+<li>OUT(b) = (in(b) - kill(b) ) union gen(b)</li>
+<li>IN(b) = union of OUT(pred) where pred is a predecessor of b</li>
+</ol>
+<p>We call the function for 1 the <strong><em>transfer</em></strong> function for the block, and the function for 2 the <strong><em>merge</em></strong> function</p>
+<p>We can solve for IN and OUT iteratively using a worklist</p>
+<pre><code>// Initialize
+for all CFG nodes n in N,
+    OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];
+
+// put all nodes into the changed set
+// N is all nodes in graph,
+Changed = N;
+
+// Iterate 
+while (Changed != emptyset)
+{
+    choose a node n in Changed;
+    // remove it from the changed set
+    Changed = Changed -{ n };
+
+    // init IN[n] to be empty
+    IN[n] = emptyset;
+  
+    // calculate IN[n] from predecessors' OUT[p]
+    for all nodes p in predecessors(n)
+         IN[n] = IN[n] Union OUT[p];
+
+    oldout = OUT[n]; // save old OUT[n]
+    
+    // update OUT[n] using transfer function f_n ()
+    OUT[n] = GEN[n] Union (IN[n] -KILL[n]);
+
+    // any change to OUT[n] compared to previous value?
+    if (OUT[n] changed) // compare oldout vs. OUT[n]
+    {    
+        // if yes, put all successors of n into the changed set
+        for all nodes s in successors(n)
+             Changed = Changed U { s };
+    }
+}
+</code></pre>
+<p>Does this always converge?</p>
+<p>what order do we want to select nodes (basic blocks)?</p>
+<p>visit a node after visiting its preds. Revese post order.</p>
+</section>
+<section id="a-second-problem-liveness-" class="level3">
+<h3 class="anchored" data-anchor-id="a-second-problem-liveness-">a second problem liveness-</h3>
+<p>A variable is live at some point if it holds a value that may be needed in the future, or equivalently if its value may be read before the next time the variable is written to.</p>
+<pre><code>             live = {}
+b = 3        live = b
+c = 5        live = b c 
+a = f(b * c) live = a</code></pre>
+<p>We had to consider flow starting at the bottom so this is a <strong><em>backwards</em></strong> analysis</p>
+<p>for a basic block (b):</p>
+<ol type="1">
+<li>GEN(s) the set of variables used in s before any assignment to s in the same block</li>
+<li>kill(s) the set of variables assigned in s</li>
+</ol>
+<p>global</p>
+<ol type="1">
+<li>OUT(exit) = {}</li>
+<li>IN(b) = gen(b) union ( OUT(b) - KILL(b))</li>
+<li>OUT(b) = union IN(b)</li>
+</ol>
+<p>An example</p>
+<pre><code>// in: {}; predecessor blocks: none
+b1: a = 3; 
+    b = 5;
+    d = 4;
+    x = 100; //x is never being used later thus not in the out set {a,b,d}
+    t = a &gt; b
+    br t .t .f 
+   // out: {a,b,d}    //union of all (in) successors of b1 =&gt; b2: {a,b}, and b3:{b,d}  
 
 
+
+.t   // in: {a,b}; predecessor blocks: b1
+b2: c = a + b;
+    d = 2;
+// out: {b,d}
+
+
+.f 
+b3:  in: {b,d}; predecessor blocks: b1 and b2
+    c = 4;
+    return b * d + c;
+// out:{}</code></pre>
+<p>This can be solved using the same code as before, flip pred, successors because its backward, reverse in and out, set elements are variable names</p>
+<p>data flow framework</p>
+<p>The data flow framework. Here’s how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:</p>
+<ol type="1">
+<li>Figure out the thing you want to know at the entry and exit of each block.</li>
+<li>Write an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a <em>local analysis</em> for the block.), calculate GEN and KILL</li>
+<li>Generate equalities according to the edges in the CFG.</li>
+<li>Solve the system of equations! (Using a general solver algorithm that you don’t need to adapt to every problem.)</li>
+</ol>
+<p>step 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL</p>
+<p>This algorithm has no problems with loops!</p>
+<p>Theory – the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?</p>
+<p>The domain of values you’re trying compute needs to form a <em>partial order</em> with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.</p>
+<p>In terms of a partial order ⊑, the merge function is the <em>meet</em> (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so <code>x ⊑ y</code> implies <code>f(x) ⊑ f(y)</code>.</p>
+<p>The usual definition of a “correct” solution to a data-flow problem is the <em>meet-over-all-paths</em> solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block</p>
+<p>More examples of things you can do with the data flow framework. 1) Reaching definitions. 1) Live variables: which variables are both defined and going to be used at some point in the future? 1) Constant propagation: which variables have statically knowable constant values? 1) Available expressions: which <em>expressions</em> have already been computed computed in the past? (Useful in CSE.) 1) Initialized variables: like in Java, which variables have had <em>something</em> written to them? 1) Interval analysis: what is the numerical range of values that a given variable might hold?</p>
+
+
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -675,13 +762,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/2b_representation.html" class="pagination-link" aria-label="Representation">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Representation</span>
+      <a href="../lectures/03b_local_value_numbering.html" class="pagination-link" aria-label="3b local value numbering">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">3b local value numbering</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/3b_local_value_numbering.html" class="pagination-link" aria-label="3b local value numbering">
-        <span class="nav-page-text">3b local value numbering</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/12_memory.html" class="pagination-link" aria-label="12_memory.qmd">
+        <span class="nav-page-text">12_memory.qmd</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -693,7 +780,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/3.local.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/04_data_flow.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>
