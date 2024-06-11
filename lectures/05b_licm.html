@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024 - About</title>
+<title>EECE7398 Fall 2024 - 05 loop invariant code motion</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../Class_Overview/schedule.html" rel="next">
+<link href="../lectures/12_memory.html" rel="next">
+<link href="../lectures/05_global.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -67,9 +68,12 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="EECE7398 Fall 2024 - About">
+<meta property="og:title" content="EECE7398 Fall 2024 - 05 loop invariant code motion">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -83,7 +87,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../Class_Overview/about.html">Class Overview</a></li><li class="breadcrumb-item"><a href="../Class_Overview/about.html">About</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05b_licm.html">05 loop invariant code motion</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -119,16 +123,16 @@ ul.task-list li input[type="checkbox"] {
       <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false">
  <span class="menu-text">Class Overview</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/about.html" class="sidebar-item-text sidebar-link active">
+  <a href="../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">About</span></a>
   </div>
 </li>
@@ -142,13 +146,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
  <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
@@ -193,7 +197,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">05 loop invariant code motion</span></a>
   </div>
 </li>
@@ -240,9 +244,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../Class_Overview/about.html">Class Overview</a></li><li class="breadcrumb-item"><a href="../Class_Overview/about.html">About</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05b_licm.html">05 loop invariant code motion</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">About</h1>
+<h1 class="title">05 loop invariant code motion</h1>
 </div>
 
 
@@ -259,20 +263,156 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This is the web site for eece 7398</p>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<p>Loop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop.</p>
+<p>A very common case for this is matrix addressing</p>
+<p>a[i,j] might expand to to i<em>4</em>stride_a1 + j *4</p>
+<pre><code>for j 
+  a[i,j] = f(a[i.j+1])</code></pre>
+<pre><code>a = 
+b = 
+result = 0
+for (){
+    result += a*b
+}</code></pre>
+<p>if we are going to move code we need a kind of landing pad called a <strong><em>pre-header</em></strong> create a new block b. change all the preds of the loop header to point to the preheader, add an edge from b to the loop header</p>
+<p>We need two steps:</p>
+<ol type="1">
+<li>find loop invariant instructions,</li>
+<li>move all the loop invariant instructions to the preheader</li>
+</ol>
+<p>An instruction instr in a loop is loop invariant of:</p>
+<p>every operand is:</p>
+<ol type="1">
+<li>constant or</li>
+<li>all reaching definitions of this operand are outside of the loop</li>
+<li>there is exactly one def in loop reaching this operand and that def is loop invariant</li>
+</ol>
+<pre><code>iterate to convergence
+ for each instr in  the loop
+  mark it at li iff 
+     for all arguments x either
+         all reaching defs of x are outside of the loop (this covers constants)
+         or there is exactly one def of instr in the loop and that def is loop invar</code></pre>
+<p>when is ok to move an instr? We call this <strong><em>safe</em></strong> to move.</p>
+<pre><code>loop
+  = x
+x = a*b </code></pre>
+<ol type="1">
+<li>the def must dom all the uses</li>
+<li>no other defs of the same variable</li>
+<li>def dominates all the loop exits</li>
+</ol>
+<pre><code>   loop {
+     if cond goto exit
+     x = a*b 
+       = x
+   }</code></pre>
+<p>For cond 3</p>
+<p>if the loop runs zero times, a*b is never executed</p>
+<p>We can remove this condition if the dest variable is dead after the loop or the instruction can cause a exception, this is called <strong><em>speculative</em></strong> exceptions.</p>
+<p>How about an example:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">    graph TD;
+B1[" B1:
+      1: b = 2
+      2: i = 1"]
+B2["b2:
+   i &lt; 100"]
+B3["B3:
+   3: a = b+1
+   4: c = 2
+   i mod 2 == 0"]
+B4["b4: 
+    5: d = a + d 
+    6: e = 1 +d"]
+B5["B5:
+    7: d= -c
+    8: f = 1+a"]
+B6["B6:
+  9: i = i + 1
+     a &lt; 2"]
+Entry --&gt; B1
+B1--&gt; B2
+B2 -- y --&gt;exit;
+B2 --n --&gt; B3
+B3 --y --&gt; B4
+B3 --n --&gt; B5
+B4--&gt; B6
+B5 --&gt; B6
+B6 --y --&gt; exit
+B6 --n --&gt; B2
+
+</pre>
 </div>
-<div class="callout-title-container flex-fill">
-Warning
+<p></p></figure><p></p>
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<p>fill in the about page</p>
+</div>
+<p>steps:</p>
+<ol type="1">
+<li>create pre header</li>
+<li>b2.1 not loop invar</li>
+<li>b3.1 loop inv</li>
+<li>b3.2 loop inv</li>
+<li>b3.3 not loop inv</li>
+<li>b4.1 not loop inv</li>
+<li>b4.2 not loop inv</li>
+<li>b5.1 not loop inv other def of d</li>
+<li>b5.2 loop invar</li>
+<li>b6.1 not loop inv</li>
+<li>b6.2 loop inv change = 2 repeat</li>
+</ol>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">    graph TD;
+B1[" B1:
+      1: b = 2
+      2: i = 1"]
+B2["b2:
+   i &lt; 100"]
+B3["B3:
+   i mod 2 == 0"]
+B4["b4: 
+    5: d = a + d 
+    6: e = 1 +d"]
+B5["B5:
+    7: d= -c
+"]
+B6["B6:
+  9: i = i + 1
+     t"]
+pre["pre:
+   3: a = b+1
+      4: c = 2
+        8: f = 1+a
+        t = a &lt; 2"]
+Entry --&gt; B1
+B1--&gt; pre
+pre --&gt; B2
+B2 -- y --&gt;exit;
+B2 --n --&gt; B3
+B3 --y --&gt; B4
+B3 --n --&gt; B5
+B4--&gt; B6
+B5 --&gt; B6
+B6 --y --&gt; exit
+B6 --n --&gt; B2
+
+</pre>
+</div>
+<p></p></figure><p></p>
 </div>
 </div>
+</div>
+<p>If we forward propagate values we could find a = 3, f = 3, t = false, and since t is false there is no loop</p>
+<p>moving the instructions out of the loop reduces the number of instructions which is good, but it also extends life times and therefore register pressure which is bad.</p>
 
 
 
@@ -688,10 +828,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../lectures/05_global.html" class="pagination-link" aria-label="5 global analysis">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">5 global analysis</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../Class_Overview/schedule.html" class="pagination-link" aria-label="Schedule">
-        <span class="nav-page-text">Schedule</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/12_memory.html" class="pagination-link" aria-label="12_memory.qmd">
+        <span class="nav-page-text">12_memory.qmd</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -703,7 +846,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/Class_Overview/about.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/05b_licm.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>
