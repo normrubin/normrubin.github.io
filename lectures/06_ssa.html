@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024</title>
+<title>EECE7398 Fall 2024 - 6 Static single assignment</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/12_memory.html" rel="next">
+<link href="../lectures/05b_licm.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -66,9 +68,12 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7398 Fall 2024 - 6 Static single assignment">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -82,9 +87,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      EECE7398 Fall 2024
-      </li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/06_ssa.html">6 Static single assignment</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -99,7 +102,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">EECE7398 Fall 2024</a> 
+      <a href="../">EECE7398 Fall 2024</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -129,13 +132,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Class_Overview/about.html" class="sidebar-item-text sidebar-link">
+  <a href="../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">About</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
+  <a href="../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Schedule</span></a>
   </div>
 </li>
@@ -143,82 +146,82 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
  <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">6 static single assignment</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/02a_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/02a_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">2a Performance and Measurement</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/02b_representation.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/02b_representation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">2b Representation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/03_local.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">3a Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">3b local value numbering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">4. Data Flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/05_global.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">5 global analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">05 loop invariant code motion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">6 Static single assignment</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/12_memory.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">12_memory.qmd</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">13_dynamic_compielrs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">14_gpu_compilers</span></a>
   </div>
 </li>
@@ -247,9 +250,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/06_ssa.html">6 Static single assignment</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">EECE7398 Fall 2024</h1>
+<h1 class="title">6 Static single assignment</h1>
 </div>
 
 
@@ -266,28 +269,430 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>EECS 7398 Fall 2024</p>
-<p><strong>Instructor</strong>: Dr.&nbsp;Norman Rubin</p>
-<p><strong>email</strong>: n.rubin@northeastern.edu</p>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<section id="static-single-assignment-ssa" class="level1">
+<h1>Static single assignment (SSA)</h1>
+<p>A variable in a program can have multiple definitions. In Bril definitions are instructions which compute values. Up till now we have been thinking about analysis which look at variables (names) but a different way to look at this is based on values, If we think of instructions calculating values, and uses being uses of values we can picture a graph called the <strong><em>data flow</em></strong> graph showing how values move through a program</p>
+<p>in SSA we change our IR so that every variable has exactly one definition in the program (each variable is assigned only once). The name SSA is statically there is only a single assignment per variable.</p>
+<section id="the-ssa-philosophy" class="level3">
+<h3 class="anchored" data-anchor-id="the-ssa-philosophy">The SSA Philosophy</h3>
+<p>In addition to a language form, SSA is also a philosophy! It can fundamentally change the way you think about programs. In the SSA philosophy:</p>
+<ul>
+<li>definitions == variables</li>
+<li>instructions == values</li>
+<li>arguments == data flow graph edges</li>
+</ul>
+<p>In LLVM, for example, instructions do not refer to argument variables by name—an argument is a <em>pointer</em> to defining instruction.</p>
+<p>Static means in the text, not in the execution.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+B0["0: i = 0
+    1: s = 0"]
+B1["2: x = m
+    3: s = s + x
+    4: i = i +4
+    5: if i &lt; n go to B0"]
+B0 --&gt; B1
+B1 --&gt; B1
+</pre>
 </div>
-<div class="callout-title-container flex-fill">
-Warning
+<p></p></figure><p></p>
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<p><strong>Office hours</strong>: TBA</p>
-<p><strong>Where</strong> TBA</p>
-<p><strong>Office hours</strong> by appointment</p>
+</div>
+<p>variable i has two static assignments 1 and 4, so this program is not in SSA</p>
+<p>Variable s has two static assignments, x has one static assignment but x has lots of dynamic assignments (when the program executes)</p>
+<p>We call a program without branches a piece of *** straightline code***.</p>
+<pre><code>    @main {
+      a: int = const 4;
+      b: int = const 2;
+      a: int = add a b;
+      b: int = add a b;
+      print b;
+    }</code></pre>
+<p>Its easy to see how to convert straight line code into ssa</p>
+<pre><code>    @main {
+      a.1: int = const 4;
+      b.1: int = const 2;
+      a.2: int = add a.1 b.1;
+      b.2: int = add a.2 b.1;
+      print b.2;
+    }</code></pre>
+<pre><code>for each variable a: 
+    Count[a] = 0 
+    Stack[a] = [0]
+
+rename_basic_block(B): 
+    for each instruction S in block B: 
+        for each use of a variable x in S: 
+            i = top(Stack[x]) 
+            replace the use of x with xi for each variable a that S defines count[a] = Count[a] + 1 
+            i = Count[a]             
+            push i onto Stack[a]             
+            replace definition of a with ai </code></pre>
+<p>We don’t need the stack here but we will need it later.</p>
+<p>Of course, things will get a little more complicated when there is control flow. And because real machines are not SSA, using separate variables (i.e., memory locations and registers) for everything is bound to be inefficient.</p>
+<p>The idea in SSA is to convert general programs into SSA form, do all our optimization there, and then convert back to a standard mutating form before we generate backend code.</p>
+</section>
+<section id="ϕ-nodes" class="level3">
+<h3 class="anchored" data-anchor-id="ϕ-nodes">ϕ-Nodes</h3>
+<p>Just renaming assignments willy-nilly will quickly run into problems. Consider this program:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TB
+B0[".b0
+    a: int = const 47;
+    br cond .left .right;"]
+left["a: int = add a a;
+    jmp .exit;"]
+right["a: int = mul a a;
+        jmp .exit;"]
+exit["print a;"]
+B0 --&gt; left
+B0 --&gt; right
+left --&gt; exit
+right --&gt; exit
+</pre>
+</div>
+<p></p></figure><p></p>
 </div>
 </div>
-<p>I’m basing a lot of this course on the <a href="https://www.cs.cornell.edu/courses/cs6120/2023fa/">cs120 Advanced Compilers</a> at Cornell. Thanks to Adrian Sampson for permission to use his stuff. You may find his web site helpful.</p>
-<p>You can see videos of Adrian’s <a href="https://www.cs.cornell.edu/courses/cs6120/2023fa/self-guided/">lectures</a></p>
+</div>
+<p>If we start renaming all the occurrences of <code>a</code>, everything goes fine until we try to write that last <code>print a</code>. Which “version” of <code>a</code> should it use?</p>
+<p>To match the expressiveness of unrestricted programs, SSA adds a new kind of instruction: a <em>ϕ-node</em>. ϕ-nodes are flow-sensitive copy instructions: they get a value from one of several variables, depending on which incoming CFG edge was most recently taken to get to them.</p>
+<p>In Bril, a ϕ-node appears as a <code>phi</code> instruction:</p>
+<pre><code>a.4: int = phi .left a.2 .right a.3;</code></pre>
+<p>The <code>phi</code> instruction chooses between any number of variables, and it picks between them based on labels. If the program most recently executed a basic block with the given label, then the <code>phi</code> instruction takes its value from the corresponding variable.</p>
+<p>You can write the above program in SSA like this:</p>
+<pre><code>    @main(cond: bool) {
+    .entry:
+        a.1: int = const 47;
+        br cond .left .right;
+    .left:
+        a.2: int = add a.1 a.1;
+        jmp .exit;
+    .right:
+        a.3: int = mul a.1 a.1;
+        jmp .exit;
+    .exit:
+        a.4: int = phi .left a.2 .right a.3;
+        print a.4;
+    }</code></pre>
+</section>
+<section id="bril-in-ssa" class="level3">
+<h3 class="anchored" data-anchor-id="bril-in-ssa">Bril in SSA</h3>
+<p>Bril has an SSA extension It adds support for a <code>phi</code> instruction. Beyond that, SSA form is just a restriction on the normal expressiveness of Bril—if you solemnly promise never to assign statically to the same variable twice, you are writing “SSA Bril.”</p>
+<p>The reference interpreter has built-in support for <code>phi</code>, so you can execute your SSA-form Bril programs without fuss.</p>
+</section>
+<section id="getting-out-of-ssa" class="level2">
+<h2 class="anchored" data-anchor-id="getting-out-of-ssa">Getting out of ssa</h2>
+<p>Compilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD;
+subgraph a;
+ A0["io =
+     j0 = 
+     k0 ="]
+A1["i1 =
+   j1 =
+   k1 = "]
+A2["i2 = phi(i0, i1
+   j2 = phi(j0, j1)
+   k2 = phi(k0, k1)
+   ...
+    = i2
+    = j2 
+    = k2"]
+    A0 --&gt; A2
+    A1--&gt; A2
+ end
+subgraph b;
+ B0["io =
+     j0 = 
+     k0 ="]
+B1["i1 =
+   j1 =
+   k1 = "]
+B2["
+   ...
+    = i2
+    = j2 
+    = k2"]
+    B0 --"i2 = i0
+       j2 = j0
+       k2 = k0"--&gt; B2
+    B1 --"i2 = i1
+          j2 = j1
+          k2 = k1"--&gt; B2
+end
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TB
+A0["L1
+   a0 =
+   b0 =
+   if A0 &gt; b0"]
+A1["b1 = a0"]
+A2["l2
+b2 = phi(b1,b0)"]
+A0 --&gt; A1
+A1--&gt; A2
+A0 --&gt; A2
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>where do we put the copy b2 = b0?</p>
+<p>The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors.</p>
+<p>We can solve this problem by doing <strong><em>critical edge splitting</em></strong>. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge.</p>
+<section id="converting-to-ssa" class="level3">
+<h3 class="anchored" data-anchor-id="converting-to-ssa">Converting to SSA</h3>
+<p>Very simple scheme</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TB
+X["Block X
+   a = 
+   b = 
+   if s &gt; b"]
+Y["Block Y
+  b = a"]
+Z["Block Z
+ret b"]
+X--&gt; Y
+Y--&gt; Z
+X --&gt; Z
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>There should be a phi-function for variable b at node z of the flow graph exactly when all of the following are true:</p>
+<ol type="1">
+<li>There is a block x containing a definition of b</li>
+<li>There is a block y (with y ≠ x) containing a definition of b</li>
+<li>There is a nonempty path Pxz of edges from x to z</li>
+<li>There is a nonempty path Pyz of edges from y to z</li>
+<li>Paths Pxz and Pyz do not have any node in common other than z, and…</li>
+<li>The node z does not appear within both Pxz and Pyz prior to the end, though it may appear in one or the other.</li>
+</ol>
+<p>this is iterative since when we add a phi, we are creating a new defintion, which may add new phi-functions</p>
+<p>When we find nodes X,Y,Z that match these steps and z does not contain a phi function for b, insert a phi</p>
+<p>While really expensive this will work</p>
+<p>To convert to SSA, we want to insert ϕ-nodes whenever there are distinct paths containing distinct definitions of a variable. We <em>don’t</em> need ϕ-nodes in places that are dominated by a definition of the variable. So what’s a way to know when control reachable from a definition is <em>not dominated</em> by that definition? The dominance frontier!</p>
+<p>This is going to be almost linear</p>
+<p>We do it in two steps. 1) insert ϕ-nodes: 1) rename variables:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TB
+
+a--&gt;b
+a--&gt; e
+a--&gt; i
+
+b--&gt;c
+c--- c
+c--&gt; d
+e--&gt; f["f
+  x = "]
+e--&gt; g
+g--&gt; h
+f--&gt; h
+h--&gt;l
+f--&gt; d
+h--&gt; e
+i--&gt; k
+i--&gt; j
+j--&gt; k
+k--&gt; l
+d--&gt; l
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>We need phi functions for x in d and h, where else?</p>
+<p>we need to iterate and keep adding phi nodes</p>
+<pre><code>for each node in the cfg 
+   for each variable with a def in node
+     add node to Defs[v]   # Blocks where v is assigned.
+
+for each v in vars:
+    W = Defs[v]
+    while W is not empty
+      remove a node n from w
+         for block in DF[d]:  # Dominance frontier.
+           Add a ϕ-node to block,
+             unless we have done so already.
+           Add block to W (because it now writes to v!),
+             unless it's already in there.</code></pre>
+<p>Since we keep adding nodes to W how do we know this terminates?</p>
+<p>Then, rename variables:</p>
+<pre><code>rename(n):
+  rename_basic_block(n)  # from before 
+  for each successor Y of n, where n is the jth pred of Y
+    for each phi-function f in Y where the operand of f is 'a'
+      i = top(stack[a])
+      replace jth operand wit a_i
+  for each child of X of n (in the dominator tree)
+    rename(X)
+    for each instruction S in n
+       pop stack(S.dest)
+</code></pre>
+<p><img src="images/StaticSingleAssignment_Part40.jpg" class="img-fluid"> <img src="images/StaticSingleAssignment_Part41.jpg" class="img-fluid"> <img src="images/StaticSingleAssignment_Part42.jpg" class="img-fluid"> <img src="images/StaticSingleAssignment_Part43.jpg" class="img-fluid"></p>
+<p>The arity of phi-functions</p>
+<p>Could we have a phi-function in a node with only one predecessor?</p>
+<p>could we have a phi-function wit more then two arguments?</p>
+<p><img src="images/StaticSingleAssignment_Part46.jpg" class="img-fluid"></p>
+<p>This algorithm computes what is called <strong><em>minimal SSA form</em></strong> which is not so mimimal since it can leave dead assignments</p>
+<p><img src="images/StaticSingleAssignment_Part48.jpg" class="img-fluid"></p>
+<p>i is only live in blocks l2 and l4 so no need to add phi-node at l1, this gives us <strong><em>pruned ssa form</em></strong></p>
+</section>
+</section>
+<section id="making-use-of-ssa-form" class="level2">
+<h2 class="anchored" data-anchor-id="making-use-of-ssa-form">making use of ssa form</h2>
+<p>Our previous analyses always used a (variable, program point), but in ssa these are the same</p>
+</section>
+<section id="dead-code-elimination-in-ssa" class="level2">
+<h2 class="anchored" data-anchor-id="dead-code-elimination-in-ssa">dead code elimination in ssa</h2>
+<p>while there is some variable v with no uses and the statement that defines v has no other side effects, delete the statement that defines v from the program.</p>
+<p>we need a counter for each variable (or each instruction)</p>
+<p>walk the program once increment the counter each time the variable is used</p>
+<p>while there exists v, such that counter[v] = 0 remove the instruction that defined v, e.g., “v = E for each variable x used in E decrement counter[x]</p>
+</section>
+<section id="sparse-constant-prop" class="level2">
+<h2 class="anchored" data-anchor-id="sparse-constant-prop">sparse constant prop</h2>
+<p>we define a partial order on consts, any &gt; all constants &gt; undefined and define the intersection of two states as the common parent</p>
+<p>with each variable we have an abstract state (like a value number)</p>
+<pre><code>v  = const c   ==&gt; v state is const 
+
+v = id q      ==&gt; v state is the state of  q 
+
+v = v0 op v1  ==&gt; if both are constants v = c0 op c1
+
+             ==&gt; if one is any, v's state is &gt; 
+
+v = phi(v0,..vn) ==&gt; v's state is the intersection of the states of v0,..,vn</code></pre>
+<p>What order do we process nodes? because the program is in ssa form we can do the nodes in dominator tree order, then before processing any instruction that is not a phi, we will have processed all the arguments</p>
+<pre><code>B0: x  = input 
+    a = 1 
+    c = a +10
+    if a &lt; c go to b1
+
+B1: b = x * a
+    print b 
+    a = a +1 
+    go to b1
+
+in ssa form 
+
+B0: x0  = input 
+    a0 = 1 
+    c0 = a0 +10
+    if a0 &lt; c0 go to b1
+
+B1: a1 phi(a1,a2 )
+    b0 = x0 * a1
+    print b0 
+    a2 = a1 +1 
+    go to b1
+</code></pre>
+<p>walking the dominator tree b0 -&gt; b1</p>
+<pre><code>B0:
+x0 - any 
+a0 - 1 
+c0 - 11 (folding the constant)
+a0 &lt; c0  skip
+B1:
+a1 = 1 (only one input of phi is defined)
+b0 = any
+a2 = 2
+
+update the uses of a2 - which is the phi a1 -&gt; any
+update the uses of a1 which is the increment no change 
 
 
+
+## liveness 
+
+![](images/StaticSingleAssignment_Part69.jpg)
+
+![](images/StaticSingleAssignment_Part70.jpg)
+
+![](images/StaticSingleAssignment_Part71.jpg)
+
+
+![](images/StaticSingleAssignment_Part73.jpg)
+
+
+
+
+### Converting from SSA
+
+Eventually, we need to convert *out of* SSA form to generate efficient code for real machines that don't have `phi`-nodes and do have finite space for variable storage.
+
+The basic algorithm is pretty straightforward.
+If you have a ϕ-node:
+
+    v = phi .l1 x .l2 y;
+
+Then there must be assignments to `x` and `y` (recursively) preceding this statement in the CFG.
+The paths from `x` to the `phi`-containing block and from `y` to the same block must "converge" at that block.
+So insert code into the `phi`-containing block's immediate predecessors along each of those two paths:
+one that does `v = id x` and one that does `v = id y`.
+Then you can delete the `phi` instruction.
+
+This basic approach can introduce some redundant copying.
+(Take a look at the code it generates after you implement it!)
+Non-SSA copy propagation optimization can work well as a post-processing step.
+For a more extensive take on how to translate out of SSA efficiently, see [“Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency” by Boissinot et al.](https://hal.inria.fr/inria-00349925v1/document)
+
+
+
+its possible that an optimization can give overlapping phi-functions</code></pre>
+<p>b0 x = 1 y = 2 B1 z = x x = y y = z if() go to b1</p>
+<pre><code>in ssa form 
+</code></pre>
+<p>b0 x1 = 1 y1 = 2 B1 x2 = phi(x1,x3) y2 = phi(y1, y3) z = x2 x3 = y2 y3= z if() go to b1 ’’’’</p>
+<p>optimze it</p>
+<p>``` b0 x1 = 1 y1 = 2 B1 x2 = phi(x1, y2) y2 = phi(y1, x2) if() go to b1 ’’’’</p>
+<p>lost the temp (this is called the swap problem) if we add copies x2 = y3 y2 = x2 (uses the wrong value of x2)</p>
+<p>Some SSA slides from <a href="http://www.cs.cmu.edu/afs/cs/academic/class/15745-s12/public/lectures/L13-SSA-Concepts-1up.pdf">Todd Mowry at CMU</a></p>
+
+
+</section>
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -699,6 +1104,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../lectures/05b_licm.html" class="pagination-link" aria-label="05 loop invariant code motion">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">05 loop invariant code motion</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../lectures/12_memory.html" class="pagination-link" aria-label="12_memory.qmd">
+        <span class="nav-page-text">12_memory.qmd</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -707,7 +1124,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/06_ssa.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>
