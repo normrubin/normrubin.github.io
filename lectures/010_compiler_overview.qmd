@@ -1,6 +1,10 @@
 ---
 title: "1 Compiler Overview"
 sidebar: false
+format:
+    revealjs:
+        chalkboard: true
+
 ---
 # Introduction 
 
@@ -9,6 +13,7 @@ A	compiler	writer	builds	bridges	between	people	and	machines, and	this	task	is	e
 a) Software	engineers	want	abstractions	
 b) Hardware	engineers	want	efficiency	
 
+## Grace Hopper (first compiler)
 
 Originally, a compiler was a person doing calculations.
 
@@ -16,15 +21,30 @@ In 1952, she had an operational link-loader, which she called a compiler. She la
 
 [![hopper](images/Grace_Hopper_and_UNIVAC.jpg)]
 
+## FORTRAN 
+
 In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).
 
 Their  paper is located at <https://dl.acm.org/doi/10.1145/1455567.1455599>.
+
 The name stands for formula translation. It's in upper case because at that time, compilers did not support lower case.
 
-The FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM's next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan. The goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.
+---
+
+The FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM's next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. 
+
+---
+
+Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan. 
+
+---
+
+The goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.
+
 
 FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters. 
 
+## development model
 
 In these early years, the development model was:
 
@@ -35,6 +55,7 @@ In these early years, the development model was:
 
 Vendors sometimes built compilers but often used small startup compiler companies.  
 
+---
 
 Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.
 
@@ -48,6 +69,8 @@ A--IR--> C;
 1) Front end - parse the program into IR
 2) Middle end - machine independent optimizations and analyses 
 3) Back end -  machine specific stuff where machine code is generated
+
+---
 
 This course focuses on part 2
 
