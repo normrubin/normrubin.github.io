@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024 - 3b local value numbering</title>
+<title>EECE7398 Fall 2024 - _ local value numbering</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="EECE7398 Fall 2024 - 3b local value numbering">
+<meta property="og:title" content="EECE7398 Fall 2024 - _ local value numbering">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/03b_local_value_numbering.html">3b local value numbering</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/03b_local_value_numbering.html">_ local value numbering</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -170,6 +170,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../lectures/02a_representaton.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Representation of programs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">_ Intro to Bril</span></a>
   </div>
@@ -177,13 +183,13 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3a Local Analysis &amp; Optimization</span></a>
+ <span class="menu-text">3 Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">3b local value numbering</span></a>
+ <span class="menu-text">_ local value numbering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -195,19 +201,25 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">5 global analysis</span></a>
+ <span class="menu-text">5 Global Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">05 loop invariant code motion</span></a>
+ <span class="menu-text">_ loop invariant code motion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">6 Static single Assignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 LLVM</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -274,9 +286,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/03b_local_value_numbering.html">3b local value numbering</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/03b_local_value_numbering.html">_ local value numbering</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">3b local value numbering</h1>
+<h1 class="title">_ local value numbering</h1>
 </div>
 
 
@@ -295,9 +307,9 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="local-value-numbering" class="level3">
 <h3 class="anchored" data-anchor-id="local-value-numbering">Local Value Numbering</h3>
-<p>Value numbering is a very powerfull technique that removes <strong><em>redunancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
+<p>Value numbering is a very powerful technique that removes <strong><em>redunancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
 <p>The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (reprented as a number) Each time it sees an instruction it forms a hash of the op code and t he value numbers of its operands and gives tha a new value number.</p>
-<p>Two instructions are redundent if they have same op code and operands, which means the same value number</p>
+<p>Two instructions are redundant if they have same op code and operands, which means the same value number</p>
 <p>e_i and e_j have the same value number if and only if e_i and e_j are provably equal for all possible operands of the expressions.</p>
 <p>local value numbering covers lot of optimizations</p>
 <pre><code>dead code elimination
@@ -318,7 +330,7 @@ main{
     print copy2;
 }
 
-common subexpression elimination cse 
+common sub-expression elimination cse 
 
 main {
     a: int = const 4;
@@ -328,7 +340,7 @@ main {
     prod: int = mul sum1 sum2;
     print prod;
 }</code></pre>
-<p>We want to stop thinking about varaibles and think about values. Two instructions are redundent if they compute the same value.</p>
+<p>We want to stop thinking about varaibles and think about values. Two instructions are redundant if they compute the same value.</p>
 </section>
 <section id="this-is-a-very-deep-idea-that-comes-up-multiple-times." class="level3">
 <h3 class="anchored" data-anchor-id="this-is-a-very-deep-idea-that-comes-up-multiple-times.">this is a very deep idea that comes up multiple times.</h3>
@@ -341,8 +353,8 @@ a:  int b c;  </code></pre>
    int const 2 
    int 0 1
 ]</code></pre>
-<p>less storage, args are just pointers, instructions are smaller. faster becuase any use points to the corresponding def without any searching.</p>
-<p>Psuedu code (similar to an interpreter)</p>
+<p>less storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.</p>
+<p>Pseudo code (similar to an interpreter)</p>
 <p>hash table constants and expressions of value numbers to value numbers and a variable holding the value</p>
 <p>reverse map from variable to value numbers</p>
 <pre><code>  main {
@@ -417,13 +429,13 @@ a:  int b c;  </code></pre>
 </tr>
 </tbody>
 </table>
-<p>as we lookup each instruction - replace each arg with the cannonical home</p>
-<p>if the value is already in the table replace with an id from cannonical home</p>
+<p>as we lookup each instruction - replace each arg with the canonical home</p>
+<p>if the value is already in the table replace with an id from canonical home</p>
 <p>extensions</p>
 <ol type="1">
 <li>a: int id b</li>
 </ol>
-<p>a gets the value number of b. No copy requred</p>
+<p>a gets the value number of b. No copy required</p>
 <ol start="2" type="1">
 <li><p>: int add a b; for add sort value numbers so add a b; and add b a; get the same value number</p></li>
 <li></li>
@@ -434,8 +446,8 @@ a:  int b c;  </code></pre>
    c: add a b;</code></pre>
 <p>if both value numbers are pointing to constants- actually do the add</p>
 </section>
-<section id="psuedu-code" class="level3">
-<h3 class="anchored" data-anchor-id="psuedu-code">psuedu code</h3>
+<section id="pseudo-code" class="level3">
+<h3 class="anchored" data-anchor-id="pseudo-code">pseudo code</h3>
 <pre><code>   table = mapping from value tuples to canonical variables,
      with each row numbered
    var2num = mapping from variable names to their current
@@ -466,7 +478,7 @@ a:  int b c;  </code></pre>
                replace a with table[var2num[a]].var
 
        var2num[instr.dest] = num</code></pre>
-<p>problem: cononical variables being overwritten</p>
+<p>problem: canonical variables being overwritten</p>
 <p>``` x = a+b<br>
 x = = a+b</p>
 <p>```</p>
@@ -906,8 +918,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/03_local.html" class="pagination-link" aria-label="3a Local Analysis &amp; Optimization">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">3a Local Analysis &amp; Optimization</span>
+      <a href="../lectures/03_local.html" class="pagination-link" aria-label="3 Local Analysis &amp; Optimization">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">3 Local Analysis &amp; Optimization</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

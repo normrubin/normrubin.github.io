@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/02b_bril.html" rel="next">
+<link href="../lectures/02a_representaton.html" rel="next">
 <link href="../lectures/01a_performance_measurement.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -71,6 +71,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <meta property="og:title" content="EECE7398 Fall 2024 - 2 Representation">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
@@ -169,6 +170,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../lectures/02a_representaton.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Representation of programs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">_ Intro to Bril</span></a>
   </div>
@@ -176,13 +183,13 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3a Local Analysis &amp; Optimization</span></a>
+ <span class="menu-text">3 Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3b local value numbering</span></a>
+ <span class="menu-text">_ local value numbering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -194,19 +201,25 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">5 global analysis</span></a>
+ <span class="menu-text">5 Global Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">05 loop invariant code motion</span></a>
+ <span class="menu-text">_ loop invariant code motion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">6 Static single Assignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 LLVM</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -292,8 +305,19 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<p>#| echo: false from graphviz import Digraph import ast import os</p>
+<p>def cmd(x): os.system(x)</p>
+<p>def ast_syntax(line): return ast.dump(ast.parse(line).body[0], indent=4)</p>
+<section id="define-a-function-to-recursively-add-nodes-to-the-digraph" class="level1">
+<h1>Define a function to recursively add nodes to the Digraph</h1>
+<p>def add_node(dot, node, parent=None): node_name = str(node.__class__.__name__) dot.node(str(id(node)), node_name) if parent: dot.edge(str(id(parent)), str(id(node))) for child in ast.iter_child_nodes(node): add_node(dot, child, node)</p>
+</section>
+<section id="add-nodes-to-the-digraph" class="level1">
+<h1>Add nodes to the Digraph</h1>
+<p>def graph(line): dot = Digraph() add_node(dot, ast.parse(line).body[0]) return dot</p>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -712,8 +736,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/02b_bril.html" class="pagination-link" aria-label="_ Intro to Bril">
-        <span class="nav-page-text">_ Intro to Bril</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/02a_representaton.html" class="pagination-link" aria-label="2 Representation of programs">
+        <span class="nav-page-text">2 Representation of programs</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

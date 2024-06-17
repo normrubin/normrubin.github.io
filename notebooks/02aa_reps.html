@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024 - Schedule</title>
+<title>EECE7398 Fall 2024 - 2a Representation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +64,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/010_compiler_overview.html" rel="next">
-<link href="../Class_Overview/about.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -68,227 +100,30 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="EECE7398 Fall 2024 - Schedule">
+<meta property="og:title" content="EECE7398 Fall 2024 - 2a Representation">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body class="nav-sidebar docked fullcontent">
+<body class="fullcontent">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../Class_Overview/about.html">Class Overview</a></li><li class="breadcrumb-item"><a href="../Class_Overview/schedule.html">Schedule</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
-    </div>
-  </nav>
-</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-center sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="../">EECE7398 Fall 2024</a> 
-    </div>
-      </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true">
- <span class="menu-text">EECS 7398</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
- <span class="menu-text">Class Overview</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">About</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Schedule</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
- <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">1 Compiler Overview</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">__ Performance and Measurement</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">2 Representation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02a_representaton.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">2 Representation of programs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">_ Intro to Bril</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3 Local Analysis &amp; Optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">_ local value numbering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">4. Data Flow</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">5 Global Analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">_ loop invariant code motion</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">6 Static single Assignment</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">7 LLVM</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">8 classic loop optimizations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">9 polyhedral analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12_memory.qmd</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">13_dynamic_compielrs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">14_gpu_compilers</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/bril.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">bril.ipynb</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item">
- <span class="menu-text">Blog Posts</span>
-  </li>
-      </ul>
-  </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril Documentation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril github</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../Class_Overview/about.html">Class Overview</a></li><li class="breadcrumb-item"><a href="../Class_Overview/schedule.html">Schedule</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Schedule</h1>
+<h1 class="title">2a Representation</h1>
 </div>
 
 
@@ -305,145 +140,343 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Caution
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Where do we discussions</p>
-<p>This actually the syllabus - needs weekly dates for a schedule, and paper list</p>
-<p>we also need to get the notebooks to show up in the lectures section</p>
-</div>
-</div>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Week</th>
-<th>Topic</th>
-<th>lectures</th>
-<th>Discussion</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td>Compiler overview and structure</td>
-<td><a href="../lectures/010_compiler_overview.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Performance Measurement</td>
-<td><a href="../lectures/02a_performance_measurement.qmd">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>2</td>
-<td>Representing programs</td>
-<td><a href="../lectures/02b_representation.ipynb">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>Overview of Bril</td>
-<td><a href="../notebooks/bril.html">notebook</a></td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>Local analysis and optimization</td>
-<td><a href="../lectures/03_local.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>Data flow</td>
-<td><a href="../lectures/04_data_flow.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td>Global analysis</td>
-<td><a href="../lectures/05_global.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>6</td>
-<td>Static single assignment</td>
-<td><a href="../lectures/06_ssa.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>7</td>
-<td>LLVM</td>
-<td><a href="../notebooks/llvm.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>8</td>
-<td>Classical loop optimizations</td>
-<td><a href="../lectures/08_loops.qmd">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>9</td>
-<td>Polyhedral analysis</td>
-<td><a href="../lectures/09_poly.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>10</td>
-<td>MLIR</td>
-<td><a href="../lectures/10_mlir.qmd">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>11</td>
-<td>Interprocedural Analysis</td>
-<td><a href="../lectures/11_whole_program.qmd">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>12</td>
-<td>Memory Management</td>
-<td><a href="../lectures/12_memory.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="odd">
-<td>13</td>
-<td>Dynamic compilers</td>
-<td><a href="../lectures/13_dynamic_compilers.html">lecture</a></td>
-<td>???</td>
-</tr>
-<tr class="even">
-<td>14</td>
-<td>GPU Compilers</td>
-<td><a href="../lectures/14_gpu_compilers.html">lecture</a></td>
-<td>???</td>
-</tr>
-</tbody>
-</table>
-<p>Papers</p>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Caution
+<section id="how-do-we-represent-programs" class="level1">
+<h1>How do we represent programs</h1>
+<p>The representation of a program - is what we read in and read out when transforming a program. What kind of properties make a good representation?</p>
+<p>One possible representation is called <strong><em>concrete syntax form</em></strong> Programs are text - surface syntax- just what you would type into an editor.</p>
+<div id="cell-4" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>value <span class="op">=</span> <span class="dv">8</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(value):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  result <span class="op">=</span> result <span class="op">+</span> i</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>29</code></pre>
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<p>list of papers and dates for student presentations</p>
+<p>What is good and what is bad about this representation?</p>
+<p>What is the level of abstraction? How do you understand the semantics.</p>
+<p>Form 2 - <strong><em>Abstract syntax form</em></strong></p>
+<p>Tree structure - Nodes are parts of the program, edges show how they are connected. We can write this as a list or a graph</p>
+<div id="cell-6" class="cell" data-execution_count="29">
+<div class="cell-output cell-output-stdout">
+<pre><code>FunctionDef(
+    name='pgm',
+    args=arguments(
+        posonlyargs=[],
+        args=[],
+        kwonlyargs=[],
+        kw_defaults=[],
+        defaults=[]),
+    body=[
+        Assign(
+            targets=[
+                Name(id='value', ctx=Store())],
+            value=Constant(value=8)),
+        Assign(
+            targets=[
+                Name(id='result', ctx=Store())],
+            value=Constant(value=1)),
+        For(
+            target=Name(id='i', ctx=Store()),
+            iter=Call(
+                func=Name(id='range', ctx=Load()),
+                args=[
+                    Name(id='value', ctx=Load())],
+                keywords=[]),
+            body=[
+                Assign(
+                    targets=[
+                        Name(id='result', ctx=Store())],
+                    value=BinOp(
+                        left=Name(id='result', ctx=Load()),
+                        op=Mult(),
+                        right=Name(id='i', ctx=Load())))],
+            orelse=[]),
+        Expr(
+            value=Call(
+                func=Name(id='print', ctx=Load()),
+                args=[
+                    Name(id='result', ctx=Load())],
+                keywords=[]))],
+    decorator_list=[])</code></pre>
+</div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dot_dia</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<div>
+<figure class="figure">
+<p><img src="02aa_reps_files/figure-html/cell-5-output-1.svg" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>AST tree representation An AST is a tree structure, nodes like if, test, body, assign Each node is one concept from the program</p>
+<p>Recursive function can walk over the tree, one chunk of code for each node.</p>
+<ol type="1">
+<li>Good - each type of node is different, making special cases are easy</li>
+<li>Bad - each type of node is different so analysis has to know about every type, making general cases hard</li>
+</ol>
+<p>This is the classic way to write an interpreter. Simple (non optimizing) compilers often use this format.</p>
+<section id="a-more-regular-representation" class="level2">
+<h2 class="anchored" data-anchor-id="a-more-regular-representation">A more regular representation</h2>
+<p>Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.</p>
+<div class="columns">
+<div class="column" style="width:45%;">
+<pre><code>    let value = 8
+    let result = 1
+    for (let i = 0;i &lt; value;i = i+ 1)
+    {
+        result = result * i
+    }
+    console.log(result )</code></pre>
+</div><div class="column" style="width:5%;">
+<!-- empty column to create gap -->
+</div><div class="column" style="width:40%;">
+<pre><code>@main {
+  v0: float = const 8;
+  value: float = id v0;
+  v1: float = const 1;
+  result: float = id v1;
+  v3: float = const 0;
+  i: float = id v3;
+.for.cond.2:
+  v4: float = id i;
+  v5: float = id value;
+  v6: bool = flt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: float = id result;
+  v8: float = id i;
+  v9: float = fmul v7 v8;
+  result: float = id v9;
+  v10: float = id i;
+  v11: float = const 1;
+  v12: float = fadd v10 v11;
+  i: float = id v12;
+  jmp .for.cond.2;
+.for.end.2:
+  v13: float = id result;
+  print v13;
+  v14: int = const 0;
+}
+</code></pre>
+</div>
+</div>
+<div id="cell-11" class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>os.system(<span class="st">'ts2bril images/toy.ts | bril2txt'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>@main {
+  v0: float = const 8;
+  value: float = id v0;
+  v1: float = const 1;
+  result: float = id v1;
+  v3: float = const 0;
+  i: float = id v3;
+.for.cond.2:
+  v4: float = id i;
+  v5: float = id value;
+  v6: bool = flt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: float = id result;
+  v8: float = id i;
+  v9: float = fmul v7 v8;
+  result: float = id v9;
+  v10: float = id i;
+  v11: float = const 1;
+  v12: float = fadd v10 v11;
+  i: float = id v12;
+  jmp .for.cond.2;
+.for.end.2:
+  v13: float = id result;
+  print v13;
+  v14: int = const 0;
+}</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>0</code></pre>
+</div>
+</div>
+<p>Looks like assembly but no limit on registers, no condition codes. fully typed, no complex addressing modes.</p>
+<p>syntax-</p>
+<p>Declare functions, labels, instructions</p>
+<p>instruction:<br>
+1) variable type = opcode arguments 2) opcode list of arguments</p>
+</section>
+<section id="what-is-good-and-what-is-about-this-reorientation" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-good-and-what-is-about-this-reorientation">what is good and what is about this reorientation?</h2>
+<p>What is the abstract syntax form for this?</p>
+</section>
+<section id="extract-info-from-this-repreentation." class="level2">
+<h2 class="anchored" data-anchor-id="extract-info-from-this-repreentation.">extract info from this repreentation.</h2>
+<section id="control-flow-graph-cfg-version-1" class="level3">
+<h3 class="anchored" data-anchor-id="control-flow-graph-cfg-version-1">control flow graph (CFG) (version 1)</h3>
+<p>Representation is a directed graph. Nodes are instructions, edges indicate <strong><em>possible</em></strong> flow of control, one entry and one exit node.</p>
+<p>Here is a simple program:</p>
+<pre><code>    @main {
+        v: int = const 5;
+        print v;
+    }</code></pre>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[const] --&gt; B[print]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>a second example</p>
+<pre><code>    @main {
+        v: int = const 4;
+        jmp  .somewhere;
+        v: int = const 2;
+        .somewhere;
+        print v;
+    }</code></pre>
+<p>What does the control flow graph look like?</p>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[const 4] --&gt; B[jmp]
+  B --&gt; C[print]
+  D[const 2] --&gt; C
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>notice label does not produce a node</p>
+<p>Easy to see a dead instruction.</p>
+<p>Third example:</p>
+<pre><code>    @main {
+        v: int = const 4;
+        b: bool = const false;
+        br b .there .here;
+    .here:
+        v: int = const 2;
+    .there;
+        print v;
+    }</code></pre>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[v: int const 4] --&gt; B[b: bool const false]
+  B --&gt; C[br b .there, .false]
+  C --&gt; D[v: const 2]
+  C --&gt; E[print v]
+  D --&gt; E
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>which is the true and which is the false, could mark the edges or use a convention</p>
+<p>Which is the entry, which is the exit?</p>
+<p>There is a long chain of instructions entered at the top, exit at the bottom, no branches inside.</p>
+<p>Basic blocks (cfg form 2) 1) nodes can be a sequence of instructions. 1) jumps and branches can only be at the end of a sequence 1) only label has to be at the start 1) every instruction in the sequence executes the same number of times</p>
+<div class="cell" data-fig-width="6.5" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A[v: int const 4\nb : bool\n br ] 
+  A --&gt; D[v: const 2]
+  A --&gt; E[print v]
+  D --&gt; E
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>As we construct basic blocks, we can add instructions up till something that ends the block (<strong><em>terminator</em></strong>)</p>
+<p>Option: do all blocks end in a terminator or not?</p>
+<p>given a block b, the <strong><em>predecessors</em></strong> of b are the blocks b_in where there is an edge bin-&gt;b. And the <strong><em>successors</em></strong> of B are the b_out where b-&gt;b_out is an edge</p>
+</section>
+</section>
+<section id="what-is-an-algorithm-that-forms-a-cfg" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-an-algorithm-that-forms-a-cfg">What is an algorithm that forms a cfg</h2>
+<ol type="1">
+<li>just find all the basic blocks</li>
+<li>add the control flow edges</li>
+</ol>
+<p>psuedo code</p>
+<ol type="1">
+<li>in: instructions - list of instructions</li>
+<li>out blocks - list of lists of instructions</li>
+</ol>
+<pre><code>current_block = []
+for i in instructions:
+    if i is not a label:
+       block.append(i)
+    if i is a label or terminator:
+        blocks.append(current_block)
+        current_block = []</code></pre>
+<p>step 2 we need a map from labels to basic blocks</p>
+<ol type="1">
+<li>in: instructions - list of instructions</li>
+<li>out blocks - list of lists of instructions</li>
+</ol>
+<pre><code>current_block = []
+for i in instructions:
+    if i is not a label:
+       block.append(i)
+    if i is a label or terminator:
+        blocks.append(current_block)
+        current_block = []
+    
+
+for block in blocks:
+   last = block[-1]
+   if last is a jmp (one successor)
+      add edge from block to last.dest 
+   else if last is a br (two successors)
+      add two edges from block to last.true, last.false 
+   else  fall through 
+      add edge to next block (if it exists)</code></pre>
+<div id="cell-18" class="cell" data-execution_count="45">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  bril_program <span class="op">=</span> f.read()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(bril_program)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
+        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
+        { "op": "add", "type": "int", "dest": "v2",
+          "args": ["v0", "v1"] },
+        { "op": "print", "args": ["v2"] }
+      ],
+      "args": []
+    }
+  ]
+}
+</code></pre>
 </div>
 </div>
 
 
+</section>
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -855,18 +888,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../Class_Overview/about.html" class="pagination-link" aria-label="About">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">About</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../lectures/010_compiler_overview.html" class="pagination-link" aria-label="1 Compiler Overview">
-        <span class="nav-page-text">1 Compiler Overview</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -875,7 +896,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/Class_Overview/schedule.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.dev/normrubin/normrubin.github.io/blob/main/notebooks/02aa_reps.ipynb" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>

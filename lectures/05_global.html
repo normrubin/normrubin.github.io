@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024 - 5 global analysis</title>
+<title>EECE7398 Fall 2024 - 5 Global Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -102,7 +102,7 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="EECE7398 Fall 2024 - 5 global analysis">
+<meta property="og:title" content="EECE7398 Fall 2024 - 5 Global Analysis">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -116,7 +116,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05_global.html">5 global analysis</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05_global.html">5 Global Analysis</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -202,6 +202,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../lectures/02a_representaton.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Representation of programs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">_ Intro to Bril</span></a>
   </div>
@@ -209,13 +215,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3a Local Analysis &amp; Optimization</span></a>
+ <span class="menu-text">3 Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3b local value numbering</span></a>
+ <span class="menu-text">_ local value numbering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -227,19 +233,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">5 global analysis</span></a>
+ <span class="menu-text">5 Global Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">05 loop invariant code motion</span></a>
+ <span class="menu-text">_ loop invariant code motion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">6 Static single Assignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 LLVM</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -306,9 +318,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05_global.html">5 global analysis</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05_global.html">5 Global Analysis</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">5 global analysis</h1>
+<h1 class="title">5 Global Analysis</h1>
 </div>
 
 
@@ -1075,8 +1087,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/05b_licm.html" class="pagination-link" aria-label="05 loop invariant code motion">
-        <span class="nav-page-text">05 loop invariant code motion</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/05b_licm.html" class="pagination-link" aria-label="_ loop invariant code motion">
+        <span class="nav-page-text">_ loop invariant code motion</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
