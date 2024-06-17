@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024 - 6 static single assignment</title>
+<title>EECE7398 Fall 2024 - 1 Compiler Overview</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/02a_performance_measurement.html" rel="next">
+<link href="../lectures/01a_performance_measurement.html" rel="next">
 <link href="../Class_Overview/schedule.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -68,187 +68,30 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="EECE7398 Fall 2024 - 6 static single assignment">
+<meta property="og:title" content="EECE7398 Fall 2024 - 1 Compiler Overview">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body class="nav-sidebar docked fullcontent">
+<body class="fullcontent">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">6 static single assignment</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
-    </div>
-  </nav>
-</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-center sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="../">EECE7398 Fall 2024</a> 
-    </div>
-      </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true">
- <span class="menu-text">EECS 7398</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false">
- <span class="menu-text">Class Overview</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">About</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Schedule</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
- <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">6 static single assignment</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02a_performance_measurement.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">2a Performance and Measurement</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02b_representation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">2b Representation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3a Local Analysis &amp; Optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3b local value numbering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">4. Data Flow</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">5 global analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">05 loop invariant code motion</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">6 Static single assignment</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12_memory.qmd</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">13_dynamic_compielrs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">14_gpu_compilers</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-      </ul>
-  </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril Documentation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril github</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">6 static single assignment</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">1 Compiler Overview</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">6 static single assignment</h1>
+<h1 class="title">1 Compiler Overview</h1>
 </div>
 
 
@@ -265,8 +108,186 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>A compiler writer builds bridges between people and machines, and this task is each day more challenging.</p>
+<ol type="a">
+<li>Software engineers want abstractions<br>
+</li>
+<li>Hardware engineers want efficiency</li>
+</ol>
+<p>Originally, a compiler was a person doing calculations.</p>
+<p>In 1952, she had an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”</p>
+<p>[<img src="images/Grace_Hopper_and_UNIVAC.jpg" class="img-fluid" alt="hopper">]</p>
+<p>In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).</p>
+<p>Their paper is located at <a href="https://dl.acm.org/doi/10.1145/1455567.1455599" class="uri">https://dl.acm.org/doi/10.1145/1455567.1455599</a>. The name stands for formula translation. It’s in upper case because at that time, compilers did not support lower case.</p>
+<p>The FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM’s next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan. The goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.</p>
+<p>FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.</p>
+<p>In these early years, the development model was:</p>
+<ol type="1">
+<li>build a new machine</li>
+<li>design a new language</li>
+<li>implement a compiler</li>
+</ol>
+<p>Vendors sometimes built compilers but often used small startup compiler companies.</p>
+<p>Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+A[Front end]--IR--&gt; B[Middle end];
+B--IR--&gt; C[Back end];
+A--IR--&gt; C;
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<ol type="1">
+<li>Front end - parse the program into IR</li>
+<li>Middle end - machine independent optimizations and analyses</li>
+<li>Back end - machine specific stuff where machine code is generated</li>
+</ol>
+<p>This course focuses on part 2</p>
+<p>A goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.</p>
+<p> There are many ways to compare the performance of programs:<br>
+– Time<br>
+– Space – Energy consumption</p>
+<p>In 1987, GCC was released. It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR. Adding an optimization or reordering optimizations is quite hard.</p>
+<p>Vendors could use one front end, one middle end and only need to write a new back end.</p>
+<p>This ended almost all the compiler startups. Free front end, middle end.</p>
+<p>In gcc the IR is somewhat C based, for instance there are pointers but there is no way to talk about garbage collection without hacks.</p>
+<p>in about 2006 LLVM (low level virtual machine) appeared. This changed the model to look like a library.</p>
+<p>The core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+A[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};
+A--IR--&gt; C;
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Optimizations form <em>passes</em>. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments.</p>
+<p>In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TB;
+A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[ASSIGNMENT] --&gt; B2[BRIL interpreter];
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<section id="cost-of-a-compiler." class="level2">
+<h2 class="anchored" data-anchor-id="cost-of-a-compiler.">Cost of a compiler.</h2>
+<p>Compilers are massive and expensive to build.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Compiler</th>
+<th style="text-align: right;">Year Started</th>
+<th style="text-align: right;">Developers</th>
+<th style="text-align: right;">Lines Of Code</th>
+<th style="text-align: right;">Est Cost $</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GCC 9.2.0</td>
+<td style="text-align: right;">1988</td>
+<td style="text-align: right;">617</td>
+<td style="text-align: right;">5,591,759</td>
+<td style="text-align: right;">425,747,279</td>
+</tr>
+<tr class="even">
+<td>LLVM 8.0.1</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: right;">1,210</td>
+<td style="text-align: right;">6,877,489</td>
+<td style="text-align: right;">529,894,190</td>
+</tr>
+<tr class="odd">
+<td>OpenJDK 14+10</td>
+<td style="text-align: right;">2007</td>
+<td style="text-align: right;">883</td>
+<td style="text-align: right;">7,955,827</td>
+<td style="text-align: right;">616,517,789</td>
+</tr>
+<tr class="even">
+<td>v8 7.8.112</td>
+<td style="text-align: right;">2008</td>
+<td style="text-align: right;">736</td>
+<td style="text-align: right;">3,043,793</td>
+<td style="text-align: right;">225,195,832</td>
+</tr>
+<tr class="odd">
+<td>Rust 1.37.0</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">2,737</td>
+<td style="text-align: right;">852,877</td>
+<td style="text-align: right;">59,109,425</td>
+</tr>
+<tr class="even">
+<td>Swift</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">857</td>
+<td style="text-align: right;">665,238</td>
+<td style="text-align: right;">45,535,689</td>
+</tr>
+<tr class="odd">
+<td>Intel Graphics 1.0.10</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">694,688</td>
+<td style="text-align: right;">46,934,626</td>
+</tr>
+</tbody>
+</table>
+<p>From CGO 2022 keynote</p>
+<p>Some observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.</p>
+</section>
+<section id="compiler-assumptions-lets-talk-about-how-many-are-still-true" class="level2">
+<h2 class="anchored" data-anchor-id="compiler-assumptions-lets-talk-about-how-many-are-still-true">Compiler Assumptions (Let’s talk about how many are still true)</h2>
+<ol type="1">
+<li>The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.</li>
+<li>Users are ok with large programs taking minutes to compile</li>
+<li>Compilers run on machines that are memory-limited.</li>
+<li>Compilers run on single-threaded machines.</li>
+<li>Most targets are C-like.</li>
+</ol>
+<p>Some changes since early 2000’s:</p>
+<ol type="1">
+<li>Integrated development environments. When you type a.b what has to happen?</li>
+<li>DSL (Doman specific languages for AI)</li>
+<li>More kinds of hardware</li>
+</ol>
+</section>
+<section id="how-well-do-compilers-do" class="level2">
+<h2 class="anchored" data-anchor-id="how-well-do-compilers-do">How well do compilers do</h2>
+<p>At the scale of datacenters, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
+<section id="proebstings-law" class="level3">
+<h3 class="anchored" data-anchor-id="proebstings-law">Proebsting’s law</h3>
+<p>Compiler Advances Double Computing Power Every 18 Years.<br>
+while hardware computing horsepower doubles every 18 months</p>
+<p>How would you prove this?</p>
 
 
+</section>
+</section>
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -685,8 +706,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/02a_performance_measurement.html" class="pagination-link" aria-label="2a Performance and Measurement">
-        <span class="nav-page-text">2a Performance and Measurement</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/01a_performance_measurement.html" class="pagination-link" aria-label="__  Performance and Measurement">
+        <span class="nav-page-text">__ Performance and Measurement</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

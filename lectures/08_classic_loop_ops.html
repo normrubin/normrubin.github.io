@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024</title>
+<title>EECE7398 Fall 2024 - 8 classic loop optimizations</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../../../">
-<script src="../../../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/09_poly.html" rel="next">
+<link href="../lectures/06_ssa.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -67,243 +69,279 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta property="og:title" content="EECE7398 Fall 2024">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="EECE7398 Fall 2024 - 8 classic loop optimizations">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body class="nav-sidebar docked fullcontent">
+<body class="fullcontent">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      EECE7398 Fall 2024
-      </li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
-    </div>
-  </nav>
-</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-center sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="../../../../">EECE7398 Fall 2024</a> 
-    </div>
-      </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true">
- <span class="menu-text">EECS 7398</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false">
- <span class="menu-text">Class Overview</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">About</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Schedule</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false">
- <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">1 Compiler Overview</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">__ Performance and Measurement</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">2 Representation</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">_ Intro to Bril</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3a Local Analysis &amp; Optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3b local value numbering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">4. Data Flow</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/05_global.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">5 global analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">05 loop invariant code motion</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">6 Static single Assignment</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">8 classic loop optimizations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">9 polyhedral analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12_memory.qmd</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">13_dynamic_compielrs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">14_gpu_compilers</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/bril.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">bril.ipynb</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item">
- <span class="menu-text">Blog Posts</span>
-  </li>
-      </ul>
-  </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril Documentation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril github</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">EECS 7398</li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/08_classic_loop_ops.html">8 classic loop optimizations</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">8 classic loop optimizations</h1>
+</div>
 
 
 
-<section id="type-inference" class="level1">
-<h1>Type Inference</h1>
-<p>Bril requires exhaustive type annotations on every instruction, which can quickly get tedious. The <code>type-infer</code> directory contains a simple global type inference tool that fills in missing type annotations. For example, it can turn this easier-to-write program:</p>
-<pre><code>@main(arg: int) {
-  five = const 5;
-  ten = const 10;
-  res = add arg five;
-  cond = le res ten;
-  br cond .then .else;
-.then:
-  print res;
-.else:
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Loops optimizations are important because</p>
+<ol type="1">
+<li>typically there is a regular access pattern</li>
+<li>the body of a loop gets repeated</li>
+<li>compilers often assume <span class="math inline">\(10^{depth}\)</span> times</li>
+</ol>
+<p>What are classic loop optimizations?</p>
+<ol type="1">
+<li>Loop Invariant Code Motion</li>
+<li>Induction Variable Recognition</li>
+<li>Strength Reduction</li>
+<li>Linear Test Replacement</li>
+<li>Loop Unrolling</li>
+</ol>
+<p>Less classic loop optimizations</p>
+<ol type="1">
+<li>Scalar replacement</li>
+<li>Loop Interchange</li>
+<li>Loop Fusion</li>
+<li>Loop Distribution (also known as Fision</li>
+<li>Loop Skewing</li>
+<li>Loop Reversal</li>
+</ol>
+<p>First recall natural loops</p>
+<ol type="1">
+<li>strongly connected region in the cfg</li>
+<li>one entry point (dominates all the nodes in the loop)</li>
+</ol>
+<p>def of loop invariant for an instruction d = op a,b</p>
+<ol type="1">
+<li>a,b are constants or,</li>
+<li>a,b defined outside the loop</li>
+<li>a,b are loop invariants</li>
+</ol>
+<p>in SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop</p>
+<p>conditions when moving an instruction d = a op b is ok</p>
+<pre><code>L0: d = 0 
+preheader: 
+L1: i = i + 1 
+d = a ⊕ b 
+     = d 
+if (i&lt;N) goto L1 
+L2: x = d </code></pre>
+<p>can move d</p>
+<p>L0: d = 0 preheader L1: if (i&gt;=N) goto L2 i = i + 1 d = a ⊕ b = d goto L1 L2: x = d ```</p>
+<p>no good d used after the loop, would not be changed if the loop executes zero times</p>
+<pre><code>L0: d = 0 
+preheader 
+L1: i = i + 1 
+d = a ⊕ b 
+  = d 
+d = 0 
+  = d 
+if (i&lt;N) goto L1
+L2: L0: d = 0 </code></pre>
+<p>no good d reassigned in the loop, do invar would be changed</p>
+<pre><code>l0: d = 0 
+preheader 
+L1: = d 
+i = i + 1 
+d = a ⊕ b 
+   = d 
+if (i&lt;N) goto L1 
+L2: x = d
+
+
+conditions without SSA
+
+1) the instruction dominates all the loop exits, where d is still live 
+1) d is only defined once 
+1) d in not live before the instruction 
+
+in SSA
+
+1) is d is live in some block after the loop, then d has to dominate that block
+2) clear 
+3) clear 
+
+
+Suppose the loop might run zero times 
+</code></pre>
+<p>while (e) { j = loopinv // may never execute S }</p>
+<p>j = loopinv // always executes while (e) { S }</p>
+<pre><code>
+can be converted into </code></pre>
+<p>if (e) { j = loopinv // may never execute while (e) { S }</p>
+<p>} ````</p>
+<section id="induction-variable-elimination" class="level2">
+<h2 class="anchored" data-anchor-id="induction-variable-elimination">induction variable elimination</h2>
+<pre><code>for (int i = 0; i &lt; 100; ++1){
+    f(a[i])
 }</code></pre>
-<p>Into this actually executable program:</p>
-<pre><code>@main(arg: int) {
-  five: int = const 5;
-  ten: int = const 10;
-  res: int = add arg five;
-  cond: bool = le res ten;
-  br cond .then .else;
-.then:
-  print res;
-.else:
+<p>calculate a[i] as: &amp;a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4</p>
+<ol type="1">
+<li>a_i = &amp;a[0] before the loop</li>
+<li>a_i = a_i + 4 (add the stride) in every iteration</li>
+<li>the only remaining use of i is the test i &lt; 100, which could become a_i &lt; &amp;a[0] + 4*100 (which is loop invariant)</li>
+</ol>
+<p>steps</p>
+<p>1find basic induction variables i = i + e, where e is loop invariant</p>
+<p>what does this look like in ssa</p>
+<pre><code>loop header:
+ i1 = phi(i0, i2)
+loop body:
+i2 = i1 + e</code></pre>
+<pre><code>loop header:
+ i1 = phi(i0, i2)
+loop body:
+a0 = i1 + e
+i2 = a0 + e1</code></pre>
+<p>for each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions</p>
+<p>Step 2 find auxiliary induction variables</p>
+<p>j = basic_ind * loop inv + loop invar</p>
+<pre><code>for (int i = 0; i &lt; n; i++) {
+     j = 2*i + 1;     // Y 
+     k = -i;          // Y 
+     l = 2*i*i + 1;   // N 
+     c = c + 5;       // Y* 
 }</code></pre>
-<p>The tool is a simple Python program, <code>infer.py</code>, that takes JSON programs that are missing types and adds types to them. It is also useful even on fully-typed programs as a type <em>checker</em> to rule out common run-time errors. The included <a href="../../../../src/briltxt/docs/tools/text.html">text format tools</a> support missing types for both parsing and printing, so here’s a shell pipeline that adds types to your text-format Bril program:</p>
-<pre><code>cat myprog.bril | bril2json | python type-infer/infer.py | bril2txt</code></pre>
-<p>You can read <a href="https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/bril-type-inference/">more about the inference tool</a>, which is originally by Christopher Roman.</p>
+<p>step 3 replace auxiliary induction variables (derived ) by new variables without the multiply</p>
+<p>step4 if the only remaining use of the induction variable is the termination test, change the test to use the new variable</p>
+<pre><code>sum = 0
+for (i = 1, i &lt; 100; i++) {
+  sum = sum + a[i -1]
+}</code></pre>
+<p>in SSA form:</p>
+<pre><code>   sum0 = 0
+   i0 = 1
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t10 = i1 -1 
+   t20 = t10 * 4
+   t30 = t20 + &amp;a
+   t40 = load t30
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   if (i2 &lt;= 100)go to l</code></pre>
+<ol type="1">
+<li>i is a basic induction variable</li>
+<li>t10 is a aux induction variable</li>
+<li>t20 is an aux induction variable</li>
+<li>t30 is an aux induction variable</li>
+</ol>
+<p>t3 has a use in the load</p>
+<p>t3 = t20 + &amp;a ==&gt; t10 * 4 + &amp;a ==&gt; (i1-1)* 4+ &amp;a</p>
+<p>t3 = 4* i1 + &amp;a - 4</p>
+<pre><code>   sum0 = 0
+   i0 = 1
+   t50 = &amp;a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &amp;a
+   t40 = load t50
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   t52 = t50 + 4
+   if (i2 &lt;= 100)go to l</code></pre>
+<pre><code>   sum0 = 0
+   i0 = 1
+   t50 = &amp;a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   // i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &amp;a
+   t40 = load t50
+   sum2 = sum1 + t40
+   //i2 = i1 + 1
+   t52 = t50 + 4
+   if (t52 &lt;= 396 + &amp;a )go to l</code></pre>
+</section>
+<section id="loop-un-switching" class="level2">
+<h2 class="anchored" data-anchor-id="loop-un-switching">loop un-switching</h2>
+<pre><code>for (int i = 0 ; i &lt; 100; ++1){
+    if (c) {  // c is loop invariant 
+        f(i)
+    } else {
+        g(i)
+    }
+}</code></pre>
+<p>look for special patterns and replace</p>
+<pre><code>if (c) {  // c is loop invariant 
+   for (int i = 0 ; i &lt; 100; ++1){
+        f(i)
+    } 
+}else {
+    for (int i = 0 ; i &lt; 100; ++1){
+        g(i)
+    }
+}</code></pre>
+<p>This is often done before vectorization</p>
+<p>loop fusion</p>
+<pre><code>for (i = 0; i &lt; 100 ; ++){
+ s0:   b[i] = f(a[i])
+}
+for (i = 0; i &lt; 100 ; ++){
+ s1:   c[i] = f(b[i])
+}</code></pre>
+<ol type="1">
+<li>when is it legal to do this?</li>
+<li>When can we get rid of the b array?</li>
+</ol>
+<p>There is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors</p>
+<p>These sort of loop optimizations would make good projects</p>
 
 
 </section>
@@ -718,6 +756,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../lectures/06_ssa.html" class="pagination-link" aria-label="6 Static single Assignment">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">6 Static single Assignment</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../lectures/09_poly.html" class="pagination-link" aria-label="9 polyhedral analysis">
+        <span class="nav-page-text">9 polyhedral analysis</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
@@ -726,7 +776,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/src/briltxt/docs/tools/infer.md" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/08_classic_loop_ops.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>
