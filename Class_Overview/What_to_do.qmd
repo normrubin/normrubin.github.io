@@ -1,0 +1,142 @@
+---
+title: "How to do assignments"
+format: html
+---
+
+#How to How to do assignments
+
+
+## Mechanics of writing a blog
+
+Assignments get submitted as blog postings.  In setting up the class web site I used [quarto](https://quarto.org/) which lets you write a blog post in markdown (no messy html required).  I recommend you use it as well.    
+
+
+## submitting via pull requests 
+
+
+To add a blog post (which you must do for discussion leading and project reports), use a pull request.
+
+You'll want to create a text file in the blog directory with your new post. Use a filename like YYYY-MM-DD-title.md, where the date is the discussion day or the project deadline and the title is up to you. 
+
+
+List all the authors of your post. Include a link to your homepage if you have one, but it's optional. Also write a short bio for yourselves (using Markdown), which will appear at the bottom of the post. Then, the rest of the text file is the Markdown text of your blog post.
+
+If you want to use math in your blog post, you can use $\pi$ for inline math and \[ e^{i\pi} + 1 = 0 \] for display math.
+
+To include images or other resources in your post, make your post into a directory. That is, make a new directory called YYYY-MM-DD-title inside blog. Then, put your text in a file called index.md inside that. Put your images in the same directory and refer to them with relative paths. See the QUARTO  docs on for more details.
+
+You can preview your writing with any Markdown renderer. To see what it will look like when published, install  quarto and type quarto render to preview the entire site.
+
+### Homeworks 
+
+
+To reinforce the specific compiler techniques we cover in class, you will implement them on your own. In lessons, we will discuss the 
+high-level ideas and provide pseudo-code; your task is to translate these into working code and collect empirical evidence to demonstrate their effectiveness. Completing these implementations will reveal practical challenges that are not apparent from a high-level overview.
+
+Testing your implementation is crucial. Your goal is to provide convincing evidence that your implementation performs as intended. 
+For instance, an optimization should generally make programs faster without causing any errors. 
+While formal proofs of these properties are likely out of scope, you will need to find alternative ways to gather evidence. 
+Avoid relying solely on existing test cases in the Bril repository, as they are typically insufficient. 
+instead, consider using all the benchmarks available in the repo.
+
+You may work individually or in groups of 2–3 students. Upon completing an implementation, follow these steps:
+
+1) Consider putting all your code online in an open-source repository, such as GitHub (optional but recommended).
+Create a fork of the class repository if desired.
+
+2) Submit the assignment on Canvas by providing a text file with a URL to your open-source implementation. If you prefer not to open-source your code, you can upload the code itself.
+
+3) Write a brief post in the lesson’s associated GitHub Discussions thread, covering the following topics (one paragraph each is sufficient):
+    a) Summarize what you did.
+    a) Explain how you tested your implementation. What test inputs did you use? Do you have any quantitative results?
+    a) Describe the hardest part of the task and how you addressed this challenge.
+
+Ensure all implementation tasks are your own work or done with your group. Although sample implementations for many tasks are available in the GitHub repository, you are not allowed to use this code. Similarly, you may not use implementations open-sourced by past 6120 students. I recommend not looking at these implementations while working on your tasks to ensure you genuinely learn the material. However, if you absolutely need to refer to them, you are responsible for managing your own learning process.
+
+
+### Paper Reading & Discussion
+
+
+I'm not sure yet if the discussions will be on Canvas or GitHub Discussions.
+
+Another part of this course involves reading and discussing research papers. For each paper (see the schedule), everyone will participate in the discussion in two ways: asynchronously on GitHub Discussions threads before class, and synchronously in class. For every paper, there will be a Discussions topic; post at least one message with your thoughts on the paper before the class discussion. Your comment doesn't need to be long—just a couple of sentences is fine. You can also respond to others' thoughts on the thread.
+
+For some papers, you will be the discussion leader. Leaders have three extra responsibilities: monitoring and replying to the asynchronous discussion, moderating and guiding the in-class discussion, and synthesizing ideas into a blog post afterward.
+
+***Leader Responsibilities***
+
+At least a week before the discussion day:
+
+    1) Create a GitHub Discussions thread in the Reading category for your topic.
+
+During the lead-up to the discussion day:
+
+    1) Monitor the GitHub Discussions thread for your topic. Answer questions and offer additional insights as needed.
+    1) Collect a list of questions for the in-class discussion. You can create your own or select the best from the online discussion.
+
+On the discussion day:
+
+Moderate the  discussion. Provide enough background to get to the discussion questions and facilitate the conversation.
+
+Due one week after the discussion day:
+
+1) Write a post about the paper for our course blog. The post should include:
+
+    a) Background information necessary to understand the paper.
+    a) A detailed summary of the main contributions.
+    a) Critical analysis of the merits and shortcomings of the work.
+    a) Discussion of the paper’s role in history and its connections to the current computing landscape.
+    A) Incorporate the best ideas from the online and in-class discussions. You can present your own opinions, the class consensus, or both.
+
+Writing the Blog Post
+
+While summarizing the paper, avoid letting direct summary dominate your post. Keep the technical explanation to about a quarter of the length. Prioritize breadth over depth in your summary, and highlight specific contributions instead of covering the entire paper.
+
+Focus most of your writing on your own commentary: context, criticism, and discussion. Choose a title for your blog post that reflects the main point you want to make about the paper, rather than just the paper’s title.
+
+For inspiration, check out last cs6120 blog posts. However, avoid reading posts about your paper, if they exist.
+
+Publishing
+
+Publish the post to the course GitHub repository by opening a pull request.  Once your PR is open, announce it on the appropriate Discussions thread to let others know.
+
+
+
+
+
+
+
+Proposal
+The first deadline is the project proposal. Open a GitHub issue answering these three questions, which are a sort of abbreviated form of the Heilmeier catechism:
+
+What will you do?
+How will you do it?
+How will you empirically measure success?
+You should also list the GitHub usernames of everyone in the group. After you send the PR, submit its URL to the “Project Proposal” assignment on CMS.
+
+The instructor will have feedback on how to approach your project.
+
+Implementation
+The main phase, of course, is implementing the thing you said you would implement. I recommend you keep a “lab notebook” to log your thoughts, attempts, and frustrations—this will come in handy for the report you’ll write about the project.
+
+I strongly recommend that you develop your code as an open-source project. Use a publicly-visible version control repository on a host like GitHub, and include an open source license. When you create your repository, comment on your proposal GitHub issue with a link. (If you have a specific objection to open-sourcing your code, that’s OK—include a description of how you’ll share your code privately with me.)
+
+Evaluation
+A major part of your project is an empirical evaluation. To design your evaluation strategy, you will need to consider at least these things:
+
+Where will you get the input code you’ll use in your evaluation?
+How will you check the correctness of your implementation? If you’ve implemented an optimization, for example, “correctness” means that the transformed programs behave the same way as the original programs.
+How will you measure the benefit (in performance, energy, complexity, etc.) of your implementation?
+How will you present the data you collect from your empirical evaluation?
+Other questions may be relevant depending on the project you choose. Consider the SIGPLAN empirical evaluation guidelines when you design your methodology.
+
+Experience Report
+For the main project deadline, you will write up the project’s outcomes in the form of a post on the course blog. Your writeup should answer these questions in excruciating, exhaustive detail:
+
+What was the goal?
+What did you do? (Include both the design and the implementation.)
+What were the hardest parts to get right?
+Were you successful? (Report rigorously on your empirical evaluation.)
+As with paper discussions, you can optionally include a video to go along with your blog post.
+
+To submit your report, open a pull request in the course’s GitHub repository to add your post to the blog. In your PR description, please include “closes #N” where N is the issue number for your proposal. The repository README has instructions.
