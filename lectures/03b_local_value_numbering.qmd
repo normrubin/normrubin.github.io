@@ -1,11 +1,11 @@
 ---
-title: "3b local value numbering"
+title: "_ local value numbering"
 format: html
 ---
 
 ### Local Value Numbering
 
-Value numbering is a very powerfull technique that removes ***redunancies***,  An instruction  x + y is redundant inside a block if it has already been computed
+Value numbering is a very powerful technique that removes ***redunancies***,  An instruction  x + y is redundant inside a block if it has already been computed
 in the block, and no intervening operation redefines x or y. If the compiler
 finds a redundant expression, it can save that value at the first computation
 and replace any subsequent evaluations with references to the saved value.
@@ -13,7 +13,7 @@ and replace any subsequent evaluations with references to the saved value.
 The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (reprented as a number)
 Each time it sees an instruction it forms a hash of the op code and t he value numbers of its operands and gives tha a new value number.
 
-Two instructions are redundent if they have same op code and operands, which means the same value number
+Two instructions are redundant if they have same op code and operands, which means the same value number
 
 e_i and e_j have the
 same value number if and only if e_i and e_j are provably equal for all possible
@@ -40,7 +40,7 @@ main{
     print copy2;
 }
 
-common subexpression elimination cse 
+common sub-expression elimination cse 
 
 main {
     a: int = const 4;
@@ -54,7 +54,7 @@ main {
 
 
 We want to stop thinking about varaibles and think about values.
-Two instructions are redundent if they compute the same value.
+Two instructions are redundant if they compute the same value.
 
 ### this is a very deep idea that comes up multiple times.  
 
@@ -72,10 +72,10 @@ becomes:
 ]
 ```
 less storage, args are just pointers, instructions are smaller.
-faster becuase any use points to the corresponding def without any searching.
+faster because any use points to the corresponding def without any searching.
 
 
-Psuedu code (similar to an interpreter)
+Pseudo code (similar to an interpreter)
 
 hash table 
 constants and expressions of value numbers to value numbers and a variable holding the value 
@@ -115,15 +115,15 @@ revese map
 | prod | 4 
 
 
-as we lookup each instruction - replace each arg with the cannonical home
+as we lookup each instruction - replace each arg with the canonical home
 
-if the value is already in the table replace with an id from cannonical home
+if the value is already in the table replace with an id from canonical home
 
 extensions 
 
 1) a: int id b 
 
-a gets the value number of b. No copy requred
+a gets the value number of b. No copy required
 
 2) : int add a b; for add sort value numbers so add a b; and add b a; get the same value number 
 
@@ -138,7 +138,7 @@ constant folding
 if both value numbers are pointing to constants- actually do the add
 
 
-### psuedu code
+### pseudo code
 
  ```
     table = mapping from value tuples to canonical variables,
@@ -173,7 +173,7 @@ if both value numbers are pointing to constants- actually do the add
         var2num[instr.dest] = num
 ```
 
-problem:   cononical variables being overwritten
+problem:   canonical variables being overwritten
 
 ``` x = a+b  
     x = 
