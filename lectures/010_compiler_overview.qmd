@@ -1,9 +1,9 @@
 ---
 title: "1 Compiler Overview"
 sidebar: false
-format:
-    revealjs:
-        chalkboard: true
+# format: 
+#     revealjs:
+#         scrollable: true
 
 ---
 # Introduction 
@@ -66,6 +66,8 @@ B--IR--> C[Back end];
 A--IR--> C;
 ```
 
+---
+
 1) Front end - parse the program into IR
 2) Middle end - machine independent optimizations and analyses 
 3) Back end -  machine specific stuff where machine code is generated
@@ -82,6 +84,7 @@ A goal of this course is to explain  how to transform a program automatically, w
 – Space	
 – Energy	consumption	
 
+## gcc 
 
 In 1987, GCC was released.  It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR.  Adding an optimization or reordering optimizations is quite hard.
 
@@ -91,7 +94,9 @@ This ended almost all the compiler startups. Free front end, middle end.
 
 In gcc the IR is somewhat C based, for instance there are pointers but there is no way to talk about garbage collection without hacks.
 
-in about 2006 LLVM (low level virtual machine) appeared. This changed the model to look like a library. 
+## llvm 
+
+in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library. 
 
 The core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.
 
