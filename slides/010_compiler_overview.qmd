@@ -1,0 +1,172 @@
+---
+title: "1 Compiler Overview"
+sidebar: false
+# format: 
+#     revealjs:
+#         scrollable: true
+
+---
+# Introduction 
+
+A	compiler	writer	builds	bridges	between	people	and	machines, and	this	task	is	each	day	more	challenging.	
+
+a) Software	engineers	want	abstractions	
+b) Hardware	engineers	want	efficiency	
+
+## Grace Hopper (first compiler)
+
+Originally, a compiler was a person doing calculations.
+
+In 1952, she had an operational link-loader, which she called a compiler. She later said, "Nobody believed that," and that she "had a running compiler and nobody would touch it. They told me computers could only do arithmetic."
+
+[![hopper](images/Grace_Hopper_and_UNIVAC.jpg)]
+
+## FORTRAN 
+
+In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).
+
+Their  paper is located at <https://dl.acm.org/doi/10.1145/1455567.1455599>.
+
+The name stands for formula translation. It's in upper case because at that time, compilers did not support lower case.
+
+---
+
+The FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM's next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. 
+
+---
+
+Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan. 
+
+---
+
+The goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.
+
+
+FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters. 
+
+## development model
+
+In these early years, the development model was:
+
+1) build a new machine 
+1) design a new language 
+1) implement a compiler 
+
+
+Vendors sometimes built compilers but often used small startup compiler companies.  
+
+---
+
+Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.
+
+```{mermaid}
+graph LR;
+A[Front end]--IR--> B[Middle end];
+B--IR--> C[Back end];
+A--IR--> C;
+```
+
+---
+
+1) Front end - parse the program into IR
+2) Middle end - machine independent optimizations and analyses 
+3) Back end -  machine specific stuff where machine code is generated
+
+---
+
+This course focuses on part 2
+
+
+A goal of this course is to explain  how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.
+
+ There	are	many	ways	to	compare	the	performance	of	programs:	
+– Time	
+– Space	
+– Energy	consumption	
+
+## gcc 
+
+In 1987, GCC was released.  It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR.  Adding an optimization or reordering optimizations is quite hard.
+
+Vendors could use one front end, one middle end and only need to write a new back end. 
+
+This ended almost all the compiler startups. Free front end, middle end. 
+
+In gcc the IR is somewhat C based, for instance there are pointers but there is no way to talk about garbage collection without hacks.
+
+## llvm 
+
+in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library. 
+
+The core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.
+
+
+```{mermaid}
+graph LR;
+A[Front end]--IR--> B0[OP0] --IR--> B1[OP1] --IR--> B2[OPT2]--IR --> BN[OPTn]--IR -->C{Back end};
+A--IR--> C;
+```
+
+Optimizations form *passes*. A user could mix and match -- run some optimizations but not others to compile a specific program. It became easy for people to add a pass.  Lots of academic research, lots of experiments. 
+
+In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.  
+
+
+```{mermaid}
+graph TB;
+A[TEXT_Version of BRIL]--> B0[BRIL in JSON] --> B1[ASSIGNMENT] --> B2[BRIL interpreter];
+```
+
+## Cost of a compiler.
+
+Compilers are massive and expensive to build.
+
+| Compiler | Year Started | Developers  | Lines Of Code  | Est Cost  $ |
+|----------|----------:|----------:|----------:|----------:|
+| GCC 9.2.0  | 1988   | 617  | 5,591,759   | 425,747,279   |
+| LLVM 8.0.1  | 2001 | 1,210 | 6,877,489  | 529,894,190 |
+| OpenJDK 14+10 | 2007 | 883 | 7,955,827 |  616,517,789|
+| v8 7.8.112 | 2008 | 736 |  3,043,793 | 225,195,832| 
+| Rust 1.37.0 | 2010 | 2,737 | 852,877 |  59,109,425| 
+| Swift       | 2010  | 857 | 665,238 | 45,535,689 |
+| Intel Graphics 1.0.10 | 2018| 149|  694,688| 46,934,626|
+
+
+From CGO 2022 keynote 
+
+Some observations:
+1) Production compilers are expensive.
+1) IR does not change easily.
+1) Much of compiler technology is old.
+1) There is a vast difference between production and student projects.
+
+
+
+
+## Compiler Assumptions (Let's talk about how many are still true)
+
+1) The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.
+1) Users are ok with large programs taking minutes to compile
+1) Compilers run on machines that are memory-limited.
+1) Compilers run on single-threaded machines.
+1) Most targets are C-like.
+
+
+Some changes since early 2000's:
+
+1) Integrated development environments.  When you type a.b what has to happen?
+1) DSL (Doman specific languages for AI)
+1) More kinds of hardware 
+
+
+## How well do compilers do 
+
+At	the	scale	of	datacenters,	every	single	performance	percent	matters!	Just	take	a	look	at	Google's	(and	other's)	publicly	available	numbers	on	expenditures	on	datacenters.	We	are	talking	about	billions	of	dollars.	A	single	percent	improvement	can	mean	millions	of	dollars	from	more	program	features	or	improved	utilization.
+
+
+### Proebsting's law
+
+Compiler Advances	Double	Computing	Power	Every	18	Years.	
+while	hardware	computing	horsepower	doubles every 18 months
+
+How would you prove this?

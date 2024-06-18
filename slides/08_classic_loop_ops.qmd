@@ -1,0 +1,324 @@
+---
+title: "8 classic loop optimizations"
+
+format:
+    revealjs:
+        slide-number: true
+        show-slide-number: print
+        chalkboard: true
+
+sidebar: false
+---
+
+Loops optimizations are important because 
+
+1) typically there is a regular access pattern
+1) the body of a loop gets repeated 
+1) compilers often assume $10^{depth}$ times 
+
+
+What are classic loop optimizations?
+
+1) Loop Invariant Code Motion
+1) Induction Variable Recognition 
+1) Strength Reduction 
+1) Linear Test Replacement 
+1) Loop Unrolling
+
+Less classic loop optimizations
+
+1) Scalar replacement 
+1) Loop Interchange 
+1) Loop Fusion 
+1) Loop Distribution (also known as Fision
+1) Loop Skewing 
+1) Loop Reversal
+
+
+First recall natural loops
+
+1) strongly connected region in the cfg 
+1) one entry point (dominates all the nodes in the loop)
+
+def of loop invariant for an instruction d = op a,b 
+
+1) a,b are constants or,
+1) a,b defined outside the loop
+1) a,b are loop invariants 
+
+in SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop
+
+
+
+
+
+conditions when moving an instruction d = a op b  is ok
+
+```
+L0: d = 0 
+preheader: 
+L1: i = i + 1 
+d = a ⊕ b 
+     = d 
+if (i<N) goto L1 
+L2: x = d 
+```
+
+can move d
+
+
+L0: d = 0
+preheader 
+L1: if (i>=N) goto L2 
+i = i + 1 
+d = a ⊕ b 
+ = d 
+ goto L1 
+L2: x = d
+ ```
+ 
+ no good d used after  the loop, would not be changed if the loop executes zero times
+
+ ```
+ L0: d = 0 
+ preheader 
+ L1: i = i + 1 
+ d = a ⊕ b 
+   = d 
+ d = 0 
+   = d 
+if (i<N) goto L1
+ L2: L0: d = 0 
+ ```
+
+ no good d reassigned in the loop, do invar would be changed 
+
+ ```
+ l0: d = 0 
+ preheader 
+ L1: = d 
+ i = i + 1 
+ d = a ⊕ b 
+    = d 
+if (i<N) goto L1 
+L2: x = d
+
+
+conditions without SSA
+
+1) the instruction dominates all the loop exits, where d is still live 
+1) d is only defined once 
+1) d in not live before the instruction 
+
+in SSA
+
+1) is d is live in some block after the loop, then d has to dominate that block
+2) clear 
+3) clear 
+
+
+Suppose the loop might run zero times 
+
+```
+while (e) {
+    j = loopinv   // may never execute 
+    S
+}
+
+j = loopinv   // always executes
+while (e) {
+    S
+}
+``` 
+
+can be converted into 
+```
+if (e) {
+    j = loopinv  // may never execute 
+while (e) {
+    S
+}
+
+}
+````
+
+
+## induction variable elimination
+
+```
+for (int i = 0; i < 100; ++1){
+    f(a[i])
+}
+```
+
+calculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4 
+
+1) a_i = &a[0] before the loop
+1) a_i = a_i + 4 (add the stride) in every iteration 
+1) the only remaining use of i is the test i < 100, which could become a_i < &a[0] + 4*100 (which is loop invariant)
+
+
+steps 
+
+1find basic induction variables 
+i = i + e, where e is loop invariant 
+
+what does this look like in ssa 
+
+```
+loop header:
+ i1 = phi(i0, i2)
+loop body:
+i2 = i1 + e
+```
+
+
+
+```
+loop header:
+ i1 = phi(i0, i2)
+loop body:
+a0 = i1 + e
+i2 = a0 + e1
+```
+
+for each instruction d = c +- loop invariant 
+see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions 
+
+Step 2 find auxiliary induction variables 
+
+j = basic_ind * loop inv + loop invar
+
+```
+for (int i = 0; i < n; i++) {
+     j = 2*i + 1;     // Y 
+     k = -i;          // Y 
+     l = 2*i*i + 1;   // N 
+     c = c + 5;       // Y* 
+}
+```
+
+step 3 replace auxiliary induction variables (derived ) by new variables without the multiply
+
+step4 if the only remaining use of the induction variable is the termination test, change the test to use the new variable 
+
+```
+sum = 0
+for (i = 1, i < 100; i++) {
+  sum = sum + a[i -1]
+}
+```
+
+in SSA form:
+
+``` 
+   sum0 = 0
+   i0 = 1
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t10 = i1 -1 
+   t20 = t10 * 4
+   t30 = t20 + &a
+   t40 = load t30
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   if (i2 <= 100)go to l
+```
+
+1) i is a basic induction variable 
+1) t10 is a aux  induction variable 
+1) t20 is an aux induction variable 
+1) t30 is an aux induction variable 
+
+t3 has a use in the load 
+
+t3 = t20 + &a ==> t10 * 4 + &a ==> (i1-1)* 4+ &a
+
+t3 = 4* i1 + &a - 4 
+
+
+``` 
+   sum0 = 0
+   i0 = 1
+   t50 = &a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &a
+   t40 = load t50
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   t52 = t50 + 4
+   if (i2 <= 100)go to l
+```
+
+
+
+``` 
+   sum0 = 0
+   i0 = 1
+   t50 = &a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   // i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &a
+   t40 = load t50
+   sum2 = sum1 + t40
+   //i2 = i1 + 1
+   t52 = t50 + 4
+   if (t52 <= 396 + &a )go to l
+```
+
+
+## loop un-switching 
+
+```
+for (int i = 0 ; i < 100; ++1){
+    if (c) {  // c is loop invariant 
+        f(i)
+    } else {
+        g(i)
+    }
+}
+```
+
+look for special patterns and replace 
+
+
+```
+if (c) {  // c is loop invariant 
+   for (int i = 0 ; i < 100; ++1){
+        f(i)
+    } 
+}else {
+    for (int i = 0 ; i < 100; ++1){
+        g(i)
+    }
+}
+```
+
+This is often done before vectorization 
+
+
+
+loop fusion
+```
+for (i = 0; i < 100 ; ++){
+ s0:   b[i] = f(a[i])
+}
+for (i = 0; i < 100 ; ++){
+ s1:   c[i] = f(b[i])
+}
+```
+
+1) when is it legal to do this?
+1) When can we get rid of the b array?
+
+There is also an optimization that goes the other way 
+split a loop so that each statement becomes a separate loop incase we could run as vectors 
+
+These sort of loop optimizations would make good projects 

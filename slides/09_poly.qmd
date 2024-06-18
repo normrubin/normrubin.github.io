@@ -1,0 +1,635 @@
+---
+title: "9 polyhedral analysis"
+
+format:
+    revealjs:
+        slide-number: true
+        show-slide-number: print
+        chalkboard: true
+
+sidebar: false 
+---
+
+# 1 intro to polyhedral analysis 
+
+We get a new flavor of IR -  more math like 
+
+two kinds of problems:
+
+1) polyhedral analysis -  given a loop transform, does the behavior change- Is it valid
+1) polyhedral scheduling  - find a transform that maximizes/minimizes some property
+
+
+The base idea -
+A statement in a loop might execute a lot of times
+Each time it executes there is one instance of the statement
+
+We want an ir that:
+
+1) let  us reason about each instance 
+1) is finite (even in the number of instances is not)
+1) lets  a compiler  reason about what is going on
+
+
+Negative - 
+
+Only applies to loop nests, where everything,
+array indexs, bounds, statements etc are affine
+so not not loops hidden in recursion
+
+99% of hpc loops are affine
+C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.
+
+over 95% of loops in deep learning are affine
+Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.
+
+
+
+Over the course of this, I'll use 3 pieces of math
+1) ILP integer linear programming 
+	find a set of integers that satisfies a set of inequalities and maximize something 
+2) fourier-motzkin method
+3) The affine form of Farkas Lemma
+
+# 1 Changing the order of iterations 
+
+can we reverse this loop:
+
+```
+for i = [1,2,3,4]
+s:   a[i] = a[i-1]
+
+```
+Does these loops do the same thing
+
+```
+for i = [1,2,3,4]      			for i = [4,3,2,1]
+s:   a[i] = a[i-1]      		 s:   a[i] = a[i-1] 
+
+```
+
+looks look at the instances by  considering a program trace 
+
+program trace (instances)
+```
+for i = [1,2,3,4]      			for i = [4,3,2,1]
+s:   a[i] = a[i-1]      		  s:   a[i] = a[i-1] 
+   s(1)                               s(4)
+   s(2)                               s(3)
+   s(3)                               s(2)
+   s(4)                               s(1)
+```
+
+and the data that is accessed 
+
+```
+for i = [1,2,3,4]      			for i = [4,3,2,1]
+s:   a[i] = a[i-1]      		  s:   a[i] = a[i-1] 
+          reads  writes
+   s(1)    a[0]   a[1]               s(4)
+   s(2)    a[1]   a[2]               s(3)
+   s(3)    a[2]   a[3]               s(2)
+   s(4)    a[3]   a[4]               s(1)
+```
+
+We need to preserve cases where an instance of s produces a value, some other instance of s consumes the value 
+
+each s(i) is an instance of a single statement
+
+data  dependence  as an equation:  $s(i) => s(i+1)$
+
+
+observation 1-  same set of instances 
+
+if we track  each instance,  we have more info b ut could run out of space 
+
+we need a more compressed ir format,  polyhedral methods use sets and math
+
+
+
+$$
+\begin{align*}
+domain &= \left\{ i \in \Z^1  \mid 1 <= i <= 4\right\} \\
+instances\  of   \ s &= \left\{ s(i) \mid 1 <=i <= 4\right\}
+\end{align*}
+$$
+
+The domain is the set of integer values of the loop index. 
+left and right have the same domain
+
+We call the order that instances execute the **schedule**
+The  schedule is the ordering  of instances.
+this is a map of instance to time. Set of pairs that determine statement order.  Total ordering on instances 
+
+
+observation 2- different schedules 
+
+$$
+\begin{align*}
+left \ schedule &= \left\{ s[i] \rightarrow i \right\} \\
+right \ schedule &= \left\{ s[i] \rightarrow 5-i \right\}
+\end{align*}
+$$
+
+
+data dependences (just the same as before but with bounds)
+$$
+dependence = \left \{(s(i), s(i+1)) \mid 1<= i <= 3 \right \} 
+$$
+
+New schedule is legal, if it respects all data dependences,
+or **set of violated data dependences is empty**
+
+what is a violated data dependence
+
+a pair (p, c) where p produces data that c consumes and c comes before p in the new schedule
+
+$$
+\left \{(s(i), s(i+1)) \mid 1 \le i \le 3 \right \}
+$$
+
+$$
+\left \{(s(i), s(j)) \mid \ newSch(i) \ge newSch(j) \right \}
+$$
+
+intersection is the set of s(i) produces data read by s(i+1) and  the consumer runs first
+
+$$
+violated\ set = \left \{ (s(i), s(i+1)) \mid 1 \le i \le 3 \land 5-i \ge 5-i+1 \right \}
+$$
+cannot reverse the loop if this set is empty
+
+we can simplify this to:
+$$
+\begin{align*}
+1<= i <= 3 \\
+ 5-i>= 5-i+1
+\end{align*}
+$$
+
+We can pull in  magic math number 1 use a ilp solver to find a solution  one  solution is i = 1 
+
+#2 ilp solver  info
+
+can an ilp solver always work?  
+
+Hilbert's tenth problem is the tenth on the list of mathematical problems that the German mathematician David Hilbert posed in 1900. It is the challenge to provide a general algorithm that, for any given Diophantine equation (a polynomial equation with integer coefficients and a finite number of unknowns), can decide whether the equation has a solution with all unknowns taking integer values.
+
+sadly answer is no (found in 1970)
+
+But we can do this if we limit the kinds of inequalities 
+
+ ## affine limits 
+
+affine functions, no multiplying unknowns,  no quantifiers (for all, or exists)  and is ok,  or ok (if we change to two problems)
+just add/subtract/ multiply by a constant,
+can add minimize/maximize a function.
+division and remainder by a constant, max/min/ absolute 
+
+Most scientific programs and ai programs fit, because array subscripts are often affine
+
+But lots of other kinds of programs do not.  
+
+There is a lot of formal math background  here, decidability in logic. 
+
+
+ilp is np-complete so it is slow, but often tractable for problems with up to several hundred variables.
+
+Some compiler writers feel that means can only do this for toy programs?  What do you think?
+
+
+
+#2  multiple dimensions 
+
+~~~
+for i in [1,2,3,4]
+  for j in [1,2,3, 4]
+    s: a(i,j) = a(i-1, j+1)
+
+~~~
+![alt text](plot2-1.png)
+The x axis is the outer loop, the y axis is the inner loop.
+The arrows are the data flow,
+
+The schedule actually goes up each column (the j values) going over the columns left to right (the i column)
+
+notice that this does execute in parallel, but it could if we execute in diagonal order and we could tile it in the yellow boxes if we ran the tiles in diagonal order.
+
+## formalizing the schedule, Lexicographic ordering
+
+schedule s(i,j) -> (i,j)
+statements -> vector (should be a time)
+
+How do we interpret a vector as a time, e.g. hours, min, seconds. 
+
+Usually written  as $\gg $ Generalization of alphabetical order
+
+$$
+(i,j) \gg (m,n) \iff i >  m \lor (i=m \land j> n)
+$$
+
+Compare left to right if terms are equal, go to next term, or different so compare the terms
+
+Notice the or we will need to call the ilp solver more than once 
+
+Checking for loop interchange 
+
+```
+for i in [1,2,3,4]                     for j in [1,2,3]
+  for j in [1,2,3]                       for i in [1,2,3,4]
+s:   a(i,j) = a(i-1,j+1)                   a(i,j) = a(i-1,j+1)  
+
+
+s(i, j) -> (i,j)                          s(i,j)=(j,i)
+```
+
+data flow 
+
+
+        read write
+s(1,1)  a(0,2)  a(1,1)
+s(1,2)  a(0,3)  a(1,2)
+s(1,3)  a(0,4)  a(1,3)
+s(1,4)  a(0,5)  a(1,4)
+s(2,1)  a(1,2)  a(2,1)   s(1,2)-> s(2,1)
+s(2,2)  a(1,3)  a(2,2)   s(1,3)-> s(2.2)
+...
+
+s(i,j) writes a value that is consumed in s(i+1, j-1)
+
+
+$$
+s(i,j) \rightarrow s(i+1, j-1)
+$$
+constants:
+
+Does there exist a statement s(i,j) and a statement $s(i',j')$
+where in the new schedule $s(i',j')$ executes first and  data flows backward in time 
+$$
+\begin{align*}
+(i', j') \gg (j,i)   &\text{ $i',j'$ is first} \\
+i' = 1+ i            &\text{ data\  from \ i+1 to $i'$}\\
+j' = -1 +j           &\text{ data\  from \ j-1 to $j'$}\\
+1 \le i \le 4 \\
+1 \le j \le 3  \\
+1 \le i' le 4 \\
+1 \le j' \leftrightarrows 3
+\end{align*}
+$$
+
+because of the lexicographic order ( or) we have two ilp problems
+one where $i'$ is greater then j, and one where $i'$ = j, and the other where $j'$ > j
+
+i ran it through 
+https://online-optimizer.appspot.com
+
+which gave me a solution 
+
+s(4,2) reads  s(3,3) but s(4,2) executes first 
+
+## ir
+
+How do we represent these sets in the  ir?
+
+~~~
+for i in [0,1,2,3,4,5]
+  for j from  i to 7
+     a(i,j) = 0
+
+~~~
+
+change the equations around so that they are ... $\ge 0$
+
+$$
+\begin{align*}
+i \ge 0  &\rightarrow  i \ge 0 \\
+i \le 5 &\rightarrow -i + 5 \ge 0 \\
+j \ge i &\rightarrow -i + j \ge 0 \\
+j \le 7 &\rightarrow =j+7 \ge 0
+\end{align*}
+$$
+
+
+We can split off the constraints:
+$$
+constraints  = \left\{ \vec{x} \mid B\vec{x} + \vec{b} >= 0\right\} 
+$$
+
+Where:
+$$
+\begin{equation*}
+B = 
+\begin{bmatrix} \begin{array}{rr}
+ 1 &  0 \\
+-1 &  0 \\
+-1 &  1 \\
+ 0 & -1
+ \end{array} \end{bmatrix}
+\vec{b} =
+\begin{bmatrix}
+ 0 \\
+ 5  \\
+ 0   \\
+7
+\end{bmatrix}
+\vec{x} =
+\begin{bmatrix}
+i \\
+j 
+\end{bmatrix}
+\end{equation*}
+$$
+
+This also works if the loop bounds are symbolic
+~~~
+for i in [L.. U]
+  for j from  i to 7
+     a(i,j) = 0
+
+~~~
+$$
+\begin{equation*}
+B = 
+\begin{bmatrix} \begin{array}{rr}
+ 1 &  0 \\
+-1 &  0 \\
+-1 &  1 \\
+ 0 & -1
+ \end{array} \end{bmatrix}
+\vec{b} =
+\begin{bmatrix}
+ L \\
+ U\\
+0\\
+7
+\end{bmatrix}
+\end{equation*}
+$$
+
+
+## suppose we have complex loop bounds?
+
+```
+for i=0; i < 7, i++
+  for j =i, j < min(7, i+4), j++
+    a(i,j) = 0
+```
+![alt text](plot1-7.png)
+
+shaded area is the polygon
+what are the loop bounds if we interchange the loops?
+
+What are the upper and lower bounds if we interchange the loops?
+
+inequalities
+$$
+\begin{align*}
+i \ge 0   & \rightarrow  i  \ge 0 \\
+i \le 6   & \rightarrow  -i+6 \ge 0 \\
+j \ge i   & \rightarrow j-i \ge 0 \\
+j \le 6    & \rightarrow  6  -j  \ge 0 \\
+j \le i+3 & \rightarrow -j+i+3 \ge 0 
+\end{align*}
+$$
+
+```
+for j  (must be constants)
+  for j (constants and j )
+
+```
+
+we can get the j bounds by projecting onto the j axis,  next we want to remove j from the inequalities 
+
+
+ir constrants
+
+$$
+\begin{align*}
+\begin{equation*}
+B =
+\begin{bmatrix} \begin{array}{rr}
+ 1 & 0 \\
+-1 & 0 \\
+-1 & 1 \\
+0 & -1 \\
+ 1 & -1 
+\end{array} \end{bmatrix}
+\vec{b} =
+\begin{bmatrix}
+ 0\\
+ 6 \\
+0\\
+6\\
+3
+\end{bmatrix}
+\end{equation*}
+\end{align*}
+$$
+
+written for i
+$$
+\begin{align}
+0  \le  & i & \\
+        & i &\le 6 \\
+        & i & \le j \\
+        & &  6  -j  \ge 0 \\
+j -3 \le & i &
+\end{align}
+$$
+
+$ i \le max(0, j-3) \land  i \le min(6,j) $
+
+written for j
+$$
+\begin{align}
+       & & i \ge 0 \\
+       & & i \le 6  \\
+i \le  &j & \\
+    &  j  & \le 6 \\
+&j& \le i+3 
+\end{align}
+$$
+
+
+bounds for j depend on i -  We need to remove i 
+
+
+math thing #2 fourier-motzkin method
+
+https://people.math.carleton.ca/~kcheung/math/notes/MATH5801/02/2_1_fourier_motzkin.html
+
+Given a set of inequalities remove one variable, (for higher dim d, need to do this multiple times)
+
+in general 
+Suppose we want to remove $x_m$ we find a pair $L \le c_1 * x_m $  and  upper bound $x_2 * x_m \ge U$ and both c's are >= 0
+
+remove x_m and add $c_2* L \ge c_1 *U $
+
+We start with each pair of constants
+$$
+c_1 * i < U \land
+c_2 *i > L
+$$
+
+there are 4 pairs (1,2), (1,3) , (2,5),  (3,5) 
+all the c's are 1 
+from the ir column 1 (i column) ignore zeros, pair up plus and minus values 
+
+
+We need to eliminate i (to get the bounds for the outer loop in j)
+
+we have 4 inequalities where i is not multiplied by zero $ j \le 6$ 
+
+we consider each pair
+
+$$
+\begin{align*}
+(1,2) \rightarrow  0 &\le 6 \ done \\
+(1,3) \rightarrow  0 &\le j\\
+(2,5) \rightarrow j-3  &\le 6\\
+(3,5) \rightarrow j-3  &\le j \ done 
+\end{align*}
+$$
+
+bounds for j are 0 to 6
+
+
+```
+for j =0 ; j <= 6 , j++
+    for i = max(j-3,6), i < j; i++>  
+	   a[i,j] = 0
+```
+
+
+## suppose we want to run the an example  in parallel
+~~~
+for i in [1,2,3,4]
+  for j in [1,2,3, 4]
+    s: a(i,j) = a(i-1, j+1) 
+~~~
+
+
+
+reorder to run in parallel get new bounds, we want to run diagonally $k= i-j$, we know the transformation that we want 
+We replace $i = k+j $
+
+for k = ??
+   for j = ?? 
+     s: a(j-k,j) = a(j-k-1, j+1)
+
+
+$$
+\begin{align*}
+1 \le i \le 4 \\
+1 \le j \le 4 \\
+\end{align*}
+$$
+
+$$
+\begin{align*}
+1 \le & k+j &\le 4 \\
+1 \le & j &\le 4 \\
+\end{align*}
+$$
+
+$$
+\begin{align*}
+1-k \le j \le 4-k \\
+1 \le j <= 4
+\end{align*}
+$$
+
+now for mf
+$$
+\begin{align*}
+1-k \le  4-k \\
+1-k  \le 4\\
+1 \le 4-k \\
+1 \le 4
+\end{align*}
+$$
+
+giving k bounds -3 to 3 
+j bound are max(1,1,k) yo min(4, 4-k)
+
+
+#  4 Scheduling 
+
+Up till now we assumed we know the transformation but now we consider 
+can we find a schedule that is good in some way
+
+an example 
+```
+for i in [0,1,2,3,4,5]
+   P:  a(i) = input(i) +1
+for j in [0,12,3,4,5]
+    c: b(j) = a(j) +2
+```
+
+This is not quite a loop nest - unless we picture an outer loop running one time.
+
+
+
+The new schedule has to be affine (restriction)
+schedule is a map from instances to time 
+$$
+P(i) = sp*i + dp \\ 
+C(j) = sc*j + dc 
+$$
+
+optimization pick sp, dp, sc, dc that optimizes the locality.
+
+
+constraint is for all i,j, p(i) writes data that c(j) reads, and i,j are in bounds
+
+
+For any legal schedule:
+
+
+$$
+\forall i,j \mid 0 \le i \le 5 \land 0 \le j \le 5 \land i = j 
+\land sp * i + dp  \le sc * j + dc
+$$
+
+
+different values of sp, dp, sc, and dc give different schedules.  
+Since all these schedules are affine - None on them is the "best".
+Some non-affine schedule might be better.
+
+This is not suitable for ilp, because of the  $ sp * i $
+
+Suppose we want to select one of the schedules that minimizes a cost function:
+$$
+w(i,j)  = sc * j + dc - sp * i + dp 
+$$
+
+w is the time the value is needed
+
+How we select a legal schedule that has the smallest w?
+
+
+
+math fact 3 
+
+The affine form of Farkas Lemma
+An affine function non-negative everywhere inside a polygon 
+iff its non-negative at all the vertices 
+
+$$
+given: 
+\forall \vec{x} \mid \left\{ \vec{x} \mid B\vec{x} + \vec{b} >= 0\right\} 
+S^T \vec{x}+\vec{d} \ge 0
+$$
+if and only if 
+$$
+\exists p_0, \vec{p} \ge 0 \mid \forall \vec{x}\mid S^T \vec{x} + \vec{d} = (\vec{p})^t(B\vec{x}+\vec{d}) + p_0
+$$
+
+What does this mean and how does it help?
+
+
+
+
+
+
+

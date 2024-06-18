@@ -1,0 +1,30 @@
+export QUARTO_PROJECT_INPUT_FILES="more
+ Class_Overview/schedule.qmd
+Class_Overview/about.qmd
+Class_Overview/What_to_do.qmd
+index.qmd
+about.qmd
+notebooks/bril.ipynb
+notebooks/02aa_reps.ipynb
+notebooks/representation.ipynb
+notebooks/llvm.ipynb
+notebooks/02_reps.ipynb
+lectures/02a_representation.qmd
+lectures/bril.qmd
+lectures/010_compiler_overview.qmd
+lectures/02b_bril.qmd
+lectures/08_classic_loop_ops.qmd
+lectures/12_memory.qmd
+lectures/05_global.qmd
+lectures/01a_performance_measurement.qmd
+lectures/110_whole_program.qmd
+lectures/09_poly.qmd
+lectures/100_mlir.qmd
+lectures/06_ssa.qmd
+lectures/05b_licm.qmd
+lectures/13_dynamic_compilers.qmd
+lectures/04_data_flow.qmd
+lectures/03b_local_value_numbering.qmd
+lectures/14_gpu_compilers.qmd
+lectures/07_llvm.ipynb
+lectures/03_local.qmd"

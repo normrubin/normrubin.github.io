@@ -1,0 +1,301 @@
+---
+title: "4. Data Flow"
+
+format:
+    revealjs:
+        slide-number: true
+        show-slide-number: print
+        chalkboard: true
+
+sidebar: false 
+---
+
+## reasoning about data flow (global analysis)
+
+We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.
+
+There is some theory to look at for this.  How do we know if the algorithm will converge for any possible cfg.
+
+and some naming for each kind of problem
+
+```{mermaid}
+graph TD
+style A text-align: left
+style B  text-align: left
+%% nodes 
+     A["1: main cond
+   2: a int = const 47
+   3: b :int = const 42
+   4:br cond .left .right"] 
+   
+   B["5: b: int = const 1
+   6 c:int = const 5 
+   7 jmp .end"]
+  
+   C["8: a :int = const 2
+   9: c: int = const 10
+   10 jmp .end"]
+    D["11: d: int sub  a b
+    12 print d
+    13 ret"]
+%% edges
+    A  -- true --> B
+    A  --false --> C
+    B --> D
+    C --> D
+```
+
+## first we are going to look at a fg  specific problem "reaching definitions"
+
+*Reaching definitions* are an example of a global property that require you to look at an entire CFG.
+
+  ***Use:*** An instruction uses all of its arguments. (So any instruction with arguments is a "use."), a binary instruction is two uses.
+
+A ***definition*** is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest or an argument)
+
+The above program has 8 definitions, Which we could represent by a bit vector of size 8.
+
+A definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and  the variable in D is not overwritten on the path.
+
+***Available:*** Definitions that reach a given point in the program are available at that point.
+
+
+if an instruction writes a variable it ***kills***  all prior definitions that write the same variable 
+
+### Reaching definitions problem determine which definitions reach which uses.
+
+
+We could build a 2d matrix - definitions by uses, where a 1 bit  indicates that this definition reaches this use.
+As a matrix this would be very sparse, later when we do ssa forms will see a very cool  compression technique. 
+Algorithms that use this kind of matrix are called bit-vector methods. 
+
+
+A ***program point*** is an instruction
+
+a definition of a variable v reaches a program point p if and only if:
+
+1) the definition reaches the point just before p 
+1) the variable v is not redefined at p
+
+or 
+
+1) the variable v is defined at p.
+
+What about multiple predecessors?  p is the first instruction of a block with multiple preds.
+
+If a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.
+This is a ***union*** operation.
+
+We are moving information down from definition. This is called ***forward*** propagation 
+
+
+
+Define two sets IN and OUT that hold definitions 
+
+IN is the set of definitions that reach a point immediately before p
+
+OUT is the set of definitions that reach a point immediately after p 
+
+To illustrate this, I"ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def.
+
+```{mermaid}
+graph TD
+style A text-align: left
+style B  text-align: left
+%% nodes 
+A_IN["A_IN={}"]
+A_OUT["A_OUT={(cond,1),(a,2),(b,3)}"]
+
+B_IN["B_IN={(cond,1),(a,2),(b,3)}"]
+B_OUT["B_OUT={(cond,1),(a,2),(b,5),(c,6)}"]
+
+C_IN["IN={(cond,1),(a,2),(b,3)}"]
+C_OUT["OUT={(cond,1),(a,8),(b,3,(c,9)}"]
+
+D_IN["IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}"]
+
+  A["blk a
+    1: main cond
+   2: a int = const 47
+   3: b :int = const 42
+   4:br cond .left .right"] 
+   
+   B["blk b
+   5: b: int = const 1
+   6 c:int = const 5 
+   7 jmp .end"]
+  
+   C["blk c
+     8: a :int = const 2
+   9: c: int = const 10
+   10 jmp .end"]
+    D["11: d: int sub  a b
+    12 print d
+    13 ret"]
+%% edges
+    A_IN --> A 
+    A --> A_OUT
+    A_OUT  -- true --> B_IN
+    B_IN --> B
+    B --> B_OUT
+    A_OUT --false --> C_IN
+    C_IN --> C
+    C-->   C_OUT
+    B_OUT--> D_IN
+    C_OUT--> D_IN
+    D_IN --> D
+```
+
+
+For a given block b,  we can compute two sets:
+
+1) kill(b) = all defs in the program that assign to y, and there is a def of y in b  
+2) gen(b) = definitions in b that reach the bottom of b
+
+And now globally:
+
+1) OUT(b) = (in(b) - kill(b) ) union gen(b)
+2) IN(b) = union of OUT(pred) where pred is a predecessor of b
+
+
+We call the function for 1 the ***transfer*** function for the block, and the function for 2 the ***merge*** function
+
+
+
+
+We can solve for IN and OUT iteratively using a worklist 
+
+```
+// Initialize
+for all CFG nodes n in N,
+    OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];
+
+// put all nodes into the changed set
+// N is all nodes in graph,
+Changed = N;
+
+// Iterate 
+while (Changed != emptyset)
+{
+    choose a node n in Changed;
+    // remove it from the changed set
+    Changed = Changed -{ n };
+
+    // init IN[n] to be empty
+    IN[n] = emptyset;
+  
+    // calculate IN[n] from predecessors' OUT[p]
+    for all nodes p in predecessors(n)
+         IN[n] = IN[n] Union OUT[p];
+
+    oldout = OUT[n]; // save old OUT[n]
+    
+    // update OUT[n] using transfer function f_n ()
+    OUT[n] = GEN[n] Union (IN[n] -KILL[n]);
+
+    // any change to OUT[n] compared to previous value?
+    if (OUT[n] changed) // compare oldout vs. OUT[n]
+    {    
+        // if yes, put all successors of n into the changed set
+        for all nodes s in successors(n)
+             Changed = Changed U { s };
+    }
+}
+
+```
+
+Does this always converge?
+
+what order do we want to select nodes (basic blocks)? 
+
+visit a node after visiting its preds.  Revese post order.
+
+
+###  a second problem liveness- 
+
+A variable is live at some point if it holds a value that may be needed in the future, or equivalently 
+if its value may be read before the next time the variable is written to.
+
+```
+             live = {}
+b = 3        live = b
+c = 5        live = b c 
+a = f(b * c) live = a
+```
+
+
+We had to consider flow starting at the bottom so this is a ***backwards*** analysis 
+
+for a basic block (b):
+
+1) GEN(s) the set of variables used in s before any assignment to s in the same block
+2) kill(s) the set of variables assigned in s 
+
+global 
+
+1) OUT(exit) = {}
+2) IN(b) = gen(b) union ( OUT(b) - KILL(b))
+3) OUT(b) = union IN(b) 
+
+An example 
+
+```
+// in: {}; predecessor blocks: none
+b1: a = 3; 
+    b = 5;
+    d = 4;
+    x = 100; //x is never being used later thus not in the out set {a,b,d}
+    t = a > b
+    br t .t .f 
+   // out: {a,b,d}    //union of all (in) successors of b1 => b2: {a,b}, and b3:{b,d}  
+
+
+
+.t   // in: {a,b}; predecessor blocks: b1
+b2: c = a + b;
+    d = 2;
+// out: {b,d}
+
+
+.f 
+b3:  in: {b,d}; predecessor blocks: b1 and b2
+    c = 4;
+    return b * d + c;
+// out:{}
+```
+
+This can be solved using the same code as before, flip pred, successors because its backward, reverse in and out, set elements are variable names 
+
+
+data flow framework
+
+The data flow framework. Here's how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:
+
+1) Figure out the thing you want to know at the entry and exit of each block.
+2)  Write an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a *local analysis* for the block.), calculate GEN and KILL
+3)  Generate equalities according to the edges in the CFG.
+4)  Solve the system of equations! (Using a general solver algorithm that you don't need to adapt to every problem.)
+
+
+step 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL
+
+
+
+This algorithm has no problems with loops!
+
+Theory -- the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?
+
+The domain of values you're trying compute needs to form a *partial order* with a unique lower bound. The rough idea is that the worklist algorithm should only "move" values monotonically in the order, so it's guaranteed to eventually terminate.
+
+
+In terms of a partial order ⊑, the merge function is the *meet* (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so `x ⊑ y` implies `f(x) ⊑ f(y)`.
+
+The usual definition of a "correct" solution to a data-flow problem is the *meet-over-all-paths* solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block
+
+More examples of things you can do with the data flow framework.
+1) Reaching definitions.
+1) Live variables: which variables are both defined and going to be used at some point in the future?
+1) Constant propagation: which variables have statically knowable constant values?
+1) Available expressions: which *expressions* have already been computed computed in the past? (Useful in CSE.)
+1) Initialized variables: like in Java, which variables have had *something* written to them?
+1) Interval analysis: what is the numerical range of values that a given variable might hold?

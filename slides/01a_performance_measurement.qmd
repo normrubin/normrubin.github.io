@@ -1,0 +1,69 @@
+---
+title: "__  Performance and Measurement"
+
+format:
+    revealjs:
+        slide-number: true
+        show-slide-number: print
+        chalkboard: true
+
+
+---
+
+# Measurement 
+
+
+#example 1
+
+[ Producing Wrong Data Without Doing Anything Obviously Wrong!](<https://dl.acm.org/citation.cfm?id=1508275>) Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.
+
+445 references 
+
+
+claim 1  measurement bias is commonplace and significant
+
+Consider a researcher who wants to determine if
+optimization O is beneficial for system S. If she measures
+S and S + O in an experimental setup that favors S + O,
+she may overstate the effect of O or even conclude that O
+is beneficial even when it is not. This phenomenon is called
+measurement bias in the natural and social sciences. 
+
+Are O3 optimizations are
+beneficial to program performance when the experimental
+setups differ. Specifically, we consider experimental setups
+that differ along two dimensions: (i) UNIX environment size
+(i.e., total number of bytes required to store the environment
+variables) because it affects the alignment of stack allocated
+data; and (ii) link order (the order of .o files that we give to
+the linker) because it affects code and data layout.
+
+
+tests 
+all C benchmarks from spec benchmark 9 int and 3 float 
+ran each 5940 times over 12 days  ran on real hardware
+used gcc  
+
+test link order 
+-8% to +10% speedup based on link order 
+same results on simulator 
+
+test environment size 
+-10% to +10 percent speedup 
+
+ran some of the tests using intel c compiler to show its not gcc specific.
+
+
+Claim 2 researchers need to  consider measurement bias
+
+None of the papers in APLOS 2008, PACT 2007, PLDI 2007, and CGO 2007 address measurement bias satisfactorily.
+
+Of the 133 papers published in the surveyed conference proceedings, 88 had at least one section dedicated to experimental methodology and evaluation. 
+The median speedup reported by these papers was 10%.   
+
+
+#example 2 
+
+[Strangely, Matrix Multiplications on GPUs Run Faster When Given "Predictable" Data!](https://www.thonking.ai/p/strangely-matrix-multiplications)
+
+[SIGPLAN Empirical Evaluation Guidelines](https://www.sigplan.org/Resources/EmpiricalEvaluation/)
