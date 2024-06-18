@@ -38,6 +38,7 @@ format:
         slide-number: true
         show-slide-number: print
         chalkboard: true
+        scrollable: true
 """
 
     for root, dirs, files in os.walk(directory):
