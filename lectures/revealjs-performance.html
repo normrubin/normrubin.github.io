@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.4.555">
 
-  <title>EECE7398 Fall 2024 - 14_gpu_compilers</title>
+  <title>EECE7398 Fall 2024 - __ Performance and Measurement</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -245,6 +245,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -321,7 +322,7 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="EECE7398 Fall 2024 - 14_gpu_compilers">
+<meta property="og:title" content="EECE7398 Fall 2024 - __ Performance and Measurement">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -329,34 +330,44 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">14_gpu_compilers</h1>
+  <h1 class="title">__ Performance and Measurement</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section class="slide level2">
+<section>
+<section id="measurement" class="title-slide slide level1 center">
+<h1>Measurement</h1>
+<p>##example 1</p>
+<p>lets look at the paper</p>
+<p><a href="https://dl.acm.org/citation.cfm?id=1508275">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
+<p>445 references</p>
+</section>
+<section class="slide level2 scrollable">
 
-<div class="callout callout-warning callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Warning</strong></p>
-</div>
-<div class="callout-content">
-<p>not done</p>
-</div>
-</div>
-</div>
+<ol type="1">
+<li>Measurement bias is significant</li>
+<li>Changing aspects of an experimental setup can introduce measurement bias. ​ Measurement bias is unpredictable and there are no obvious ways to avoid it. ​ Prior work in computer system evaluation does not adequately consider measurement bias. ​</li>
+<li>The paper discusses two techniques for dealing with measurement bias: experimental setup randomization and causal analysis. ​</li>
+<li>Measurement bias occurs for all benchmarks and architectures. ​</li>
+<li>Measurement bias due to link order can significantly fluctuate conclusions. ​</li>
+<li>Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​</li>
+<li>o avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​ —</li>
+</ol>
+<p>A sample blog post about this paper <a href="https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/">blog</a></p>
+</section>
+<section id="another-example" class="slide level2">
+<h2>another example</h2>
+<p><a href="https://www.thonking.ai/p/strangely-matrix-multiplications">Strangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!</a></p>
+<p><a href="https://www.sigplan.org/Resources/EmpiricalEvaluation/">SIGPLAN Empirical Evaluation Guidelines</a></p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section>
+</section></section>
     </div>
   </div>
 
@@ -410,10 +421,10 @@
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: 'c/t',
+        slideNumber: false,
 
         // 'all', 'print', or 'speaker'
-        showSlideNumber: 'print',
+        showSlideNumber: 'all',
 
         // Add the current slide number to the URL hash so that reloading the
         // page/copying the URL will return you to the same slide

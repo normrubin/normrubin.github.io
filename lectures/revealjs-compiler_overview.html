@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.4.555">
 
-  <title>EECE7398 Fall 2024 - 9 polyhedral analysis</title>
+  <title>EECE7398 Fall 2024 - 1 Compiler Overview</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -245,6 +245,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -321,7 +322,10 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="EECE7398 Fall 2024 - 9 polyhedral analysis">
+  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<meta property="og:title" content="EECE7398 Fall 2024 - 1 Compiler Overview">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -329,440 +333,236 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">9 polyhedral analysis</h1>
+  <h1 class="title">1 Compiler Overview</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="intro-to-polyhedral-analysis" class="title-slide slide level1 center">
-<h1>1 intro to polyhedral analysis</h1>
-<p>We get a new flavor of IR - more math like</p>
-<p>two kinds of problems:</p>
-<ol type="1">
-<li>polyhedral analysis - given a loop transform, does the behavior change- Is it valid</li>
-<li>polyhedral scheduling - find a transform that maximizes/minimizes some property</li>
-</ol>
-<p>The base idea - A statement in a loop might execute a lot of times Each time it executes there is one instance of the statement</p>
-<p>We want an ir that:</p>
-<ol type="1">
-<li>let us reason about each instance</li>
-<li>is finite (even in the number of instances is not)</li>
-<li>lets a compiler reason about what is going on</li>
-</ol>
-<p>Negative -</p>
-<p>Only applies to loop nests, where everything, array indexs, bounds, statements etc are affine so not not loops hidden in recursion</p>
-<p>99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.</p>
-<p>over 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al.&nbsp;2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.</p>
-<p>Over the course of this, I’ll use 3 pieces of math 1) ILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something 2) fourier-motzkin method 3) The affine form of Farkas Lemma</p>
-</section>
-
 <section>
-<section id="changing-the-order-of-iterations" class="title-slide slide level1 center">
-<h1>1 Changing the order of iterations</h1>
-<p>can we reverse this loop:</p>
-<pre><code>for i = [1,2,3,4]
-s:   a[i] = a[i-1]
-</code></pre>
-<p>Does these loops do the same thing</p>
-<pre><code>for i = [1,2,3,4]               for i = [4,3,2,1]
-s:   a[i] = a[i-1]               s:   a[i] = a[i-1] 
-</code></pre>
-<p>looks look at the instances by considering a program trace</p>
-<p>program trace (instances)</p>
-<pre><code>for i = [1,2,3,4]               for i = [4,3,2,1]
-s:   a[i] = a[i-1]                s:   a[i] = a[i-1] 
-   s(1)                               s(4)
-   s(2)                               s(3)
-   s(3)                               s(2)
-   s(4)                               s(1)</code></pre>
-<p>and the data that is accessed</p>
-<pre><code>for i = [1,2,3,4]               for i = [4,3,2,1]
-s:   a[i] = a[i-1]                s:   a[i] = a[i-1] 
-          reads  writes
-   s(1)    a[0]   a[1]               s(4)
-   s(2)    a[1]   a[2]               s(3)
-   s(3)    a[2]   a[3]               s(2)
-   s(4)    a[3]   a[4]               s(1)</code></pre>
-<p>We need to preserve cases where an instance of s produces a value, some other instance of s consumes the value</p>
-<p>each s(i) is an instance of a single statement</p>
-<p>data dependence as an equation: <span class="math inline">\(s(i) =&gt; s(i+1)\)</span></p>
-<p>observation 1- same set of instances</p>
-<p>if we track each instance, we have more info b ut could run out of space</p>
-<p>we need a more compressed ir format, polyhedral methods use sets and math</p>
-<p><span class="math display">\[
-\begin{align*}
-domain &amp;= \left\{ i \in \Z^1  \mid 1 &lt;= i &lt;= 4\right\} \\
-instances\  of   \ s &amp;= \left\{ s(i) \mid 1 &lt;=i &lt;= 4\right\}
-\end{align*}
-\]</span></p>
-<p>The domain is the set of integer values of the loop index. left and right have the same domain</p>
-<p>We call the order that instances execute the <strong>schedule</strong> The schedule is the ordering of instances. this is a map of instance to time. Set of pairs that determine statement order. Total ordering on instances</p>
-<p>observation 2- different schedules</p>
-<p><span class="math display">\[
-\begin{align*}
-left \ schedule &amp;= \left\{ s[i] \rightarrow i \right\} \\
-right \ schedule &amp;= \left\{ s[i] \rightarrow 5-i \right\}
-\end{align*}
-\]</span></p>
-<p>data dependences (just the same as before but with bounds) <span class="math display">\[
-dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
-\]</span></p>
-<p>New schedule is legal, if it respects all data dependences, or <strong>set of violated data dependences is empty</strong></p>
-<p>what is a violated data dependence</p>
-<p>a pair (p, c) where p produces data that c consumes and c comes before p in the new schedule</p>
-<p><span class="math display">\[
-\left \{(s(i), s(i+1)) \mid 1 \le i \le 3 \right \}
-\]</span></p>
-<p><span class="math display">\[
-\left \{(s(i), s(j)) \mid \ newSch(i) \ge newSch(j) \right \}
-\]</span></p>
-<p>intersection is the set of s(i) produces data read by s(i+1) and the consumer runs first</p>
-<p><span class="math display">\[
-violated\ set = \left \{ (s(i), s(i+1)) \mid 1 \le i \le 3 \land 5-i \ge 5-i+1 \right \}
-\]</span> cannot reverse the loop if this set is empty</p>
-<p>we can simplify this to: <span class="math display">\[
-\begin{align*}
-1&lt;= i &lt;= 3 \\
-5-i&gt;= 5-i+1
-\end{align*}
-\]</span></p>
-<p>We can pull in magic math number 1 use a ilp solver to find a solution one solution is i = 1</p>
-<p>#2 ilp solver info</p>
-<p>can an ilp solver always work?</p>
-<p>Hilbert’s tenth problem is the tenth on the list of mathematical problems that the German mathematician David Hilbert posed in 1900. It is the challenge to provide a general algorithm that, for any given Diophantine equation (a polynomial equation with integer coefficients and a finite number of unknowns), can decide whether the equation has a solution with all unknowns taking integer values.</p>
-<p>sadly answer is no (found in 1970)</p>
-<p>But we can do this if we limit the kinds of inequalities</p>
-<p>## affine limits</p>
-<p>affine functions, no multiplying unknowns, no quantifiers (for all, or exists) and is ok, or ok (if we change to two problems) just add/subtract/ multiply by a constant, can add minimize/maximize a function. division and remainder by a constant, max/min/ absolute</p>
-<p>Most scientific programs and ai programs fit, because array subscripts are often affine</p>
-<p>But lots of other kinds of programs do not.</p>
-<p>There is a lot of formal math background here, decidability in logic.</p>
-<p>ilp is np-complete so it is slow, but often tractable for problems with up to several hundred variables.</p>
-<p>Some compiler writers feel that means can only do this for toy programs? What do you think?</p>
-<p>#2 multiple dimensions</p>
-<pre><code>for i in [1,2,3,4]
-  for j in [1,2,3, 4]
-    s: a(i,j) = a(i-1, j+1)
-</code></pre>
-<p><img data-src="plot2-1.png" alt="alt text"> The x axis is the outer loop, the y axis is the inner loop. The arrows are the data flow,</p>
-<p>The schedule actually goes up each column (the j values) going over the columns left to right (the i column)</p>
-<p>notice that this does execute in parallel, but it could if we execute in diagonal order and we could tile it in the yellow boxes if we ran the tiles in diagonal order.</p>
+<section id="introduction" class="title-slide slide level1 center scrollable">
+<h1>Introduction</h1>
+<p>A compiler writer builds bridges between people and machines, and this task is each day more challenging.</p>
+<ol type="a">
+<li>Software engineers want abstractions<br>
+</li>
+<li>Hardware engineers want efficiency</li>
+</ol>
 </section>
-<section id="formalizing-the-schedule-lexicographic-ordering" class="slide level2">
-<h2>formalizing the schedule, Lexicographic ordering</h2>
-<p>schedule s(i,j) -&gt; (i,j) statements -&gt; vector (should be a time)</p>
-<p>How do we interpret a vector as a time, e.g.&nbsp;hours, min, seconds.</p>
-<p>Usually written as $$ Generalization of alphabetical order</p>
-<p><span class="math display">\[
-(i,j) \gg (m,n) \iff i &gt;  m \lor (i=m \land j&gt; n)
-\]</span></p>
-<p>Compare left to right if terms are equal, go to next term, or different so compare the terms</p>
-<p>Notice the or we will need to call the ilp solver more than once</p>
-<p>Checking for loop interchange</p>
-<pre><code>for i in [1,2,3,4]                     for j in [1,2,3]
-  for j in [1,2,3]                       for i in [1,2,3,4]
-s:   a(i,j) = a(i-1,j+1)                   a(i,j) = a(i-1,j+1)  
-
-
-s(i, j) -&gt; (i,j)                          s(i,j)=(j,i)</code></pre>
-<p>data flow</p>
-<pre><code>    read write</code></pre>
-<p>s(1,1) a(0,2) a(1,1) s(1,2) a(0,3) a(1,2) s(1,3) a(0,4) a(1,3) s(1,4) a(0,5) a(1,4) s(2,1) a(1,2) a(2,1) s(1,2)-&gt; s(2,1) s(2,2) a(1,3) a(2,2) s(1,3)-&gt; s(2.2) …</p>
-<p>s(i,j) writes a value that is consumed in s(i+1, j-1)</p>
-<p><span class="math display">\[
-s(i,j) \rightarrow s(i+1, j-1)
-\]</span> constants:</p>
-<p>Does there exist a statement s(i,j) and a statement <span class="math inline">\(s(i',j')\)</span> where in the new schedule <span class="math inline">\(s(i',j')\)</span> executes first and data flows backward in time <span class="math display">\[
-\begin{align*}
-(i', j') \gg (j,i)   &amp;\text{ $i',j'$ is first} \\
-i' = 1+ i            &amp;\text{ data\  from \ i+1 to $i'$}\\
-j' = -1 +j           &amp;\text{ data\  from \ j-1 to $j'$}\\
-1 \le i \le 4 \\
-1 \le j \le 3  \\
-1 \le i' le 4 \\
-1 \le j' \leftrightarrows 3
-\end{align*}
-\]</span></p>
-<p>because of the lexicographic order ( or) we have two ilp problems one where <span class="math inline">\(i'\)</span> is greater then j, and one where <span class="math inline">\(i'\)</span> = j, and the other where <span class="math inline">\(j'\)</span> &gt; j</p>
-<p>i ran it through https://online-optimizer.appspot.com</p>
-<p>which gave me a solution</p>
-<p>s(4,2) reads s(3,3) but s(4,2) executes first</p>
+<section id="early-compilers" class="slide level2">
+<h2>Early Compilers</h2>
+<p>Originally, a compiler was a person doing calculations.</p>
+<p>In 1952, Grace Hopper an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”</p>
+<p>[<img data-src="images/Grace_Hopper_and_UNIVAC.jpg" alt="hopper">]</p>
 </section>
-<section id="ir" class="slide level2">
-<h2>ir</h2>
-<p>How do we represent these sets in the ir?</p>
-<pre><code>for i in [0,1,2,3,4,5]
-  for j from  i to 7
-     a(i,j) = 0
-</code></pre>
-<p>change the equations around so that they are … <span class="math inline">\(\ge 0\)</span></p>
-<p><span class="math display">\[
-\begin{align*}
-i \ge 0  &amp;\rightarrow  i \ge 0 \\
-i \le 5 &amp;\rightarrow -i + 5 \ge 0 \\
-j \ge i &amp;\rightarrow -i + j \ge 0 \\
-j \le 7 &amp;\rightarrow =j+7 \ge 0
-\end{align*}
-\]</span></p>
-<p>We can split off the constraints: <span class="math display">\[
-constraints  = \left\{ \vec{x} \mid B\vec{x} + \vec{b} &gt;= 0\right\}
-\]</span></p>
-<p>Where: <span class="math display">\[
-\begin{equation*}
-B =
-\begin{bmatrix} \begin{array}{rr}
-1 &amp;  0 \\
--1 &amp;  0 \\
--1 &amp;  1 \\
-0 &amp; -1
-\end{array} \end{bmatrix}
-\vec{b} =
-\begin{bmatrix}
-0 \\
-5  \\
-0   \\
-7
-\end{bmatrix}
-\vec{x} =
-\begin{bmatrix}
-i \\
-j
-\end{bmatrix}
-\end{equation*}
-\]</span></p>
-<p>This also works if the loop bounds are symbolic ~~~ for i in [L.. U] for j from i to 7 a(i,j) = 0</p>
-<pre><code>$$
-\begin{equation*}
-B = 
-\begin{bmatrix} \begin{array}{rr}
- 1 &amp;  0 \\
--1 &amp;  0 \\
--1 &amp;  1 \\
- 0 &amp; -1
- \end{array} \end{bmatrix}
-\vec{b} =
-\begin{bmatrix}
- L \\
- U\\
-0\\
-7
-\end{bmatrix}
-\end{equation*}
-$$
+<section id="fortran" class="slide level2">
+<h2>FORTRAN</h2>
+<p>In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).</p>
+<p>2/3 of the cost and 90% of the time for solving a problem was coding</p>
+<p>FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.</p>
+</section>
+<section id="development-model" class="slide level2 scrollable">
+<h2>development model</h2>
+<p>In these early years, the development model was:</p>
+<ol type="1">
+<li>build a new machine</li>
+<li>design a new language</li>
+<li>implement the compiler</li>
+</ol>
+<p>Vendors sometimes built compilers but often used small startup compiler companies.</p>
+</section>
+<section class="slide level2 scrollable">
 
+<p>Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.</p>
+<ol type="1">
+<li>Front end - parse the program into IR</li>
+<li>Middle end - machine independent optimizations and analyses</li>
+<li>Back end - machine specific stuff where machine code is generated</li>
+</ol>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+A[Front end]--IR--&gt; B[Middle end];
+B--IR--&gt; C[Back end];
+A--IR--&gt; C;
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2 scrollable">
 
-## suppose we have complex loop bounds?
+<p>This course focuses on part 2</p>
+<p>A goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.</p>
+<p> There are many ways to compare the performance of programs:</p>
+<ol type="1">
+<li>Time</li>
+<li>Space</li>
+<li>Energy</li>
+</ol>
+</section>
+<section id="gcc" class="slide level2">
+<h2>gcc</h2>
+<p>In 1987, GCC was released. It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR. Adding an optimization or reordering optimizations is quite hard.</p>
+<p>Vendors could use one front end, one middle end and only need to write a new back end.</p>
+</section>
+<section class="slide level2">
 
-```
-for i=0; i &lt; 7, i++
-  for j =i, j &lt; min(7, i+4), j++
-    a(i,j) = 0
-```
-![alt text](plot1-7.png)
+<p>This ended almost all the compiler startups. Free front end, middle end.</p>
+<p>In gcc the IR is somewhat C based, for instance there are pointers but there is no simple way to talk about garbage collection without hacks.</p>
+</section>
+<section id="llvm" class="slide level2">
+<h2>LLVM</h2>
+<p>in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.</p>
+<p>The core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.</p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR;
+A[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};
+A--IR--&gt; C;
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level2">
 
-shaded area is the polygon
-what are the loop bounds if we interchange the loops?
+<p>Optimizations form <em>passes</em>. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments.</p>
+</section>
+<section id="bril" class="slide level2">
+<h2>bril</h2>
+<p>In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.</p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TB;
+A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[BRIL interpreter];
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="cost-of-a-compiler." class="slide level2">
+<h2>Cost of a compiler.</h2>
+<p>Compilers are massive and expensive to build.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Compiler</th>
+<th style="text-align: right;">Year Started</th>
+<th style="text-align: right;">Developers</th>
+<th style="text-align: right;">Lines Of Code</th>
+<th style="text-align: right;">Est Cost $</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GCC 9.2.0</td>
+<td style="text-align: right;">1988</td>
+<td style="text-align: right;">617</td>
+<td style="text-align: right;">5,591,759</td>
+<td style="text-align: right;">425,747,279</td>
+</tr>
+<tr class="even">
+<td>LLVM 8.0.1</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: right;">1,210</td>
+<td style="text-align: right;">6,877,489</td>
+<td style="text-align: right;">529,894,190</td>
+</tr>
+<tr class="odd">
+<td>OpenJDK 14+10</td>
+<td style="text-align: right;">2007</td>
+<td style="text-align: right;">883</td>
+<td style="text-align: right;">7,955,827</td>
+<td style="text-align: right;">616,517,789</td>
+</tr>
+<tr class="even">
+<td>v8 7.8.112</td>
+<td style="text-align: right;">2008</td>
+<td style="text-align: right;">736</td>
+<td style="text-align: right;">3,043,793</td>
+<td style="text-align: right;">225,195,832</td>
+</tr>
+<tr class="odd">
+<td>Rust 1.37.0</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">2,737</td>
+<td style="text-align: right;">852,877</td>
+<td style="text-align: right;">59,109,425</td>
+</tr>
+<tr class="even">
+<td>Swift</td>
+<td style="text-align: right;">2010</td>
+<td style="text-align: right;">857</td>
+<td style="text-align: right;">665,238</td>
+<td style="text-align: right;">45,535,689</td>
+</tr>
+<tr class="odd">
+<td>Intel Graphics 1.0.10</td>
+<td style="text-align: right;">2018</td>
+<td style="text-align: right;">149</td>
+<td style="text-align: right;">694,688</td>
+<td style="text-align: right;">46,934,626</td>
+</tr>
+</tbody>
+</table>
+<p>From CGO 2022 keynote</p>
+</section>
+<section class="slide level2">
 
-What are the upper and lower bounds if we interchange the loops?
+<p>Some observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.</p>
+</section>
+<section id="compiler-assumptions-lets-talk-about-how-many-are-still-true" class="slide level2 scrollable">
+<h2>Compiler Assumptions (Let’s talk about how many are still true)</h2>
+<ol type="1">
+<li>The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.</li>
+<li>Users are ok with large programs taking minutes to compile</li>
+<li>Compilers run on machines that are memory-limited.</li>
+<li>Compilers run on single-threaded machines.</li>
+<li>Most targets are C-like.</li>
+</ol>
+</section>
+<section class="slide level2 scrollable">
 
-inequalities
-$$
-\begin{align*}
-i \ge 0   &amp; \rightarrow  i  \ge 0 \\
-i \le 6   &amp; \rightarrow  -i+6 \ge 0 \\
-j \ge i   &amp; \rightarrow j-i \ge 0 \\
-j \le 6    &amp; \rightarrow  6  -j  \ge 0 \\
-j \le i+3 &amp; \rightarrow -j+i+3 \ge 0 
-\end{align*}
-$$
-
-```
-for j  (must be constants)
-  for j (constants and j )
-
-```
-
-we can get the j bounds by projecting onto the j axis,  next we want to remove j from the inequalities 
-
-
-ir constrants
-
-$$
-\begin{align*}
-\begin{equation*}
-B =
-\begin{bmatrix} \begin{array}{rr}
- 1 &amp; 0 \\
--1 &amp; 0 \\
--1 &amp; 1 \\
-0 &amp; -1 \\
- 1 &amp; -1 
-\end{array} \end{bmatrix}
-\vec{b} =
-\begin{bmatrix}
- 0\\
- 6 \\
-0\\
-6\\
-3
-\end{bmatrix}
-\end{equation*}
-\end{align*}
-$$
-
-written for i
-$$
-\begin{align}
-0  \le  &amp; i &amp; \\
-        &amp; i &amp;\le 6 \\
-        &amp; i &amp; \le j \\
-        &amp; &amp;  6  -j  \ge 0 \\
-j -3 \le &amp; i &amp;
-\end{align}
-$$
-
-$ i \le max(0, j-3) \land  i \le min(6,j) $
-
-written for j
-$$
-\begin{align}
-       &amp; &amp; i \ge 0 \\
-       &amp; &amp; i \le 6  \\
-i \le  &amp;j &amp; \\
-    &amp;  j  &amp; \le 6 \\
-&amp;j&amp; \le i+3 
-\end{align}
-$$
-
-
-bounds for j depend on i -  We need to remove i 
-
-
-math thing #2 fourier-motzkin method
-
-https://people.math.carleton.ca/~kcheung/math/notes/MATH5801/02/2_1_fourier_motzkin.html
-
-Given a set of inequalities remove one variable, (for higher dim d, need to do this multiple times)
-
-in general 
-Suppose we want to remove $x_m$ we find a pair $L \le c_1 * x_m $  and  upper bound $x_2 * x_m \ge U$ and both c's are &gt;= 0
-
-remove x_m and add $c_2* L \ge c_1 *U $
-
-We start with each pair of constants
-$$
-c_1 * i &lt; U \land
-c_2 *i &gt; L
-$$
-
-there are 4 pairs (1,2), (1,3) , (2,5),  (3,5) 
-all the c's are 1 
-from the ir column 1 (i column) ignore zeros, pair up plus and minus values 
-
-
-We need to eliminate i (to get the bounds for the outer loop in j)
-
-we have 4 inequalities where i is not multiplied by zero $ j \le 6$ 
-
-we consider each pair
-
-$$
-\begin{align*}
-(1,2) \rightarrow  0 &amp;\le 6 \ done \\
-(1,3) \rightarrow  0 &amp;\le j\\
-(2,5) \rightarrow j-3  &amp;\le 6\\
-(3,5) \rightarrow j-3  &amp;\le j \ done 
-\end{align*}
-$$
-
-bounds for j are 0 to 6
-
-
-```
-for j =0 ; j &lt;= 6 , j++
-    for i = max(j-3,6), i &lt; j; i++&gt;  
-       a[i,j] = 0
-```
-
-
-## suppose we want to run the an example  in parallel</code></pre>
-<p>for i in [1,2,3,4] for j in [1,2,3, 4] s: a(i,j) = a(i-1, j+1) ~~~</p>
-<p>reorder to run in parallel get new bounds, we want to run diagonally <span class="math inline">\(k= i-j\)</span>, we know the transformation that we want We replace $i = k+j $</p>
-<p>for k = ?? for j = ?? s: a(j-k,j) = a(j-k-1, j+1)</p>
-<p><span class="math display">\[
-\begin{align*}
-1 \le i \le 4 \\
-1 \le j \le 4 \\
-\end{align*}
-\]</span></p>
-<p><span class="math display">\[
-\begin{align*}
-1 \le &amp; k+j &amp;\le 4 \\
-1 \le &amp; j &amp;\le 4 \\
-\end{align*}
-\]</span></p>
-<p><span class="math display">\[
-\begin{align*}
-1-k \le j \le 4-k \\
-1 \le j &lt;= 4
-\end{align*}
-\]</span></p>
-<p>now for mf <span class="math display">\[
-\begin{align*}
-1-k \le  4-k \\
-1-k  \le 4\\
-1 \le 4-k \\
-1 \le 4
-\end{align*}
-\]</span></p>
-<p>giving k bounds -3 to 3 j bound are max(1,1,k) yo min(4, 4-k)</p>
-</section></section>
-<section id="scheduling" class="title-slide slide level1 center">
-<h1>4 Scheduling</h1>
-<p>Up till now we assumed we know the transformation but now we consider can we find a schedule that is good in some way</p>
-<p>an example</p>
-<pre><code>for i in [0,1,2,3,4,5]
-   P:  a(i) = input(i) +1
-for j in [0,12,3,4,5]
-    c: b(j) = a(j) +2</code></pre>
-<p>This is not quite a loop nest - unless we picture an outer loop running one time.</p>
-<p>The new schedule has to be affine (restriction) schedule is a map from instances to time <span class="math display">\[
-P(i) = sp*i + dp \\
-C(j) = sc*j + dc
-\]</span></p>
-<p>optimization pick sp, dp, sc, dc that optimizes the locality.</p>
-<p>constraint is for all i,j, p(i) writes data that c(j) reads, and i,j are in bounds</p>
-<p>For any legal schedule:</p>
-<p><span class="math display">\[
-\forall i,j \mid 0 \le i \le 5 \land 0 \le j \le 5 \land i = j
-\land sp * i + dp  \le sc * j + dc
-\]</span></p>
-<p>different values of sp, dp, sc, and dc give different schedules.<br>
-Since all these schedules are affine - None on them is the “best”. Some non-affine schedule might be better.</p>
-<p>This is not suitable for ilp, because of the $ sp * i $</p>
-<p>Suppose we want to select one of the schedules that minimizes a cost function: <span class="math display">\[
-w(i,j)  = sc * j + dc - sp * i + dp
-\]</span></p>
-<p>w is the time the value is needed</p>
-<p>How we select a legal schedule that has the smallest w?</p>
-<p>math fact 3</p>
-<p>The affine form of Farkas Lemma An affine function non-negative everywhere inside a polygon iff its non-negative at all the vertices</p>
-<p><span class="math display">\[
-given:
-\forall \vec{x} \mid \left\{ \vec{x} \mid B\vec{x} + \vec{b} &gt;= 0\right\}
-S^T \vec{x}+\vec{d} \ge 0
-\]</span> if and only if <span class="math display">\[
-\exists p_0, \vec{p} \ge 0 \mid \forall \vec{x}\mid S^T \vec{x} + \vec{d} = (\vec{p})^t(B\vec{x}+\vec{d}) + p_0
-\]</span></p>
-<p>What does this mean and how does it help?</p>
+<p>Some changes since early 2000’s:</p>
+<ol type="1">
+<li>Integrated development environments. When you type a.b what has to happen?</li>
+<li>DSL (Doman specific languages for AI)</li>
+<li>More kinds of hardware</li>
+</ol>
+</section>
+<section id="how-well-do-compilers-do" class="slide level2">
+<h2>How well do compilers do</h2>
+<p>At the scale of datacenters, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
+<h3 id="proebstings-law">Proebsting’s law</h3>
+<div class="callout-warn">
+<p>reference to probsting’s law</p>
+</div>
+<p>Compiler Advances Double Computing Power Every 18 Years.<br>
+while hardware computing horsepower doubles every 18 months</p>
+<p>How would you prove this?</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section>
+</section></section>
     </div>
   </div>
 
@@ -816,10 +616,10 @@ S^T \vec{x}+\vec{d} \ge 0
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: 'c/t',
+        slideNumber: false,
 
         // 'all', 'print', or 'speaker'
-        showSlideNumber: 'print',
+        showSlideNumber: 'all',
 
         // Add the current slide number to the URL hash so that reloading the
         // page/copying the URL will return you to the same slide
