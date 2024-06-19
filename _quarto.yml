@@ -3,8 +3,8 @@ project:
   resources: 
     - lectures/images/*
     - notebooks/*
-  pre-render:
-      - python runfirst.py
+  # pre-render:
+  #     - python runfirst.py
 
 website:
 
@@ -40,47 +40,6 @@ website:
           - text: "Course content"
             auto: lectures
           - text: "Blog Posts"
-
-# | 1    | Compiler overview and structure |[lecture](../lectures/010_compiler_overview.qmd)      | ???| 
-# |      | Performance Measurement         |[lecture](../lectures/02a_performance_measurement.qmd)|???|
-# | 2    | Representing programs           |[lecture](../lectures/02b_representation.ipynb)       |???|
-# |      | Overview of Bril                |[notebook](../notebooks/bril.ipynb)               |???   |
-# | 3    | Local analysis and optimization |[lecture](../lectures/03_local.qmd)       |???   |
-# | 4    | Data flow                       |[lecture](../lectures/04_data_flow.qmd)|???            |
-# | 5    | Global analysis                 |[lecture](../lectures/05_global.qmd)|???            |
-# | 6    | Static single assignment        |[lecture](../lectures/06_ssa.qmd)|???            |
-# | 7    | LLVM                            |[lecture](../notebooks/llvm.ipynb)|???            |
-# | 8    | Classical loop optimizations    |[lecture](../lectures/08_loops.qmd)|???            |
-# | 9    | Polyhedral analysis             |[lecture](../lectures/09_poly.qmd)|???            |
-# | 10   | MLIR                            |[lecture](../lectures/10_mlir.qmd)|???            |
-# | 11   | Interprocedural Analysis        |[lecture](../lectures/11_whole_program.qmd)|???            |
-# | 12   | Memory Management               |[lecture](../lectures/12_memory.qmd)|???            |
-# | 13   | Dynamic compilers               |[lecture](../lectures/13_dynamic_compilers.qmd)|???            |
-# | 14   | GPU Compilers                   |[lecture](../lectures/14_gpu_compilers.qmd)|???            |
-
-
-
-              # - text: "1. Compiler Overview"
-              #   file: lectures/010_compiler_overview.qmd
-              # - text: "2a. Measurement"
-              #   contents:
-              #     - file: lectures/02a_performance_measurement.qmd  
-              #     - file: notebooks/02b_representation.ipynb
-            # lectures/03a_local.qmd  
-            # lectures/03b_local_value_numbering.qmd 
-            # lectures/04_data_flow.qmd
-            # lectures/05a_sss.qmd
-            # lectures/05b_licm.qmd   
-            # lectures/05_global.qmd    
-            # lectures/06_ssa.qmd            
-            # lectures/07_sss.qmd
-            # lectures/08_classic_loop_ops.qmd
-            # lectures/09_poly.qmd    
-            # lectures/10_sss.qmd
-            # lectures/11_sss.qmd
-            # lectures/12_memory.qmd
-            # lectures/13_dynamic_compilers.qmd
-            # lectures/14_gpu_compilers.qmd
           - section: Homework
             auto: homeworks
       - text: "Bril Documentation"

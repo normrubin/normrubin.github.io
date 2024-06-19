@@ -1,62 +1,43 @@
 ---
 title: "__  Performance and Measurement"
-format: html
+format:
+  html: default
+  revealjs: 
+    chalkboard: true
+    output-file: "revealjs-performance.html"
+    scrollable: true
 
 ---
 
 # Measurement 
 
 
-#example 1
+##example 1
+
+lets look at the paper 
 
 [ Producing Wrong Data Without Doing Anything Obviously Wrong!](<https://dl.acm.org/citation.cfm?id=1508275>) Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.
 
 445 references 
 
 
-claim 1  measurement bias is commonplace and significant
+---
 
-Consider a researcher who wants to determine if
-optimization O is beneficial for system S. If she measures
-S and S + O in an experimental setup that favors S + O,
-she may overstate the effect of O or even conclude that O
-is beneficial even when it is not. This phenomenon is called
-measurement bias in the natural and social sciences. 
+1. Measurement bias is significant
+1. Changing aspects of an experimental setup can introduce measurement bias. ​
+Measurement bias is unpredictable and there are no obvious ways to avoid it. ​
+Prior work in computer system evaluation does not adequately consider measurement bias. ​
+1. The paper discusses two techniques for dealing with measurement bias: experimental setup randomization and causal analysis. ​
+1. Measurement bias occurs for all benchmarks and architectures. ​
+1. Measurement bias due to link order can significantly fluctuate conclusions. ​
+1. Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​
+1. o avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​
+ ---
 
-Are O3 optimizations are
-beneficial to program performance when the experimental
-setups differ. Specifically, we consider experimental setups
-that differ along two dimensions: (i) UNIX environment size
-(i.e., total number of bytes required to store the environment
-variables) because it affects the alignment of stack allocated
-data; and (ii) link order (the order of .o files that we give to
-the linker) because it affects code and data layout.
+A sample blog post about this paper
+[blog](https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/)
 
-
-tests 
-all C benchmarks from spec benchmark 9 int and 3 float 
-ran each 5940 times over 12 days  ran on real hardware
-used gcc  
-
-test link order 
--8% to +10% speedup based on link order 
-same results on simulator 
-
-test environment size 
--10% to +10 percent speedup 
-
-ran some of the tests using intel c compiler to show its not gcc specific.
-
-
-Claim 2 researchers need to  consider measurement bias
-
-None of the papers in APLOS 2008, PACT 2007, PLDI 2007, and CGO 2007 address measurement bias satisfactorily.
-
-Of the 133 papers published in the surveyed conference proceedings, 88 had at least one section dedicated to experimental methodology and evaluation. 
-The median speedup reported by these papers was 10%.   
-
-
-#example 2 
+## another example
 
 [Strangely, Matrix Multiplications on GPUs Run Faster When Given "Predictable" Data!](https://www.thonking.ai/p/strangely-matrix-multiplications)
 

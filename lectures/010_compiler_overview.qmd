@@ -1,11 +1,13 @@
 ---
 title: "1 Compiler Overview"
-sidebar: false
-format: 
-    revealjs:
+format:
+  html: default
+  revealjs: 
+    chalkboard: true
+    output-file: "revealjs-compiler_overview.html"
     scrollable: true
-
 ---
+
 # Introduction 
 
 A	compiler	writer	builds	bridges	between	people	and	machines, and	this	task	is	each	day	more	challenging.	
@@ -13,7 +15,7 @@ A	compiler	writer	builds	bridges	between	people	and	machines, and	this	task	is	e
 a) Software	engineers	want	abstractions	
 b) Hardware	engineers	want	efficiency	
 
-##  (first compilers)
+##  Early  Compilers
 
 Originally, a compiler was a person doing calculations.
 
@@ -25,22 +27,23 @@ In 1952,  Grace Hopper an operational link-loader, which she called a compiler. 
 
 In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).
 
+::: {.content-hidden  when-format="revealjs"}
+ Will only appear in HTML and not in Reveal.js
+
 Their  paper is located at <https://dl.acm.org/doi/10.1145/1455567.1455599>.
 
 The name stands for formula translation. It's in upper case because at that time, compilers did not support lower case.
 
----
 
 The FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM's next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. 
-
----
-
 Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan. 
 
----
-
 The goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.
+:::
 
+::: {.content-visible when-format="revealjs"}
+2/3 of the cost and 90% of the time for solving a problem was coding
+:::
 
 FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters. 
 
@@ -59,6 +62,10 @@ Vendors sometimes built compilers but often used small startup compiler companie
 
 Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.
 
+1) Front end - parse the program into IR
+1) Middle end - machine independent optimizations and analyses 
+1) Back end -  machine specific stuff where machine code is generated
+
 ```{mermaid}
 graph LR;
 A[Front end]--IR--> B[Middle end];
@@ -66,11 +73,6 @@ B--IR--> C[Back end];
 A--IR--> C;
 ```
 
----
-
-1) Front end - parse the program into IR
-2) Middle end - machine independent optimizations and analyses 
-3) Back end -  machine specific stuff where machine code is generated
 
 ---
 
@@ -79,10 +81,11 @@ This course focuses on part 2
 
 A goal of this course is to explain  how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.
 
- There	are	many	ways	to	compare	the	performance	of	programs:	
-– Time	
-– Space	
-– Energy	consumption	
+ There	are	many ways	to	compare	the	performance	of	programs:	
+
+1. Time	
+2. Space 
+1. Energy 
 
 ## gcc 
 
@@ -90,11 +93,13 @@ In 1987, GCC was released.  It formalized the IR, and was more or less open sour
 
 Vendors could use one front end, one middle end and only need to write a new back end. 
 
+---
+
 This ended almost all the compiler startups. Free front end, middle end. 
 
-In gcc the IR is somewhat C based, for instance there are pointers but there is no way to talk about garbage collection without hacks.
+In gcc the IR is somewhat C based, for instance there are pointers but there is no simple way to talk about garbage collection without hacks.
 
-## llvm 
+## LLVM 
 
 in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library. 
 
@@ -107,14 +112,22 @@ A[Front end]--IR--> B0[OP0] --IR--> B1[OP1] --IR--> B2[OPT2]--IR --> BN[OPTn]--I
 A--IR--> C;
 ```
 
+---
+
+
 Optimizations form *passes*. A user could mix and match -- run some optimizations but not others to compile a specific program. It became easy for people to add a pass.  Lots of academic research, lots of experiments. 
+
+
+---
+
+## bril
 
 In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.  
 
 
 ```{mermaid}
 graph TB;
-A[TEXT_Version of BRIL]--> B0[BRIL in JSON] --> B1[ASSIGNMENT] --> B2[BRIL interpreter];
+A[TEXT_Version of BRIL]--> B0[BRIL in JSON] --> B1["new pass"] --> B2[BRIL interpreter];
 ```
 
 ## Cost of a compiler.
@@ -134,6 +147,8 @@ Compilers are massive and expensive to build.
 
 From CGO 2022 keynote 
 
+---
+
 Some observations:
 1) Production compilers are expensive.
 1) IR does not change easily.
@@ -150,7 +165,9 @@ Some observations:
 1) Compilers run on machines that are memory-limited.
 1) Compilers run on single-threaded machines.
 1) Most targets are C-like.
-
+ 
+ 
+ ---
 
 Some changes since early 2000's:
 
@@ -165,6 +182,10 @@ At	the	scale	of	datacenters,	every	single	performance	percent	matters!	Just	take
 
 
 ### Proebsting's law
+
+::: {.callout-warn}
+reference to probsting's law 
+:::
 
 Compiler Advances	Double	Computing	Power	Every	18	Years.	
 while	hardware	computing	horsepower	doubles every 18 months
