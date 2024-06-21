@@ -181,13 +181,36 @@ Some changes since early 2000's:
 At	the	scale	of	datacenters,	every	single	performance	percent	matters!	Just	take	a	look	at	Google's	(and	other's)	publicly	available	numbers	on	expenditures	on	datacenters.	We	are	talking	about	billions	of	dollars.	A	single	percent	improvement	can	mean	millions	of	dollars	from	more	program	features	or	improved	utilization.
 
 
-### Proebsting's law
+[proebsting's law](https://proebsting.cs.arizona.edu/law.html)
 
-::: {.callout-warn}
-reference to probsting's law 
-:::
 
 Compiler Advances	Double	Computing	Power	Every	18	Years.	
-while	hardware	computing	horsepower	doubles every 18 months
-
+while	hardware	computing	horsepower	doubles every 18 months. 
 How would you prove this?
+
+[one attempt](https://zeux.io/2022/01/08/on-proebstings-law/)
+
+## why are compilers not better
+
+Talk given by KAI's Arch Robison 
+
+Compile-time program optimizations are similar to poetry: more are written than actually published in commercial compilers.
+Hard economic reality is that many interesting optimizations have too narrow an audience to justify their cost in a 
+general-purpose compiler 
+and custom compilers are too expensive to write.
+
+## effects of optimization
+
+Remove performance penalty for:
+
+1. using higher level constructs
+1. safety checks (e.g., array bounds checks)
+1. writing clean, simple code
+  a. no benefit to applying loop unrolling by hand
+1. Encourage ADT’s that are as efficient as primitive types
+1. Benefit: cleaner, higher level code gets written
+
+The main problem with performance is how to chose the  algorithm 
+
+
+
