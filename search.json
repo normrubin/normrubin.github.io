@@ -261,13 +261,61 @@
   {
     "objectID": "lectures/02a_representation.html",
     "href": "lectures/02a_representation.html",
-    "title": "2 Representation",
+    "title": "2 Representation of programs",
     "section": "",
-    "text": "#| echo: false from graphviz import Digraph import ast import os\ndef cmd(x): os.system(x)\ndef ast_syntax(line): return ast.dump(ast.parse(line).body[0], indent=4)\n\nDefine a function to recursively add nodes to the Digraph\ndef add_node(dot, node, parent=None): node_name = str(node.__class__.__name__) dot.node(str(id(node)), node_name) if parent: dot.edge(str(id(parent)), str(id(node))) for child in ast.iter_child_nodes(node): add_node(dot, child, node)\n\n\nAdd nodes to the Digraph\ndef graph(line): dot = Digraph() add_node(dot, ast.parse(line).body[0]) return dot\n\n\n\n\n Back to top",
+    "text": "The representation of a program - is what we read in and read out when transforming a program. What kind of properties make a good representation?\nOne possible representation is called concrete syntax form Programs are text - surface syntax- just what you would type into an editor.\n\nvalue = 8\nresult = 1\nfor i in range(value):\n  result = result + i\nprint(result)\n\n29\n\n\nWhat is good and what is bad about this representation?\nWhat is the level of abstraction? How do you understand the semantics.\nForm 2 - Abstract syntax form\nTree structure - Nodes are parts of the program, edges show how they are connected. We can write this as a list or a graph\n\n\nFunctionDef(\n    name='pgm',\n    args=arguments(\n        posonlyargs=[],\n        args=[],\n        kwonlyargs=[],\n        kw_defaults=[],\n        defaults=[]),\n    body=[\n        Assign(\n            targets=[\n                Name(id='value', ctx=Store())],\n            value=Constant(value=8)),\n        Assign(\n            targets=[\n                Name(id='result', ctx=Store())],\n            value=Constant(value=1)),\n        For(\n            target=Name(id='i', ctx=Store()),\n            iter=Call(\n                func=Name(id='range', ctx=Load()),\n                args=[\n                    Name(id='value', ctx=Load())],\n                keywords=[]),\n            body=[\n                Assign(\n                    targets=[\n                        Name(id='result', ctx=Store())],\n                    value=BinOp(\n                        left=Name(id='result', ctx=Load()),\n                        op=Mult(),\n                        right=Name(id='i', ctx=Load())))],\n            orelse=[]),\n        Expr(\n            value=Call(\n                func=Name(id='print', ctx=Load()),\n                args=[\n                    Name(id='result', ctx=Load())],\n                keywords=[]))],\n    decorator_list=[])\n\n\n\ndot_dia\n\n\n\n\n\n\n\n\nAST tree representation An AST is a tree structure, nodes like if, test, body, assign Each node is one concept from the program\nRecursive function can walk over the tree, one chunk of code for each node.\n\nGood - each type of node is different, making special cases are easy\nBad - each type of node is different so analysis has to know about every type, making general cases hard\n\nThis is the classic way to write an interpreter. Simple (non optimizing) compilers often use this format.\n\n\nPrograms are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.\n\n\n    let value = 8\n    let result = 1\n    for (let i = 0;i &lt; value;i = i+ 1)\n    {\n        result = result * i\n    }\n    console.log(result )\n\n\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n\n\nos.system('ts2bril images/toy.ts | bril2txt')\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n0\n\n\nLooks like assembly but no limit on registers, no condition codes. fully typed, no complex addressing modes.\nsyntax-\nDeclare functions, labels, instructions\ninstruction:\n1) variable type = opcode arguments 2) opcode list of arguments\n\n\n\nWhat is the abstract syntax form for this?\n\n\n\n\n\nRepresentation is a directed graph. Nodes are instructions, edges indicate possible flow of control, one entry and one exit node.\nHere is a simple program:\n    @main {\n        v: int = const 5;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[const] --&gt; B[print]\n\n\n\n\n\n\na second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\nWhat does the control flow graph look like?\n\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\nnotice label does not produce a node\nEasy to see a dead instruction.\nThird example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nwhich is the true and which is the false, could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside.\nBasic blocks (cfg form 2) 1) nodes can be a sequence of instructions. 1) jumps and branches can only be at the end of a sequence 1) only label has to be at the start 1) every instruction in the sequence executes the same number of times\n\n\n\n\n\nflowchart LR\n  A[v: int const 4\\nb : bool\\n br ] \n  A --&gt; D[v: const 2]\n  A --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nAs we construct basic blocks, we can add instructions up till something that ends the block (terminator)\nOption: do all blocks end in a terminator or not?\ngiven a block b, the predecessors of b are the blocks b_in where there is an edge bin-&gt;b. And the successors of B are the b_out where b-&gt;b_out is an edge\n\n\n\n\n\njust find all the basic blocks\nadd the control flow edges\n\npsuedo code\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\nstep 2 we need a map from labels to basic blocks\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\n    \n\nfor block in blocks:\n   last = block[-1]\n   if last is a jmp (one successor)\n      add edge from block to last.dest \n   else if last is a br (two successors)\n      add two edges from block to last.true, last.false \n   else  fall through \n      add edge to next block (if it exists)\n\nwith open(\"images/add.json\", 'r') as f:\n  bril_program = f.read()\n  print(bril_program)\n\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\",\n          \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"print\", \"args\": [\"v2\"] }\n      ],\n      \"args\": []\n    }\n  ]\n}",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "2 Representation"
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#a-more-regular-representation",
+    "href": "lectures/02a_representation.html#a-more-regular-representation",
+    "title": "2 Representation of programs",
+    "section": "",
+    "text": "Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.\n\n\n    let value = 8\n    let result = 1\n    for (let i = 0;i &lt; value;i = i+ 1)\n    {\n        result = result * i\n    }\n    console.log(result )\n\n\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n\n\nos.system('ts2bril images/toy.ts | bril2txt')\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n0\n\n\nLooks like assembly but no limit on registers, no condition codes. fully typed, no complex addressing modes.\nsyntax-\nDeclare functions, labels, instructions\ninstruction:\n1) variable type = opcode arguments 2) opcode list of arguments",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#what-is-good-and-what-is-about-this-reorientation",
+    "href": "lectures/02a_representation.html#what-is-good-and-what-is-about-this-reorientation",
+    "title": "2 Representation of programs",
+    "section": "",
+    "text": "What is the abstract syntax form for this?",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#extract-info-from-this-repreentation.",
+    "href": "lectures/02a_representation.html#extract-info-from-this-repreentation.",
+    "title": "2 Representation of programs",
+    "section": "",
+    "text": "Representation is a directed graph. Nodes are instructions, edges indicate possible flow of control, one entry and one exit node.\nHere is a simple program:\n    @main {\n        v: int = const 5;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[const] --&gt; B[print]\n\n\n\n\n\n\na second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\nWhat does the control flow graph look like?\n\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\nnotice label does not produce a node\nEasy to see a dead instruction.\nThird example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nwhich is the true and which is the false, could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside.\nBasic blocks (cfg form 2) 1) nodes can be a sequence of instructions. 1) jumps and branches can only be at the end of a sequence 1) only label has to be at the start 1) every instruction in the sequence executes the same number of times\n\n\n\n\n\nflowchart LR\n  A[v: int const 4\\nb : bool\\n br ] \n  A --&gt; D[v: const 2]\n  A --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nAs we construct basic blocks, we can add instructions up till something that ends the block (terminator)\nOption: do all blocks end in a terminator or not?\ngiven a block b, the predecessors of b are the blocks b_in where there is an edge bin-&gt;b. And the successors of B are the b_out where b-&gt;b_out is an edge",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#what-is-an-algorithm-that-forms-a-cfg",
+    "href": "lectures/02a_representation.html#what-is-an-algorithm-that-forms-a-cfg",
+    "title": "2 Representation of programs",
+    "section": "",
+    "text": "just find all the basic blocks\nadd the control flow edges\n\npsuedo code\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\nstep 2 we need a map from labels to basic blocks\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\n    \n\nfor block in blocks:\n   last = block[-1]\n   if last is a jmp (one successor)\n      add edge from block to last.dest \n   else if last is a br (two successors)\n      add two edges from block to last.true, last.false \n   else  fall through \n      add edge to next block (if it exists)\n\nwith open(\"images/add.json\", 'r') as f:\n  bril_program = f.read()\n  print(bril_program)\n\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\",\n          \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"print\", \"args\": [\"v2\"] }\n      ],\n      \"args\": []\n    }\n  ]\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
     ]
   },
   {
@@ -312,6 +360,34 @@
       "Lectures",
       "7 LLVM"
     ]
+  },
+  {
+    "objectID": "homework/3_hw.html",
+    "href": "homework/3_hw.html",
+    "title": "3_hw",
+    "section": "",
+    "text": "Task3: Implement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "homework/6_extra_credit.html",
+    "href": "homework/6_extra_credit.html",
+    "title": "6- extra credit hw",
+    "section": "",
+    "text": "Task6: Implement and evaluate a loop optimization, either start with Bril or LLVM, you can use the ssa form of Bril if you want. If you use Bril you will have to find the natural loops, if you use LLVM you can call LoopPass but other parts of the implementation will be tricker, Pick an optimization (I’d suggest loop invariant code motion) but any of the others mentioned in class would be fine. Evaluate its performance, in Bril you can use the Bril benchmarks, in LLVM select an existing benchmark such as Embench and feel free to violate the sigplan guidelines SIGPLAN empirical evaluation guidelines by cherry-picking a convenient subset.\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "homework/project.html",
+    "href": "homework/project.html",
+    "title": "project",
+    "section": "",
+    "text": "Half way through the course, you should submit a project proposal, I’ll review it to make sure you are not tackling too big a challenge or going to far afield.\nAt the end of the course, you will complete a compiler research project. This is an open- ended project that can be on any topic in the field of compilers.\nThe final product is an experience report where you rigorously evaluate the success of your implementation. You can work individually or in groups of 2–3 students. When you finish an implementation, write it up. Your writeup should answer these questions in a good degree of detail: ● What was the goal? ● What did you do? (include both the design and the implementation) ● What were the hardest parts to get right? ● Were you successful? (report rigorously on your empirical evaluation)\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "homework/hw0.html",
+    "href": "homework/hw0.html",
+    "title": "homework 0",
+    "section": "",
+    "text": "Warning\n\n\n\nshould i make it easier to claim a paper?\nHow does a student submit something to canvas\n\n\nIntroduce yourself in the intro topic. Mention a compilers topic you’d like to learn about someday, either in this class or beyond.\nPick a paper from the weekly schedule whose discussion you will lead. Claim the paper by opening a pull request for the weekly.qmd file, fill in your name in the LEADER: line. If you want to work in a group, one of you should put all the names down.\nAdd a text file to Canvas to indicate you have done the introduction and claimed a paper\n\nFor this task, submit an empty text file or whatever.\nFor others, include a link to your code. if you want, you can upload your code instead.\n\n\n\n\n Back to top"
   },
   {
     "objectID": "index.html",
@@ -913,7 +989,7 @@
     "href": "weekly.html",
     "title": "EECS7398 Weekly Schedule",
     "section": "",
-    "text": "tbl-colwidths: [10,20,20,20, 15, 15 ]\nsince the is the first time this course is offered. This is a tentative schedule.\n\n\n\n\n\n\nWarning\n\n\n\nNeed to figure out where discussions are kept. Is it on github? or in canvas?\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek\nday\nDate\ntopic\ndiscussions\nDue\n\n\n\n\n1\nFriday\nSept 6\nCompiler overview and structure\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2\nTuesday\nSept 10\nPerformance Measurement\n\nhw0\n\n\n\nPerformance and Measurement (Norm using Adrian’s blog)\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\nSIGPLAN Empirical Evaluation Guidelines\n\n\n\n\n\n\n\n\n\n\n\n2\nFriday\nSept 13\nRepresenting programs\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nTuesday\nSept 17\nOverview of Bril\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nFriday\nSept 20\nLocal analysis and optimization\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nTuesday\nSept 24\nData flow\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nFriday\nSept 27\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nTuesday\nOct 1\nGlobal analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nFriday\nOct 4\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nTuesday\nOct 8\nStatic single assignment\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nFriday\nOct 11\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nTuesday\nOct 15\nLLVM\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nFriday\nOct 18\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nTuesday\nOct 22\nClassical loop optimizations\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nFriday\nOct 25\nPolyhedral analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nTuesday\nOct 29\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nFriday\nNov 1\nMLIR\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nTuesday\nNov 5\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nFriday\nNov 8\nInterprocedural Analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nTuesday\nNov 12\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nFriday\nNov 15\nMemory Management\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nTuesday\nNov 19\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nFriday\nNov 22\nDynamic compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nTuesday\nNov 26\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nFriday\nNov 29\nThanksgiving\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nTuesday\nDec 3\nGPU Compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nFriday\nDec 6\ncontinued\n\n\n\n\n\nfinal project deadline ——\n\n\n\n Back to top",
+    "text": "tbl-colwidths: [10,20,20,20, 15, 15 ]\nSince the is the first time this course is offered. This is a tentative schedule.\n\n\n\n\n\n\nWarning\n\n\n\nNeed to figure out where discussions are kept. Is it on github? or in canvas?\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek\nday\nDate\ntopic\ndiscussions\nDue\n\n\n\n\n1\nFriday\nSept 6\nCompiler overview and structure\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2\nTuesday\nSept 10\nPerformance Measurement\n\nhw0\n\n\n\nPerformance and Measurement LEADER: Norm using Adrian’s blog)\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\nSIGPLAN Empirical Evaluation Guidelines\n\n\n\n\n\n\n\n\n\n\n\n2\nFriday\nSept 13\nRepresenting programs\n\n\n\n\n\nsome paper LEADER:\n\n\n\n\n\n\n\n\n\n\n\n3\nTuesday\nSept 17\nOverview of Bril\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nFriday\nSept 20\nLocal analysis and optimization\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nTuesday\nSept 24\nData flow\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nFriday\nSept 27\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nTuesday\nOct 1\nGlobal analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nFriday\nOct 4\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nTuesday\nOct 8\nStatic single assignment\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nFriday\nOct 11\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nTuesday\nOct 15\nLLVM\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nFriday\nOct 18\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nTuesday\nOct 22\nClassical loop optimizations\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nFriday\nOct 25\nPolyhedral analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nTuesday\nOct 29\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nFriday\nNov 1\nMLIR\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nTuesday\nNov 5\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nFriday\nNov 8\nInterprocedural Analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nTuesday\nNov 12\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nFriday\nNov 15\nMemory Management\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nTuesday\nNov 19\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nFriday\nNov 22\nDynamic compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nTuesday\nNov 26\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nFriday\nNov 29\nThanksgiving\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nTuesday\nDec 3\nGPU Compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nFriday\nDec 6\ncontinued\n\n\n\n\n\nfinal project deadline ——\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Weekly Schedule"
@@ -974,6 +1050,34 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "homework/4_hw.html",
+    "href": "homework/4_hw.html",
+    "title": "4_hw",
+    "section": "",
+    "text": "Task4: Implement some of the dominance utilities- 1) Find dominators for a function, 2) construct the dominance tree, 3) compute the dominance frontier. Devise a way to test your implementations. Can you find a way to confirm that block A dominates blockB. When you code this, remember that computing these sets should be cheap while checking their output could use slow naive algorithms.\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "homework/5_hw.html",
+    "href": "homework/5_hw.html",
+    "title": "5_hw",
+    "section": "",
+    "text": "Task5: Implement the into SSA and out of SSA transformations on Bril functions. Watch out for variables that are undefined on some paths. The script “is_ssa.py can check if a program is really in SSA and the Bril interpreter bili supports phi functions so you can execute code in the midpoint of your round trip. Measure the overhead (does the final program have more instructions (static or dynamic) the original, be sure to report the overhead in your writeup.\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "homework/1.hw.html",
+    "href": "homework/1.hw.html",
+    "title": "1-Homework",
+    "section": "",
+    "text": "Warning\n\n\n\n\nhow to add benchmark to repo pull request to where - add benchmark to docs?\nhow to ask questions on writing benchmark, discussion goes where (Canvas?)\nhow to write blog on what got done\nhow to submit blog url to canvas, what do they submit for gradding\n\n\n\nYour goal is to get familiar with Bril.\nPart 1\nWrite a new benchmark.\nYou can write it by hand, use the TypeScript compiler, or generate it some other way. Try running it with brili.\nOpen a pull request to add your new benchmark. ??? Add your code to the the benchmarks directory.\nUse turnt –save yours.bril to create the test outputs for your new benchmark. (See the Turnt README for details.) Mention it in the docs.\npart 2 Write a program to analyze or transform Bril programs in some small way. Pick your favorite programming language—there is no “starter code,” so you can start from scratch.\nLoad up a JSON file. You can start with this tiny one! Read the docs.\nDo something unambitious with it: count the number of add instructions, or add a print instruction before every jump, or whatever. Pick something small and contrived! Use Turnt to test your new tool.\nAlong the way, you will run into problems! Ask questions on ???, and open issues and pull requests to describe or fix problems. For example, even super simple benchmarks you might imagine probably can’t be written easily because Bril is too simple. Mention this on ??? discussions, and consider pitching in to help add features.\nThink about how to write a good test, and finally write a post describing your work and submit it in Canvas\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "homework/2_hw.html",
+    "href": "homework/2_hw.html",
+    "title": "2.hw",
+    "section": "",
+    "text": "Task2: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned. Then implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class.\n\n\n\n Back to top"
   },
   {
     "objectID": "lectures/09_poly.html",
