@@ -549,13 +549,32 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 <section id="how-well-do-compilers-do" class="slide level2">
 <h2>How well do compilers do</h2>
 <p>At the scale of datacenters, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
-<h3 id="proebstings-law">Proebsting’s law</h3>
-<div class="callout-warn">
-<p>reference to probsting’s law</p>
-</div>
+<p><a href="https://proebsting.cs.arizona.edu/law.html">proebsting’s law</a></p>
 <p>Compiler Advances Double Computing Power Every 18 Years.<br>
-while hardware computing horsepower doubles every 18 months</p>
-<p>How would you prove this?</p>
+while hardware computing horsepower doubles every 18 months. How would you prove this?</p>
+<p><a href="https://zeux.io/2022/01/08/on-proebstings-law/">one attempt</a></p>
+</section>
+<section id="why-are-compilers-not-better" class="slide level2">
+<h2>why are compilers not better</h2>
+<p>Talk given by KAI’s Arch Robison</p>
+<p>Compile-time program optimizations are similar to poetry: more are written than actually published in commercial compilers. Hard economic reality is that many interesting optimizations have too narrow an audience to justify their cost in a general-purpose compiler and custom compilers are too expensive to write.</p>
+</section>
+<section id="effects-of-optimization" class="slide level2 scrollable">
+<h2>effects of optimization</h2>
+<p>Remove performance penalty for:</p>
+<ol type="1">
+<li>using higher level constructs</li>
+<li>safety checks (e.g., array bounds checks)</li>
+<li>writing clean, simple code</li>
+</ol>
+<ol type="a">
+<li>no benefit to applying loop unrolling by hand</li>
+</ol>
+<ol type="1">
+<li>Encourage ADT’s that are as efficient as primitive types</li>
+<li>Benefit: cleaner, higher level code gets written</li>
+</ol>
+<p>The main problem with performance is how to chose the algorithm</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
