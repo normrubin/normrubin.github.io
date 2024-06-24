@@ -1,28 +1,46 @@
 ---
 title: "_ local value numbering"
-format: html
+sidebar: false 
+format: 
+    html: default
+    revealjs:
+        chalkboard: true
+        output-file: revealjs-lvn
+        scrollable: true
+keep-ipynb: true
+python: kaggle_comp
 ---
 
 ### Local Value Numbering
 
+::: {.content-hidden  when-format="revealjs"}
 
 [slides from Phil Gibbons at CMU](http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/) lectures/L3-Local-Opts.pdf) for more details and context on LVN
+
+:::
 
 Value numbering is a very powerful technique that removes ***redunancies***,  An instruction  x + y is redundant inside a block if it has already been computed
 in the block, and no intervening operation redefines x or y. If the compiler
 finds a redundant expression, it can save that value at the first computation
 and replace any subsequent evaluations with references to the saved value.
 
-The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (reprented as a number)
-Each time it sees an instruction it forms a hash of the op code and t he value numbers of its operands and gives tha a new value number.
+--- 
+
+The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)
+
+Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives tha a new value number.
 
 Two instructions are redundant if they have same op code and operands, which means the same value number
 
-e_i and e_j have the
-same value number if and only if e_i and e_j are provably equal for all possible
+---
+
+
+$e_i$ and $e_j$ have the
+same value number if and only if $e_i$ and $e_j$  are provably equal for all possible
 operands of the expressions.
 
-local value numbering covers lot of optimizations
+
+## local value numbering covers lot of optimizations that look different
 
 ```
 dead code elimination
@@ -55,11 +73,12 @@ main {
 }
 ```
 
+## variables vis values 
 
-We want to stop thinking about varaibles and think about values.
+We want to stop thinking about variables and think about values.
 Two instructions are redundant if they compute the same value.
 
-### this is a very deep idea that comes up multiple times.  
+---
 
 for example in a JIT compiler we want computation to be fast so we can get rid of all the variables
 ```
@@ -77,15 +96,19 @@ becomes:
 less storage, args are just pointers, instructions are smaller.
 faster because any use points to the corresponding def without any searching.
 
+ ---
 
 Pseudo code (similar to an interpreter)
 
-hash table 
-constants and expressions of value numbers to value numbers and a variable holding the value 
+1. hash table 
+constants and expressions of value numbers to value numbers and to a  variable holding the value 
 
-reverse map from variable to value numbers 
+2. reverse map from variables to value numbers 
 
+--- 
 
+::: {.columns}
+::: {.column}
 ```
   main {
     a: int = const 4;
@@ -98,7 +121,9 @@ reverse map from variable to value numbers
   }
 ```
 
-table 
+:::
+
+::: {.column style="font-size: 60%;"}
 
 |key | value  |canonical name|
 |---| ------| ------|
@@ -106,8 +131,6 @@ table
 |const 2 | 2 | b |
 |add 1 2 | 3 | sum1|
 |mul 3 3 | 4 | prod| 
-
-revese map
 
 | name | value|
 |---| ---|
@@ -117,20 +140,40 @@ revese map
 | sum2 | 3| 
 | prod | 4 
 
+:::
 
-as we lookup each instruction - replace each arg with the canonical home
 
-if the value is already in the table replace with an id from canonical home
 
-extensions 
+::: 
+
+
+# steps 
+
+```
+for each instruction 
+   build a temp instruction  
+   for each arg,  
+       see if the argument has a value number, if it does 
+      update the temp instruction to use the canonical name
+      if the argument has no vn give it one 
+  see if  the temp instruction is in the table, if is,
+      delete it 
+      give the dest the value number that was found 
+```
+
+---
+
+extensions:
 
 1) a: int id b 
 
 a gets the value number of b. No copy required
 
-2) : int add a b; for add sort value numbers so add a b; and add b a; get the same value number 
+2) add a b; for add sort value numbers so add a b; and add b a; get the same value number 
 
-3) 
+---
+
+## extension 3
 
 ```
 constant folding 
@@ -138,14 +181,35 @@ constant folding
    b: int const 2;
    c: add a b;
 ```
-if both value numbers are pointing to constants- actually do the add
+3. if both value numbers are pointing to constants- actually do the add
 
 
-### pseudo code
+
+## problem:   canonical variables might be  overwritten
+
+``` x = a+b  
+    x = 
+      = a+b 
+```
+
+. . .
+
+
+one option is to save the value, if x will be overwritten add a temp
+
+```
+t = a+b
+x = t 
+x = 
+  = t 
+```
+
+## pseudo code
 
  ```
     table = mapping from value tuples to canonical variables,
       with each row numbered
+    
     var2num = mapping from variable names to their current
       value numbers (i.e., rows in table)
 
@@ -155,7 +219,7 @@ if both value numbers are pointing to constants- actually do the add
         if value in table:
             # The value has been computed before; reuse it.
             num, var = table[value]
-            replace instr with copy of var
+            delete the instruction 
 
         else:
             # A newly computed value.
@@ -175,24 +239,19 @@ if both value numbers are pointing to constants- actually do the add
 
         var2num[instr.dest] = num
 ```
+---
 
-problem:   canonical variables being overwritten
 
-``` x = a+b  
-    x = 
-      = a+b 
 
-```
-
-* Local value numbering.
+## Local value numbering.
  
 
-
-
-You can see my implementation in `lvn.py` in [the examples directory] in the Bril repository. But seriously, don't be tempted! You want to write your implementation without looking at mine!
+You can see one implementation in `lvn.py` in the Bril repository. But seriously, don't be tempted! You want to write your implementation without looking at mine!
 
 [examples](https://github.com/normrubin/bril/tree/main/examples)
-### Testing Your Optimizations
+
+
+## Testing Your Optimizations
 
 As part of your tasks for this lesson, you will implement your first two optimizations.
 The two main things you want your optimizations to do are:
@@ -200,26 +259,47 @@ The two main things you want your optimizations to do are:
 1. Not break programs.
 2. Make programs faster, most of the time.
 
-As with every task in this class, part of the work is checking that you have done what you set out to do---in this case, that your optimizations do those two things.
-Think carefully about how to make a convincing case for each of those criteria.
+---
 
-One tempting methodology might be to handwrite a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right.
+As with every task in this class, part of the work is checking that you have done what you set out to do --- in this case, that your optimizations do those two things.
+
+Think carefully about how to make a convincing case for each of those criteria. 
+---
+
+One tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right.
 This does not amount to convincing evidence (maybe you can think of a few specific reasons why).
 
-While there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available [Bril benchmark][bench]*,
+---
+
+While there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available [Bril benchmark](https://capra.cs.cornell.edu/bril/tools/bench.html),
 systematically check that it still produces the right output for at least one input,
 and collect aggregate statistics about some metric you're interested in.
 This is a nice way to check for unexpected behavior in programs that you didn't carefully write yourself to test the cases you're thinking of.
 
-If this is the route you choose, you can do it however you like, I have made a simple tool that you can consider using, called [Brench][].
+ ---
+
+If this is the route you choose, you can do it however you like, There is  a simple tool that you can consider using, called Brench.
 Brench is not very fancy; it does three things:
 
+::: {.content-hidden  when-format="revealjs"}
+
+:::
+
 1. It makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an "interpret" command and an "optimize-and-then-interpret" command.)
+
 2. It checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn't change its output when interpreted.)
+
 3. It can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)
 
 Those three things are probably what you want to do to make a convincing case for an optimization's correctness and effectiveness, whether or not you use Brench. It's there if you want it, but feel free to go your own way!
 
-[bench]: https://capra.cs.cornell.edu/bril/tools/bench.html
+:::
+
+::: {.content-visible when-format="revealjs"}
+
+1. run multiple commands over a list of tests
+1. check the each command got the same output for each text 
+1. collect a statistic for each command 
+:::
 
 
