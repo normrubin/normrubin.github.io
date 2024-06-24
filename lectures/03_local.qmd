@@ -1,18 +1,31 @@
 ---
 title: "3 Local Analysis & Optimization"
-format: html
 sidebar: false 
+format: 
+    html: default
+    revealjs:
+        chalkboard: true
+        output-file: revealjs-local
+        scrollable: true
+keep-ipynb: true
+python: kaggle_comp
 ---
 
 
 I want to separate 3 flavors of optimization.
 
-1) local meaning within one basic block
-1) global meaning within one function (not really global)
-1) inter-procedural over the entire program
+1. local meaning within one basic block
+1. global meaning within one function (not really global)
+1. inter-procedural over the entire program
+
+--- 
 
 Usually an optimization takes time that is more then linear in some property, For example a local optimization might take time $n^2$ in the number of instructions in the block.
 a global optimization might take much longer, and an inter-procedural longer still.  To keep compile time reasonable many compilers limit the number of global optimizations and skip inter-procedural optimizations. As a consequence many more optimizations get published but not used in production.
+
+---
+
+when would running an optimization speedup compilation?
 
 For a local optimization,
  instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.
@@ -20,7 +33,9 @@ For a local optimization,
  For a global optimization, two instructions are ordered by a path from one block to another 
  and different paths through the program give different orders.
 
-One special case is JIT (just in time) compilers, where programs get compiled at the start of execution.  GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called ***Hotspot*** compiling.  Some JIT compilers use ***hot/cold*** compiling, where they only run the fancy compiler on basic blocks that are hotl, i.e., execute a lot.
+---
+
+One special case is JIT (just in time) compilers, where programs get compiled at the start of execution.  GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called ***Hotspot*** compiling.  Some JIT compilers use ***hot/cold*** compiling, where they only run the fancy compiler on basic blocks that are hot , i.e., execute a lot.
 
 ```{mermaid}
 flowchart LR
@@ -31,8 +46,11 @@ B --> C1[fancy compiler - only run on long running functions];
 C1 --> D;
 
 ```
+---
 
 We are going to consider several versions of ***trivial dead code elimination***.  Trivial because we are going to hold off on control flow related optimizations till later. Sometimes people call this DCE or trivial DCE.
+
+---
 
 For each case, we start by defining what we mean by dead code.  
 
@@ -49,13 +67,20 @@ example 1
 What instruction is dead? (meaning get the same answer if we delete the instruction)
 What is your definition? Is this meaning of dead code local or global?
 
+---
+
 Why would you ever have dead code in a program?  One reason is that have DCE as a separate pass means other optimizations do not have to clean up.  
 
 ## Definition 1- Dead if instruction writes a variable and the variable is never used.
 
-An instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels no not write a variable so they get deleted as well.
+An instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels do  not write a variable so they do not get deleted as well.
+
+
+---
 
 What is the pseudo code to find dead instructions using this definition?
+
+. . .
 
 ```
 used = empty set 
@@ -66,6 +91,7 @@ for instd in func
        delete instr
 ```
 
+---
 
 example 2 
 
@@ -79,20 +105,38 @@ example 2
   print d;
 }
 ```
+. . .
 
 The code so far only deletes one instruction, but we would like to get rid of two. Instruction c should also be dead.
 How do we change the definition
 
 ## Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.
 
-A slow way to do this. - iterating till convergence
+## iterating till convergence
 
 ~~~
 while changes:
        run one pass of tdce above
 ~~~
 
-what would be faster?  What is some pseudo code for the change
+## what would be faster?  What is some pseudo code for the change
+
+. . . 
+
+``` 
+  find all the variables that are used in more then one block
+  for each block b 
+     used = all variables used in more then one block
+     walk backwards over the instruction in the block
+     for each instruction is dest in used?
+        yes - remove dest from used, add arguments to used 
+        no  - instruction is dead 
+
+```
+
+finding all the variables used in more then one block might be expensive 
+
+---
 
 example 3 
 
@@ -119,9 +163,11 @@ this talks about paths (control flow paths)
 }
 ```
 
-for now we want to skip control flow, so we 
+## for now we want to skip control flow
 
 ## Definition: An instruction is dead if that instruction writes a variable v and no  path within the block  starting at that instruction reaches a use of v in the same block or reaches the exit of the block
+
+---
 
 ``` 
 cands are the variables that are defined but not used 
@@ -136,18 +182,21 @@ this is a mapping variables that have been defined but not used
   
 ```
 
-and as you might expect, we need to interate this till convergence
+and as you might expect, we need to iterate this till convergence
 
-Does running dce make compilation time go up?
+--- 
 
 Compilers often run dce more then once- why? 
 
+---
 
 testing out dce 
 
 1) program should get the same answer 
 
 1) program should run less instructions 
+
+---
 
 Some test cases:
 
@@ -158,6 +207,7 @@ Some test cases:
 1) other examples in [the DCE test directory](https://github.com/sampsyo/bril/tree/main/examples/test/tdce) 
 
 
+## testing 
 
   bril2json < bench.bril | python3 tdce.py | bril2txt
 
@@ -168,18 +218,33 @@ Some test cases:
   bril2json < bench.bril | python3 tdce.py | wc -l
 
 Then profiling to measure dynamic instruction count:
-The bril interpreter has a flag -p which prints the number of dynamcially executed instructions.  How good a measure is this for real programs?
+The bril interpreter has a flag -p which prints the number of dynamically executed instructions.  
 
+How good a measure is this for real programs?
 
+# test with profile 
 
     bril2json < bench.bril | brili -p
     
     bril2json < bench.bril | python3 tdce.py | brili -p
 
+---
+
+## using trunt (golden images)
+
+
+1. Configure. Decide what command you want to test. Make a turnt.toml config file and put command = "mycmd {filename}" in it to pass each test file as an argument to mycmd.
+
+2. Take a snapshot. Run turnt --save foo.bril.  Execute mycmd foo.bril  and save the standard output into foo.out. 
+
+You might want to take a look at this output to make sure it's what you expect
+
+
+3. Test your work. Now that you have a test in place, keep working. Use turnt *.bril to run all your tests and confirm that the output still matches. 
+
+If there's a mismatch, you can do turnt --diff to see the changes. 
 
 
 
-name = "slides from Phil Gibbons at CMU"
-url = "http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/lectures/L3-Local-Opts.pdf"
-details = "for more details and context on LVN
+
 

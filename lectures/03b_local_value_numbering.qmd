@@ -5,6 +5,9 @@ format: html
 
 ### Local Value Numbering
 
+
+[slides from Phil Gibbons at CMU](http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/) lectures/L3-Local-Opts.pdf) for more details and context on LVN
+
 Value numbering is a very powerful technique that removes ***redunancies***,  An instruction  x + y is redundant inside a block if it has already been computed
 in the block, and no intervening operation redefines x or y. If the compiler
 finds a redundant expression, it can save that value at the first computation
