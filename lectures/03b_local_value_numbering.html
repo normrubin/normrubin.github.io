@@ -337,6 +337,7 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="local-value-numbering" class="level3">
 <h3 class="anchored" data-anchor-id="local-value-numbering">Local Value Numbering</h3>
+<p><a href="http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/">slides from Phil Gibbons at CMU</a> lectures/L3-Local-Opts.pdf) for more details and context on LVN</p>
 <p>Value numbering is a very powerful technique that removes <strong><em>redunancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
 <p>The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (reprented as a number) Each time it sees an instruction it forms a hash of the op code and t he value numbers of its operands and gives tha a new value number.</p>
 <p>Two instructions are redundant if they have same op code and operands, which means the same value number</p>

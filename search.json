@@ -191,7 +191,7 @@
     "href": "lectures/03_local.html",
     "title": "3 Local Analysis & Optimization",
     "section": "",
-    "text": "I want to separate 3 flavors of optimization.\nUsually an optimization takes time that is more then linear in some property, For example a local optimization might take time \\(n^2\\) in the number of instructions in the block. a global optimization might take much longer, and an inter-procedural longer still. To keep compile time reasonable many compilers limit the number of global optimizations and skip inter-procedural optimizations. As a consequence many more optimizations get published but not used in production.\nFor a local optimization, instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.\nFor a global optimization, two instructions are ordered by a path from one block to another and different paths through the program give different orders.\nOne special case is JIT (just in time) compilers, where programs get compiled at the start of execution. GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called Hotspot compiling. Some JIT compilers use hot/cold compiling, where they only run the fancy compiler on basic blocks that are hotl, i.e., execute a lot.\nflowchart LR\nA[application] -- offline --&gt; B[byte code/ptx]\nB --&gt; C[quick run time compiler/ finalizer]\nC --&gt; D[isa]\nB --&gt; C1[fancy compiler - only run on long running functions];\nC1 --&gt; D;\nWe are going to consider several versions of trivial dead code elimination. Trivial because we are going to hold off on control flow related optimizations till later. Sometimes people call this DCE or trivial DCE.\nFor each case, we start by defining what we mean by dead code.\nexample 1\nWhat instruction is dead? (meaning get the same answer if we delete the instruction) What is your definition? Is this meaning of dead code local or global?\nWhy would you ever have dead code in a program? One reason is that have DCE as a separate pass means other optimizations do not have to clean up.",
+    "text": "I want to separate 3 flavors of optimization.\nUsually an optimization takes time that is more then linear in some property, For example a local optimization might take time \\(n^2\\) in the number of instructions in the block. a global optimization might take much longer, and an inter-procedural longer still. To keep compile time reasonable many compilers limit the number of global optimizations and skip inter-procedural optimizations. As a consequence many more optimizations get published but not used in production.\nwhen would running an optimization speedup compilation?\nFor a local optimization, instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.\nFor a global optimization, two instructions are ordered by a path from one block to another and different paths through the program give different orders.\nOne special case is JIT (just in time) compilers, where programs get compiled at the start of execution. GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called Hotspot compiling. Some JIT compilers use hot/cold compiling, where they only run the fancy compiler on basic blocks that are hot , i.e., execute a lot.\nflowchart LR\nA[application] -- offline --&gt; B[byte code/ptx]\nB --&gt; C[quick run time compiler/ finalizer]\nC --&gt; D[isa]\nB --&gt; C1[fancy compiler - only run on long running functions];\nC1 --&gt; D;\nWe are going to consider several versions of trivial dead code elimination. Trivial because we are going to hold off on control flow related optimizations till later. Sometimes people call this DCE or trivial DCE.\nFor each case, we start by defining what we mean by dead code.\nexample 1\nWhat instruction is dead? (meaning get the same answer if we delete the instruction) What is your definition? Is this meaning of dead code local or global?\nWhy would you ever have dead code in a program? One reason is that have DCE as a separate pass means other optimizations do not have to clean up.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -203,7 +203,7 @@
     "href": "lectures/03_local.html#definition-1--dead-if-instruction-writes-a-variable-and-the-variable-is-never-used.",
     "title": "3 Local Analysis & Optimization",
     "section": "Definition 1- Dead if instruction writes a variable and the variable is never used.",
-    "text": "Definition 1- Dead if instruction writes a variable and the variable is never used.\nAn instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels no not write a variable so they get deleted as well.\nWhat is the pseudo code to find dead instructions using this definition?\nused = empty set \nfor instr in func \n   used += instr.args \nfor instd in func\n    if instr has a dest and dest in not in used \n       delete instr\nexample 2\n@main {\n  a: int = const 4;\n  b: int = const 2;\n  c: int = const 1;  \n  d: int = add a b;\n  e: int = add c d; \n  print d;\n}\nThe code so far only deletes one instruction, but we would like to get rid of two. Instruction c should also be dead. How do we change the definition",
+    "text": "Definition 1- Dead if instruction writes a variable and the variable is never used.\nAn instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels do not write a variable so they do not get deleted as well.\n\nWhat is the pseudo code to find dead instructions using this definition?\n. . .\nused = empty set \nfor instr in func \n   used += instr.args \nfor instd in func\n    if instr has a dest and dest in not in used \n       delete instr\n\nexample 2\n@main {\n  a: int = const 4;\n  b: int = const 2;\n  c: int = const 1;  \n  d: int = add a b;\n  e: int = add c d; \n  print d;\n}\n. . .\nThe code so far only deletes one instruction, but we would like to get rid of two. Instruction c should also be dead. How do we change the definition",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -215,7 +215,31 @@
     "href": "lectures/03_local.html#definition-2--dead-if-instruction-writes-a-variable-and-the-variable-is-either-never-used-or-only-used-in-dead-instructions.",
     "title": "3 Local Analysis & Optimization",
     "section": "Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.",
-    "text": "Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.\nA slow way to do this. - iterating till convergence\nwhile changes:\n       run one pass of tdce above\nwhat would be faster? What is some pseudo code for the change\nexample 3\n@main {\n  a: int = const 4;\n  a: int = const 200;\n  print a;\n}",
+    "text": "Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "3 Local Analysis & Optimization"
+    ]
+  },
+  {
+    "objectID": "lectures/03_local.html#iterating-till-convergence",
+    "href": "lectures/03_local.html#iterating-till-convergence",
+    "title": "3 Local Analysis & Optimization",
+    "section": "iterating till convergence",
+    "text": "iterating till convergence\nwhile changes:\n       run one pass of tdce above",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "3 Local Analysis & Optimization"
+    ]
+  },
+  {
+    "objectID": "lectures/03_local.html#what-would-be-faster-what-is-some-pseudo-code-for-the-change",
+    "href": "lectures/03_local.html#what-would-be-faster-what-is-some-pseudo-code-for-the-change",
+    "title": "3 Local Analysis & Optimization",
+    "section": "what would be faster? What is some pseudo code for the change",
+    "text": "what would be faster? What is some pseudo code for the change\n. . .\n  find all the variables that are used in more then one block\n  for each block b \n     used = all variables used in more then one block\n     walk backwards over the instruction in the block\n     for each instruction is dest in used?\n        yes - remove dest from used, add arguments to used \n        no  - instruction is dead \n\nfinding all the variables used in more then one block might be expensive\n\nexample 3\n@main {\n  a: int = const 4;\n  a: int = const 200;\n  print a;\n}",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -227,7 +251,19 @@
     "href": "lectures/03_local.html#definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-starting-at-that-instruction-reaches-a-use-of-v",
     "title": "3 Local Analysis & Optimization",
     "section": "Definition? An instruction is dead if that instruction writes a variable v and no path starting at that instruction reaches a use of v",
-    "text": "Definition? An instruction is dead if that instruction writes a variable v and no path starting at that instruction reaches a use of v\nthis talks about paths (control flow paths)\n@main {\n  a: int = const 4;\n     br input .then .else \n  .then\n  a: int = const 200;\n  .else \n  print a;\n}\nfor now we want to skip control flow, so we",
+    "text": "Definition? An instruction is dead if that instruction writes a variable v and no path starting at that instruction reaches a use of v\nthis talks about paths (control flow paths)\n@main {\n  a: int = const 4;\n     br input .then .else \n  .then\n  a: int = const 200;\n  .else \n  print a;\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "3 Local Analysis & Optimization"
+    ]
+  },
+  {
+    "objectID": "lectures/03_local.html#for-now-we-want-to-skip-control-flow",
+    "href": "lectures/03_local.html#for-now-we-want-to-skip-control-flow",
+    "title": "3 Local Analysis & Optimization",
+    "section": "for now we want to skip control flow",
+    "text": "for now we want to skip control flow",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -239,12 +275,99 @@
     "href": "lectures/03_local.html#definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-within-the-block-starting-at-that-instruction-reaches-a-use-of-v-in-the-same-block-or-reaches-the-exit-of-the-block",
     "title": "3 Local Analysis & Optimization",
     "section": "Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block",
-    "text": "Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block\ncands are the variables that are defined but not used \nlast_def = {}  variables -&gt; instructions \nthis is a mapping variables that have been defined but not used\n\n   for instr in block:\n      each arg (use) removes arg from last def \n      if the instr has a dest \n          if the dest is in last_def, \n      add dest-&gt;instr to last def\n  \nand as you might expect, we need to interate this till convergence\nDoes running dce make compilation time go up?\nCompilers often run dce more then once- why?\ntesting out dce\n\nprogram should get the same answer\nprogram should run less instructions\n\nSome test cases:\n\nsimple.bril,\nreassign.bril,\nother examples in the DCE test directory\n\nbril2json &lt; bench.bril | python3 tdce.py | bril2txt\nNext, try using wc to check static code size differences:\nbril2json &lt; bench.bril | wc -l\nbril2json &lt; bench.bril | python3 tdce.py | wc -l\nThen profiling to measure dynamic instruction count: The bril interpreter has a flag -p which prints the number of dynamcially executed instructions. How good a measure is this for real programs?\nbril2json &lt; bench.bril | brili -p\n\nbril2json &lt; bench.bril | python3 tdce.py | brili -p\nname = “slides from Phil Gibbons at CMU” url = “http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/lectures/L3-Local-Opts.pdf” details = “for more details and context on LVN",
+    "text": "Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block\n\ncands are the variables that are defined but not used \nlast_def = {}  variables -&gt; instructions \nthis is a mapping variables that have been defined but not used\n\n   for instr in block:\n      each arg (use) removes arg from last def \n      if the instr has a dest \n          if the dest is in last_def, \n      add dest-&gt;instr to last def\n  \nand as you might expect, we need to iterate this till convergence\n\nCompilers often run dce more then once- why?\n\ntesting out dce\n\nprogram should get the same answer\nprogram should run less instructions\n\n\nSome test cases:\n\nsimple.bril,\nreassign.bril,\nother examples in the DCE test directory",
     "crumbs": [
       "EECS 7398",
       "Lectures",
       "3 Local Analysis & Optimization"
     ]
+  },
+  {
+    "objectID": "lectures/03_local.html#testing",
+    "href": "lectures/03_local.html#testing",
+    "title": "3 Local Analysis & Optimization",
+    "section": "testing",
+    "text": "testing\nbril2json &lt; bench.bril | python3 tdce.py | bril2txt\nNext, try using wc to check static code size differences:\nbril2json &lt; bench.bril | wc -l\nbril2json &lt; bench.bril | python3 tdce.py | wc -l\nThen profiling to measure dynamic instruction count: The bril interpreter has a flag -p which prints the number of dynamically executed instructions.\nHow good a measure is this for real programs?",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "3 Local Analysis & Optimization"
+    ]
+  },
+  {
+    "objectID": "lectures/03_local.html#using-trunt-golden-images",
+    "href": "lectures/03_local.html#using-trunt-golden-images",
+    "title": "3 Local Analysis & Optimization",
+    "section": "using trunt (golden images)",
+    "text": "using trunt (golden images)\n\nConfigure. Decide what command you want to test. Make a turnt.toml config file and put command = “mycmd {filename}” in it to pass each test file as an argument to mycmd.\nTake a snapshot. Run turnt –save foo.bril. Execute mycmd foo.bril and save the standard output into foo.out.\n\nYou might want to take a look at this output to make sure it’s what you expect\n\nTest your work. Now that you have a test in place, keep working. Use turnt *.bril to run all your tests and confirm that the output still matches.\n\nIf there’s a mismatch, you can do turnt –diff to see the changes.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "3 Local Analysis & Optimization"
+    ]
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#definition-1--dead-if-instruction-writes-a-variable-and-the-variable-is-never-used.",
+    "href": "lectures/revealjs-local.html#definition-1--dead-if-instruction-writes-a-variable-and-the-variable-is-never-used.",
+    "title": "3 Local Analysis & Optimization",
+    "section": "Definition 1- Dead if instruction writes a variable and the variable is never used.",
+    "text": "Definition 1- Dead if instruction writes a variable and the variable is never used.\nAn instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels do not write a variable so they do not get deleted as well."
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#definition-2--dead-if-instruction-writes-a-variable-and-the-variable-is-either-never-used-or-only-used-in-dead-instructions.",
+    "href": "lectures/revealjs-local.html#definition-2--dead-if-instruction-writes-a-variable-and-the-variable-is-either-never-used-or-only-used-in-dead-instructions.",
+    "title": "3 Local Analysis & Optimization",
+    "section": "Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.",
+    "text": "Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions."
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#iterating-till-convergence",
+    "href": "lectures/revealjs-local.html#iterating-till-convergence",
+    "title": "3 Local Analysis & Optimization",
+    "section": "iterating till convergence",
+    "text": "iterating till convergence\nwhile changes:\n       run one pass of tdce above"
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#what-would-be-faster-what-is-some-pseudo-code-for-the-change",
+    "href": "lectures/revealjs-local.html#what-would-be-faster-what-is-some-pseudo-code-for-the-change",
+    "title": "3 Local Analysis & Optimization",
+    "section": "what would be faster? What is some pseudo code for the change",
+    "text": "what would be faster? What is some pseudo code for the change\n\n  find all the variables that are used in more then one block\n  for each block b \n     used = all variables used in more then one block\n     walk backwards over the instruction in the block\n     for each instruction is dest in used?\n        yes - remove dest from used, add arguments to used \n        no  - instruction is dead \n\nfinding all the variables used in more then one block might be expensive"
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-starting-at-that-instruction-reaches-a-use-of-v",
+    "href": "lectures/revealjs-local.html#definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-starting-at-that-instruction-reaches-a-use-of-v",
+    "title": "3 Local Analysis & Optimization",
+    "section": "Definition? An instruction is dead if that instruction writes a variable v and no path starting at that instruction reaches a use of v",
+    "text": "Definition? An instruction is dead if that instruction writes a variable v and no path starting at that instruction reaches a use of v\nthis talks about paths (control flow paths)\n@main {\n  a: int = const 4;\n     br input .then .else \n  .then\n  a: int = const 200;\n  .else \n  print a;\n}"
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#for-now-we-want-to-skip-control-flow",
+    "href": "lectures/revealjs-local.html#for-now-we-want-to-skip-control-flow",
+    "title": "3 Local Analysis & Optimization",
+    "section": "for now we want to skip control flow",
+    "text": "for now we want to skip control flow"
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-within-the-block-starting-at-that-instruction-reaches-a-use-of-v-in-the-same-block-or-reaches-the-exit-of-the-block",
+    "href": "lectures/revealjs-local.html#definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-within-the-block-starting-at-that-instruction-reaches-a-use-of-v-in-the-same-block-or-reaches-the-exit-of-the-block",
+    "title": "3 Local Analysis & Optimization",
+    "section": "Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block",
+    "text": "Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block"
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#testing",
+    "href": "lectures/revealjs-local.html#testing",
+    "title": "3 Local Analysis & Optimization",
+    "section": "testing",
+    "text": "testing\nbril2json &lt; bench.bril | python3 tdce.py | bril2txt\nNext, try using wc to check static code size differences:\nbril2json &lt; bench.bril | wc -l\nbril2json &lt; bench.bril | python3 tdce.py | wc -l\nThen profiling to measure dynamic instruction count: The bril interpreter has a flag -p which prints the number of dynamically executed instructions.\nHow good a measure is this for real programs?"
+  },
+  {
+    "objectID": "lectures/revealjs-local.html#using-trunt-golden-images",
+    "href": "lectures/revealjs-local.html#using-trunt-golden-images",
+    "title": "3 Local Analysis & Optimization",
+    "section": "using trunt (golden images)",
+    "text": "using trunt (golden images)\n\nConfigure. Decide what command you want to test. Make a turnt.toml config file and put command = “mycmd {filename}” in it to pass each test file as an argument to mycmd.\nTake a snapshot. Run turnt –save foo.bril. Execute mycmd foo.bril and save the standard output into foo.out.\n\nYou might want to take a look at this output to make sure it’s what you expect\n\nTest your work. Now that you have a test in place, keep working. Use turnt *.bril to run all your tests and confirm that the output still matches.\n\nIf there’s a mismatch, you can do turnt –diff to see the changes."
   },
   {
     "objectID": "lectures/bril.html",
@@ -263,7 +386,55 @@
     "href": "lectures/02a_representation.html",
     "title": "2 Representation of programs",
     "section": "",
-    "text": "The representation of a program - is what we read in and read out when transforming a program. What kind of properties make a good representation?\nOne possible representation is called concrete syntax form Programs are text - surface syntax- just what you would type into an editor.\n\nvalue = 8\nresult = 1\nfor i in range(value):\n  result = result + i\nprint(result)\n\n29\n\n\nWhat is good and what is bad about this representation?\nWhat is the level of abstraction? How do you understand the semantics.\nForm 2 - Abstract syntax form\nTree structure - Nodes are parts of the program, edges show how they are connected. We can write this as a list or a graph\n\n\nFunctionDef(\n    name='pgm',\n    args=arguments(\n        posonlyargs=[],\n        args=[],\n        kwonlyargs=[],\n        kw_defaults=[],\n        defaults=[]),\n    body=[\n        Assign(\n            targets=[\n                Name(id='value', ctx=Store())],\n            value=Constant(value=8)),\n        Assign(\n            targets=[\n                Name(id='result', ctx=Store())],\n            value=Constant(value=1)),\n        For(\n            target=Name(id='i', ctx=Store()),\n            iter=Call(\n                func=Name(id='range', ctx=Load()),\n                args=[\n                    Name(id='value', ctx=Load())],\n                keywords=[]),\n            body=[\n                Assign(\n                    targets=[\n                        Name(id='result', ctx=Store())],\n                    value=BinOp(\n                        left=Name(id='result', ctx=Load()),\n                        op=Mult(),\n                        right=Name(id='i', ctx=Load())))],\n            orelse=[]),\n        Expr(\n            value=Call(\n                func=Name(id='print', ctx=Load()),\n                args=[\n                    Name(id='result', ctx=Load())],\n                keywords=[]))],\n    decorator_list=[])\n\n\n\ndot_dia\n\n\n\n\n\n\n\n\nAST tree representation An AST is a tree structure, nodes like if, test, body, assign Each node is one concept from the program\nRecursive function can walk over the tree, one chunk of code for each node.\n\nGood - each type of node is different, making special cases are easy\nBad - each type of node is different so analysis has to know about every type, making general cases hard\n\nThis is the classic way to write an interpreter. Simple (non optimizing) compilers often use this format.\n\n\nPrograms are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.\n\n\n    let value = 8\n    let result = 1\n    for (let i = 0;i &lt; value;i = i+ 1)\n    {\n        result = result * i\n    }\n    console.log(result )\n\n\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n\n\nos.system('ts2bril images/toy.ts | bril2txt')\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n0\n\n\nLooks like assembly but no limit on registers, no condition codes. fully typed, no complex addressing modes.\nsyntax-\nDeclare functions, labels, instructions\ninstruction:\n1) variable type = opcode arguments 2) opcode list of arguments\n\n\n\nWhat is the abstract syntax form for this?\n\n\n\n\n\nRepresentation is a directed graph. Nodes are instructions, edges indicate possible flow of control, one entry and one exit node.\nHere is a simple program:\n    @main {\n        v: int = const 5;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[const] --&gt; B[print]\n\n\n\n\n\n\na second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\nWhat does the control flow graph look like?\n\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\nnotice label does not produce a node\nEasy to see a dead instruction.\nThird example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nwhich is the true and which is the false, could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside.\nBasic blocks (cfg form 2) 1) nodes can be a sequence of instructions. 1) jumps and branches can only be at the end of a sequence 1) only label has to be at the start 1) every instruction in the sequence executes the same number of times\n\n\n\n\n\nflowchart LR\n  A[v: int const 4\\nb : bool\\n br ] \n  A --&gt; D[v: const 2]\n  A --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nAs we construct basic blocks, we can add instructions up till something that ends the block (terminator)\nOption: do all blocks end in a terminator or not?\ngiven a block b, the predecessors of b are the blocks b_in where there is an edge bin-&gt;b. And the successors of B are the b_out where b-&gt;b_out is an edge\n\n\n\n\n\njust find all the basic blocks\nadd the control flow edges\n\npsuedo code\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\nstep 2 we need a map from labels to basic blocks\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\n    \n\nfor block in blocks:\n   last = block[-1]\n   if last is a jmp (one successor)\n      add edge from block to last.dest \n   else if last is a br (two successors)\n      add two edges from block to last.true, last.false \n   else  fall through \n      add edge to next block (if it exists)\n\nwith open(\"images/add.json\", 'r') as f:\n  bril_program = f.read()\n  print(bril_program)\n\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\",\n          \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"print\", \"args\": [\"v2\"] }\n      ],\n      \"args\": []\n    }\n  ]\n}",
+    "text": "The representation of a program\nWhat we read in and read out when transforming a program.\nWhat kind of properties make a good representation?\n\nfrom graphviz import Digraph\nimport ast\nimport os \n\ndef cmd(x):\n  os.system(x)\n  \ndef ast_syntax(line):\n  return ast.dump(ast.parse(line).body[0], indent=4)\n\n  \n# Define a function to recursively add nodes to the Digraph\ndef add_node(dot, node, parent=None):\n  node_name = str(node.__class__.__name__)\n  dot.node(str(id(node)), node_name)\n  if parent:\n    dot.edge(str(id(parent)), str(id(node)))\n  for child in ast.iter_child_nodes(node):\n    add_node(dot, child, node)\n\n# Add nodes to the Digraph\n\ndef graph(line):\n  dot = Digraph()\n  add_node(dot, ast.parse(line).body[0])\n  return dot",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#how-do-we-represent-programs",
+    "href": "lectures/02a_representation.html#how-do-we-represent-programs",
+    "title": "2 Representation of programs",
+    "section": "",
+    "text": "The representation of a program\nWhat we read in and read out when transforming a program.\nWhat kind of properties make a good representation?\n\nfrom graphviz import Digraph\nimport ast\nimport os \n\ndef cmd(x):\n  os.system(x)\n  \ndef ast_syntax(line):\n  return ast.dump(ast.parse(line).body[0], indent=4)\n\n  \n# Define a function to recursively add nodes to the Digraph\ndef add_node(dot, node, parent=None):\n  node_name = str(node.__class__.__name__)\n  dot.node(str(id(node)), node_name)\n  if parent:\n    dot.edge(str(id(parent)), str(id(node)))\n  for child in ast.iter_child_nodes(node):\n    add_node(dot, child, node)\n\n# Add nodes to the Digraph\n\ndef graph(line):\n  dot = Digraph()\n  add_node(dot, ast.parse(line).body[0])\n  return dot",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#concrete-syntax",
+    "href": "lectures/02a_representation.html#concrete-syntax",
+    "title": "2 Representation of programs",
+    "section": "Concrete Syntax",
+    "text": "Concrete Syntax\nOne possible representation is called concrete syntax form Programs are text or surface syntax- just what you would type into an editor.\nvalue = 8\nresult = 1\nfor i in range(value):\n  result = result + i\nprint(result)\nWhat is good and what is bad about this representation?\nWhat is the level of abstraction?\nHow do you understand the semantics.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#abstract-syntax",
+    "href": "lectures/02a_representation.html#abstract-syntax",
+    "title": "2 Representation of programs",
+    "section": "Abstract syntax",
+    "text": "Abstract syntax\nTree structure\n\nNodes are parts of the program,\nEdges show how they are connected.\n\nWe can write this as a list or a graph\n\n\ndef pgm():\n    value = 8\n    result = 1\n    for i in range(value):\n        result = result * i\n    print(result)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#ast-tree-representation",
+    "href": "lectures/02a_representation.html#ast-tree-representation",
+    "title": "2 Representation of programs",
+    "section": "AST tree representation",
+    "text": "AST tree representation\nAn AST is a tree structure, nodes like ‘if’, ‘test’, ‘body’, assign’.\nEach node is one concept from the program\nRecursive function can walk over the tree, one chunk of code for each node.\n\nGood - each type of node is different, making special cases are easy\nBad - each type of node is different so analysis has to know about every type, making general cases hard\n\nThis is the classic way to write an interpreter.\nSimple (non optimizing) compilers often use this format.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -274,8 +445,8 @@
     "objectID": "lectures/02a_representation.html#a-more-regular-representation",
     "href": "lectures/02a_representation.html#a-more-regular-representation",
     "title": "2 Representation of programs",
-    "section": "",
-    "text": "Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.\n\n\n    let value = 8\n    let result = 1\n    for (let i = 0;i &lt; value;i = i+ 1)\n    {\n        result = result * i\n    }\n    console.log(result )\n\n\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n\n\nos.system('ts2bril images/toy.ts | bril2txt')\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}\n\n\n0\n\n\nLooks like assembly but no limit on registers, no condition codes. fully typed, no complex addressing modes.\nsyntax-\nDeclare functions, labels, instructions\ninstruction:\n1) variable type = opcode arguments 2) opcode list of arguments",
+    "section": "A more regular representation",
+    "text": "A more regular representation\nPrograms are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.\nts2bril images/toy.ts | bril2txt\n\n\n    //typescript program \n    let value = 8\n    let result = 1\n    for (let i = 0; i &lt; value;\n         i = i+1)\n    {\n        result = result * i\n    }\n    console.log(result )\n\n\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -283,11 +454,11 @@
     ]
   },
   {
-    "objectID": "lectures/02a_representation.html#what-is-good-and-what-is-about-this-reorientation",
-    "href": "lectures/02a_representation.html#what-is-good-and-what-is-about-this-reorientation",
+    "objectID": "lectures/02a_representation.html#bril",
+    "href": "lectures/02a_representation.html#bril",
     "title": "2 Representation of programs",
-    "section": "",
-    "text": "What is the abstract syntax form for this?",
+    "section": "bril",
+    "text": "bril\n\nLooks like assembly\nno limit on registers,\nno condition codes.\nfully typed,\nno complex addressing modes.\neasy to extend",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -295,11 +466,83 @@
     ]
   },
   {
-    "objectID": "lectures/02a_representation.html#extract-info-from-this-repreentation.",
-    "href": "lectures/02a_representation.html#extract-info-from-this-repreentation.",
+    "objectID": "lectures/02a_representation.html#bril-syntax",
+    "href": "lectures/02a_representation.html#bril-syntax",
     "title": "2 Representation of programs",
-    "section": "",
-    "text": "Representation is a directed graph. Nodes are instructions, edges indicate possible flow of control, one entry and one exit node.\nHere is a simple program:\n    @main {\n        v: int = const 5;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[const] --&gt; B[print]\n\n\n\n\n\n\na second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\nWhat does the control flow graph look like?\n\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\nnotice label does not produce a node\nEasy to see a dead instruction.\nThird example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nwhich is the true and which is the false, could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside.\nBasic blocks (cfg form 2) 1) nodes can be a sequence of instructions. 1) jumps and branches can only be at the end of a sequence 1) only label has to be at the start 1) every instruction in the sequence executes the same number of times\n\n\n\n\n\nflowchart LR\n  A[v: int const 4\\nb : bool\\n br ] \n  A --&gt; D[v: const 2]\n  A --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\nAs we construct basic blocks, we can add instructions up till something that ends the block (terminator)\nOption: do all blocks end in a terminator or not?\ngiven a block b, the predecessors of b are the blocks b_in where there is an edge bin-&gt;b. And the successors of B are the b_out where b-&gt;b_out is an edge",
+    "section": "Bril syntax",
+    "text": "Bril syntax\nDeclare functions, labels, instructions\ninstruction:\n\nvariable type = opcode arguments\nopcode list of arguments\n\nForm 1, variable is the destination, like a: int = add b, c\nForm 2, no destination, like print a\nwhat is good and what is about this representation?",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#control-flow-graph-cfg-version-1",
+    "href": "lectures/02a_representation.html#control-flow-graph-cfg-version-1",
+    "title": "2 Representation of programs",
+    "section": "control flow graph (CFG) (version 1)",
+    "text": "control flow graph (CFG) (version 1)\nRepresentation is a directed graph.\n\nNodes are instructions,\nedges indicate possible flow of control,\none entry and one exit node.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#example-one",
+    "href": "lectures/02a_representation.html#example-one",
+    "title": "2 Representation of programs",
+    "section": "Example one",
+    "text": "Example one\n@main {\n    v: int = const 5;\n    print v;\n}\n. . .\n\n\n\n\n\nflowchart LR\nA[const] --&gt; B[print]",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#second-example",
+    "href": "lectures/02a_representation.html#second-example",
+    "title": "2 Representation of programs",
+    "section": "second example",
+    "text": "second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\n. . .\n\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\n. . .\nnotice label does not produce a node\nEasy to see a dead instruction.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#third-example",
+    "href": "lectures/02a_representation.html#third-example",
+    "title": "2 Representation of programs",
+    "section": "Third example:",
+    "text": "Third example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n. . .\n\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\n. . .\nwhich is the true edge and which is the false edge , could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#cfg-cfg-form-2",
+    "href": "lectures/02a_representation.html#cfg-cfg-form-2",
+    "title": "2 Representation of programs",
+    "section": "CFG (cfg form 2)",
+    "text": "CFG (cfg form 2)\n\nnodes ares sequences of instructions.\njumps and branches can only be at the end of a sequence\nonly label has to be at the start\nevery instruction in the sequence executes the same number of times",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#construct-cfg",
+    "href": "lectures/02a_representation.html#construct-cfg",
+    "title": "2 Representation of programs",
+    "section": "construct cfg",
+    "text": "construct cfg\nwalk over the instructions:\nAs we construct basic blocks, we can add instructions up till something that ends the block (terminator)\nOption: do all blocks end in a terminator or not?\ngiven a block b, the predecessors of \\(b\\) are the blocks \\(b_{in}\\) where there is an edge \\(b_{in}-&gt;b\\). And the successors of \\(b\\) are the \\(b_{out}\\) where \\(b-&gt;b_{out}\\) is an edge.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -310,13 +553,149 @@
     "objectID": "lectures/02a_representation.html#what-is-an-algorithm-that-forms-a-cfg",
     "href": "lectures/02a_representation.html#what-is-an-algorithm-that-forms-a-cfg",
     "title": "2 Representation of programs",
-    "section": "",
-    "text": "just find all the basic blocks\nadd the control flow edges\n\npsuedo code\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\nstep 2 we need a map from labels to basic blocks\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\n    \n\nfor block in blocks:\n   last = block[-1]\n   if last is a jmp (one successor)\n      add edge from block to last.dest \n   else if last is a br (two successors)\n      add two edges from block to last.true, last.false \n   else  fall through \n      add edge to next block (if it exists)\n\nwith open(\"images/add.json\", 'r') as f:\n  bril_program = f.read()\n  print(bril_program)\n\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\",\n          \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"print\", \"args\": [\"v2\"] }\n      ],\n      \"args\": []\n    }\n  ]\n}",
+    "section": "What is an algorithm that forms a cfg",
+    "text": "What is an algorithm that forms a cfg\n. . .\n\njust find all the basic blocks\nadd the control flow edges",
     "crumbs": [
       "EECS 7398",
       "Lectures",
       "2 Representation of programs"
     ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#pseudo-code-to-construct-cfg",
+    "href": "lectures/02a_representation.html#pseudo-code-to-construct-cfg",
+    "title": "2 Representation of programs",
+    "section": "pseudo code to construct cfg",
+    "text": "pseudo code to construct cfg\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\n\nstep 2 we need a map from labels to basic blocks\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []\n    \n\nfor block in blocks:\n   last = block[-1]\n   if last is a jmp (one successor)\n      add edge from block to last.dest \n   else if last is a br (two successors)\n      add two edges from block to last.true, last.false \n   else  fall through \n      add edge to next block (if it exists)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/02a_representation.html#how-to-look-at-a-bril-program",
+    "href": "lectures/02a_representation.html#how-to-look-at-a-bril-program",
+    "title": "2 Representation of programs",
+    "section": "How to look at a Bril program",
+    "text": "How to look at a Bril program\n\nwith open(\"images/add.json\", 'r') as f:\n  bril_program = f.read()\n  print(bril_program)\n\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\",\n          \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"print\", \"args\": [\"v2\"] }\n      ],\n      \"args\": []\n    }\n  ]\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "2 Representation of programs"
+    ]
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#how-do-we-represent-programs",
+    "href": "lectures/revealjs-rep.html#how-do-we-represent-programs",
+    "title": "2 Representation of programs",
+    "section": "How do we represent programs",
+    "text": "How do we represent programs\nThe representation of a program\nWhat we read in and read out when transforming a program.\nWhat kind of properties make a good representation?"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#concrete-syntax",
+    "href": "lectures/revealjs-rep.html#concrete-syntax",
+    "title": "2 Representation of programs",
+    "section": "Concrete Syntax",
+    "text": "Concrete Syntax\nOne possible representation is called concrete syntax form Programs are text or surface syntax- just what you would type into an editor.\nvalue = 8\nresult = 1\nfor i in range(value):\n  result = result + i\nprint(result)\nWhat is good and what is bad about this representation?\nWhat is the level of abstraction?\nHow do you understand the semantics."
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#abstract-syntax",
+    "href": "lectures/revealjs-rep.html#abstract-syntax",
+    "title": "2 Representation of programs",
+    "section": "Abstract syntax",
+    "text": "Abstract syntax\nTree structure\n\nNodes are parts of the program,\nEdges show how they are connected.\n\nWe can write this as a list or a graph\n\n\ndef pgm():\n    value = 8\n    result = 1\n    for i in range(value):\n        result = result * i\n    print(result)"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#ast-tree-representation",
+    "href": "lectures/revealjs-rep.html#ast-tree-representation",
+    "title": "2 Representation of programs",
+    "section": "AST tree representation",
+    "text": "AST tree representation\nAn AST is a tree structure, nodes like ‘if’, ‘test’, ‘body’, assign’.\nEach node is one concept from the program\nRecursive function can walk over the tree, one chunk of code for each node.\n\nGood - each type of node is different, making special cases are easy\nBad - each type of node is different so analysis has to know about every type, making general cases hard\n\nThis is the classic way to write an interpreter.\nSimple (non optimizing) compilers often use this format."
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#a-more-regular-representation",
+    "href": "lectures/revealjs-rep.html#a-more-regular-representation",
+    "title": "2 Representation of programs",
+    "section": "A more regular representation",
+    "text": "A more regular representation\nPrograms are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.\nts2bril images/toy.ts | bril2txt\n\n\n    //typescript program \n    let value = 8\n    let result = 1\n    for (let i = 0; i &lt; value;\n         i = i+1)\n    {\n        result = result * i\n    }\n    console.log(result )\n\n\n\n@main {\n  v0: float = const 8;\n  value: float = id v0;\n  v1: float = const 1;\n  result: float = id v1;\n  v3: float = const 0;\n  i: float = id v3;\n.for.cond.2:\n  v4: float = id i;\n  v5: float = id value;\n  v6: bool = flt v4 v5;\n  br v6 .for.body.2 .for.end.2;\n.for.body.2:\n  v7: float = id result;\n  v8: float = id i;\n  v9: float = fmul v7 v8;\n  result: float = id v9;\n  v10: float = id i;\n  v11: float = const 1;\n  v12: float = fadd v10 v11;\n  i: float = id v12;\n  jmp .for.cond.2;\n.for.end.2:\n  v13: float = id result;\n  print v13;\n  v14: int = const 0;\n}"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#bril",
+    "href": "lectures/revealjs-rep.html#bril",
+    "title": "2 Representation of programs",
+    "section": "bril",
+    "text": "bril\n\nLooks like assembly\nno limit on registers,\nno condition codes.\nfully typed,\nno complex addressing modes.\neasy to extend"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#bril-syntax",
+    "href": "lectures/revealjs-rep.html#bril-syntax",
+    "title": "2 Representation of programs",
+    "section": "Bril syntax",
+    "text": "Bril syntax\nDeclare functions, labels, instructions\ninstruction:\n\nvariable type = opcode arguments\nopcode list of arguments\n\nForm 1, variable is the destination, like a: int = add b, c\nForm 2, no destination, like print a\nwhat is good and what is about this representation?"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#control-flow-graph-cfg-version-1",
+    "href": "lectures/revealjs-rep.html#control-flow-graph-cfg-version-1",
+    "title": "2 Representation of programs",
+    "section": "control flow graph (CFG) (version 1)",
+    "text": "control flow graph (CFG) (version 1)\nRepresentation is a directed graph.\n\nNodes are instructions,\nedges indicate possible flow of control,\none entry and one exit node."
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#example-one",
+    "href": "lectures/revealjs-rep.html#example-one",
+    "title": "2 Representation of programs",
+    "section": "Example one",
+    "text": "Example one\n@main {\n    v: int = const 5;\n    print v;\n}\n\n\n\n\n\n\nflowchart LR\nA[const] --&gt; B[print]"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#second-example",
+    "href": "lectures/revealjs-rep.html#second-example",
+    "title": "2 Representation of programs",
+    "section": "second example",
+    "text": "second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\n\n\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\n\n\nnotice label does not produce a node\nEasy to see a dead instruction."
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#third-example",
+    "href": "lectures/revealjs-rep.html#third-example",
+    "title": "2 Representation of programs",
+    "section": "Third example:",
+    "text": "Third example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n\n\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\n\n\nwhich is the true edge and which is the false edge , could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside."
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#cfg-cfg-form-2",
+    "href": "lectures/revealjs-rep.html#cfg-cfg-form-2",
+    "title": "2 Representation of programs",
+    "section": "CFG (cfg form 2)",
+    "text": "CFG (cfg form 2)\n\nnodes ares sequences of instructions.\njumps and branches can only be at the end of a sequence\nonly label has to be at the start\nevery instruction in the sequence executes the same number of times"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#construct-cfg",
+    "href": "lectures/revealjs-rep.html#construct-cfg",
+    "title": "2 Representation of programs",
+    "section": "construct cfg",
+    "text": "construct cfg\nwalk over the instructions:\nAs we construct basic blocks, we can add instructions up till something that ends the block (terminator)\nOption: do all blocks end in a terminator or not?\ngiven a block b, the predecessors of \\(b\\) are the blocks \\(b_{in}\\) where there is an edge \\(b_{in}-&gt;b\\). And the successors of \\(b\\) are the \\(b_{out}\\) where \\(b-&gt;b_{out}\\) is an edge."
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#what-is-an-algorithm-that-forms-a-cfg",
+    "href": "lectures/revealjs-rep.html#what-is-an-algorithm-that-forms-a-cfg",
+    "title": "2 Representation of programs",
+    "section": "What is an algorithm that forms a cfg",
+    "text": "What is an algorithm that forms a cfg\n\n\njust find all the basic blocks\nadd the control flow edges"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#pseudo-code-to-construct-cfg",
+    "href": "lectures/revealjs-rep.html#pseudo-code-to-construct-cfg",
+    "title": "2 Representation of programs",
+    "section": "pseudo code to construct cfg",
+    "text": "pseudo code to construct cfg\n\nin: instructions - list of instructions\nout blocks - list of lists of instructions\n\ncurrent_block = []\nfor i in instructions:\n    if i is not a label:\n       block.append(i)\n    if i is a label or terminator:\n        blocks.append(current_block)\n        current_block = []"
+  },
+  {
+    "objectID": "lectures/revealjs-rep.html#how-to-look-at-a-bril-program",
+    "href": "lectures/revealjs-rep.html#how-to-look-at-a-bril-program",
+    "title": "2 Representation of programs",
+    "section": "How to look at a Bril program",
+    "text": "How to look at a Bril program\n\n\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\",\n          \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"print\", \"args\": [\"v2\"] }\n      ],\n      \"args\": []\n    }\n  ]\n}"
   },
   {
     "objectID": "lectures/01a_performance_measurement.html",
@@ -989,7 +1368,7 @@
     "href": "weekly.html",
     "title": "EECS7398 Weekly Schedule",
     "section": "",
-    "text": "tbl-colwidths: [10,20,20,20, 15, 15 ]\nSince the is the first time this course is offered. This is a tentative schedule.\n\n\n\n\n\n\nWarning\n\n\n\nNeed to figure out where discussions are kept. Is it on github? or in canvas?\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek\nday\nDate\ntopic\ndiscussions\nDue\n\n\n\n\n1\nFriday\nSept 6\nCompiler overview and structure\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2\nTuesday\nSept 10\nPerformance Measurement\n\nhw0\n\n\n\nPerformance and Measurement LEADER: Norm using Adrian’s blog)\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\nSIGPLAN Empirical Evaluation Guidelines\n\n\n\n\n\n\n\n\n\n\n\n2\nFriday\nSept 13\nRepresenting programs\n\n\n\n\n\nsome paper LEADER:\n\n\n\n\n\n\n\n\n\n\n\n3\nTuesday\nSept 17\nOverview of Bril\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nFriday\nSept 20\nLocal analysis and optimization\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nTuesday\nSept 24\nData flow\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nFriday\nSept 27\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nTuesday\nOct 1\nGlobal analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nFriday\nOct 4\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nTuesday\nOct 8\nStatic single assignment\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nFriday\nOct 11\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nTuesday\nOct 15\nLLVM\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nFriday\nOct 18\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nTuesday\nOct 22\nClassical loop optimizations\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nFriday\nOct 25\nPolyhedral analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nTuesday\nOct 29\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nFriday\nNov 1\nMLIR\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nTuesday\nNov 5\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nFriday\nNov 8\nInterprocedural Analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nTuesday\nNov 12\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nFriday\nNov 15\nMemory Management\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nTuesday\nNov 19\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nFriday\nNov 22\nDynamic compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nTuesday\nNov 26\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nFriday\nNov 29\nThanksgiving\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nTuesday\nDec 3\nGPU Compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nFriday\nDec 6\ncontinued\n\n\n\n\n\nfinal project deadline ——\n\n\n\n Back to top",
+    "text": "tbl-colwidths: [10,20,20,20, 15, 15 ]\nSince the is the first time this course is offered. This is a tentative schedule.\n\n\n\n\n\n\nWarning\n\n\n\nNeed to figure out where discussions are kept. Is it on github? or in canvas?\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek\nday\nDate\ntopic\ndiscussions\nDue\n\n\n\n\n1\nFriday\nSept 6\nCompiler overview and structure\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2\nTuesday\nSept 10\nPerformance Measurement\n\nhw0\n\n\n\nPerformance and Measurement LEADER: Norm using Adrian’s blog)\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\nSIGPLAN Empirical Evaluation Guidelines\n\n\n\n\n\n\n\n\n\n\n\n2\nFriday\nSept 13\nRepresenting programs\n\n\n\n\n\nsome paper LEADER:\n\n\n\n\n\n\n\n\n\n\n\n3\nTuesday\nSept 17\nOverview of Bril\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nFriday\nSept 20\nLocal analysis and optimization\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nTuesday\nSept 24\nData flow\n\nhw1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nFriday\nSept 27\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nTuesday\nOct 1\nGlobal analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nFriday\nOct 4\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nTuesday\nOct 8\nStatic single assignment\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nFriday\nOct 11\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nTuesday\nOct 15\nLLVM\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nFriday\nOct 18\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nTuesday\nOct 22\nClassical loop optimizations\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nFriday\nOct 25\nPolyhedral analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nTuesday\nOct 29\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nFriday\nNov 1\nMLIR\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nTuesday\nNov 5\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nFriday\nNov 8\nInterprocedural Analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nTuesday\nNov 12\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nFriday\nNov 15\nMemory Management\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nTuesday\nNov 19\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nFriday\nNov 22\nDynamic compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nTuesday\nNov 26\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nFriday\nNov 29\nThanksgiving\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nTuesday\nDec 3\nGPU Compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nFriday\nDec 6\ncontinued\n\n\n\n\n\nfinal project deadline ——\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Weekly Schedule"
@@ -1192,7 +1571,7 @@
     "href": "lectures/03b_local_value_numbering.html",
     "title": "_ local value numbering",
     "section": "",
-    "text": "Local Value Numbering\nValue numbering is a very powerful technique that removes redunancies, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.\nThe idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (reprented as a number) Each time it sees an instruction it forms a hash of the op code and t he value numbers of its operands and gives tha a new value number.\nTwo instructions are redundant if they have same op code and operands, which means the same value number\ne_i and e_j have the same value number if and only if e_i and e_j are provably equal for all possible operands of the expressions.\nlocal value numbering covers lot of optimizations\ndead code elimination\n\nmain {\n    a: int = const 100;\n    a: int = const 42;\n    print a;\n\n}\n\ncopy propagation\n\nmain{\n    x: int = const 4;\n    copy1: int = id x;\n    copy2: int = id copy1;\n    print copy2;\n}\n\ncommon sub-expression elimination cse \n\nmain {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2: int = add a b;\n    prod: int = mul sum1 sum2;\n    print prod;\n}\nWe want to stop thinking about varaibles and think about values. Two instructions are redundant if they compute the same value.\n\n\nthis is a very deep idea that comes up multiple times.\nfor example in a JIT compiler we want computation to be fast so we can get rid of all the variables\nb: int const 1;\nc: int cont 2;\na:  int b c;  \nbecomes:\n[  int const 1\n   int const 2 \n   int 0 1\n]\nless storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.\nPseudo code (similar to an interpreter)\nhash table constants and expressions of value numbers to value numbers and a variable holding the value\nreverse map from variable to value numbers\n  main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2: int = add a b;\n    prod: int = mult sum1 sum2;\n    print prod\n\n  }\ntable\n\n\n\nkey\nvalue\ncanonical name\n\n\n\n\nconst 4\n1\na\n\n\nconst 2\n2\nb\n\n\nadd 1 2\n3\nsum1\n\n\nmul 3 3\n4\nprod\n\n\n\nrevese map\n\n\n\nname\nvalue\n\n\n\n\na\n1\n\n\nb\n2\n\n\nsum1\n3\n\n\nsum2\n3\n\n\nprod\n4\n\n\n\nas we lookup each instruction - replace each arg with the canonical home\nif the value is already in the table replace with an id from canonical home\nextensions\n\na: int id b\n\na gets the value number of b. No copy required\n\n: int add a b; for add sort value numbers so add a b; and add b a; get the same value number\n\n\nconstant folding \n   a: int const 1;\n   b: int const 2;\n   c: add a b;\nif both value numbers are pointing to constants- actually do the add\n\n\npseudo code\n   table = mapping from value tuples to canonical variables,\n     with each row numbered\n   var2num = mapping from variable names to their current\n     value numbers (i.e., rows in table)\n\n   for instr in block:\n       value = (instr.op, var2num[instr.args[0]], ...)\n\n       if value in table:\n           # The value has been computed before; reuse it.\n           num, var = table[value]\n           replace instr with copy of var\n\n       else:\n           # A newly computed value.\n           num = fresh value number\n\n           dest = instr.dest\n           if instr.dest  will be overwritten later:\n                dest = fresh variable name\n                instr.dest = dest\n           else:\n                dest = instr.dest\n\n           table[value] = num, dest\n\n           for a in instr.args:\n               replace a with table[var2num[a]].var\n\n       var2num[instr.dest] = num\nproblem: canonical variables being overwritten\n``` x = a+b\nx = = a+b\n```\n\nLocal value numbering.\n\nYou can see my implementation in lvn.py in [the examples directory] in the Bril repository. But seriously, don’t be tempted! You want to write your implementation without looking at mine!\nexamples ### Testing Your Optimizations\nAs part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:\n\nNot break programs.\nMake programs faster, most of the time.\n\nAs with every task in this class, part of the work is checking that you have done what you set out to do—in this case, that your optimizations do those two things. Think carefully about how to make a convincing case for each of those criteria.\nOne tempting methodology might be to handwrite a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).\nWhile there are many ways to be convincing, a pretty good way might be to run your optimization on every single available Bril benchmark, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.\nIf this is the route you choose, you can do it however you like, I have made a simple tool that you can consider using, called [Brench][]. Brench is not very fancy; it does three things:\n\nIt makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)\nIt checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)\nIt can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)\n\nThose three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!\n\n\n\n\n Back to top",
+    "text": "Local Value Numbering\nslides from Phil Gibbons at CMU lectures/L3-Local-Opts.pdf) for more details and context on LVN\nValue numbering is a very powerful technique that removes redunancies, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.\nThe idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (reprented as a number) Each time it sees an instruction it forms a hash of the op code and t he value numbers of its operands and gives tha a new value number.\nTwo instructions are redundant if they have same op code and operands, which means the same value number\ne_i and e_j have the same value number if and only if e_i and e_j are provably equal for all possible operands of the expressions.\nlocal value numbering covers lot of optimizations\ndead code elimination\n\nmain {\n    a: int = const 100;\n    a: int = const 42;\n    print a;\n\n}\n\ncopy propagation\n\nmain{\n    x: int = const 4;\n    copy1: int = id x;\n    copy2: int = id copy1;\n    print copy2;\n}\n\ncommon sub-expression elimination cse \n\nmain {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2: int = add a b;\n    prod: int = mul sum1 sum2;\n    print prod;\n}\nWe want to stop thinking about varaibles and think about values. Two instructions are redundant if they compute the same value.\n\n\nthis is a very deep idea that comes up multiple times.\nfor example in a JIT compiler we want computation to be fast so we can get rid of all the variables\nb: int const 1;\nc: int cont 2;\na:  int b c;  \nbecomes:\n[  int const 1\n   int const 2 \n   int 0 1\n]\nless storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.\nPseudo code (similar to an interpreter)\nhash table constants and expressions of value numbers to value numbers and a variable holding the value\nreverse map from variable to value numbers\n  main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2: int = add a b;\n    prod: int = mult sum1 sum2;\n    print prod\n\n  }\ntable\n\n\n\nkey\nvalue\ncanonical name\n\n\n\n\nconst 4\n1\na\n\n\nconst 2\n2\nb\n\n\nadd 1 2\n3\nsum1\n\n\nmul 3 3\n4\nprod\n\n\n\nrevese map\n\n\n\nname\nvalue\n\n\n\n\na\n1\n\n\nb\n2\n\n\nsum1\n3\n\n\nsum2\n3\n\n\nprod\n4\n\n\n\nas we lookup each instruction - replace each arg with the canonical home\nif the value is already in the table replace with an id from canonical home\nextensions\n\na: int id b\n\na gets the value number of b. No copy required\n\n: int add a b; for add sort value numbers so add a b; and add b a; get the same value number\n\n\nconstant folding \n   a: int const 1;\n   b: int const 2;\n   c: add a b;\nif both value numbers are pointing to constants- actually do the add\n\n\npseudo code\n   table = mapping from value tuples to canonical variables,\n     with each row numbered\n   var2num = mapping from variable names to their current\n     value numbers (i.e., rows in table)\n\n   for instr in block:\n       value = (instr.op, var2num[instr.args[0]], ...)\n\n       if value in table:\n           # The value has been computed before; reuse it.\n           num, var = table[value]\n           replace instr with copy of var\n\n       else:\n           # A newly computed value.\n           num = fresh value number\n\n           dest = instr.dest\n           if instr.dest  will be overwritten later:\n                dest = fresh variable name\n                instr.dest = dest\n           else:\n                dest = instr.dest\n\n           table[value] = num, dest\n\n           for a in instr.args:\n               replace a with table[var2num[a]].var\n\n       var2num[instr.dest] = num\nproblem: canonical variables being overwritten\n``` x = a+b\nx = = a+b\n```\n\nLocal value numbering.\n\nYou can see my implementation in lvn.py in [the examples directory] in the Bril repository. But seriously, don’t be tempted! You want to write your implementation without looking at mine!\nexamples ### Testing Your Optimizations\nAs part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:\n\nNot break programs.\nMake programs faster, most of the time.\n\nAs with every task in this class, part of the work is checking that you have done what you set out to do—in this case, that your optimizations do those two things. Think carefully about how to make a convincing case for each of those criteria.\nOne tempting methodology might be to handwrite a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).\nWhile there are many ways to be convincing, a pretty good way might be to run your optimization on every single available Bril benchmark, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.\nIf this is the route you choose, you can do it however you like, I have made a simple tool that you can consider using, called [Brench][]. Brench is not very fancy; it does three things:\n\nIt makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)\nIt checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)\nIt can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)\n\nThose three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!\n\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Lectures",

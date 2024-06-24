@@ -107,14 +107,16 @@ window.Quarto = {
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-search-results"></div>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs-local.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -143,10 +145,14 @@ window.Quarto = {
 <li>global meaning within one function (not really global)</li>
 <li>inter-procedural over the entire program</li>
 </ol>
+<hr>
 <p>Usually an optimization takes time that is more then linear in some property, For example a local optimization might take time <span class="math inline">\(n^2\)</span> in the number of instructions in the block. a global optimization might take much longer, and an inter-procedural longer still. To keep compile time reasonable many compilers limit the number of global optimizations and skip inter-procedural optimizations. As a consequence many more optimizations get published but not used in production.</p>
+<hr>
+<p>when would running an optimization speedup compilation?</p>
 <p>For a local optimization, instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.</p>
 <p>For a global optimization, two instructions are ordered by a path from one block to another and different paths through the program give different orders.</p>
-<p>One special case is JIT (just in time) compilers, where programs get compiled at the start of execution. GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called <strong><em>Hotspot</em></strong> compiling. Some JIT compilers use <strong><em>hot/cold</em></strong> compiling, where they only run the fancy compiler on basic blocks that are hotl, i.e., execute a lot.</p>
+<hr>
+<p>One special case is JIT (just in time) compilers, where programs get compiled at the start of execution. GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called <strong><em>Hotspot</em></strong> compiling. Some JIT compilers use <strong><em>hot/cold</em></strong> compiling, where they only run the fancy compiler on basic blocks that are hot , i.e., execute a lot.</p>
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -165,7 +171,9 @@ C1 --&gt; D;
 </div>
 </div>
 </div>
+<hr>
 <p>We are going to consider several versions of <strong><em>trivial dead code elimination</em></strong>. Trivial because we are going to hold off on control flow related optimizations till later. Sometimes people call this DCE or trivial DCE.</p>
+<hr>
 <p>For each case, we start by defining what we mean by dead code.</p>
 <p>example 1</p>
 <pre><code>@main {
@@ -176,17 +184,21 @@ C1 --&gt; D;
   print d;
 }</code></pre>
 <p>What instruction is dead? (meaning get the same answer if we delete the instruction) What is your definition? Is this meaning of dead code local or global?</p>
+<hr>
 <p>Why would you ever have dead code in a program? One reason is that have DCE as a separate pass means other optimizations do not have to clean up.</p>
 <section id="definition-1--dead-if-instruction-writes-a-variable-and-the-variable-is-never-used." class="level2">
 <h2 class="anchored" data-anchor-id="definition-1--dead-if-instruction-writes-a-variable-and-the-variable-is-never-used.">Definition 1- Dead if instruction writes a variable and the variable is never used.</h2>
-<p>An instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels no not write a variable so they get deleted as well.</p>
+<p>An instruction that has side-effects, like a print statement does not write a variable so it never gets deleted. Labels do not write a variable so they do not get deleted as well.</p>
+<hr>
 <p>What is the pseudo code to find dead instructions using this definition?</p>
+<p>. . .</p>
 <pre><code>used = empty set 
 for instr in func 
    used += instr.args 
 for instd in func
     if instr has a dest and dest in not in used 
        delete instr</code></pre>
+<hr>
 <p>example 2</p>
 <pre><code>@main {
   a: int = const 4;
@@ -196,14 +208,30 @@ for instd in func
   e: int = add c d; 
   print d;
 }</code></pre>
+<p>. . .</p>
 <p>The code so far only deletes one instruction, but we would like to get rid of two. Instruction c should also be dead. How do we change the definition</p>
 </section>
 <section id="definition-2--dead-if-instruction-writes-a-variable-and-the-variable-is-either-never-used-or-only-used-in-dead-instructions." class="level2">
 <h2 class="anchored" data-anchor-id="definition-2--dead-if-instruction-writes-a-variable-and-the-variable-is-either-never-used-or-only-used-in-dead-instructions.">Definition 2- Dead if instruction writes a variable and the variable is either never used or only used in dead instructions.</h2>
-<p>A slow way to do this. - iterating till convergence</p>
+</section>
+<section id="iterating-till-convergence" class="level2">
+<h2 class="anchored" data-anchor-id="iterating-till-convergence">iterating till convergence</h2>
 <pre><code>while changes:
        run one pass of tdce above</code></pre>
-<p>what would be faster? What is some pseudo code for the change</p>
+</section>
+<section id="what-would-be-faster-what-is-some-pseudo-code-for-the-change" class="level2">
+<h2 class="anchored" data-anchor-id="what-would-be-faster-what-is-some-pseudo-code-for-the-change">what would be faster? What is some pseudo code for the change</h2>
+<p>. . .</p>
+<pre><code>  find all the variables that are used in more then one block
+  for each block b 
+     used = all variables used in more then one block
+     walk backwards over the instruction in the block
+     for each instruction is dest in used?
+        yes - remove dest from used, add arguments to used 
+        no  - instruction is dead 
+</code></pre>
+<p>finding all the variables used in more then one block might be expensive</p>
+<hr>
 <p>example 3</p>
 <pre><code>@main {
   a: int = const 4;
@@ -222,10 +250,13 @@ for instd in func
   .else 
   print a;
 }</code></pre>
-<p>for now we want to skip control flow, so we</p>
+</section>
+<section id="for-now-we-want-to-skip-control-flow" class="level2">
+<h2 class="anchored" data-anchor-id="for-now-we-want-to-skip-control-flow">for now we want to skip control flow</h2>
 </section>
 <section id="definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-within-the-block-starting-at-that-instruction-reaches-a-use-of-v-in-the-same-block-or-reaches-the-exit-of-the-block" class="level2">
 <h2 class="anchored" data-anchor-id="definition-an-instruction-is-dead-if-that-instruction-writes-a-variable-v-and-no-path-within-the-block-starting-at-that-instruction-reaches-a-use-of-v-in-the-same-block-or-reaches-the-exit-of-the-block">Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block</h2>
+<hr>
 <pre><code>cands are the variables that are defined but not used 
 last_def = {}  variables -&gt; instructions 
 this is a mapping variables that have been defined but not used
@@ -236,31 +267,52 @@ this is a mapping variables that have been defined but not used
           if the dest is in last_def, 
       add dest-&gt;instr to last def
   </code></pre>
-<p>and as you might expect, we need to interate this till convergence</p>
-<p>Does running dce make compilation time go up?</p>
+<p>and as you might expect, we need to iterate this till convergence</p>
+<hr>
 <p>Compilers often run dce more then once- why?</p>
+<hr>
 <p>testing out dce</p>
 <ol type="1">
 <li><p>program should get the same answer</p></li>
 <li><p>program should run less instructions</p></li>
 </ol>
+<hr>
 <p>Some test cases:</p>
 <ol type="1">
 <li><p><a href="https://github.com/sampsyo/bril/blob/main/examples/test/tdce/simple.bril"><code>simple.bril</code></a>,</p></li>
 <li><p><a href="https://github.com/sampsyo/bril/blob/main/examples/test/tdce/reassign.bril"><code>reassign.bril</code></a>,</p></li>
 <li><p>other examples in <a href="https://github.com/sampsyo/bril/tree/main/examples/test/tdce">the DCE test directory</a></p></li>
 </ol>
+</section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">testing</h2>
 <p>bril2json &lt; bench.bril | python3 tdce.py | bril2txt</p>
 <p>Next, try using <code>wc</code> to check static code size differences:</p>
 <p>bril2json &lt; bench.bril | wc -l</p>
 <p>bril2json &lt; bench.bril | python3 tdce.py | wc -l</p>
-<p>Then profiling to measure dynamic instruction count: The bril interpreter has a flag -p which prints the number of dynamcially executed instructions. How good a measure is this for real programs?</p>
+<p>Then profiling to measure dynamic instruction count: The bril interpreter has a flag -p which prints the number of dynamically executed instructions.</p>
+<p>How good a measure is this for real programs?</p>
+</section>
+<section id="test-with-profile" class="level1">
+<h1>test with profile</h1>
 <pre><code>bril2json &lt; bench.bril | brili -p
 
 bril2json &lt; bench.bril | python3 tdce.py | brili -p</code></pre>
-<p>name = “slides from Phil Gibbons at CMU” url = “http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/lectures/L3-Local-Opts.pdf” details = “for more details and context on LVN</p>
+<hr>
+<section id="using-trunt-golden-images" class="level2">
+<h2 class="anchored" data-anchor-id="using-trunt-golden-images">using trunt (golden images)</h2>
+<ol type="1">
+<li><p>Configure. Decide what command you want to test. Make a turnt.toml config file and put command = “mycmd {filename}” in it to pass each test file as an argument to mycmd.</p></li>
+<li><p>Take a snapshot. Run turnt –save foo.bril. Execute mycmd foo.bril and save the standard output into foo.out.</p></li>
+</ol>
+<p>You might want to take a look at this output to make sure it’s what you expect</p>
+<ol start="3" type="1">
+<li>Test your work. Now that you have a test in place, keep working. Use turnt *.bril to run all your tests and confirm that the output still matches.</li>
+</ol>
+<p>If there’s a mismatch, you can do turnt –diff to see the changes.</p>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
