@@ -69,250 +69,51 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="EECE7398 Fall 2024 - _ local value numbering">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body class="nav-sidebar docked fullcontent">
+<body>
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/03b_local_value_numbering.html">_ local value numbering</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
-    </div>
-  </nav>
-</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-center sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="../">EECE7398 Fall 2024</a> 
-    </div>
-      </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true">
- <span class="menu-text">EECS 7398</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weekly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Weekly Schedule</span></a>
-  </div>
-</li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false">
- <span class="menu-text">Class Overview</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/about.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">About</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/schedule.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Schedule</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/sylibus.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Schedule</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How to do assignments</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
- <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">1 Compiler Overview</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">__ Performance and Measurement</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">2 Representation of programs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">_ Intro to Bril</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">3 Local Analysis &amp; Optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">_ local value numbering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">4. Data Flow</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">5 Global Analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">_ loop invariant code motion</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">6 Static single Assignment</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">7 LLVM</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">8 classic loop optimizations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">9 polyhedral analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 MLIR</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">11 Whole program</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">12_memory.qmd</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">13_dynamic_compielrs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">14_gpu_compilers</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/bril.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">bril.ipynb</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/junk.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Junk</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item">
- <span class="menu-text">Blog Posts</span>
-  </li>
-      </ul>
-  </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril Documentation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril github</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs-lvn.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
@@ -339,10 +140,15 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="local-value-numbering">Local Value Numbering</h3>
 <p><a href="http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/">slides from Phil Gibbons at CMU</a> lectures/L3-Local-Opts.pdf) for more details and context on LVN</p>
 <p>Value numbering is a very powerful technique that removes <strong><em>redunancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
-<p>The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (reprented as a number) Each time it sees an instruction it forms a hash of the op code and t he value numbers of its operands and gives tha a new value number.</p>
+<hr>
+<p>The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)</p>
+<p>Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives tha a new value number.</p>
 <p>Two instructions are redundant if they have same op code and operands, which means the same value number</p>
-<p>e_i and e_j have the same value number if and only if e_i and e_j are provably equal for all possible operands of the expressions.</p>
-<p>local value numbering covers lot of optimizations</p>
+<hr>
+<p><span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> have the same value number if and only if <span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> are provably equal for all possible operands of the expressions.</p>
+</section>
+<section id="local-value-numbering-covers-lot-of-optimizations-that-look-different" class="level2">
+<h2 class="anchored" data-anchor-id="local-value-numbering-covers-lot-of-optimizations-that-look-different">local value numbering covers lot of optimizations that look different</h2>
 <pre><code>dead code elimination
 
 main {
@@ -371,10 +177,11 @@ main {
     prod: int = mul sum1 sum2;
     print prod;
 }</code></pre>
-<p>We want to stop thinking about varaibles and think about values. Two instructions are redundant if they compute the same value.</p>
 </section>
-<section id="this-is-a-very-deep-idea-that-comes-up-multiple-times." class="level3">
-<h3 class="anchored" data-anchor-id="this-is-a-very-deep-idea-that-comes-up-multiple-times.">this is a very deep idea that comes up multiple times.</h3>
+<section id="variables-vis-values" class="level2">
+<h2 class="anchored" data-anchor-id="variables-vis-values">variables vis values</h2>
+<p>We want to stop thinking about variables and think about values. Two instructions are redundant if they compute the same value.</p>
+<hr>
 <p>for example in a JIT compiler we want computation to be fast so we can get rid of all the variables</p>
 <pre><code>b: int const 1;
 c: int cont 2;
@@ -385,9 +192,15 @@ a:  int b c;  </code></pre>
    int 0 1
 ]</code></pre>
 <p>less storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.</p>
+<hr>
 <p>Pseudo code (similar to an interpreter)</p>
-<p>hash table constants and expressions of value numbers to value numbers and a variable holding the value</p>
-<p>reverse map from variable to value numbers</p>
+<ol type="1">
+<li><p>hash table constants and expressions of value numbers to value numbers and to a variable holding the value</p></li>
+<li><p>reverse map from variables to value numbers</p></li>
+</ol>
+<hr>
+<div class="columns">
+<div class="column">
 <pre><code>  main {
     a: int = const 4;
     b: int = const 2;
@@ -397,7 +210,7 @@ a:  int b c;  </code></pre>
     print prod
 
   }</code></pre>
-<p>table</p>
+</div><div class="column" style="font-size: 60%;">
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -429,7 +242,6 @@ a:  int b c;  </code></pre>
 </tr>
 </tbody>
 </table>
-<p>revese map</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -460,27 +272,55 @@ a:  int b c;  </code></pre>
 </tr>
 </tbody>
 </table>
-<p>as we lookup each instruction - replace each arg with the canonical home</p>
-<p>if the value is already in the table replace with an id from canonical home</p>
-<p>extensions</p>
+</div>
+</div>
+</section>
+<section id="steps" class="level1">
+<h1>steps</h1>
+<pre><code>for each instruction 
+   build a temp instruction  
+   for each arg,  
+       see if the argument has a value number, if it does 
+      update the temp instruction to use the canonical name
+      if the argument has no vn give it one 
+  see if  the temp instruction is in the table, if is,
+      delete it 
+      give the dest the value number that was found </code></pre>
+<hr>
+<p>extensions:</p>
 <ol type="1">
 <li>a: int id b</li>
 </ol>
 <p>a gets the value number of b. No copy required</p>
 <ol start="2" type="1">
-<li><p>: int add a b; for add sort value numbers so add a b; and add b a; get the same value number</p></li>
-<li></li>
+<li>add a b; for add sort value numbers so add a b; and add b a; get the same value number</li>
 </ol>
+<hr>
+<section id="extension-3" class="level2">
+<h2 class="anchored" data-anchor-id="extension-3">extension 3</h2>
 <pre><code>constant folding 
    a: int const 1;
    b: int const 2;
    c: add a b;</code></pre>
-<p>if both value numbers are pointing to constants- actually do the add</p>
+<ol start="3" type="1">
+<li>if both value numbers are pointing to constants- actually do the add</li>
+</ol>
 </section>
-<section id="pseudo-code" class="level3">
-<h3 class="anchored" data-anchor-id="pseudo-code">pseudo code</h3>
+<section id="problem-canonical-variables-might-be-overwritten" class="level2">
+<h2 class="anchored" data-anchor-id="problem-canonical-variables-might-be-overwritten">problem: canonical variables might be overwritten</h2>
+<p><code>x = a+b       x =        = a+b</code></p>
+<p>. . .</p>
+<p>one option is to save the value, if x will be overwritten add a temp</p>
+<pre><code>t = a+b
+x = t 
+x = 
+  = t </code></pre>
+</section>
+<section id="pseudo-code" class="level2">
+<h2 class="anchored" data-anchor-id="pseudo-code">pseudo code</h2>
 <pre><code>   table = mapping from value tuples to canonical variables,
      with each row numbered
+   
    var2num = mapping from variable names to their current
      value numbers (i.e., rows in table)
 
@@ -490,7 +330,7 @@ a:  int b c;  </code></pre>
        if value in table:
            # The value has been computed before; reuse it.
            num, var = table[value]
-           replace instr with copy of var
+           delete the instruction 
 
        else:
            # A newly computed value.
@@ -509,32 +349,40 @@ a:  int b c;  </code></pre>
                replace a with table[var2num[a]].var
 
        var2num[instr.dest] = num</code></pre>
-<p>problem: canonical variables being overwritten</p>
-<p>``` x = a+b<br>
-x = = a+b</p>
-<p>```</p>
-<ul>
-<li>Local value numbering.</li>
-</ul>
-<p>You can see my implementation in <code>lvn.py</code> in [the examples directory] in the Bril repository. But seriously, don’t be tempted! You want to write your implementation without looking at mine!</p>
-<p><a href="https://github.com/normrubin/bril/tree/main/examples">examples</a> ### Testing Your Optimizations</p>
+<hr>
+</section>
+<section id="local-value-numbering." class="level2">
+<h2 class="anchored" data-anchor-id="local-value-numbering.">Local value numbering.</h2>
+<p>You can see one implementation in <code>lvn.py</code> in the Bril repository. But seriously, don’t be tempted! You want to write your implementation without looking at mine!</p>
+<p><a href="https://github.com/normrubin/bril/tree/main/examples">examples</a></p>
+</section>
+<section id="testing-your-optimizations" class="level2">
+<h2 class="anchored" data-anchor-id="testing-your-optimizations">Testing Your Optimizations</h2>
 <p>As part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:</p>
 <ol type="1">
 <li>Not break programs.</li>
 <li>Make programs faster, most of the time.</li>
 </ol>
-<p>As with every task in this class, part of the work is checking that you have done what you set out to do—in this case, that your optimizations do those two things. Think carefully about how to make a convincing case for each of those criteria.</p>
-<p>One tempting methodology might be to handwrite a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).</p>
-<p>While there are many ways to be convincing, a pretty good way might be to run your optimization on <em>every single available <a href="https://capra.cs.cornell.edu/bril/tools/bench.html">Bril benchmark</a></em>, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.</p>
-<p>If this is the route you choose, you can do it however you like, I have made a simple tool that you can consider using, called [Brench][]. Brench is not very fancy; it does three things:</p>
+<hr>
+<p>As with every task in this class, part of the work is checking that you have done what you set out to do — in this case, that your optimizations do those two things.</p>
+</section>
+<section id="think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria." class="level2">
+<h2 class="anchored" data-anchor-id="think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria.">Think carefully about how to make a convincing case for each of those criteria.</h2>
+<p>One tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).</p>
+<hr>
+<p>While there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available <a href="https://capra.cs.cornell.edu/bril/tools/bench.html">Bril benchmark</a>, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.</p>
+<hr>
+<p>If this is the route you choose, you can do it however you like, There is a simple tool that you can consider using, called Brench. Brench is not very fancy; it does three things:</p>
 <ol type="1">
-<li>It makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)</li>
-<li>It checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)</li>
-<li>It can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)</li>
+<li><p>It makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)</p></li>
+<li><p>It checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)</p></li>
+<li><p>It can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)</p></li>
 </ol>
 <p>Those three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!</p>
+<p>:::</p>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
