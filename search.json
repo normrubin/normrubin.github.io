@@ -155,7 +155,7 @@
     "href": "lectures/04_data_flow.html",
     "title": "4. Data Flow",
     "section": "",
-    "text": "We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.\nThere is some theory to look at for this. How do we know if the algorithm will converge for any possible cfg.\nand some naming for each kind of problem\n\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D",
+    "text": "We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.\nThere is some theory to look at for this. How do we know if the algorithm will converge for any possible cfg.\nand some naming for each kind of problem",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -167,7 +167,7 @@
     "href": "lectures/04_data_flow.html#reasoning-about-data-flow-global-analysis",
     "title": "4. Data Flow",
     "section": "",
-    "text": "We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.\nThere is some theory to look at for this. How do we know if the algorithm will converge for any possible cfg.\nand some naming for each kind of problem\n\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D",
+    "text": "We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.\nThere is some theory to look at for this. How do we know if the algorithm will converge for any possible cfg.\nand some naming for each kind of problem",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -175,16 +175,334 @@
     ]
   },
   {
-    "objectID": "lectures/04_data_flow.html#first-we-are-going-to-look-at-a-fg-specific-problem-reaching-definitions",
-    "href": "lectures/04_data_flow.html#first-we-are-going-to-look-at-a-fg-specific-problem-reaching-definitions",
+    "objectID": "lectures/04_data_flow.html#example",
+    "href": "lectures/04_data_flow.html#example",
     "title": "4. Data Flow",
-    "section": "first we are going to look at a fg specific problem “reaching definitions”",
-    "text": "first we are going to look at a fg specific problem “reaching definitions”\nReaching definitions are an example of a global property that require you to look at an entire CFG.\nUse: An instruction uses all of its arguments. (So any instruction with arguments is a “use.”), a binary instruction is two uses.\nA definition is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest or an argument)\nThe above program has 8 definitions, Which we could represent by a bit vector of size 8.\nA definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and the variable in D is not overwritten on the path.\nAvailable: Definitions that reach a given point in the program are available at that point.\nif an instruction writes a variable it kills all prior definitions that write the same variable\n\nReaching definitions problem determine which definitions reach which uses.\nWe could build a 2d matrix - definitions by uses, where a 1 bit indicates that this definition reaches this use. As a matrix this would be very sparse, later when we do ssa forms will see a very cool compression technique. Algorithms that use this kind of matrix are called bit-vector methods.\nA program point is an instruction\na definition of a variable v reaches a program point p if and only if:\n\nthe definition reaches the point just before p\nthe variable v is not redefined at p\n\nor\n\nthe variable v is defined at p.\n\nWhat about multiple predecessors? p is the first instruction of a block with multiple preds.\nIf a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p. This is a union operation.\nWe are moving information down from definition. This is called forward propagation\nDefine two sets IN and OUT that hold definitions\nIN is the set of definitions that reach a point immediately before p\nOUT is the set of definitions that reach a point immediately after p\nTo illustrate this, I”ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def.\n\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \nA_IN[\"A_IN={}\"]\nA_OUT[\"A_OUT={(cond,1),(a,2),(b,3)}\"]\n\nB_IN[\"B_IN={(cond,1),(a,2),(b,3)}\"]\nB_OUT[\"B_OUT={(cond,1),(a,2),(b,5),(c,6)}\"]\n\nC_IN[\"IN={(cond,1),(a,2),(b,3)}\"]\nC_OUT[\"OUT={(cond,1),(a,8),(b,3,(c,9)}\"]\n\nD_IN[\"IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}\"]\n\n  A[\"blk a\n    1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"blk b\n   5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"blk c\n     8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A_IN --&gt; A \n    A --&gt; A_OUT\n    A_OUT  -- true --&gt; B_IN\n    B_IN --&gt; B\n    B --&gt; B_OUT\n    A_OUT --false --&gt; C_IN\n    C_IN --&gt; C\n    C--&gt;   C_OUT\n    B_OUT--&gt; D_IN\n    C_OUT--&gt; D_IN\n    D_IN --&gt; D\n\n\n\n\n\n\nFor a given block b, we can compute two sets:\n\nkill(b) = all defs in the program that assign to y, and there is a def of y in b\n\ngen(b) = definitions in b that reach the bottom of b\n\nAnd now globally:\n\nOUT(b) = (in(b) - kill(b) ) union gen(b)\nIN(b) = union of OUT(pred) where pred is a predecessor of b\n\nWe call the function for 1 the transfer function for the block, and the function for 2 the merge function\nWe can solve for IN and OUT iteratively using a worklist\n// Initialize\nfor all CFG nodes n in N,\n    OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];\n\n// put all nodes into the changed set\n// N is all nodes in graph,\nChanged = N;\n\n// Iterate \nwhile (Changed != emptyset)\n{\n    choose a node n in Changed;\n    // remove it from the changed set\n    Changed = Changed -{ n };\n\n    // init IN[n] to be empty\n    IN[n] = emptyset;\n  \n    // calculate IN[n] from predecessors' OUT[p]\n    for all nodes p in predecessors(n)\n         IN[n] = IN[n] Union OUT[p];\n\n    oldout = OUT[n]; // save old OUT[n]\n    \n    // update OUT[n] using transfer function f_n ()\n    OUT[n] = GEN[n] Union (IN[n] -KILL[n]);\n\n    // any change to OUT[n] compared to previous value?\n    if (OUT[n] changed) // compare oldout vs. OUT[n]\n    {    \n        // if yes, put all successors of n into the changed set\n        for all nodes s in successors(n)\n             Changed = Changed U { s };\n    }\n}\n\nDoes this always converge?\nwhat order do we want to select nodes (basic blocks)?\nvisit a node after visiting its preds. Revese post order.\n\n\na second problem liveness-\nA variable is live at some point if it holds a value that may be needed in the future, or equivalently if its value may be read before the next time the variable is written to.\n             live = {}\nb = 3        live = b\nc = 5        live = b c \na = f(b * c) live = a\nWe had to consider flow starting at the bottom so this is a backwards analysis\nfor a basic block (b):\n\nGEN(s) the set of variables used in s before any assignment to s in the same block\nkill(s) the set of variables assigned in s\n\nglobal\n\nOUT(exit) = {}\nIN(b) = gen(b) union ( OUT(b) - KILL(b))\nOUT(b) = union IN(b)\n\nAn example\n// in: {}; predecessor blocks: none\nb1: a = 3; \n    b = 5;\n    d = 4;\n    x = 100; //x is never being used later thus not in the out set {a,b,d}\n    t = a &gt; b\n    br t .t .f \n   // out: {a,b,d}    //union of all (in) successors of b1 =&gt; b2: {a,b}, and b3:{b,d}  \n\n\n\n.t   // in: {a,b}; predecessor blocks: b1\nb2: c = a + b;\n    d = 2;\n// out: {b,d}\n\n\n.f \nb3:  in: {b,d}; predecessor blocks: b1 and b2\n    c = 4;\n    return b * d + c;\n// out:{}\nThis can be solved using the same code as before, flip pred, successors because its backward, reverse in and out, set elements are variable names\ndata flow framework\nThe data flow framework. Here’s how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:\n\nFigure out the thing you want to know at the entry and exit of each block.\nWrite an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a local analysis for the block.), calculate GEN and KILL\nGenerate equalities according to the edges in the CFG.\nSolve the system of equations! (Using a general solver algorithm that you don’t need to adapt to every problem.)\n\nstep 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL\nThis algorithm has no problems with loops!\nTheory – the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?\nThe domain of values you’re trying compute needs to form a partial order with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.\nIn terms of a partial order ⊑, the merge function is the meet (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so x ⊑ y implies f(x) ⊑ f(y).\nThe usual definition of a “correct” solution to a data-flow problem is the meet-over-all-paths solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block\nMore examples of things you can do with the data flow framework. 1) Reaching definitions. 1) Live variables: which variables are both defined and going to be used at some point in the future? 1) Constant propagation: which variables have statically knowable constant values? 1) Available expressions: which expressions have already been computed computed in the past? (Useful in CSE.) 1) Initialized variables: like in Java, which variables have had something written to them? 1) Interval analysis: what is the numerical range of values that a given variable might hold?",
+    "section": "example",
+    "text": "example\n\n\n     main(cond)\n     a int = const 47\n     b :int = const 42\n     br cond .left .right\n    .left\n     b: int = const 1\n     c:int = const 5 \n    jmp .end\n   .right\n     a :int = const 2\n     c: int = const 10\n   jmp .end\n   .end\n    d: int sub  a b\n    print d\n    ret\n\n\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D",
     "crumbs": [
       "EECS 7398",
       "Lectures",
       "4. Data Flow"
     ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#first-we-are-going-to-look-at-a-specific-problem-reaching-definitions",
+    "href": "lectures/04_data_flow.html#first-we-are-going-to-look-at-a-specific-problem-reaching-definitions",
+    "title": "4. Data Flow",
+    "section": "first we are going to look at a specific problem “reaching definitions”",
+    "text": "first we are going to look at a specific problem “reaching definitions”\nReaching definitions are an example of a global property that require you to look at an entire CFG.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#definitions",
+    "href": "lectures/04_data_flow.html#definitions",
+    "title": "4. Data Flow",
+    "section": "definitions",
+    "text": "definitions\nA Use: An instruction uses all of its arguments. (So any instruction with arguments is a “use.”), a binary instruction is two uses.\nA definition is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest )\nA definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and the variable in D is not overwritten on the path.\nAvailable: Definitions that reach a given point in the program are available at that point.\nif an instruction writes a variable it kills all prior definitions that write the same variable",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#reaching-definitions-problem-determine-which-definitions-reach-which-uses.",
+    "href": "lectures/04_data_flow.html#reaching-definitions-problem-determine-which-definitions-reach-which-uses.",
+    "title": "4. Data Flow",
+    "section": "Reaching definitions problem: determine which definitions reach which uses.",
+    "text": "Reaching definitions problem: determine which definitions reach which uses.\nThe above program has 8 definitions, Which we could represent by a bit vector of size 8.\nWe could build a 2d matrix - definitions by uses, where a 1 bit indicates that this definition reaches this use. As a matrix this would be very sparse, later when we do ssa forms will see a very cool compression technique. Algorithms that use this kind of matrix are called bit-vector methods.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#a-program-point-is-an-instruction",
+    "href": "lectures/04_data_flow.html#a-program-point-is-an-instruction",
+    "title": "4. Data Flow",
+    "section": "A program point is an instruction",
+    "text": "A program point is an instruction\nA definition of a variable v reaches just after a program point p if and only if:\n\nthe definition reaches the point just before p\nthe variable v is not redefined at p\n\nor\n\nthe variable v is defined at p.\n\n\nWhat about multiple predecessors? p is the first instruction of a block with multiple preds.\nIf a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.\nThis is a union operation.\nWe are moving information down from definition. This is called forward propagation\n\nDefine two sets IN and OUT that hold definitions\nIN is the set of definitions that reach a point immediately before p\nOUT is the set of definitions that reach a point immediately after p\n\nTo illustrate this, I”ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def\n\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \nA_IN[\"A_IN={}\"]\nA_OUT[\"A_OUT={(cond,1),(a,2),(b,3)}\"]\n\nB_IN[\"B_IN={(cond,1),(a,2),(b,3)}\"]\nB_OUT[\"B_OUT={(cond,1),(a,2),(b,5),(c,6)}\"]\n\nC_IN[\"IN={(cond,1),(a,2),(b,3)}\"]\nC_OUT[\"OUT={(cond,1),(a,8),(b,3,(c,9)}\"]\n\nD_IN[\"IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}\"]\n \n  A[\"blk a\n    1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"blk b\n   5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"blk c\n     8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A_IN --&gt; A \n    A --&gt; A_OUT\n    A_OUT  -- true --&gt; B_IN\n    B_IN --&gt; B\n    B --&gt; B_OUT\n    A_OUT --false --&gt; C_IN\n    C_IN --&gt; C\n    C--&gt;   C_OUT\n    B_OUT--&gt; D_IN\n    C_OUT--&gt; D_IN\n    D_IN --&gt; D",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#calculate-in-and-out",
+    "href": "lectures/04_data_flow.html#calculate-in-and-out",
+    "title": "4. Data Flow",
+    "section": "calculate in and out",
+    "text": "calculate in and out\nFor a given block b, we can compute two sets (of definitions):\n\nkill(b) = all defs in the program that assign to y, and there is a def of y in b\n\ngen(b) = definitions in b that reach the bottom of b\n\nReaching defs will need iteration. but these sets do not change",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#and-now-globally",
+    "href": "lectures/04_data_flow.html#and-now-globally",
+    "title": "4. Data Flow",
+    "section": "And now globally:",
+    "text": "And now globally:\n\n\\(OUT(b) = (in(b) - kill(b) ) \\cup gen(b)\\)\n\\(IN(b) = \\cup \\left( \\operatorname{OUT}(p) \\mid p \\in predecessors(b) \\right))\\)\n\nWe call the function for 1 the transfer function for the block, and the function for 2 the merge function",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist",
+    "href": "lectures/04_data_flow.html#pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist",
+    "title": "4. Data Flow",
+    "section": "pseudo code : We can solve for IN and OUT iteratively using a worklist",
+    "text": "pseudo code : We can solve for IN and OUT iteratively using a worklist\n// Initialize\nfor all CFG nodes n in N,\n    OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];\n\n// put all nodes into the changed set\n// N is all nodes in graph,\nChanged = N;\n\n// Iterate \nwhile (Changed != emptyset)\n{\n    choose a node n in Changed;\n    // remove it from the changed set\n    Changed = Changed -{ n };\n\n    // init IN[n] to be empty\n    IN[n] = emptyset;\n  \n    // calculate IN[n] from predecessors' OUT[p]\n    for all nodes p in predecessors(n)\n         IN[n] = IN[n] Union OUT[p];\n\n    oldout = OUT[n]; // save old OUT[n]\n    \n    // update OUT[n] using transfer function f_n ()\n    OUT[n] = GEN[n] Union (IN[n] -KILL[n]);\n\n    // any change to OUT[n] compared to previous value?\n    if (OUT[n] changed) // compare oldout vs. OUT[n]\n    {    \n        // if yes, put all successors of n into the changed set\n        for all nodes s in successors(n)\n             Changed = Changed U { s };\n    }\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#questions",
+    "href": "lectures/04_data_flow.html#questions",
+    "title": "4. Data Flow",
+    "section": "questions",
+    "text": "questions\nDoes this always converge?\nwhat order do we want to select nodes (basic blocks)?\n. . .\nallways since the sets change in one direction\nvisit a node after visiting its preds. Reverse post order.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#a-second-problem-liveness-",
+    "href": "lectures/04_data_flow.html#a-second-problem-liveness-",
+    "title": "4. Data Flow",
+    "section": "a second problem liveness-",
+    "text": "a second problem liveness-\nA variable is live at some point if it holds a value that may be needed in the future, or equivalently if its value may be read before the next time the variable is written to.\n             live = {}\nb = 3        live = b\nc = 5        live = b c \na = f(b * c) live = a\n\nWe had to consider flow starting at the bottom so this is a backwards analysis\nfor a basic block (b):\n\nGEN(s) the set of variables used in s before any assignment to s in the same block\nkill(s) the set of variables assigned in s",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#global-liveness",
+    "href": "lectures/04_data_flow.html#global-liveness",
+    "title": "4. Data Flow",
+    "section": "global liveness",
+    "text": "global liveness\n\nOUT(exit) = {}\nIN(b) = gen(b) union ( OUT(b) - KILL(b))\nOUT(b) = union IN(b)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#an-example",
+    "href": "lectures/04_data_flow.html#an-example",
+    "title": "4. Data Flow",
+    "section": "An example",
+    "text": "An example\n// in: {}; predecessor blocks: none\nb1: a = 3; \n    b = 5;\n    d = 4;\n    x = 100; //x is never being used later thus not in the out set {a,b,d}\n    t = a &gt; b\n    br t .t .f \n   // out: {a,b,d}    //union of all (in) successors of b1 =&gt; b2: {a,b}, and b3:{b,d}  \n\n\n\n.t   // in: {a,b}; predecessor blocks: b1\nb2: c = a + b;\n    d = 2;\n// out: {b,d}\n\n\n.f \nb3:  in: {b,d}; predecessor blocks: b1 and b2\n    c = 4;\n    return b * d + c;\n// out:{}\nThis can be solved using the same code as before, flip pred, successors because its backward, reverse in and out, set elements are variable names",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#data-flow-framework",
+    "href": "lectures/04_data_flow.html#data-flow-framework",
+    "title": "4. Data Flow",
+    "section": "data flow framework",
+    "text": "data flow framework\nThe data flow framework. Here’s how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:\n\nFigure out the thing you want to know at the entry and exit of each block.\nWrite an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a local analysis for the block.), calculate GEN and KILL\nGenerate equalities according to the edges in the CFG.\nSolve the system of equations! (Using a general solver algorithm that you don’t need to adapt to every problem.)\n\n\nstep 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#loops",
+    "href": "lectures/04_data_flow.html#loops",
+    "title": "4. Data Flow",
+    "section": "loops",
+    "text": "loops\nThis algorithm has no problems with loops!\nTheory – the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#partial-orders",
+    "href": "lectures/04_data_flow.html#partial-orders",
+    "title": "4. Data Flow",
+    "section": "partial orders",
+    "text": "partial orders\nThe domain of values you’re trying compute needs to form a partial order with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.\nIn terms of a partial order ⊑, the merge function is the meet (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so x ⊑ y implies f(x) ⊑ f(y).\n\nThe usual definition of a “correct” solution to a data-flow problem is the meet-over-all-paths solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#other-data-flow-problems",
+    "href": "lectures/04_data_flow.html#other-data-flow-problems",
+    "title": "4. Data Flow",
+    "section": "other data flow problems",
+    "text": "other data flow problems\nMore examples of things you can do with the data flow framework.\n\nReaching definitions.\nLive variables: which variables are both defined and going to be used at some point in the future?\nConstant propagation: which variables have statically knowable constant values?\nAvailable expressions: which expressions have already been computed in the past? (Useful in CSE.)\nInitialized variables: like in Java, which variables have had something written to them?\nInterval analysis: what is the numerical range of values that a given variable might hold?",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#ud-chains",
+    "href": "lectures/04_data_flow.html#ud-chains",
+    "title": "4. Data Flow",
+    "section": "ud chains",
+    "text": "ud chains\nIn data flow we talked about a matrix definitions by uses which is very sparse and very slow to process.\nuse-def chains, for each use build a list of all defs that might reach that use.\ndef-use chains for each def calculate the set of all uses that the def might reach.\nBoth of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "4. Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#reasoning-about-data-flow-global-analysis",
+    "href": "lectures/revealjs-data-flow.html#reasoning-about-data-flow-global-analysis",
+    "title": "4. Data Flow",
+    "section": "Reasoning about data flow (global analysis)",
+    "text": "Reasoning about data flow (global analysis)\nWe will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.\nThere is some theory to look at for this. How do we know if the algorithm will converge for any possible cfg.\nand some naming for each kind of problem"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#example",
+    "href": "lectures/revealjs-data-flow.html#example",
+    "title": "4. Data Flow",
+    "section": "example",
+    "text": "example\n\n\n     main(cond)\n     a int = const 47\n     b :int = const 42\n     br cond .left .right\n    .left\n     b: int = const 1\n     c:int = const 5 \n    jmp .end\n   .right\n     a :int = const 2\n     c: int = const 10\n   jmp .end\n   .end\n    d: int sub  a b\n    print d\n    ret\n\n\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#first-we-are-going-to-look-at-a-specific-problem-reaching-definitions",
+    "href": "lectures/revealjs-data-flow.html#first-we-are-going-to-look-at-a-specific-problem-reaching-definitions",
+    "title": "4. Data Flow",
+    "section": "first we are going to look at a specific problem “reaching definitions”",
+    "text": "first we are going to look at a specific problem “reaching definitions”\nReaching definitions are an example of a global property that require you to look at an entire CFG."
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#definitions",
+    "href": "lectures/revealjs-data-flow.html#definitions",
+    "title": "4. Data Flow",
+    "section": "definitions",
+    "text": "definitions\nA Use: An instruction uses all of its arguments. (So any instruction with arguments is a “use.”), a binary instruction is two uses.\nA definition is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest )\nA definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and the variable in D is not overwritten on the path.\nAvailable: Definitions that reach a given point in the program are available at that point.\nif an instruction writes a variable it kills all prior definitions that write the same variable"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#reaching-definitions-problem-determine-which-definitions-reach-which-uses.",
+    "href": "lectures/revealjs-data-flow.html#reaching-definitions-problem-determine-which-definitions-reach-which-uses.",
+    "title": "4. Data Flow",
+    "section": "Reaching definitions problem: determine which definitions reach which uses.",
+    "text": "Reaching definitions problem: determine which definitions reach which uses.\nThe above program has 8 definitions, Which we could represent by a bit vector of size 8.\nWe could build a 2d matrix - definitions by uses, where a 1 bit indicates that this definition reaches this use. As a matrix this would be very sparse, later when we do ssa forms will see a very cool compression technique. Algorithms that use this kind of matrix are called bit-vector methods."
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#a-program-point-is-an-instruction",
+    "href": "lectures/revealjs-data-flow.html#a-program-point-is-an-instruction",
+    "title": "4. Data Flow",
+    "section": "A program point is an instruction",
+    "text": "A program point is an instruction\nA definition of a variable v reaches just after a program point p if and only if:\n\nthe definition reaches the point just before p\nthe variable v is not redefined at p\n\nor\n\nthe variable v is defined at p."
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#calculate-in-and-out",
+    "href": "lectures/revealjs-data-flow.html#calculate-in-and-out",
+    "title": "4. Data Flow",
+    "section": "calculate in and out",
+    "text": "calculate in and out\nFor a given block b, we can compute two sets (of definitions):\n\nkill(b) = all defs in the program that assign to y, and there is a def of y in b\n\ngen(b) = definitions in b that reach the bottom of b\n\nReaching defs will need iteration. but these sets do not change"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#and-now-globally",
+    "href": "lectures/revealjs-data-flow.html#and-now-globally",
+    "title": "4. Data Flow",
+    "section": "And now globally:",
+    "text": "And now globally:\n\n\\(OUT(b) = (in(b) - kill(b) ) \\cup gen(b)\\)\n\\(IN(b) = \\cup \\left( \\operatorname{OUT}(p) \\mid p \\in predecessors(b) \\right))\\)\n\nWe call the function for 1 the transfer function for the block, and the function for 2 the merge function"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist",
+    "href": "lectures/revealjs-data-flow.html#pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist",
+    "title": "4. Data Flow",
+    "section": "pseudo code : We can solve for IN and OUT iteratively using a worklist",
+    "text": "pseudo code : We can solve for IN and OUT iteratively using a worklist\n// Initialize\nfor all CFG nodes n in N,\n    OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];\n\n// put all nodes into the changed set\n// N is all nodes in graph,\nChanged = N;\n\n// Iterate \nwhile (Changed != emptyset)\n{\n    choose a node n in Changed;\n    // remove it from the changed set\n    Changed = Changed -{ n };\n\n    // init IN[n] to be empty\n    IN[n] = emptyset;\n  \n    // calculate IN[n] from predecessors' OUT[p]\n    for all nodes p in predecessors(n)\n         IN[n] = IN[n] Union OUT[p];\n\n    oldout = OUT[n]; // save old OUT[n]\n    \n    // update OUT[n] using transfer function f_n ()\n    OUT[n] = GEN[n] Union (IN[n] -KILL[n]);\n\n    // any change to OUT[n] compared to previous value?\n    if (OUT[n] changed) // compare oldout vs. OUT[n]\n    {    \n        // if yes, put all successors of n into the changed set\n        for all nodes s in successors(n)\n             Changed = Changed U { s };\n    }\n}"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#questions",
+    "href": "lectures/revealjs-data-flow.html#questions",
+    "title": "4. Data Flow",
+    "section": "questions",
+    "text": "questions\nDoes this always converge?\nwhat order do we want to select nodes (basic blocks)?\n\nallways since the sets change in one direction\nvisit a node after visiting its preds. Reverse post order."
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#a-second-problem-liveness-",
+    "href": "lectures/revealjs-data-flow.html#a-second-problem-liveness-",
+    "title": "4. Data Flow",
+    "section": "a second problem liveness-",
+    "text": "a second problem liveness-\nA variable is live at some point if it holds a value that may be needed in the future, or equivalently if its value may be read before the next time the variable is written to.\n             live = {}\nb = 3        live = b\nc = 5        live = b c \na = f(b * c) live = a"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#global-liveness",
+    "href": "lectures/revealjs-data-flow.html#global-liveness",
+    "title": "4. Data Flow",
+    "section": "global liveness",
+    "text": "global liveness\n\nOUT(exit) = {}\nIN(b) = gen(b) union ( OUT(b) - KILL(b))\nOUT(b) = union IN(b)"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#an-example",
+    "href": "lectures/revealjs-data-flow.html#an-example",
+    "title": "4. Data Flow",
+    "section": "An example",
+    "text": "An example\n// in: {}; predecessor blocks: none\nb1: a = 3; \n    b = 5;\n    d = 4;\n    x = 100; //x is never being used later thus not in the out set {a,b,d}\n    t = a &gt; b\n    br t .t .f \n   // out: {a,b,d}    //union of all (in) successors of b1 =&gt; b2: {a,b}, and b3:{b,d}  \n\n\n\n.t   // in: {a,b}; predecessor blocks: b1\nb2: c = a + b;\n    d = 2;\n// out: {b,d}\n\n\n.f \nb3:  in: {b,d}; predecessor blocks: b1 and b2\n    c = 4;\n    return b * d + c;\n// out:{}\nThis can be solved using the same code as before, flip pred, successors because its backward, reverse in and out, set elements are variable names"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#data-flow-framework",
+    "href": "lectures/revealjs-data-flow.html#data-flow-framework",
+    "title": "4. Data Flow",
+    "section": "data flow framework",
+    "text": "data flow framework\nThe data flow framework. Here’s how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:\n\nFigure out the thing you want to know at the entry and exit of each block.\nWrite an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a local analysis for the block.), calculate GEN and KILL\nGenerate equalities according to the edges in the CFG.\nSolve the system of equations! (Using a general solver algorithm that you don’t need to adapt to every problem.)"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#loops",
+    "href": "lectures/revealjs-data-flow.html#loops",
+    "title": "4. Data Flow",
+    "section": "loops",
+    "text": "loops\nThis algorithm has no problems with loops!\nTheory – the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#partial-orders",
+    "href": "lectures/revealjs-data-flow.html#partial-orders",
+    "title": "4. Data Flow",
+    "section": "partial orders",
+    "text": "partial orders\nThe domain of values you’re trying compute needs to form a partial order with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.\nIn terms of a partial order ⊑, the merge function is the meet (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so x ⊑ y implies f(x) ⊑ f(y)."
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#other-data-flow-problems",
+    "href": "lectures/revealjs-data-flow.html#other-data-flow-problems",
+    "title": "4. Data Flow",
+    "section": "other data flow problems",
+    "text": "other data flow problems\nMore examples of things you can do with the data flow framework.\n\nReaching definitions.\nLive variables: which variables are both defined and going to be used at some point in the future?\nConstant propagation: which variables have statically knowable constant values?\nAvailable expressions: which expressions have already been computed in the past? (Useful in CSE.)\nInitialized variables: like in Java, which variables have had something written to them?\nInterval analysis: what is the numerical range of values that a given variable might hold?"
+  },
+  {
+    "objectID": "lectures/revealjs-data-flow.html#ud-chains",
+    "href": "lectures/revealjs-data-flow.html#ud-chains",
+    "title": "4. Data Flow",
+    "section": "ud chains",
+    "text": "ud chains\nIn data flow we talked about a matrix definitions by uses which is very sparse and very slow to process.\nuse-def chains, for each use build a list of all defs that might reach that use.\ndef-use chains for each def calculate the set of all uses that the def might reach.\nBoth of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs"
   },
   {
     "objectID": "lectures/03_local.html",
@@ -1368,7 +1686,7 @@
     "href": "weekly.html",
     "title": "EECS7398 Weekly Schedule",
     "section": "",
-    "text": "tbl-colwidths: [10,20,20,20, 15, 15 ]\nSince the is the first time this course is offered. This is a tentative schedule.\n\n\n\n\n\n\nWarning\n\n\n\nNeed to figure out where discussions are kept. Is it on github? or in canvas?\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek\nday\nDate\ntopic\ndiscussions\nDue\n\n\n\n\n1\nFriday\nSept 6\nCompiler overview and structure\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2\nTuesday\nSept 10\nPerformance Measurement\n\nhw0\n\n\n\nPerformance and Measurement LEADER: Norm using Adrian’s blog)\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\nSIGPLAN Empirical Evaluation Guidelines\n\n\n\n\n\n\n\n\n\n\n\n2\nFriday\nSept 13\nRepresenting programs\n\n\n\n\n\nsome paper LEADER:\n\n\n\n\n\n\n\n\n\n\n\n3\nTuesday\nSept 17\nOverview of Bril\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nFriday\nSept 20\nLocal analysis and optimization\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nTuesday\nSept 24\nValue numbering\n\nhw1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nFriday\nSept 27\nData flow\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nTuesday\nOct 1\nGlobal analysis\n\nhw2\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nFriday\nOct 4\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nTuesday\nOct 8\nStatic single assignment\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n6\nFriday\nOct 11\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nTuesday\nOct 15\nLLVM\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n7\nFriday\nOct 18\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nTuesday\nOct 22\nClassical loop optimizations\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nFriday\nOct 25\nPolyhedral analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nTuesday\nOct 29\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nFriday\nNov 1\nMLIR\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nTuesday\nNov 5\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nFriday\nNov 8\nInterprocedural Analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nTuesday\nNov 12\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n11\nFriday\nNov 15\nMemory Management\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nTuesday\nNov 19\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n12\nFriday\nNov 22\nDynamic compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nTuesday\nNov 26\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nFriday\nNov 29\nThanksgiving\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nTuesday\nDec 3\nGPU Compilers\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n14\nFriday\nDec 6\ncontinued\n\n\n\n\n\nfinal project deadline ——\n\n\n\n Back to top",
+    "text": "tbl-colwidths: [10,20,20,20, 15, 15 ]\nSince the is the first time this course is offered. This is a tentative schedule.\n\n\n\n\n\n\nWarning\n\n\n\nNeed to figure out where discussions are kept. Is it on github? or in canvas?\n\n\n\n\n\n\n\n\n\n\n\n\n\nweek\nday\nDate\ntopic\ndiscussions\nDue\n\n\n\n\n1\nFriday\nSept 6\nCompiler overview and structure\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2\nTuesday\nSept 10\nPerformance Measurement\n\nhw0\n\n\n\npaper 1 - Producing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\nLEADER: Norm using Adrian’s blog)\nSIGPLAN Empirical Evaluation Guidelines\n\n\n\n\n\n\n\n\n\n\n\n2\nFriday\nSept 13\nRepresenting programs\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nTuesday\nSept 17\nOverview of Bril\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n3\nFriday\nSept 20\nLocal analysis and optimization\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nTuesday\nSept 24\nValue numbering\n\nhw1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n4\nFriday\nSept 27\nData flow\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nTuesday\nOct 1\nGlobal analysis\n\nhw2\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5\nFriday\nOct 4\ncontinued\n\n\n\n\n\npaper 2 - iterative data-flow analysis, revisited Cooper, Keith D.; Harvey, Timothy J.; Kennedy, Ken (2004-03-26) [November 2002]. pldi 2002\n\n\n\n\n\n\n\n\n\n\n\n6\nTuesday\nOct 8\nStatic single assignment\n\n\n\n\n\nDynamo: A Transparent Dynamic Optimization System Vasanth Bala vas@hpl.hp.com chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://dl.acm.org/doi/pdf/10.1145/349299.349303\n\n\n\n\n\n\n\n\n\n\n\n6\nFriday\nOct 11\ncontinued\n\n\n\n\n\nGlobal value numbers and redundant computations chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://dl.acm.org/doi/pdf/10.1145/73560.73562\n\n\n\n\n\n\n\n\n\n\n\n7\nTuesday\nOct 15\nLLVM\n\n\n\n\n\nhttps://dl.acm.org/doi/10.1145/1064978.1065042 Threads cannot be implemented as a library\n\n\n\n\n\n\n\n\n\n\n\n7\nFriday\nOct 18\ncontinued\n\n\n\n\n\nfinal project propsal ????\n\n\n\n\n\n\n\n\n\n\n\n8\nTuesday\nOct 22\nClassical loop optimizations\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n8\nFriday\nOct 25\nPolyhedral analysis\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nTuesday\nOct 29\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n9\nFriday\nNov 1\nMLIR\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n10\nTuesday\nNov 5\ncontinued\n\n\n\n\n\nSuperoptimizer: A Look at the Smallest Program Alexia Massalin. ASPLOS 1987.\n\n\n\n\n\n\n\n\n\n\n\n10\nFriday\nNov 8\nInterprocedural Analysis\n\n\n\n\n\nFormal Verification of a Realistic Compiler Xavier Leroy. CACM in 2009.\n\n\n\n\n\n\n\n\n\n\n\n11\nTuesday\nNov 12\ncontinued\n\n\n\n\n\nEfficient Path Profiling Thomas Ball and James R. Larus. MICRO 1996.\n\n\n\n\n\n\n\n\n\n\n\n11\nFriday\nNov 15\nMemory Management\n\n\n\n\n\nAn Efficient Implementation of SELF, a Dynamically-Typed Object-Oriented Language Based on Prototypes C. Chambers, D. Ungar, and E. Lee. OOPSLA 1989.\n\n\n\n\n\n\n\n\n\n\n\n12\nTuesday\nNov 19\ncontinued\n\n\n\n\n\n“Partial Redundancy Elimination” by Jens Knoop, Oliver Rüthing, and Bernhard Steffen\nYear: 1992\n\n\n\n\n\n\n\n\n\n\n\n12\nFriday\nNov 22\nDynamic compilers\n\n\n\n\n\nFormal Verification of a Realistic Compiler Xavier Leroy. CACM in 2009.\n\n\n\n\n\n\n\n\n\n\n\n13\nTuesday\nNov 26\ncontinued\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n13\nFriday\nNov 29\nThanksgiving\n\n\n\n\n\nhttps://dada.cs.washington.edu/research/tr/2017/12/UW-CSE-17-12-01.pdf 12-01 TVM:End-to-End Optimization Stack for Deep Learnin\n\n\n\n\n\n\n\n\n\n\n\n14\nTuesday\nDec 3\nGPU Compilers\n\n\n\n\n\nRevealing Compiler Heuristics through Automated Discovery and Optimization, V. Seeker, C. Cummins, M. Cole, B. Franke, K. Hazelwood, H. Leather\n\n\n\n\n\n\n\n\n\n\n\n14\nFriday\nDec 6\ncontinued\n\n\n\n\n\nEnd-to-end deep learning of optimization heuristics - Chris Cummins, Pavlos Petoumenos, Zheng Wang, and Hugh Leather PACT 2017. https://ieeexplore.ieee.org/document/8091247\nfinal project deadline ——\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Weekly Schedule"
@@ -1414,7 +1732,7 @@
     "href": "notebooks/possible_papers.html",
     "title": "Untitled",
     "section": "",
-    "text": "End-to-end deep learning of optimization heuristics - Chris Cummins, Pavlos Petoumenos, Zheng Wang, and Hugh Leather PACT 2017. https://ieeexplore.ieee.org/document/8091247\nDistinguished Paper Award: Revealing Compiler Heuristics through Automated Discovery and Optimization, V. Seeker, C. Cummins, M. Cole, B. Franke, K. Hazelwood, H. Leather\nhttps://dl.acm.org/doi/abs/10.1145/3213846.3213848?casa_token=cbgdY_Wgz9kAAAAA:IMKfnKAYKl3t9wXFen_yauFHY__vyUHcqSgjENz7RB2QEGeTC1L70FEC5vM9FnKBWdAiL6tw1uC4 Compiler fuzzing through deep learning\nchrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://dada.cs.washington.edu/research/tr/2017/12/UW-CSE-17-12-01.pdf 12-01 TVM:End-to-End Optimization Stack for Deep Learnin\n“Effective Superword Level Parallelism for Multimedia Extension Architectures” by Samuel Larsen and Saman Amarasinghe (2000)\nEnergy-Aware Tile Size Selection for Affine Programs on GPUs, M. Jayaweera, M. Kong, Y. Wang, D. Kaeli, Pre-print, Artifact\n\n\n\n Back to top"
+    "text": "Glow: Graph Lowering Compiler Techniques for Neural Networks Nadav Rotem, Jordan Fix, Saleem Abdulrasool, Garret Catron, Summer Deng, Roman Dzhabarov, Nick Gibson, James Hegeman, Meghan Lele, Roman Levenstein, Jack Montgomery, Bert Maher, Satish Nadathur, Jakob Olesen, Jongsoo Park, Artem Rakhov, Misha Smelyanski chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://arxiv.org/pdf/1805.00907\nA Deep Learning Based Cost Model for Automatic Code Optimization. Riyadh Baghdadi, Massinissa Merouani, Mohamed-Hicham Leghettas, Kamel Abdous, Taha Arbaoui, Karima Benatchba, Saman Amarasinghe. Proceedings of the Fourth Conference on Machine Learning and Systems (MLSys).\nhttps://dl.acm.org/doi/abs/10.1145/3213846.3213848?casa_token=cbgdY_Wgz9kAAAAA:IMKfnKAYKl3t9wXFen_yauFHY__vyUHcqSgjENz7RB2QEGeTC1L70FEC5vM9FnKBWdAiL6tw1uC4 Compiler fuzzing through deep learning\n“Effective Superword Level Parallelism for Multimedia Extension Architectures” by Samuel Larsen and Saman Amarasinghe (2000)\nEnergy-Aware Tile Size Selection for Affine Programs on GPUs, M. Jayaweera, M. Kong, Y. Wang, D. Kaeli, Pre-print, Artifact\n\n\n\n Back to top"
   },
   {
     "objectID": "notebooks/llvm.html",
@@ -1543,11 +1861,186 @@
     ]
   },
   {
+    "objectID": "lectures/revealjs-global-anal.html#graph-properties",
+    "href": "lectures/revealjs-global-anal.html#graph-properties",
+    "title": "5 Global Analysis",
+    "section": "Graph Properties",
+    "text": "Graph Properties\nWe are going to define assorted graph properties, that can be calculated on cfgs."
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#dominators",
+    "href": "lectures/revealjs-global-anal.html#dominators",
+    "title": "5 Global Analysis",
+    "section": "dominators",
+    "text": "dominators\nWe first define a binary relation on cfg nodes, called dominance. a node d dominates a node i (d dom i) if every possible execution path in the cfg that goes from the entry to i goes through d. \n\nDom is reflexive, so a dom a for all nodes a.\nDom is transitive, a dom b, b dom c ==&gt; a dom c\nDom is anti-symmetric if a dom b, and b dom a then b = a"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#dominator-trees",
+    "href": "lectures/revealjs-global-anal.html#dominator-trees",
+    "title": "5 Global Analysis",
+    "section": "dominator trees",
+    "text": "dominator trees\nWe next define immediate dominators a idom b, a != b and there is no c != a and c != b where a dom c and c dom b.\n\nidom is unique\nidom forms a tree called the dominator tree, root is the entry of the cfg\n\nA strict dominator a sdom b if a dom b and a != b"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#an-example",
+    "href": "lectures/revealjs-global-anal.html#an-example",
+    "title": "5 Global Analysis",
+    "section": "an example",
+    "text": "an example\n\n\nA control flow graph\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\n\nThe dominator tree\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#simple-implementation-dominators",
+    "href": "lectures/revealjs-global-anal.html#simple-implementation-dominators",
+    "title": "5 Global Analysis",
+    "section": "simple implementation dominators",
+    "text": "simple implementation dominators\n\\[\n\\begin{gathered}\n\\operatorname{Dom}\\left(n_o\\right)=\\left\\{n_o\\right\\} \\\\\n\\operatorname{Dom}(n)=\\{n\\} \\cup\\left(\\bigcap_{p \\in \\operatorname{preds}(n)} \\operatorname{Dom}(p)\\right)\n\\end{gathered}\n\\]"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#pseudo-code",
+    "href": "lectures/revealjs-global-anal.html#pseudo-code",
+    "title": "5 Global Analysis",
+    "section": "pseudo code",
+    "text": "pseudo code\nassume nodes start at 0,\ncompute_dominators(CFG cfg) {\n  cfg[0].dominators = {0}\n  for (bb in cfg except 0) {\n    b.dominators = {all nodes in cfg}\n  }\n\n  do {\n    change = false;\n    for (bb in cfg except 0) {\n      temp = {all nodes in cfg}\n      for (pred in bb.predecessors) {\n        temp = intersect(temp, pred.dominators)\n      }\n      temp = union(temp, {bb})\n      if (temp != bb.dominators) {\n        change = true\n        bb.dominators = temp\n      }\n    }\n  } while (change);\n}"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#how-do-we-implement-this",
+    "href": "lectures/revealjs-global-anal.html#how-do-we-implement-this",
+    "title": "5 Global Analysis",
+    "section": "How do we implement this",
+    "text": "How do we implement this\nnumber the vertices starting at 0, vertices are 0,1,2, number_of_vertices -1 so we could use a bit-vector for the set, and we should process vertices in reverse post order"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#a-faster-way",
+    "href": "lectures/revealjs-global-anal.html#a-faster-way",
+    "title": "5 Global Analysis",
+    "section": "a faster way",
+    "text": "a faster way\nCooper, Harvey, Kennedy Algorithm\nif we have the dominator tree, finding immediate dominators is easy, its the parent of the node Finding dominators is also easy, its all the parents on the path from the entry to the node\nsuppose we have a node in the cfg with two parents, like n4, if we takes paths backward in the dominator tree the first common ancestor is n1, (the dominator)"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#a-more-complex-example",
+    "href": "lectures/revealjs-global-anal.html#a-more-complex-example",
+    "title": "5 Global Analysis",
+    "section": "a more complex example",
+    "text": "a more complex example\n\n\n\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\n\n\n\n\n\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\n\n\nneed n4 and n8\n\nboth are dominated by n0"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#subproblem-find-lowest-common-ancestor-in-dt-of-two-nodes-a-and-b",
+    "href": "lectures/revealjs-global-anal.html#subproblem-find-lowest-common-ancestor-in-dt-of-two-nodes-a-and-b",
+    "title": "5 Global Analysis",
+    "section": "subproblem: find lowest common ancestor in dt of two nodes a and b",
+    "text": "subproblem: find lowest common ancestor in dt of two nodes a and b\nfor each node in the dom tree we have the depth, how far from the root, so if a and b have the same parent, that is the dominator, otherwise move the node with the higher depth up one\na fast way to determine which node is lower keep the nodes in post order, nodes at the top of the cfg have higher numbers"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#part1",
+    "href": "lectures/revealjs-global-anal.html#part1",
+    "title": "5 Global Analysis",
+    "section": "part1",
+    "text": "part1\nintersect(b1, b2, idoms,postorder_map) {\n  while (b1 != b2) {\n    if (postorder_map[b1] &lt; postorder_map[b2]) {\n      b1 = idoms[b1];\n    } else {\n      b2 = idoms[b2];\n    }\n  }\n  return b1;"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#pseudo-code-1",
+    "href": "lectures/revealjs-global-anal.html#pseudo-code-1",
+    "title": "5 Global Analysis",
+    "section": "pseudo code",
+    "text": "pseudo code\nvoid compute_dominators(CFG cfg) {\n  // Some initialization steps and e.g. get postorder.\n\n  // Map its basic block to its postorder traversal.\n  foreach (p ; postorder) {\n    postorder_map[p] = counter;\n    ++counter;\n  }\n\n  bool change;\n  do {\n    change = false;\n    foreach_reverse i in postorder) {\n      bb = cffg block i \n      new_idom = bb.preds[0];  // Arbitrarily choose the first predecessor\n\n      for pred in preds (bb)) {\n        if (cfg.idoms[pred] != CFG.UNDEFINED_IDOM) {\n          new_idom = intersect(new_idom, pred, cfg.idoms, postorder_map);\n        }\n      }\n      if (cfg.idoms[i] != new_idom) {\n        cfg.idoms[i] = new_idom;\n        change = true;\n      }\n    }\n  } while (change);\n}"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#dominator-frontiers",
+    "href": "lectures/revealjs-global-anal.html#dominator-frontiers",
+    "title": "5 Global Analysis",
+    "section": "dominator frontiers",
+    "text": "dominator frontiers\nA node A has a dominance frontier which are set of nodes b where A does not dominate b but A dominates a pred of b. Lets see n5 dominance frontier\nFinally we have a post dominates b if all paths from b to the exit go through a. for instance n4 post dominates n6."
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#natural-loops",
+    "href": "lectures/revealjs-global-anal.html#natural-loops",
+    "title": "5 Global Analysis",
+    "section": "natural loops",
+    "text": "natural loops\n\n\n\n\n\n  graph TD;\n  entry --&gt; loop\n  loop --&gt; if \n  if --&gt; then\n  if --&gt; else\n  then --&gt; endif\n  else --&gt; endif\n  endif --&gt; loop\n  loop --&gt; exit\n\n\n\n\n\n\n\nhas to have a cycle in cfg (strongly connected)\nsingle entry point (called the header ) header"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#cycle-but-not-header",
+    "href": "lectures/revealjs-global-anal.html#cycle-but-not-header",
+    "title": "5 Global Analysis",
+    "section": "cycle but not header",
+    "text": "cycle but not header\nHow about an example that has a cycle and no header\n\n\n\n\n\n    graph TD;\n    entry --&gt; if;\n    if --&gt; loop1\n    if --&gt; loop2\n    loop2 --&gt; loop1\nloop1 --&gt; loop2\n\n\n\n\n\n\nThis loop has two entry points."
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#natural-loops-1",
+    "href": "lectures/revealjs-global-anal.html#natural-loops-1",
+    "title": "5 Global Analysis",
+    "section": "natural loops",
+    "text": "natural loops\nA back-edge is an edge A-&gt;B, where B dominates A\nother edges are forward edges\nNatural loops:\n\nfor a back-edge A-&gt;B, B is the header of the loop\nthe smallest set of vertices L including A and B, such that for all v in L either preds(v) are in L or v == B"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#example",
+    "href": "lectures/revealjs-global-anal.html#example",
+    "title": "5 Global Analysis",
+    "section": "example",
+    "text": "example\n\n\n\n\n\n\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\n\n\nBackedges B -&gt; H2,\nB-&gt; H1\n\nfor B-&gt; H2, loop is H2,\nfor B-&gt; H1, loop is H1, A, H2, B"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#reducible-control-flow",
+    "href": "lectures/revealjs-global-anal.html#reducible-control-flow",
+    "title": "5 Global Analysis",
+    "section": "reducible control flow",
+    "text": "reducible control flow\nin a reducible cfg every back edge has a natural loop.\nA reducible CFG is one with edges that can be partitioned into two disjoint sets: forward edges, and back edges, such that:\nForward edges form a directed acyclic graph with all nodes reachable from the entry node.\nFor all back edges (A, B), node B dominates node A."
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#what-is-the-surface-version",
+    "href": "lectures/revealjs-global-anal.html#what-is-the-surface-version",
+    "title": "5 Global Analysis",
+    "section": "what is the surface version",
+    "text": "what is the surface version\nStructured programming languages are often designed such that all CFGs they produce are reducible, and common structured programming statements such as IF, FOR, WHILE, BREAK, and CONTINUE produce reducible graphs. To produce irreducible graphs, statements such as GOTO are needed. Irreducible graphs may also be produced by some compiler optimizations."
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#t1-and-t2-transforms",
+    "href": "lectures/revealjs-global-anal.html#t1-and-t2-transforms",
+    "title": "5 Global Analysis",
+    "section": "t1 and t2 transforms",
+    "text": "t1 and t2 transforms\nLet G be a CFG. Suppose n is a node in G with a self-loop, that is, an edge from n to itself.\nTransformation T1: on node n is removal of this self-loop.\nLet n1 and n2 be nodes in G such that n2 has the unique direct ancestor n1, and n2 is not the initial node.\ntransformation T2: on node pair (n1,n2) is merging nodes n1 and n2 into one node,"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#t1-t2",
+    "href": "lectures/revealjs-global-anal.html#t1-t2",
+    "title": "5 Global Analysis",
+    "section": "t1 / t2",
+    "text": "t1 / t2\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#example-1",
+    "href": "lectures/revealjs-global-anal.html#example-1",
+    "title": "5 Global Analysis",
+    "section": "example",
+    "text": "example\nint  n = (count + 7) / 8;\nswitch (count % 8) {\ncase 0: do { *to = *from++;\ncase 7:      *to = *from++;\ncase 6:      *to = *from++;\ncase 5:      *to = *from++;\ncase 4:      *to = *from++;\ncase 3:      *to = *from++;\ncase 2:      *to = *from++;\ncase 1:      *to = *from++;\n        } while (--n &gt; 0);\n}"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#simplified-control-flow",
+    "href": "lectures/revealjs-global-anal.html#simplified-control-flow",
+    "title": "5 Global Analysis",
+    "section": "simplified control flow",
+    "text": "simplified control flow\n\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\nnot reducible"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#other-optimizations-interactions",
+    "href": "lectures/revealjs-global-anal.html#other-optimizations-interactions",
+    "title": "5 Global Analysis",
+    "section": "other optimizations interactions",
+    "text": "other optimizations interactions\nloop: if (cond) goto past_loop\n    s1\n    call bar()\n    goto loop\npastloop:\n\nfunction bar()\n    b1 \n    if () return\n    b2"
+  },
+  {
+    "objectID": "lectures/revealjs-global-anal.html#inline-the-function-combine-jmps-to-jmps",
+    "href": "lectures/revealjs-global-anal.html#inline-the-function-combine-jmps-to-jmps",
+    "title": "5 Global Analysis",
+    "section": "inline the function, combine jmps to jmps",
+    "text": "inline the function, combine jmps to jmps\n::: {.columns} ::: {.column}\nloop: if (cond) goto past_loop\n    s1\n    b1\n    if () go to next\n    b2\n    next:\ngoto loop\n::: ::: {.column}\n\n\n\n\n\n    graph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n\n\n:::\nNow we have two back edges so two loops"
+  },
+  {
     "objectID": "lectures/05_global.html",
     "href": "lectures/05_global.html",
     "title": "5 Global Analysis",
     "section": "",
-    "text": "We are going to define assorted graph properties, that can be calculated on cfgs.\nIn data flow we talked about a matrix all_defs x all_uses which is very sparse and very slow to process. One way to speed it up, is use-def chains, for each use build a list of all defs that might reach that use. Or we could have def-use chains for each def calculate the set of all uses that the def might reach. Both of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs\nWe first define a binary relation on cfg nodes, called dominance. a node d dominates a node i (d dom i) if every possible execution path in the cfg that goes from the entry to i goes through d. \n\nDom is reflexive, so a dom a for all nodes a.\nDom is transitive, a dom b, b dom c ==&gt; a dom c\nDom is anti-symmetric if a dom b, and b dom a then b = a\n\nWe next define immediate dominators a idom b, a != b and there is no c != a and c != b where a dom c and c dom b.\n\nidom is unique\nidom forms a tree called the dominator tree, root is the entry of the cfg\n\nA strict dominator a sdom b if a dom b and a != b\nA control flow graph\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\nThe dominator tree\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn0 --&gt; n2;n0 --&gt; n3\nn1 --&gt; n4;\n\n\n\n\n\n\ndominators\n\nn0 dominates n0, n1, n2, n3 and n4\nn1 dominates n1, n2, n3 and n4\nn2 dominates n2\nn3 dominates n3\nn4 dominates n4\n\nimmediate dominators\n\nn0 idom n1\nn0 idom n1\nn3 idom n3\nn1 idom n4\n\na simple implementation\n\\[\n\\begin{gathered}\n\\operatorname{Dom}\\left(n_o\\right)=\\left\\{n_o\\right\\} \\\\\n\\operatorname{Dom}(n)=\\{n\\} \\cup\\left(\\bigcap_{p \\in \\operatorname{preds}(n)} \\operatorname{Dom}(p)\\right)\n\\end{gathered}\n\\]\nTo find the dominators of a node, first put the node itself in the dominators set. Then, take all the common (i.e. intersection) dominators of its predecessors and put them in the set.\nWhat order do we want to process the nodes?\ncompute_dominators(CFG cfg) {\n  cfg[0].dominators = {0}\n  for (bb in cfg except 0) {\n    b.dominators = {all nodes in cfg}\n  }\n\n  do {\n    change = false;\n    for (bb in cfg except 0) {\n      temp = {all nodes in cfg}\n      for (pred in bb.predecessors) {\n        temp = intersect(temp, pred.dominators)\n      }\n      temp = union(temp, {bb})\n      if (temp != bb.dominators) {\n        change = true\n        bb.dominators = temp\n      }\n    }\n  } while (change);\n}\nHow do we implement this\nnumber the vertices starting at 0, vertices are 0,1,2, number_of_vertices -1 so we could use a bit-vector for the set, and we should process vertices in reverse post order\nCooper, Harvey, Kennedy Algorithm\nif we have the dominator tree, finding immediate dominators is easy, its the parent of the node Finding dominators is also easy, its all the parents on the path from the entry to the node\nsuppose we have a node in the cfg with two parents, like n4, if we takes paths backward in the dominator tree the first common ancestor is n1, Which is the dominator\nlets look at a more complex example\n\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\nlets look at a more complex example\n\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\nsubproblem: find lowest common ancestor of two nodes a and b\nfor each node in the dom tree we have the depth, how far from the root, so if a and b have the same parent, that is the dominator, otherwise move the node with the higher depth up one\na fast way to determine which node is lower the nodes in post order, nodes at the top of the cfg have higher numbers\nvoid compute_dominators(CFG cfg) {\n  // Some initialization steps and e.g. get postorder.\n\n  // Map its basic block to its postorder traversal.\n  foreach (p ; postorder) {\n    postorder_map[p] = counter;\n    ++counter;\n  }\n\n  bool change;\n  do {\n    change = false;\n    foreach_reverse (int i; postorder) {\n      BasicBlock *bb = &cfg[i];\n      int new_idom = bb.preds[0];  // Arbitrarily choose the first predecessor\n      foreach (pred ; bb.preds[1..bb.preds.length]) {\n        if (cfg.idoms[pred] != CFG.UNDEFINED_IDOM) {\n          new_idom = intersect(new_idom, pred, cfg.idoms, postorder_map);\n        }\n      }\n      if (cfg.idoms[i] != new_idom) {\n        cfg.idoms[i] = new_idom;\n        change = true;\n      }\n    }\n  } while (change);\n}\n\nint intersect(int b1, int b2, Array!int idoms, Array!int postorder_map) {\n  while (b1 != b2) {\n    if (postorder_map[b1] &lt; postorder_map[b2]) {\n      b1 = idoms[b1];\n    } else {\n      b2 = idoms[b2];\n    }\n  }\n  return b1;\nA node A has a dominance frontier which are set of nodes b where A does not dominate b but A dominates a pred of b. Lets see n5’ dominance frontier\nFinally we have a post dominates b if all paths from b to the exit go through a. for instance n4 post dominates n6.\n## natural loops\n\n\n\n\n\n  graph TD;\n  entry --&gt; loop\n  loop --&gt; if \n  if --&gt; then\n  if --&gt; else\n  then --&gt; endif\n  else --&gt; endif\n  endif --&gt; loop\n  loop --&gt; exit\n\n\n\n\n\n\nconditions for a natural loop:\n\nhas to have a cycle in cfg (strongly connected)\nsingle entry point (called the header ) header\n\nHow about an example of a cycle that has a cycle and no header\n\n\n\n\n\n    graph TD;\n    entry --&gt; if;\n    if --&gt; loop1\n    if --&gt; loop2\n    loop2 --&gt; loop1\nloop1 --&gt; loop2\n\n\n\n\n\n\nThis loop has two entry points.\ndefine a backedge is an edge A-&gt;B, where B dominates A\nother edges are forward edges\nNatural loops:\n\nfor a backedge A-&gt;B, B is the header of the loop\nthe smallest set of vertices L including A and B, such that for all v in L either preds(v) are in L or v == B\n\nLets see what this means for nested loops\n\n\n\n\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\nBackedges B -&gt; H2, and B-&gt; H1\nfor B-&gt; H2, loop is H2, for B-&gt; H1, loop is H1, A, H2, B\n*** reducible control flow *** in a reducible cfg every back edge has a natural loop.\nA reducible CFG is one with edges that can be partitioned into two disjoint sets: forward edges, and back edges, such that:\nForward edges form a directed acyclic graph with all nodes reachable from the entry node.\nFor all back edges (A, B), node B dominates node A.\nStructured programming languages are often designed such that all CFGs they produce are reducible, and common structured programming statements such as IF, FOR, WHILE, BREAK, and CONTINUE produce reducible graphs. To produce irreducible graphs, statements such as GOTO are needed. Irreducible graphs may also be produced by some compiler optimizations.\nloop has two entry p\nWhere did the name come from:\nT1 and T2 transforms\nT1: Let G be a CFG. Suppose n is a node in G with a self-loop, that is, an edge from n to itself.\nTransformation T1 on node n is removal of this self-loop.\nT2: Let n1 and n2 be nodes in G such that n2 has the unique direct ancestor n1, and n2 is not the initial node. Then transformation T2 on node pair (n1,n2) is merging nodes n1 and n2 into one node, named n1/n2, and deleting the unique edge between them\nint  n = (count + 7) / 8;\nswitch (count % 8) {\ncase 0: do { *to = *from++;\ncase 7:      *to = *from++;\ncase 6:      *to = *from++;\ncase 5:      *to = *from++;\ncase 4:      *to = *from++;\ncase 3:      *to = *from++;\ncase 2:      *to = *from++;\ncase 1:      *to = *from++;\n        } while (--n &gt; 0);\n}\nsimplified control flow\n\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case1\n    switch --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; switch\n    dowhile --&gt; exit\n\n\n\n\n\n\nthe argument about no goto’s is really an argument about reducible control flow",
+    "text": "We are going to define assorted graph properties, that can be calculated on cfgs.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -1555,11 +2048,299 @@
     ]
   },
   {
-    "objectID": "lectures/05_global.html#all-kinds-of-graph-properties--",
-    "href": "lectures/05_global.html#all-kinds-of-graph-properties--",
+    "objectID": "lectures/05_global.html#graph-properties",
+    "href": "lectures/05_global.html#graph-properties",
     "title": "5 Global Analysis",
     "section": "",
-    "text": "We are going to define assorted graph properties, that can be calculated on cfgs.\nIn data flow we talked about a matrix all_defs x all_uses which is very sparse and very slow to process. One way to speed it up, is use-def chains, for each use build a list of all defs that might reach that use. Or we could have def-use chains for each def calculate the set of all uses that the def might reach. Both of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs\nWe first define a binary relation on cfg nodes, called dominance. a node d dominates a node i (d dom i) if every possible execution path in the cfg that goes from the entry to i goes through d. \n\nDom is reflexive, so a dom a for all nodes a.\nDom is transitive, a dom b, b dom c ==&gt; a dom c\nDom is anti-symmetric if a dom b, and b dom a then b = a\n\nWe next define immediate dominators a idom b, a != b and there is no c != a and c != b where a dom c and c dom b.\n\nidom is unique\nidom forms a tree called the dominator tree, root is the entry of the cfg\n\nA strict dominator a sdom b if a dom b and a != b\nA control flow graph\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\nThe dominator tree\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn0 --&gt; n2;n0 --&gt; n3\nn1 --&gt; n4;\n\n\n\n\n\n\ndominators\n\nn0 dominates n0, n1, n2, n3 and n4\nn1 dominates n1, n2, n3 and n4\nn2 dominates n2\nn3 dominates n3\nn4 dominates n4\n\nimmediate dominators\n\nn0 idom n1\nn0 idom n1\nn3 idom n3\nn1 idom n4\n\na simple implementation\n\\[\n\\begin{gathered}\n\\operatorname{Dom}\\left(n_o\\right)=\\left\\{n_o\\right\\} \\\\\n\\operatorname{Dom}(n)=\\{n\\} \\cup\\left(\\bigcap_{p \\in \\operatorname{preds}(n)} \\operatorname{Dom}(p)\\right)\n\\end{gathered}\n\\]\nTo find the dominators of a node, first put the node itself in the dominators set. Then, take all the common (i.e. intersection) dominators of its predecessors and put them in the set.\nWhat order do we want to process the nodes?\ncompute_dominators(CFG cfg) {\n  cfg[0].dominators = {0}\n  for (bb in cfg except 0) {\n    b.dominators = {all nodes in cfg}\n  }\n\n  do {\n    change = false;\n    for (bb in cfg except 0) {\n      temp = {all nodes in cfg}\n      for (pred in bb.predecessors) {\n        temp = intersect(temp, pred.dominators)\n      }\n      temp = union(temp, {bb})\n      if (temp != bb.dominators) {\n        change = true\n        bb.dominators = temp\n      }\n    }\n  } while (change);\n}\nHow do we implement this\nnumber the vertices starting at 0, vertices are 0,1,2, number_of_vertices -1 so we could use a bit-vector for the set, and we should process vertices in reverse post order\nCooper, Harvey, Kennedy Algorithm\nif we have the dominator tree, finding immediate dominators is easy, its the parent of the node Finding dominators is also easy, its all the parents on the path from the entry to the node\nsuppose we have a node in the cfg with two parents, like n4, if we takes paths backward in the dominator tree the first common ancestor is n1, Which is the dominator\nlets look at a more complex example\n\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\nlets look at a more complex example\n\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\nsubproblem: find lowest common ancestor of two nodes a and b\nfor each node in the dom tree we have the depth, how far from the root, so if a and b have the same parent, that is the dominator, otherwise move the node with the higher depth up one\na fast way to determine which node is lower the nodes in post order, nodes at the top of the cfg have higher numbers\nvoid compute_dominators(CFG cfg) {\n  // Some initialization steps and e.g. get postorder.\n\n  // Map its basic block to its postorder traversal.\n  foreach (p ; postorder) {\n    postorder_map[p] = counter;\n    ++counter;\n  }\n\n  bool change;\n  do {\n    change = false;\n    foreach_reverse (int i; postorder) {\n      BasicBlock *bb = &cfg[i];\n      int new_idom = bb.preds[0];  // Arbitrarily choose the first predecessor\n      foreach (pred ; bb.preds[1..bb.preds.length]) {\n        if (cfg.idoms[pred] != CFG.UNDEFINED_IDOM) {\n          new_idom = intersect(new_idom, pred, cfg.idoms, postorder_map);\n        }\n      }\n      if (cfg.idoms[i] != new_idom) {\n        cfg.idoms[i] = new_idom;\n        change = true;\n      }\n    }\n  } while (change);\n}\n\nint intersect(int b1, int b2, Array!int idoms, Array!int postorder_map) {\n  while (b1 != b2) {\n    if (postorder_map[b1] &lt; postorder_map[b2]) {\n      b1 = idoms[b1];\n    } else {\n      b2 = idoms[b2];\n    }\n  }\n  return b1;\nA node A has a dominance frontier which are set of nodes b where A does not dominate b but A dominates a pred of b. Lets see n5’ dominance frontier\nFinally we have a post dominates b if all paths from b to the exit go through a. for instance n4 post dominates n6.\n## natural loops\n\n\n\n\n\n  graph TD;\n  entry --&gt; loop\n  loop --&gt; if \n  if --&gt; then\n  if --&gt; else\n  then --&gt; endif\n  else --&gt; endif\n  endif --&gt; loop\n  loop --&gt; exit\n\n\n\n\n\n\nconditions for a natural loop:\n\nhas to have a cycle in cfg (strongly connected)\nsingle entry point (called the header ) header\n\nHow about an example of a cycle that has a cycle and no header\n\n\n\n\n\n    graph TD;\n    entry --&gt; if;\n    if --&gt; loop1\n    if --&gt; loop2\n    loop2 --&gt; loop1\nloop1 --&gt; loop2\n\n\n\n\n\n\nThis loop has two entry points.\ndefine a backedge is an edge A-&gt;B, where B dominates A\nother edges are forward edges\nNatural loops:\n\nfor a backedge A-&gt;B, B is the header of the loop\nthe smallest set of vertices L including A and B, such that for all v in L either preds(v) are in L or v == B\n\nLets see what this means for nested loops\n\n\n\n\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\nBackedges B -&gt; H2, and B-&gt; H1\nfor B-&gt; H2, loop is H2, for B-&gt; H1, loop is H1, A, H2, B\n*** reducible control flow *** in a reducible cfg every back edge has a natural loop.\nA reducible CFG is one with edges that can be partitioned into two disjoint sets: forward edges, and back edges, such that:\nForward edges form a directed acyclic graph with all nodes reachable from the entry node.\nFor all back edges (A, B), node B dominates node A.\nStructured programming languages are often designed such that all CFGs they produce are reducible, and common structured programming statements such as IF, FOR, WHILE, BREAK, and CONTINUE produce reducible graphs. To produce irreducible graphs, statements such as GOTO are needed. Irreducible graphs may also be produced by some compiler optimizations.\nloop has two entry p\nWhere did the name come from:\nT1 and T2 transforms\nT1: Let G be a CFG. Suppose n is a node in G with a self-loop, that is, an edge from n to itself.\nTransformation T1 on node n is removal of this self-loop.\nT2: Let n1 and n2 be nodes in G such that n2 has the unique direct ancestor n1, and n2 is not the initial node. Then transformation T2 on node pair (n1,n2) is merging nodes n1 and n2 into one node, named n1/n2, and deleting the unique edge between them\nint  n = (count + 7) / 8;\nswitch (count % 8) {\ncase 0: do { *to = *from++;\ncase 7:      *to = *from++;\ncase 6:      *to = *from++;\ncase 5:      *to = *from++;\ncase 4:      *to = *from++;\ncase 3:      *to = *from++;\ncase 2:      *to = *from++;\ncase 1:      *to = *from++;\n        } while (--n &gt; 0);\n}\nsimplified control flow\n\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case1\n    switch --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; switch\n    dowhile --&gt; exit\n\n\n\n\n\n\nthe argument about no goto’s is really an argument about reducible control flow",
+    "text": "We are going to define assorted graph properties, that can be calculated on cfgs.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#dominators",
+    "href": "lectures/05_global.html#dominators",
+    "title": "5 Global Analysis",
+    "section": "dominators",
+    "text": "dominators\nWe first define a binary relation on cfg nodes, called dominance. a node d dominates a node i (d dom i) if every possible execution path in the cfg that goes from the entry to i goes through d. \n\nDom is reflexive, so a dom a for all nodes a.\nDom is transitive, a dom b, b dom c ==&gt; a dom c\nDom is anti-symmetric if a dom b, and b dom a then b = a",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#dominator-trees",
+    "href": "lectures/05_global.html#dominator-trees",
+    "title": "5 Global Analysis",
+    "section": "dominator trees",
+    "text": "dominator trees\nWe next define immediate dominators a idom b, a != b and there is no c != a and c != b where a dom c and c dom b.\n\nidom is unique\nidom forms a tree called the dominator tree, root is the entry of the cfg\n\nA strict dominator a sdom b if a dom b and a != b",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#an-example",
+    "href": "lectures/05_global.html#an-example",
+    "title": "5 Global Analysis",
+    "section": "an example",
+    "text": "an example\n\n\nA control flow graph\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\n\nThe dominator tree\n\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#simple-implementation-dominators",
+    "href": "lectures/05_global.html#simple-implementation-dominators",
+    "title": "5 Global Analysis",
+    "section": "simple implementation dominators",
+    "text": "simple implementation dominators\n\\[\n\\begin{gathered}\n\\operatorname{Dom}\\left(n_o\\right)=\\left\\{n_o\\right\\} \\\\\n\\operatorname{Dom}(n)=\\{n\\} \\cup\\left(\\bigcap_{p \\in \\operatorname{preds}(n)} \\operatorname{Dom}(p)\\right)\n\\end{gathered}\n\\]\n\nTo find the dominators of a node, first put the node itself in the dominators set. Then, take all the common (i.e. intersection) dominators of its predecessors and put them in the set.\nWhat order do we want to process the nodes?",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#pseudo-code",
+    "href": "lectures/05_global.html#pseudo-code",
+    "title": "5 Global Analysis",
+    "section": "pseudo code",
+    "text": "pseudo code\nassume nodes start at 0,\ncompute_dominators(CFG cfg) {\n  cfg[0].dominators = {0}\n  for (bb in cfg except 0) {\n    b.dominators = {all nodes in cfg}\n  }\n\n  do {\n    change = false;\n    for (bb in cfg except 0) {\n      temp = {all nodes in cfg}\n      for (pred in bb.predecessors) {\n        temp = intersect(temp, pred.dominators)\n      }\n      temp = union(temp, {bb})\n      if (temp != bb.dominators) {\n        change = true\n        bb.dominators = temp\n      }\n    }\n  } while (change);\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#how-do-we-implement-this",
+    "href": "lectures/05_global.html#how-do-we-implement-this",
+    "title": "5 Global Analysis",
+    "section": "How do we implement this",
+    "text": "How do we implement this\nnumber the vertices starting at 0, vertices are 0,1,2, number_of_vertices -1 so we could use a bit-vector for the set, and we should process vertices in reverse post order",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#a-faster-way",
+    "href": "lectures/05_global.html#a-faster-way",
+    "title": "5 Global Analysis",
+    "section": "a faster way",
+    "text": "a faster way\nCooper, Harvey, Kennedy Algorithm\nif we have the dominator tree, finding immediate dominators is easy, its the parent of the node Finding dominators is also easy, its all the parents on the path from the entry to the node\nsuppose we have a node in the cfg with two parents, like n4, if we takes paths backward in the dominator tree the first common ancestor is n1, (the dominator)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#a-more-complex-example",
+    "href": "lectures/05_global.html#a-more-complex-example",
+    "title": "5 Global Analysis",
+    "section": "a more complex example",
+    "text": "a more complex example\n\n\n\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\n\n\n\n\n\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\n\n\nneed n4 and n8\n\nboth are dominated by n0",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#subproblem-find-lowest-common-ancestor-in-dt-of-two-nodes-a-and-b",
+    "href": "lectures/05_global.html#subproblem-find-lowest-common-ancestor-in-dt-of-two-nodes-a-and-b",
+    "title": "5 Global Analysis",
+    "section": "subproblem: find lowest common ancestor in dt of two nodes a and b",
+    "text": "subproblem: find lowest common ancestor in dt of two nodes a and b\nfor each node in the dom tree we have the depth, how far from the root, so if a and b have the same parent, that is the dominator, otherwise move the node with the higher depth up one\na fast way to determine which node is lower keep the nodes in post order, nodes at the top of the cfg have higher numbers",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#part1",
+    "href": "lectures/05_global.html#part1",
+    "title": "5 Global Analysis",
+    "section": "part1",
+    "text": "part1\nintersect(b1, b2, idoms,postorder_map) {\n  while (b1 != b2) {\n    if (postorder_map[b1] &lt; postorder_map[b2]) {\n      b1 = idoms[b1];\n    } else {\n      b2 = idoms[b2];\n    }\n  }\n  return b1;",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#pseudo-code-1",
+    "href": "lectures/05_global.html#pseudo-code-1",
+    "title": "5 Global Analysis",
+    "section": "pseudo code",
+    "text": "pseudo code\nvoid compute_dominators(CFG cfg) {\n  // Some initialization steps and e.g. get postorder.\n\n  // Map its basic block to its postorder traversal.\n  foreach (p ; postorder) {\n    postorder_map[p] = counter;\n    ++counter;\n  }\n\n  bool change;\n  do {\n    change = false;\n    foreach_reverse i in postorder) {\n      bb = cffg block i \n      new_idom = bb.preds[0];  // Arbitrarily choose the first predecessor\n\n      for pred in preds (bb)) {\n        if (cfg.idoms[pred] != CFG.UNDEFINED_IDOM) {\n          new_idom = intersect(new_idom, pred, cfg.idoms, postorder_map);\n        }\n      }\n      if (cfg.idoms[i] != new_idom) {\n        cfg.idoms[i] = new_idom;\n        change = true;\n      }\n    }\n  } while (change);\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#dominator-frontiers",
+    "href": "lectures/05_global.html#dominator-frontiers",
+    "title": "5 Global Analysis",
+    "section": "dominator frontiers",
+    "text": "dominator frontiers\nA node A has a dominance frontier which are set of nodes b where A does not dominate b but A dominates a pred of b. Lets see n5 dominance frontier\nFinally we have a post dominates b if all paths from b to the exit go through a. for instance n4 post dominates n6.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#natural-loops",
+    "href": "lectures/05_global.html#natural-loops",
+    "title": "5 Global Analysis",
+    "section": "natural loops",
+    "text": "natural loops\n\n\n\n\n\n  graph TD;\n  entry --&gt; loop\n  loop --&gt; if \n  if --&gt; then\n  if --&gt; else\n  then --&gt; endif\n  else --&gt; endif\n  endif --&gt; loop\n  loop --&gt; exit\n\n\n\n\n\n\n\nhas to have a cycle in cfg (strongly connected)\nsingle entry point (called the header ) header",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#cycle-but-not-header",
+    "href": "lectures/05_global.html#cycle-but-not-header",
+    "title": "5 Global Analysis",
+    "section": "cycle but not header",
+    "text": "cycle but not header\nHow about an example that has a cycle and no header\n\n\n\n\n\n    graph TD;\n    entry --&gt; if;\n    if --&gt; loop1\n    if --&gt; loop2\n    loop2 --&gt; loop1\nloop1 --&gt; loop2\n\n\n\n\n\n\nThis loop has two entry points.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#natural-loops-1",
+    "href": "lectures/05_global.html#natural-loops-1",
+    "title": "5 Global Analysis",
+    "section": "natural loops",
+    "text": "natural loops\nA back-edge is an edge A-&gt;B, where B dominates A\nother edges are forward edges\nNatural loops:\n\nfor a back-edge A-&gt;B, B is the header of the loop\nthe smallest set of vertices L including A and B, such that for all v in L either preds(v) are in L or v == B",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#example",
+    "href": "lectures/05_global.html#example",
+    "title": "5 Global Analysis",
+    "section": "example",
+    "text": "example\n\n\n\n\n\n\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\n\n\nBackedges B -&gt; H2,\nB-&gt; H1\n\nfor B-&gt; H2, loop is H2,\nfor B-&gt; H1, loop is H1, A, H2, B",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#reducible-control-flow",
+    "href": "lectures/05_global.html#reducible-control-flow",
+    "title": "5 Global Analysis",
+    "section": "reducible control flow",
+    "text": "reducible control flow\nin a reducible cfg every back edge has a natural loop.\nA reducible CFG is one with edges that can be partitioned into two disjoint sets: forward edges, and back edges, such that:\nForward edges form a directed acyclic graph with all nodes reachable from the entry node.\nFor all back edges (A, B), node B dominates node A.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#what-is-the-surface-version",
+    "href": "lectures/05_global.html#what-is-the-surface-version",
+    "title": "5 Global Analysis",
+    "section": "what is the surface version",
+    "text": "what is the surface version\nStructured programming languages are often designed such that all CFGs they produce are reducible, and common structured programming statements such as IF, FOR, WHILE, BREAK, and CONTINUE produce reducible graphs. To produce irreducible graphs, statements such as GOTO are needed. Irreducible graphs may also be produced by some compiler optimizations.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#t1-and-t2-transforms",
+    "href": "lectures/05_global.html#t1-and-t2-transforms",
+    "title": "5 Global Analysis",
+    "section": "t1 and t2 transforms",
+    "text": "t1 and t2 transforms\nLet G be a CFG. Suppose n is a node in G with a self-loop, that is, an edge from n to itself.\nTransformation T1: on node n is removal of this self-loop.\nLet n1 and n2 be nodes in G such that n2 has the unique direct ancestor n1, and n2 is not the initial node.\ntransformation T2: on node pair (n1,n2) is merging nodes n1 and n2 into one node,",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#t1-t2",
+    "href": "lectures/05_global.html#t1-t2",
+    "title": "5 Global Analysis",
+    "section": "t1 / t2",
+    "text": "t1 / t2\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#example-1",
+    "href": "lectures/05_global.html#example-1",
+    "title": "5 Global Analysis",
+    "section": "example",
+    "text": "example\nint  n = (count + 7) / 8;\nswitch (count % 8) {\ncase 0: do { *to = *from++;\ncase 7:      *to = *from++;\ncase 6:      *to = *from++;\ncase 5:      *to = *from++;\ncase 4:      *to = *from++;\ncase 3:      *to = *from++;\ncase 2:      *to = *from++;\ncase 1:      *to = *from++;\n        } while (--n &gt; 0);\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#simplified-control-flow",
+    "href": "lectures/05_global.html#simplified-control-flow",
+    "title": "5 Global Analysis",
+    "section": "simplified control flow",
+    "text": "simplified control flow\n\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\nnot reducible",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#other-optimizations-interactions",
+    "href": "lectures/05_global.html#other-optimizations-interactions",
+    "title": "5 Global Analysis",
+    "section": "other optimizations interactions",
+    "text": "other optimizations interactions\nloop: if (cond) goto past_loop\n    s1\n    call bar()\n    goto loop\npastloop:\n\nfunction bar()\n    b1 \n    if () return\n    b2",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "5 Global Analysis"
+    ]
+  },
+  {
+    "objectID": "lectures/05_global.html#inline-the-function-combine-jmps-to-jmps",
+    "href": "lectures/05_global.html#inline-the-function-combine-jmps-to-jmps",
+    "title": "5 Global Analysis",
+    "section": "inline the function, combine jmps to jmps",
+    "text": "inline the function, combine jmps to jmps\n::: {.columns} ::: {.column}\nloop: if (cond) goto past_loop\n    s1\n    b1\n    if () go to next\n    b2\n    next:\ngoto loop\n::: ::: {.column}\n\n\n\n\n\n    graph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n\n\n:::\nNow we have two back edges so two loops",
     "crumbs": [
       "EECS 7398",
       "Lectures",
