@@ -1,16 +1,23 @@
 ---
 title: "5 Global Analysis"
-format: html
+format: 
+    html: default
+    revealjs:
+        chalkboard: true
+        output-file: revealjs-global-anal
+        scrollable: true
+keep-ipynb: true
+python: kaggle_comp
+sidebar: false 
 ---
 
-## all kinds of graph properties -
+
+## Graph Properties
 
 We are going to define assorted graph properties, that can be calculated on cfgs.
 
-In data flow we talked about a matrix all_defs x all_uses which is very sparse and very slow to process.
-One way to speed it up, is use-def chains, for each use build a list of all defs that might reach that use. Or we could have def-use chains for each def calculate the set of all uses that the def might reach.    Both of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs 
 
-
+## dominators 
 
 We first define a binary relation on cfg nodes, called ***dominance***. a node d dominates a node i (d dom i) if every possible execution path in the cfg that goes from the entry to i goes through d.   
 
@@ -18,6 +25,7 @@ We first define a binary relation on cfg nodes, called ***dominance***. a node d
 2) Dom is transitive, a dom b, b dom c ==> a dom c 
 3) Dom is anti-symmetric  if a dom b, and b dom a then b = a 
 
+## dominator trees
 
 We next define ***immediate dominators*** a idom b, a != b and there is no c != a and c != b where a dom c and c dom b. 
 
@@ -26,7 +34,10 @@ We next define ***immediate dominators*** a idom b, a != b and there is no c != 
 
 A ***strict dominator*** a sdom b if a dom b and a != b
 
+## an example 
 
+::: {.columns}
+::: {.column}
 A control flow graph
 
 ```{mermaid}
@@ -38,31 +49,55 @@ n2 --> n4;
 n3 --> n4;
 ```
 
+:::
+::: {.column}
 The dominator tree
 
 ```{mermaid}
 graph TD;
 n0 --> n1;
-n0 --> n2;n0 --> n3
+n1 --> n2;n1 --> n3
 n1 --> n4;
 ```
+:::
+::: 
 
-dominators
+# another example
 
-1) n0 dominates n0, n1, n2, n3 and n4
-1) n1 dominates n1, n2, n3 and n4
-1) n2 dominates n2
-1) n3 dominates n3
-1) n4 dominates n4
+::: {.columns}
+::: {.column}
 
-immediate dominators 
+A control flow graph
 
-1) n0 idom n1
-2) n0 idom n1
-1) n3 idom n3
-1) n1 idom n4
+```{mermaid}
+graph TD;
+n1 --> n2;
+n2 --> n3;
+n2 --> n4; n2--> n6;
+n3 --> n5
+n4 --> n5
+n5 --> n2
+ 
+```
+:::
+::: {.column}
 
-a simple implementation
+Dominator tree
+
+```{mermaid}
+graph TD;
+n1--> n2
+n2 --> n3
+n2 --> n4
+n2--> n5
+n2 --> n6
+```
+
+:::
+::: 
+
+
+## simple implementation dominators 
 
 $$
 \begin{gathered}
@@ -71,10 +106,15 @@ $$
 \end{gathered}
 $$ 
 
+---
+
 To find the dominators of a node, first put the node itself in the dominators set. Then, take all the common (i.e. intersection) dominators of its predecessors and put them in the set.
 
 What order do we want to process the nodes?
 
+## pseudo code 
+
+assume nodes start at 0, 
 
 ```
 compute_dominators(CFG cfg) {
@@ -100,36 +140,24 @@ compute_dominators(CFG cfg) {
 }
 ```
 
-How do we implement this 
+## How do we implement this 
 
 number the vertices starting at 0, vertices are 0,1,2, number_of_vertices -1 
 so we could use a bit-vector for the set, and we should process vertices in reverse post order 
+
+## a faster way 
 
 [Cooper, Harvey, Kennedy Algorithm](https://www.cs.tufts.edu/comp/150FP/archive/keith-cooper/dom14.pdf)
 
 if we have the dominator tree, finding immediate dominators is easy, its the parent of the node
 Finding dominators is also easy, its all the parents  on the path from the entry to the node
 
-suppose we have a node in the cfg with two parents, like n4,  if we takes paths backward in the dominator tree  the first common ancestor is n1, Which is the dominator 
+suppose we have a node in the cfg with two parents, like n4,  if we takes paths backward in the dominator tree  the first common ancestor is n1, (the dominator) 
 
-lets look at a more complex example
+##  a more complex example
 
-```{mermaid}
-graph TD;
-n0 --> n5;
-n0 --> n1;
-n5 --> n7;
-n5 --> n6;
-n1 --> n2 ;
-n1 --> n3;
-n7 --> n8;
-n6 --> n4;
-n2 --> n4;
-n4 --> n8 ;
-n3 --> n8;
-```
-
-lets look at a more complex example
+::: {.columns}
+::: {.column}
 
 ```{mermaid}
 graph TD;
@@ -145,13 +173,54 @@ n2 --> n4;
 n4 --> n8 ;
 n3 --> n8;
 ```
+:::
+::: {.column}
 
-subproblem: find lowest common ancestor of two nodes a and b
+```{mermaid}
+graph TD;
+n0--> n5
+n0 --> n1
+n5--> n7
+n5--> n6
+n1--> n2
+n1 --> n3
+```
+
+need n4 and n8
+
+
+:::{.fragment}
+
+both are dominated by n0
+
+:::
+
+:::
+
+:::
+
+
+## subproblem: find lowest common ancestor in dt of two nodes a and b
 
 for each node in the dom tree we have the depth, how far from the root, so if a and b have the same parent, that is  the dominator, otherwise move the node with the higher depth up one 
 
 a fast way to determine which node is lower 
-the nodes in post order,  nodes at the top of the cfg have higher numbers 
+keep the nodes in post order,  nodes at the top of the cfg have higher numbers 
+
+## part1 
+```
+intersect(b1, b2, idoms,postorder_map) {
+  while (b1 != b2) {
+    if (postorder_map[b1] < postorder_map[b2]) {
+      b1 = idoms[b1];
+    } else {
+      b2 = idoms[b2];
+    }
+  }
+  return b1;
+```
+
+## pseudo code 
 
 ```
 void compute_dominators(CFG cfg) {
@@ -166,10 +235,11 @@ void compute_dominators(CFG cfg) {
   bool change;
   do {
     change = false;
-    foreach_reverse (int i; postorder) {
-      BasicBlock *bb = &cfg[i];
-      int new_idom = bb.preds[0];  // Arbitrarily choose the first predecessor
-      foreach (pred ; bb.preds[1..bb.preds.length]) {
+    foreach_reverse i in postorder) {
+      bb = cffg block i 
+      new_idom = bb.preds[0];  // Arbitrarily choose the first predecessor
+
+      for pred in preds (bb)) {
         if (cfg.idoms[pred] != CFG.UNDEFINED_IDOM) {
           new_idom = intersect(new_idom, pred, cfg.idoms, postorder_map);
         }
@@ -182,23 +252,16 @@ void compute_dominators(CFG cfg) {
   } while (change);
 }
 
-int intersect(int b1, int b2, Array!int idoms, Array!int postorder_map) {
-  while (b1 != b2) {
-    if (postorder_map[b1] < postorder_map[b2]) {
-      b1 = idoms[b1];
-    } else {
-      b2 = idoms[b2];
-    }
-  }
-  return b1;
+
   ```
 
+## dominator frontiers 
 
-  A node A has a  ***dominance frontier*** which are set of nodes b where A does not dominate b but A dominates a pred of b.  Lets see n5' dominance frontier 
+  A node A has a  ***dominance frontier*** which are set of nodes b where A does not dominate b but A dominates a pred of b.  Lets see n5 dominance frontier 
 
   Finally we have a ***post dominates*** b if all paths from b to the exit go through a. for instance n4 post dominates n6. 
 
-  ## natural loops
+## natural loops
 
   ```{mermaid}
   graph TD;
@@ -212,12 +275,13 @@ int intersect(int b1, int b2, Array!int idoms, Array!int postorder_map) {
   loop --> exit
   ```
 
-  conditions for a natural loop:
+  1. has to have a cycle in cfg (strongly connected)
+  1. single entry point (called the **header** ) header
 
-  1) has to have a cycle in cfg (strongly connected)
-  1) single entry point (called the **header** ) header
 
-  How about an example of a cycle that has a cycle and no header
+## cycle but not header
+
+  How about an example  that has a cycle and no header
 
   ```{mermaid}
     graph TD;
@@ -230,18 +294,22 @@ loop1 --> loop2
 
 This loop has two entry points.  
 
+## natural loops 
 
-define a ***backedge***  is an edge A->B, where B dominates A 
+A  ***back-edge***  is an edge A->B, where B dominates A 
 
 other edges are forward edges 
 
 Natural loops:
 
-1) for a backedge A->B,  B is the header of the loop
+1) for a back-edge A->B,  B is the header of the loop
 1) the smallest set of vertices L including A and B, such that for all v in L either preds(v) are in L or v == B
 
-Lets see what this means for nested loops 
+## example 
 
+
+::: {.columns}
+::: {.column}
 ```{mermaid}
     graph TD;
     entry --> H1
@@ -252,14 +320,19 @@ Lets see what this means for nested loops
     B --> H1
     H1 --> exit
 ```
-
-
-Backedges  B -> H2, and B-> H1
+:::
+::: {.column}
+1. Backedges  B -> H2,
+1. B-> H1
 
 for B-> H2, loop is H2,
+ 
 for B-> H1, loop is H1, A, H2, B 
+:::
+::: 
 
-*** reducible control flow *** 
+## reducible control flow
+
 in a reducible cfg every back edge has a natural loop.
 
 A reducible CFG is one with edges that can be partitioned into two disjoint sets: forward edges, and back edges, such that:
@@ -268,26 +341,71 @@ Forward edges form a directed acyclic graph with all nodes reachable from the en
 
 For all back edges (A, B), node B dominates node A.
 
-
+## what is the surface version
+ 
 Structured programming languages are often designed such that all CFGs they produce are reducible, and common structured programming statements such as IF, FOR, WHILE, BREAK, and CONTINUE produce reducible graphs. To produce irreducible graphs, statements such as GOTO are needed. Irreducible graphs may also be produced by some compiler optimizations.
 
 
 
-loop has two entry p
+##  t1 and t2 transforms 
 
-Where did the name come from:
+Let G be a CFG. Suppose n is a node in G with a self-loop, that is, an edge from n to itself.
 
-T1 and T2 transforms 
+Transformation T1:  on node n is removal of this self-loop.
+
+Let n1 and n2 be nodes in G such that n2 has the unique direct ancestor n1, and n2 is not
+the initial node. 
+
+transformation T2:  on node pair (n1,n2) is merging nodes n1 and n2
+into one node, 
+
+## t1 / t2
+
+::: {.columns}
+::: {.column}
+
+```{mermaid}
+    graph TD;
+    a0[" "] --> n
+a1[" "] --> n
+n --> n
+ n --> b[" "]
+n --> b1[" "]
+```
 
 
-T1: Let G be a CFG. Suppose n is a node in G with a self-loop, that is, an edge from n to itself.
+```{mermaid}
+    graph TD;
+    a0[" "] --> n1
+a1[" "] --> n1
+n1 --> n2
+n2--> n1
+ n2 --> b[" "]
+n2 --> b1[" "]
+```
+:::
+::: {.column}
 
-Transformation T1 on node n is removal of this self-loop.
+```{mermaid}
+    graph TD;
+    a0[" "] --> n
+a1[" "] --> n
+ n --> b[" "]
+n --> b1[" "]
+```
 
-T2: Let n1 and n2 be nodes in G such that n2 has the unique direct ancestor n1, and n2 is not
-the initial node. Then transformation T2 on node pair (n1,n2) is merging nodes n1 and n2
-into one node, named n1/n2, and deleting the unique edge between them
+```{mermaid}
+    graph TD;
+    a0[" "] --> n1["n1_n2"]
+a1[" "] --> n1
+ n1 --> b[" "]
+n1 --> b1[" "]
+```
+:::
 
+:::
+
+## example 
 
     int  n = (count + 7) / 8;
     switch (count % 8) {
@@ -301,8 +419,8 @@ into one node, named n1/n2, and deleting the unique edge between them
     case 1:      *to = *from++;
             } while (--n > 0);
     }
-
-simplified control flow 
+    
+## simplified control flow 
 
 ```{mermaid}
     graph TD;
@@ -319,17 +437,53 @@ simplified control flow
 
 
 
-```{mermaid}
-    graph TD;
-    entry --> switch;
-    switch --> case1
-    switch --> case2
-    case2--> case1
-    case1 --> dowhile
-    dowhile --> switch
-    dowhile --> exit
+
+not reducible  
+
+
+## other optimizations interactions 
+
+
+``` 
+loop: if (cond) goto past_loop
+    s1
+    call bar()
+    goto loop
+pastloop:
+
+function bar()
+    b1 
+    if () return
+    b2
 ```
 
-the argument about no goto's is really an argument about reducible control flow 
+##  inline the function, combine  jmps to jmps 
 
+::: {.columns}
+::: {.column}
+```
+loop: if (cond) goto past_loop
+    s1
+    b1
+    if () go to next
+    b2
+    next:
+goto loop
+```
+:::
+::: {.column}
+```{mermaid}
+    graph TD;
+    loop--> s1
+    loop---> past_loop
+    s1--> b1
+    b1 -->inline_if
+    inline_if --> b2
+    b2 --> next_goto
+    inline_if --> loop
+    next_goto --> loop
+```
 
+::: 
+
+Now we have two back edges so two loops 
