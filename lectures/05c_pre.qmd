@@ -1,0 +1,166 @@
+
+---
+title: "_ partial_redundancy elimination"
+sidebar: false 
+format: 
+    html: default
+    revealjs:
+        chalkboard: true
+        output-file: revealjs-partial-redun
+        scrollable: true
+keep-ipynb: true
+python: kaggle_comp
+---
+
+
+
+
+## partial redundancy elimination
+
+::: {.columns}
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+b1[a = b + c]
+b2[" "]
+b3[d = b + c]
+b1--> b3
+b2--> b3
+```
+
+:::
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+b1["t = b + c
+    a = t"]
+b2[t = b + c]
+b3[d =t]
+b1--> b3
+b2--> b3
+```
+:::
+
+:::
+
+## simplifications 
+
+1. only going to look at one expression $b + c$
+1. initially all nodes in the cfg contain at most one assignment statement 
+1. if there is a node that has multiple successors (a branch node)  and one of the successors has multiple predecessors (a join) node we have added a extra node between them
+
+
+
+## down safe 
+
+we are moving computations earlier in the cfg 
+
+don't move so far that it might not be used, or that an argument gets changed
+
+::: {.columns}
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+b1[" "]
+b2[" "]
+b3[b = d + e]
+b4[a = b + c]
+b5[" "]
+b6[d = b + c]
+b1 --> b2
+b1 --> b3
+b2 --> b4
+b4 --> b5
+b5 --> b4
+b3 --> b6
+b4 --> exit
+b6 --> exit
+
+```
+
+
+
+:::
+::: {.column}
+
+cannot move b +c to top, because b changes
+:::
+
+::: 
+
+
+# down safe 
+
+a node n is ***down--safe*** if we can move the computation of $b+c$ to the top of n
+if the result would be definitely used before any of the arguments are changed.
+
+that means it would be useful to compute it here 
+
+
+This is also called ***anticipatable*** or ***very busy*** 
+
+down-safe can be setup as a data flow problem 
+
+# data flow for down-safe
+
+1) local operations:
+    a. define Used(block) is $b +c$ is used in the block
+    b. define transparent(block) is neither b or c is assigned in the block
+
+
+
+$$
+D_{\text{safe}}(\text{exit}) = \text{false}
+$$
+
+$$
+D_{\text{safe}}(n)=\text{used}(n) \cap [ \text{trans}(n) \cap_{s \in \text{succs}(n)}D_{\text{safe}}(s)] 
+$$ 
+
+## up-safe
+
+We can add a computation of $b+c$ in any down-safe node.  We want to pick a good one.
+
+define ***up-safe***(block) (also called ***available***) if $b+c$ will be definitely used without being killed, computed on every path from entry to the block and not killed 
+
+Do not add $b+c$ to a block if the expression is available at that block
+
+up-safe is a second data flow problem
+
+
+$$
+U_{\text{safe}}(\text{entry}) = \text{false}
+$$
+
+$$
+U_{\text{safe}}(n)=  \text{trans}(n) \cap_{p \in \text{preds}(n)} \text{used}(p) \cup \text{U}_{\text{safwe}}(p)
+$$
+
+
+## placement 
+
+want a down-safe node, that is not up-safe 
+
+1. pick the closest to the entry (min number of computations)
+1. pick a later node to lower register pressure 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+A[a: Down-safe]
+B[b+c  :avail]
+C[c: Down-safe]
+D[:avail,Down-safe]
+E[e: Down-safe]
+F[b+c: Down-safe]
+A-->C
+B-->D
+C--> E
+D--> E
+E--> F
+```
+
+We could move  b+c in nodes a,c or e, but e does not help 

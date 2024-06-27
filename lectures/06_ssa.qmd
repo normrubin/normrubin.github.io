@@ -1,17 +1,29 @@
 ---
 title: "6 Static single Assignment"
-format: html
+sidebar: false 
+format: 
+
+    revealjs:
+        chalkboard: true
+        output-file: revealjs-ssa
+        scrollable: true
+keep-ipynb: true
+python: kaggle_comp
 ---
 
+    html: default
 
-# Static single assignment (SSA) 
+
+## Static single assignment (SSA) 
 
 A variable in a program can have multiple definitions. In Bril definitions are instructions which compute values. Up till now we have been thinking about analysis which 
 look at variables (names) but a different way to look at this is based on values, If we think of instructions calculating values, and uses being uses of values we can picture a graph called the ***data flow*** graph showing how values move through a program 
 
-in SSA we change our IR so that every variable has exactly one definition in the program (each variable is assigned only once). The name SSA is statically there is only a single assignment per variable.
+## ssa 
 
-### The SSA Philosophy
+in SSA we change our IR so that every variable has exactly one definition in the program (each variable is assigned only once). The name SSA means statically there is only a single assignment per variable.
+
+## The SSA Philosophy
 
 In addition to a language form, SSA is also a philosophy!
 It can fundamentally change the way you think about programs.
@@ -21,11 +33,16 @@ In the SSA philosophy:
 * instructions == values
 * arguments == data flow graph edges
 
+---
+
 In LLVM, for example, instructions do not refer to argument variables by name—an argument is a *pointer* to defining instruction. 
 
 Static means in the text, not in the execution.
 
+##  an example
+
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TD
 B0["0: i = 0
     1: s = 0"]
@@ -38,11 +55,14 @@ B1 --> B1
 ```
 
 
-variable i has two static assignments 1 and 4, so this program is not in SSA
+variable i has two static assignments 0 and 4, so this program is not in SSA
 
 Variable s has two static assignments, x has one static assignment but x has lots of dynamic assignments (when the program executes)
 
-We call a program without branches a piece of *** straightline code***. 
+
+## straightline code 
+
+We call a program without branches a piece of ***straightline code***. 
 
 ```
     @main {
@@ -53,6 +73,8 @@ We call a program without branches a piece of *** straightline code***.
       print b;
     }
 ```
+. . .
+
 Its easy to see how to convert  straight line code into ssa 
 
 ```
@@ -64,23 +86,30 @@ Its easy to see how to convert  straight line code into ssa
       print b.2;
     }
 ```
+
+
+## pseudo code for one basic block
+
 ```
 for each variable a: 
     Count[a] = 0 
     Stack[a] = [0]
 
 rename_basic_block(B): 
-    for each instruction S in block B: 
-        for each use of a variable x in S: 
+    for each instruction S in block B:
+        for each use of a argument x in S: 
             i = top(Stack[x]) 
-            replace the use of x with xi for each variable a that S defines count[a] = Count[a] + 1 
+            replace the use of x with $x_i$
+            
+        for each variable a that S defines (a dest)
+            count[a] = Count[a] + 1 
             i = Count[a]             
             push i onto Stack[a]             
-            replace definition of a with ai 
+            replace definition of a with $a_i$ 
 ```
-
-
 We don't need the stack here but we will need it later.
+
+--- 
 
 Of course, things will get a little more complicated when there is control flow.
 And because real machines are not SSA, using separate variables (i.e., memory locations and registers) for everything is bound to be inefficient.
@@ -88,17 +117,15 @@ And because real machines are not SSA, using separate variables (i.e., memory lo
 The idea in SSA is to convert general programs into SSA form, do all our optimization there, and then convert back to a standard mutating form before we generate backend code.
 
 
+## phi-Nodes
 
-
-
-### ϕ-Nodes
-
-Just renaming assignments willy-nilly will quickly run into problems.
+Just renaming assignments will quickly run into problems.
 Consider this program:
 
 
 ```{mermaid}
-graph TB
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
 B0[".b0
     a: int = const 47;
     br cond .left .right;"]
@@ -113,18 +140,25 @@ left --> exit
 right --> exit
 ```
 
-If we start renaming all the occurrences of `a`, everything goes fine until we try to write that last `print a`.
-Which "version" of `a` should it use?
+Which "version" of `a` should we use in the print statement?
 
-To match the expressiveness of unrestricted programs, SSA adds a new kind of instruction: a *ϕ-node*.
-ϕ-nodes are flow-sensitive copy instructions: they get a value from one of several variables, depending on which incoming CFG edge was most recently taken to get to them.
 
-In Bril, a ϕ-node appears as a `phi` instruction:
+## phi nodes 
+
+To match the expressiveness of unrestricted programs, SSA adds a new kind of instruction: a *phi-node*.
+
+phi-nodes are flow-sensitive copy instructions: they get a value from one of several variables, depending on which incoming CFG edge was most recently taken to get to them.
+
+## phi nodes in Bril
+
+In Bril, a phi-node appears as a `phi` instruction:
 
     a.4: int = phi .left a.2 .right a.3;
 
 The `phi` instruction chooses between any number of variables, and it picks between them based on labels.
 If the program most recently executed a basic block with the given label, then the `phi` instruction takes its value from the corresponding variable.
+
+## back to the example  
 
 You can write the above program in SSA like this:
 
@@ -146,7 +180,7 @@ You can write the above program in SSA like this:
 ```
 
 
-### Bril in SSA
+##   Bril in SSA
 
 Bril has an SSA extension
 It adds support for a `phi` instruction.
@@ -160,26 +194,40 @@ The reference interpreter has built-in support for `phi`, so you can execute you
 
 Compilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies. 
 
+## an example 
+
+
+::: {.columns}
+
+::: {.column}
 ```{mermaid}
-graph TD;
-subgraph a;
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
  A0["io =
      j0 = 
      k0 ="]
 A1["i1 =
    j1 =
    k1 = "]
-A2["i2 = phi(i0, i1
+A2["i2 = phi(i0, i1)
    j2 = phi(j0, j1)
    k2 = phi(k0, k1)
    ...
     = i2
     = j2 
     = k2"]
+
     A0 --> A2
     A1--> A2
- end
-subgraph b;
+ ```
+
+:::
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
  B0["io =
      j0 = 
      k0 ="]
@@ -197,39 +245,61 @@ B2["
     B1 --"i2 = i1
           j2 = j1
           k2 = k1"--> B2
-end
-
 ```
 
+:::
+
+::: 
+
+we cannot put instructions on edges, but we can add to prev block
+
+## critical edges 
+
+
+::: {.columns}
+
+::: {.column}
+
+
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TB
-A0["L1
+A0["L1:
    a0 =
    b0 =
    if A0 > b0"]
 A1["b1 = a0"]
-A2["l2
+A2["l2:
 b2 = phi(b1,b0)"]
 A0 --> A1
-A1--> A2
+A1 --> A2
 A0 --> A2
 ```
 
-where do we put the copy b2 = b0?
+:::
 
-The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. 
+::: {.column}
+
+  b2 = b0?
+
+:::
+
+::: 
+
+The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors.  This should remind you of adding a preheader to a loop
+
+## critical edge splitting 
 
 
 We can solve this problem by doing ***critical edge splitting***. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge. 
 
 
 
-### Converting to SSA
-
-Very simple scheme 
+## Converting to SSA  - Very simple scheme 
 
 ```{mermaid}
-graph TB
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
 X["Block X
    a = 
    b = 
@@ -238,14 +308,27 @@ Y["Block Y
   b = a"]
 Z["Block Z
 ret b"]
-X--> Y
+X --> Y
 Y--> Z
 X --> Z
 ```
 
+Where do we need phi-functions?
 
-There should be a phi-function for variable b at node z of the flow graph exactly when all of the following are true:
+Which variables 
 
+. . .
+
+At the merge (join) node 
+
+b 
+
+
+
+
+## scheme 
+
+conditions:  phi-function for variable b at node z 
 
 1) There is a block x containing a definition of b
 1) There is a block y (with y ≠ x) containing a definition of b
@@ -254,6 +337,7 @@ There should be a phi-function for variable b at node z of the flow graph exactl
 1) Paths Pxz and Pyz do not have any node in common other than z, and… 
 1) The node z does not appear within both Pxz and Pyz prior to the end, though it may appear in one or the other. 
 
+## scheme part 2
 
 this is iterative since when we add a phi, we are creating a new defintion, which may add new phi-functions 
 
@@ -261,22 +345,33 @@ When we find nodes X,Y,Z that match these steps and z does not contain a phi fun
 
 While really expensive this will work 
 
+## fast methods 
 
-To convert to SSA, we want to insert ϕ-nodes whenever there are distinct paths containing distinct definitions of a variable.
-We *don't* need ϕ-nodes in places that are dominated by a definition of the variable.
+To convert to SSA, we want to insert phi-nodes whenever there are distinct paths containing distinct definitions of a variable.
+We *don't* need phi-nodes in places that are dominated by a definition of the variable.
 So what's a way to know when control reachable from a definition is *not dominated* by that definition?
+
 The dominance frontier!
 
-This is going to be almost linear
+## an almost linear method 
+
 
 We do it in two steps.
-1) insert ϕ-nodes:
-1) rename variables:
 
+1. insert phi-nodes:
+1. rename variables:
+
+---
+ 
+
+::: {.columns}
+
+::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TB
-
+a[x=]
 a-->b
 a--> e
 a--> i
@@ -300,30 +395,50 @@ d--> l
 
 ```
 
-We need phi functions for x in d and h, where else?
+:::
+
+::: {.column}
+
+We need phi functions for this def of x in d and h, where else?
+3 more 
+
+:::
+
+::: 
+
+. . .
+
+
 
 we need to iterate  and keep adding phi nodes
 
+---
+
+
+
 ```
 for each node in the cfg 
-   for each variable with a def in node
+   for each variable with a dest in node
      add node to Defs[v]   # Blocks where v is assigned.
 
 for each v in vars:
     W = Defs[v]
     while W is not empty
       remove a node n from w
-         for block in DF[d]:  # Dominance frontier.
-           Add a ϕ-node to block,
+         for block in DF[n]:  # Dominance frontier.
+           Add a phi-node to block,
              unless we have done so already.
-           Add block to W (because it now writes to v!),
+           Add block to W (because it now writes to v),
              unless it's already in there.
 ```
+
+. . .
 
 Since we keep adding nodes to W how do we know this terminates?
 
 
-Then, rename variables:
+## rename variables:
+
 ```
 rename(n):
   rename_basic_block(n)  # from before 
@@ -338,25 +453,260 @@ rename(n):
 
 ```
 
-![](images/StaticSingleAssignment_Part40.jpg)
-![](images/StaticSingleAssignment_Part41.jpg)
-![](images/StaticSingleAssignment_Part42.jpg)
-![](images/StaticSingleAssignment_Part43.jpg)
+---
 
-The arity of phi-functions
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+L0["L0: i = 1
+   L1: j = 1
+   L2: k = 0"]
+
+L3["L3: if j <20 go to l4 else l10"]
+
+L4["l4: if j < 20 goto l7 else l5"]
+
+L5["l5: j = i
+   l6: k = k +1"]
+
+
+L7["l7: j = k
+  l8: k = k +2"]
+
+L9[L9: goto l3]
+
+L10["l10: ret j"]
+
+L0--> L3
+
+L3--> L4
+L3 --> L10
+
+L4 --> L5
+L4 --> L7
+
+L5--> L9
+L7 --> L9
+L9 --> L3
+```
+
+## What is the dominator tree?
+
+::: {.columns}
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+L0["L0: i = 1
+   L1: j = 1
+   L2: k = 0"]
+
+L3["L3: if j <20 go to l4 else l10"]
+
+L4["l4: if j < 20 goto l7 else l5"]
+
+L5["l5: j = i
+   l6: k = k +1"]
+
+
+L7["l7: j = k
+  l8: k = k +2"]
+
+L9[L9: goto l3]
+
+L10["l10: ret j"]
+
+L0--> L3
+
+L3--> L4
+L3 --> L10
+
+L4 --> L5
+L4 --> L7
+L5 --> L9
+L7 -.-> L9
+L9 --> L3
+```
+
+:::
+
+::: {.column}
+
+```{mermaid}
+graph TB 
+L0 --> L3 
+L3--> L4
+L3 --> L10
+L4--> L5 
+L4 --> L9
+L4 --> L7
+```
+
+:::
+
+::: 
+
+
+## dominance frontiers 
+
+
+::: {.columns}
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+L0["L0: i = 1
+   L1: j = 1
+   L2: k = 0"]
+
+L3["L3: if j <20 go to l4 else l10"]
+
+L4["l4: if j < 20 goto l7 else l5"]
+
+L5["l5: j = i
+   l6: k = k +1"]
+
+
+L7["l7: j = k
+  l8: k = k +2"]
+
+L9[L9: goto l3]
+
+L10["l10: ret j"]
+
+L0--> L3 
+
+L3--> L4
+L3 --> L10
+
+L4 --> L5
+L4 --> L7
+L5 --> L9
+L7 -.-> L9
+L9 --> L3
+```
+
+:::
+
+::: {.column}
+
+```{mermaid}
+graph TB 
+L0 --> L3 
+L3--> L4
+L3 --> L10
+L4--> L5 
+L4 --> L9
+L4 --> L7
+```
+
+:::
+
+::: 
+
+
+## add phi nodes 
+
+::: {.columns}
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+L0["L0: i = 1
+   L1: j = 1
+   L2: k = 0"]
+
+L3["L3: if j <20 go to l4 else l10"]
+
+L4["l4: if j < 20 goto l7 else l5"]
+
+L5["l5: j = i
+   l6: k = k +1"]
+
+
+L7["l7: j = k
+  l8: k = k +2"]
+
+L9[L9: goto l3]
+
+L10["l10: ret j"]
+
+L0--> L3
+
+L3--> L4
+L3 --> L10
+
+L4 --> L5
+L4 --> L7
+L5 --> L9
+L7 --> L9
+L9 --> L3
+```
+
+:::
+
+::: {.column}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+L0["L0: i = 1
+   L1: j = 1
+   L2: k = 0"]
+
+L3["j = phi(j,j) 
+    k = phi(k,k) 
+   L3: if j <20 go to l4 else l10"]
+
+L4["l4: if j < 20 goto l7 else l5"]
+
+L5["l5: j = i
+   l6: k = k +1"]
+
+
+L7["l7: j = k
+  l8: k = k +2"]
+
+L9["j = phi(j,j)
+   k = phi(k,k)
+  L9: goto l3"]
+
+L10["l10: ret j"]
+
+L0--> L3
+
+L3--> L4
+L3 --> L10
+
+L4 --> L5
+L4 --> L7
+L5 --> L9
+L7 --> L9
+L9 --> L3
+```
+
+:::
+
+::: 
+## The arity of phi-functions
 
 Could we have a phi-function in a node with only one predecessor?
 
 could we have a phi-function wit more then two arguments?
 
-![](images/StaticSingleAssignment_Part46.jpg)
 
 
 This algorithm computes what is called ***minimal SSA form*** which is not so mimimal since it can leave dead assignments 
 
-![](images/StaticSingleAssignment_Part48.jpg)
-
-i is only live in blocks l2 and l4 so no need to add phi-node at l1, this gives us ***pruned ssa form***
+doing dead code elimination   ***pruned ssa form***
 
 ## making use of ssa form
 
@@ -380,7 +730,7 @@ decrement counter[x]
 
 ## sparse constant prop
 
-we define a partial order  on consts,  any > all constants > undefined
+we define a partial order  on constats,  any > all constants > undefined
 and define the intersection of two states as the common parent 
 
 
@@ -392,28 +742,20 @@ v = id q      ==> v state is the state of  q
 
 v = v0 op v1  ==> if both are constants v = c0 op c1
 
-             ==> if one is any, v's state is > 
+             ==> if one is any, v's state is any
 
 v = phi(v0,..vn) ==> v's state is the intersection of the states of v0,..,vn
 ```
+##  What order do we process nodes?  
 
-What order do we process nodes?   because the program is in ssa form 
+because the program is in ssa form 
 we can do the nodes in dominator tree order, then before processing any instruction that is not a phi, we will have processed all the arguments 
+
+---
+
 
 
 ```
-B0: x  = input 
-    a = 1 
-    c = a +10
-    if a < c go to b1
-
-B1: b = x * a
-    print b 
-    a = a +1 
-    go to b1
-
-in ssa form 
-
 B0: x0  = input 
     a0 = 1 
     c0 = a0 +10
@@ -424,10 +766,31 @@ B1: a1 phi(a1,a2 )
     print b0 
     a2 = a1 +1 
     go to b1
-
 ```
 
-walking the dominator tree b0 -> b1
+
+## walking the dominator tree b0 -> b1
+
+::: {.columns}
+
+::: {.column}
+
+```
+B0: x0  = input 
+    a0 = 1 
+    c0 = a0 +10
+    if a0 < c0 go to b1
+
+B1: a1 phi(a0,a2 )
+    b0 = x0 * a1
+    print b0 
+    a2 = a1 +1 
+    go to b1
+```
+
+:::
+
+::: {.column}
 
 ```
 B0:
@@ -436,43 +799,40 @@ a0 - 1
 c0 - 11 (folding the constant)
 a0 < c0  skip
 B1:
-a1 = 1 (only one input of phi is defined)
-b0 = any
-a2 = 2
+a1 -  1 (only one input defined)
+b0  - any
+a2 -  2
+update the uses of a2 - the phi
+a1 -  any 
 
-update the uses of a2 - which is the phi a1 -> any
-update the uses of a1 which is the increment no change 
+update the uses of a1 
+no change 
+```
 
+:::
 
-
-## liveness 
-
-![](images/StaticSingleAssignment_Part69.jpg)
-
-![](images/StaticSingleAssignment_Part70.jpg)
-
-![](images/StaticSingleAssignment_Part71.jpg)
+::: 
 
 
-![](images/StaticSingleAssignment_Part73.jpg)
-
-
-
-
-### Converting from SSA
+##  Converting from SSA
 
 Eventually, we need to convert *out of* SSA form to generate efficient code for real machines that don't have `phi`-nodes and do have finite space for variable storage.
 
+## basic algorithm 
+
 The basic algorithm is pretty straightforward.
-If you have a ϕ-node:
+If you have a phi-node:
 
     v = phi .l1 x .l2 y;
 
 Then there must be assignments to `x` and `y` (recursively) preceding this statement in the CFG.
+
 The paths from `x` to the `phi`-containing block and from `y` to the same block must "converge" at that block.
 So insert code into the `phi`-containing block's immediate predecessors along each of those two paths:
 one that does `v = id x` and one that does `v = id y`.
 Then you can delete the `phi` instruction.
+
+## extra copies 
 
 This basic approach can introduce some redundant copying.
 (Take a look at the code it generates after you implement it!)
@@ -480,19 +840,10 @@ Non-SSA copy propagation optimization can work well as a post-processing step.
 For a more extensive take on how to translate out of SSA efficiently, see [“Revisiting Out-of-SSA Translation for Correctness, Code Quality, and Efficiency” by Boissinot et al.](https://hal.inria.fr/inria-00349925v1/document)
 
 
+## overlap 
 
 its possible that an optimization can give overlapping phi-functions
-```
-b0 
-  x = 1
-  y = 2
-B1 
-  z = x
-  x = y
-  y = z
-  if() go to b1
-``` 
-in ssa form 
+
 
 ```
 b0 
@@ -505,9 +856,9 @@ y2 = phi(y1, y3)
   x3 = y2
   y3= z
   if() go to b1
-''''
+```
 
-optimze it 
+##  optimize it 
 
 ```
 b0 
@@ -517,12 +868,14 @@ B1
 x2 = phi(x1, y2)
 y2 = phi(y1, x2)
   if() go to b1
-''''
+```
 
-lost the temp (this is called the swap problem)
+##   lost the temp (this is called the swap problem)
 if we add copies 
 x2 = y3
 y2 = x2 (uses the wrong value of x2)
+
+phi nodes execute all at once - not one at a time 
 
 
 Some SSA slides from [Todd Mowry at CMU](http://www.cs.cmu.edu/afs/cs/academic/class/15745-s12/public/lectures/L13-SSA-Concepts-1up.pdf)
