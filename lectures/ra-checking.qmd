@@ -1,0 +1,253 @@
+---
+title: "Testing Register allocators"
+format: html
+---
+
+## this is based on the [cranelift](https://cranelift.dev/) compiler used for web-assembly and rust 
+
+## what is register allocation  
+
+In Bril and LLVM a program can use an arbitrary number of registers, 
+
+
+```
+void f() {
+    int x0 = compute(0);
+    int x1 = compute(1);
+    // ...
+    int x99 = compute(99);
+    
+    // --- 100 possibly different values were computed 
+    // --- where are those values stored?
+    
+    consume(x0);
+    consume(x1);
+    // ...
+    consume(x99);
+}
+
+```
+
+## storing variables 
+
+one option
+
+Allocate a memory location for each local variable. All of the $x_N$  variables above semantically live in memory.
+When the function is called, it allocates a nwe area on the stack called the stack frame and uses it to store local variables.
+
+This means that adding two variables, takes two loads, one add, and one store so it is very  slow 
+
+Compiling code in this way is very fast because we need to make almost no decisions: a variable reference always becomes a memory load, 
+
+On computers we have a limited set of registers 
+
+Register allocation: is assigning a value in the program to a register for storage. 
+The register allocator decides how to shuffle values between memory and registers, and between register.
+
+In Bril and LLVM we have virtual registers - as many as you want. 
+The register allocator has to rewrite the instructions to use physical registers. Since the number of physical registers is limited, The allocator might insert additional instructions:
+
+1. stores (called spills) to move a register to memory 
+1. loads (called reloads) to move memory to a register 
+1. moves  to copy from one register to another 
+
+The locations in memory are usually on the stack and are called spill-slots
+
+## example of register allocation on a machine with two physical registers 
+```
+virtual register code          physical register code 
+                               {v0 -> r0, v1 -> r1}
+                               store r1, [sp+0]  a spill
+add v2, v0, v1                 add r1, r0, r1 
+                               {v0 -> r0, v1-> [sp+-0], v2-> r1}
+sub v3, v2, v0                 sub r1, r1, r0
+                               load r0, [sp+0]  a reload 
+mul  v4, v3, v1                mul r0, r1, r0
+                               {v4-> r0}
+store v4, [sp+48]              store r0, [sp+48]
+```
+
+## complexity 
+
+if you do register allocation for code that is not in SSA, this is NP-complete 
+But if you do it on code that is in SSA, the time complexity is polynomial.  
+
+There are lots of approximate algorithms- all complicated, lots of machines have extra constraints for instance there is a GPU load instruction that read 128 bits from memory and puts the value into 4 
+consecutive registers
+
+I'm not going to talk about these algorithms here 
+
+## How to  Verify Correctness of an allocator?
+
+Before and after the allocator, we have the same instructions (except for those added by the allocator)
+
+assume we have a machine with an infinite register set and a second machine with a finite register set.
+
+Correct means both programs executed on these two machines get the same answer for all possible inputs 
+
+
+## how do we test this?
+
+How do we test this equivalence?
+
+pick a random program and a  random input. interpret  and see if the result is the same.
+
+could try more random inputs, could generate more random programs (fuzzer tools)
+
+Could reasonably confident but not 100% and very expensive 
+
+
+## use value numbering  check one program, one basic block, all possible inputs 
+
+``` 
+// original               // allocated 
+ld v0, [A]                ld r0, [A]
+ld v1, [B]                ld r1, [B]
+ld v2, [C]                ld r2, [C]
+add v3, v0, v1            add r0, r0, r1
+add v4, v2, v3            add r0, r2, r0
+return v4                 return r0
+
+```
+```
+v0 -> vn 1 ld [A]         r0 -> vn 1 ld [A]
+v1 -> vn 2 ld [B]         r1 -> vn 2 ld [B]
+v2 -> vn 3 ld [C]         r2 -> vn 3 ld [C]
+v3 -> vn 4 add 1,2        r0 -> vn 4 add 1,2 
+v4 -> vn 5 add 3,4        r0 -> vn 5 add 3,4 
+return vn 5               return vn 5
+```
+
+##  check more then one program  (all programs at once)
+
+This requires a proof that the two programs get the same result - this is an active research question -  
+
+some success but not easy 
+
+not used in production 
+
+## best we can do is generate lots of programs check each one 
+
+```{mermaid}
+graph LR
+A[Virtual code]
+B[Register allocator]
+C[Machine code]
+D[Checker]
+E[Fuzzing engine]
+A--> B
+B--> C
+C --> D
+D --> E
+E --> A
+A --> D
+```
+
+We could use the fuzzer to generate random programs or we could use a test set 
+
+##  algorithm (linear in number of instructions)
+
+for each instruction we need to form pairs - virtual and physical register that holds the same value 
+
+
+for instruction v and p,  check that the arguments are equal, if not fail
+add the pair dest of v == dest of p
+
+does not matter what the original op code was, just need register names 
+
+## more general 
+
+Treat the allocated program as containing:
+
+1. Spill <spillslot>, <CPU register>: copy data (symbol representing virtual register) from a register to a spill slot.
+1. Reload <CPU register>, <spillslot>: copy data from a spill slot to a register.
+1. copy <CPU register>, <CPU register>: move data from one CPU register to another (N.B.: only regalloc-inserted moves are recognized as a Move, not moves in the original input program.)
+1. Op read:<CPU register list>, read_orig:<virtual register list> write:<CPU register list> write_orig:<virtual register list>: some arbitrary operation that reads some registers and writes some other registers.
+
+
+Run the value number over this:  
+
+state: for each physical register, and spill slot 
+
+we need either:
+
+1. the virtual register name
+2. unknown -  
+1. conflicted if it has more then one virtual register 
+
+
+## steps (still no control flow )
+
+When we see a Spill, Reload, or Move, we copy the symbolic state from the source location (register or spill slot) to the destination location. 
+
+
+When we see an Op, we do some checks then some updates:
+
+For each read (input) register, we examine the symbolic value stored in the given  register. 
+
+If that symbol matches the virtual register that the original instruction used, then the allocator has properly conveyed the virtual register’s value to its use here, and thus the allocation is correct 
+
+If not, we can signal a checker error, and look for the bug in our register allocator. why are there no false positives?
+
+For each write (output) register, we set the symbolic value stored in the given CPU register to be the given  virtual register. 
+
+
+## control flow 
+
+We can use data flow  and a lattice 
+
+here is the lattice 
+
+```{mermaid}
+graph TD
+A[Unknown]
+B[VR0]
+C[VR1]
+D[VR2]
+E[Conflicted]
+A-->B
+A-->C
+A-->D
+B -->E
+C--> E
+D--> E
+```
+
+## now for the data flow 
+
+We start out with all physical registers and spill slots as 'unknown'
+At each join point move down the lattice
+
+conflicted is ok, so long as it is not used 
+
+Since the number of physical registers and spill slots is finite we can can merge all of them at the top of each basic block.  
+
+like usual we might pick a good order to process basic blocks 
+
+
+## How about an example:
+
+```{mermaid}
+graph TD
+A[p0->v1, [sp+4] -> v2]
+B[p0->v9, [sp+4] -> v2]
+C["top,
+   reload p0 from  [sp+4]]
+A--> C
+B --> C
+```
+
+at the top of C, we see that physical p0 is conflicted -  
+but that is not a error 
+
+after the reload we find it contains v2
+
+
+## tracing pointers - 
+
+Since we know what virtual registers are in each spill-slot, and virtual registers have types 
+we can tell which spill slots contain pointers 
+
+suppose we have a spot where we might call a gc,  we could force spilling of all live vrs that contain a pointer and then tell the gc which spill locations to consider 
+
+
