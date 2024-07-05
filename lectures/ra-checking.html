@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.557">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>EECE7398 Fall 2024</title>
+<title>Testing Register allocators – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -67,9 +67,41 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta property="og:title" content="EECE7398 Fall 2024">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Testing Register allocators – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -80,13 +112,13 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/junk.html">Junk</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/ra-checking.html">Testing Register allocators</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -110,9 +142,9 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true">
  <span class="menu-text">EECS 7398</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -125,9 +157,9 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
  <span class="menu-text">Class Overview</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -160,9 +192,9 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -289,8 +321,8 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/junk.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Junk</span></a>
+  <a href="../lectures/ra-checking.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Testing Register allocators</span></a>
   </div>
 </li>
       </ul>
@@ -321,12 +353,245 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/ra-checking.html">Testing Register allocators</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Testing Register allocators</h1>
+</div>
 
 
 
-<p>junk file</p>
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
+</header>
+
+
+<section id="this-is-based-on-the-cranelift-compiler-used-for-web-assembly-and-rust" class="level2">
+<h2 class="anchored" data-anchor-id="this-is-based-on-the-cranelift-compiler-used-for-web-assembly-and-rust">this is based on the <a href="https://cranelift.dev/">cranelift</a> compiler used for web-assembly and rust</h2>
+</section>
+<section id="what-is-register-allocation" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-register-allocation">what is register allocation</h2>
+<p>In Bril and LLVM a program can use an arbitrary number of registers,</p>
+<pre><code>void f() {
+    int x0 = compute(0);
+    int x1 = compute(1);
+    // ...
+    int x99 = compute(99);
+    
+    // --- 100 possibly different values were computed 
+    // --- where are those values stored?
+    
+    consume(x0);
+    consume(x1);
+    // ...
+    consume(x99);
+}
+</code></pre>
+</section>
+<section id="storing-variables" class="level2">
+<h2 class="anchored" data-anchor-id="storing-variables">storing variables</h2>
+<p>one option</p>
+<p>Allocate a memory location for each local variable. All of the <span class="math inline">\(x_N\)</span> variables above semantically live in memory. When the function is called, it allocates a nwe area on the stack called the stack frame and uses it to store local variables.</p>
+<p>This means that adding two variables, takes two loads, one add, and one store so it is very slow</p>
+<p>Compiling code in this way is very fast because we need to make almost no decisions: a variable reference always becomes a memory load,</p>
+<p>On computers we have a limited set of registers</p>
+<p>Register allocation: is assigning a value in the program to a register for storage. The register allocator decides how to shuffle values between memory and registers, and between register.</p>
+<p>In Bril and LLVM we have virtual registers - as many as you want. The register allocator has to rewrite the instructions to use physical registers. Since the number of physical registers is limited, The allocator might insert additional instructions:</p>
+<ol type="1">
+<li>stores (called spills) to move a register to memory</li>
+<li>loads (called reloads) to move memory to a register</li>
+<li>moves to copy from one register to another</li>
+</ol>
+<p>The locations in memory are usually on the stack and are called spill-slots</p>
+</section>
+<section id="example-of-register-allocation-on-a-machine-with-two-physical-registers" class="level2">
+<h2 class="anchored" data-anchor-id="example-of-register-allocation-on-a-machine-with-two-physical-registers">example of register allocation on a machine with two physical registers</h2>
+<pre><code>virtual register code          physical register code 
+                               {v0 -&gt; r0, v1 -&gt; r1}
+                               store r1, [sp+0]  a spill
+add v2, v0, v1                 add r1, r0, r1 
+                               {v0 -&gt; r0, v1-&gt; [sp+-0], v2-&gt; r1}
+sub v3, v2, v0                 sub r1, r1, r0
+                               load r0, [sp+0]  a reload 
+mul  v4, v3, v1                mul r0, r1, r0
+                               {v4-&gt; r0}
+store v4, [sp+48]              store r0, [sp+48]</code></pre>
+</section>
+<section id="complexity" class="level2">
+<h2 class="anchored" data-anchor-id="complexity">complexity</h2>
+<p>if you do register allocation for code that is not in SSA, this is NP-complete But if you do it on code that is in SSA, the time complexity is polynomial.</p>
+<p>There are lots of approximate algorithms- all complicated, lots of machines have extra constraints for instance there is a GPU load instruction that read 128 bits from memory and puts the value into 4 consecutive registers</p>
+<p>I’m not going to talk about these algorithms here</p>
+</section>
+<section id="how-to-verify-correctness-of-an-allocator" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-verify-correctness-of-an-allocator">How to Verify Correctness of an allocator?</h2>
+<p>Before and after the allocator, we have the same instructions (except for those added by the allocator)</p>
+<p>assume we have a machine with an infinite register set and a second machine with a finite register set.</p>
+<p>Correct means both programs executed on these two machines get the same answer for all possible inputs</p>
+</section>
+<section id="how-do-we-test-this" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-we-test-this">how do we test this?</h2>
+<p>How do we test this equivalence?</p>
+<p>pick a random program and a random input. interpret and see if the result is the same.</p>
+<p>could try more random inputs, could generate more random programs (fuzzer tools)</p>
+<p>Could reasonably confident but not 100% and very expensive</p>
+</section>
+<section id="use-value-numbering-check-one-program-one-basic-block-all-possible-inputs" class="level2">
+<h2 class="anchored" data-anchor-id="use-value-numbering-check-one-program-one-basic-block-all-possible-inputs">use value numbering check one program, one basic block, all possible inputs</h2>
+<pre><code>// original               // allocated 
+ld v0, [A]                ld r0, [A]
+ld v1, [B]                ld r1, [B]
+ld v2, [C]                ld r2, [C]
+add v3, v0, v1            add r0, r0, r1
+add v4, v2, v3            add r0, r2, r0
+return v4                 return r0
+</code></pre>
+<pre><code>v0 -&gt; vn 1 ld [A]         r0 -&gt; vn 1 ld [A]
+v1 -&gt; vn 2 ld [B]         r1 -&gt; vn 2 ld [B]
+v2 -&gt; vn 3 ld [C]         r2 -&gt; vn 3 ld [C]
+v3 -&gt; vn 4 add 1,2        r0 -&gt; vn 4 add 1,2 
+v4 -&gt; vn 5 add 3,4        r0 -&gt; vn 5 add 3,4 
+return vn 5               return vn 5</code></pre>
+</section>
+<section id="check-more-then-one-program-all-programs-at-once" class="level2">
+<h2 class="anchored" data-anchor-id="check-more-then-one-program-all-programs-at-once">check more then one program (all programs at once)</h2>
+<p>This requires a proof that the two programs get the same result - this is an active research question -</p>
+<p>some success but not easy</p>
+<p>not used in production</p>
+</section>
+<section id="best-we-can-do-is-generate-lots-of-programs-check-each-one" class="level2">
+<h2 class="anchored" data-anchor-id="best-we-can-do-is-generate-lots-of-programs-check-each-one">best we can do is generate lots of programs check each one</h2>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR
+A[Virtual code]
+B[Register allocator]
+C[Machine code]
+D[Checker]
+E[Fuzzing engine]
+A--&gt; B
+B--&gt; C
+C --&gt; D
+D --&gt; E
+E --&gt; A
+A --&gt; D
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>We could use the fuzzer to generate random programs or we could use a test set</p>
+</section>
+<section id="algorithm-linear-in-number-of-instructions" class="level2">
+<h2 class="anchored" data-anchor-id="algorithm-linear-in-number-of-instructions">algorithm (linear in number of instructions)</h2>
+<p>for each instruction we need to form pairs - virtual and physical register that holds the same value</p>
+<p>for instruction v and p, check that the arguments are equal, if not fail add the pair dest of v == dest of p</p>
+<p>does not matter what the original op code was, just need register names</p>
+</section>
+<section id="more-general" class="level2">
+<h2 class="anchored" data-anchor-id="more-general">more general</h2>
+<p>Treat the allocated program as containing:</p>
+<ol type="1">
+<li>Spill <spillslot>, <cpu register="">: copy data (symbol representing virtual register) from a register to a spill slot.</cpu></spillslot></li>
+<li>Reload <cpu register="">, <spillslot>: copy data from a spill slot to a register.</spillslot></cpu></li>
+<li>copy <cpu register="">, <cpu register="">: move data from one CPU register to another (N.B.: only regalloc-inserted moves are recognized as a Move, not moves in the original input program.)</cpu></cpu></li>
+<li>Op read:<cpu register="" list="">, read_orig:<virtual register="" list=""> write:<cpu register="" list=""> write_orig:<virtual register="" list="">: some arbitrary operation that reads some registers and writes some other registers.</virtual></cpu></virtual></cpu></li>
+</ol>
+<p>Run the value number over this:</p>
+<p>state: for each physical register, and spill slot</p>
+<p>we need either:</p>
+<ol type="1">
+<li>the virtual register name</li>
+<li>unknown -<br>
+</li>
+<li>conflicted if it has more then one virtual register</li>
+</ol>
+</section>
+<section id="steps-still-no-control-flow" class="level2">
+<h2 class="anchored" data-anchor-id="steps-still-no-control-flow">steps (still no control flow )</h2>
+<p>When we see a Spill, Reload, or Move, we copy the symbolic state from the source location (register or spill slot) to the destination location.</p>
+<p>When we see an Op, we do some checks then some updates:</p>
+<p>For each read (input) register, we examine the symbolic value stored in the given register.</p>
+<p>If that symbol matches the virtual register that the original instruction used, then the allocator has properly conveyed the virtual register’s value to its use here, and thus the allocation is correct</p>
+<p>If not, we can signal a checker error, and look for the bug in our register allocator. why are there no false positives?</p>
+<p>For each write (output) register, we set the symbolic value stored in the given CPU register to be the given virtual register.</p>
+</section>
+<section id="control-flow" class="level2">
+<h2 class="anchored" data-anchor-id="control-flow">control flow</h2>
+<p>We can use data flow and a lattice</p>
+<p>here is the lattice</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+A[Unknown]
+B[VR0]
+C[VR1]
+D[VR2]
+E[Conflicted]
+A--&gt;B
+A--&gt;C
+A--&gt;D
+B --&gt;E
+C--&gt; E
+D--&gt; E
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="now-for-the-data-flow" class="level2">
+<h2 class="anchored" data-anchor-id="now-for-the-data-flow">now for the data flow</h2>
+<p>We start out with all physical registers and spill slots as ‘unknown’ At each join point move down the lattice</p>
+<p>conflicted is ok, so long as it is not used</p>
+<p>Since the number of physical registers and spill slots is finite we can can merge all of them at the top of each basic block.</p>
+<p>like usual we might pick a good order to process basic blocks</p>
+</section>
+<section id="how-about-an-example" class="level2">
+<h2 class="anchored" data-anchor-id="how-about-an-example">How about an example:</h2>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+A[p0-&gt;v1, [sp+4] -&gt; v2]
+B[p0-&gt;v9, [sp+4] -&gt; v2]
+C["top,
+   reload p0 from  [sp+4]]
+A--&gt; C
+B --&gt; C
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>at the top of C, we see that physical p0 is conflicted -<br>
+but that is not a error</p>
+<p>after the reload we find it contains v2</p>
+</section>
+<section id="tracing-pointers--" class="level2">
+<h2 class="anchored" data-anchor-id="tracing-pointers--">tracing pointers -</h2>
+<p>Since we know what virtual registers are in each spill-slot, and virtual registers have types we can tell which spill slots contain pointers</p>
+<p>suppose we have a spot where we might call a gc, we could force spilling of all live vrs that contain a pointer and then tell the gc which spill locations to consider</p>
+
+
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -364,18 +629,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -407,7 +661,29 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
       var filterRegex = new RegExp("https:\/\/normrubin\.github\.io\/");
@@ -415,7 +691,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -755,7 +1031,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/junk.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/edit/main/lectures/ra-checking.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
 </div>

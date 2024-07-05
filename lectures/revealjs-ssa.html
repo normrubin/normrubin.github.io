@@ -8,9 +8,9 @@
 <link href="../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.4.557">
+  <meta name="generator" content="quarto-1.5.53">
 
-  <title>EECE7398 Fall 2024 - 6 Static single Assignment</title>
+  <title>EECE7398 Fall 2024 – 6 Static single Assignment</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -325,7 +325,7 @@
   <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
   <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
   <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
-<meta property="og:title" content="EECE7398 Fall 2024 - 6 Static single Assignment">
+<meta property="og:title" content="6 Static single Assignment – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -568,8 +568,7 @@ B2["
 </div>
 </div>
 </div>
-</div>
-</div>
+</div></div>
 <p>we cannot put instructions on edges, but we can add to prev block</p>
 </section>
 <section id="critical-edges" class="slide level2">
@@ -601,8 +600,7 @@ A0 --&gt; A2
 </div>
 </div><div class="column">
 <p>b2 = b0?</p>
-</div>
-</div>
+</div></div>
 <p>The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop</p>
 </section>
 <section id="critical-edge-splitting" class="slide level2">
@@ -714,8 +712,7 @@ d--&gt; l
 </div>
 </div><div class="column">
 <p>We need phi functions for this def of x in d and h, where else? 3 more</p>
-</div>
-</div>
+</div></div>
 <div class="fragment">
 <p>we need to iterate and keep adding phi nodes</p>
 </div>
@@ -864,8 +861,7 @@ L4 --&gt; L7
 </div>
 </div>
 </div>
-</div>
-</div>
+</div></div>
 </section>
 <section id="dominance-frontiers" class="slide level2">
 <h2>dominance frontiers</h2>
@@ -932,8 +928,7 @@ L4 --&gt; L7
 </div>
 </div>
 </div>
-</div>
-</div>
+</div></div>
 </section>
 <section id="add-phi-nodes" class="slide level2">
 <h2>add phi nodes</h2>
@@ -1028,8 +1023,7 @@ L9 --&gt; L3
 </div>
 </div>
 </div>
-</div>
-</div>
+</div></div>
 </section>
 <section id="the-arity-of-phi-functions" class="slide level2">
 <h2>The arity of phi-functions</h2>
@@ -1109,8 +1103,7 @@ a1 -  any
 
 update the uses of a1 
 no change </code></pre>
-</div>
-</div>
+</div></div>
 </section>
 <section id="converting-from-ssa" class="slide level2">
 <h2>Converting from SSA</h2>
@@ -1407,18 +1400,7 @@ y2 = phi(y1, x2)
         }
         return false;
       }
-      const clipboard = new window.ClipboardJS('.code-copy-button', {
-        text: function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
-          for (const childEl of codeEl.children) {
-            if (isCodeAnnotation(childEl)) {
-              childEl.remove();
-            }
-          }
-          return codeEl.innerText;
-        }
-      });
-      clipboard.on('success', function(e) {
+      const onCopySuccess = function(e) {
         // button target
         const button = e.trigger;
         // don't keep focus
@@ -1450,7 +1432,29 @@ y2 = phi(y1, x2)
         }, 1000);
         // clear code selection
         e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
       });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        // For code content inside modals, clipBoardJS needs to be initialized with a container option
+        // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
         var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
         var mailtoRegex = new RegExp(/^mailto:/);
           var filterRegex = new RegExp("https:\/\/normrubin\.github\.io\/");
@@ -1458,7 +1462,7 @@ y2 = phi(y1, x2)
             return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }
         // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
         for (var i=0; i<links.length; i++) {
           const link = links[i];
           if (!isInternal(link.href)) {
