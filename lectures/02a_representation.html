@@ -64,8 +64,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/02b_bril.html" rel="next">
-<link href="../lectures/01a_performance_measurement.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -154,7 +152,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/02a_representation.html">2 Representation of programs</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">2 Representation of programs</h1>
 </div>
@@ -178,7 +176,7 @@ window.Quarto = {
 <p>The representation of a program</p>
 <p>What we read in and read out when transforming a program.</p>
 <p>What kind of properties make a good representation?</p>
-<div id="066f3914" class="cell" data-execution_count="1">
+<div id="a33e956d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os </span>
@@ -490,7 +488,7 @@ for block in blocks:
 </section>
 <section id="how-to-look-at-a-bril-program" class="level2">
 <h2 class="anchored" data-anchor-id="how-to-look-at-a-bril-program">How to look at a Bril program</h2>
-<div id="2667db1b" class="cell" data-execution_count="2">
+<div id="6c369edd" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  bril_program <span class="op">=</span> f.read()</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(bril_program)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -939,18 +937,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../lectures/01a_performance_measurement.html" class="pagination-link" aria-label="__  Performance and Measurement">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">__ Performance and Measurement</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../lectures/02b_bril.html" class="pagination-link" aria-label="_ Intro to Bril">
-        <span class="nav-page-text">_ Intro to Bril</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

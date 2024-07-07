@@ -548,7 +548,7 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 </section>
 <section id="how-well-do-compilers-do" class="slide level2">
 <h2>How well do compilers do</h2>
-<p>At the scale of datacenters, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
+<p>At the scale of data-centers, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
 <p><a href="https://proebsting.cs.arizona.edu/law.html">proebsting’s law</a></p>
 <p>Compiler Advances Double Computing Power Every 18 Years.<br>
 while hardware computing horsepower doubles every 18 months. How would you prove this?</p>
@@ -565,16 +565,14 @@ while hardware computing horsepower doubles every 18 months. How would you prove
 <ol type="1">
 <li>using higher level constructs</li>
 <li>safety checks (e.g., array bounds checks)</li>
-<li>writing clean, simple code</li>
-</ol>
-<ol type="a">
-<li>no benefit to applying loop unrolling by hand</li>
-</ol>
-<ol type="1">
+<li>writing clean, simple code (no benefit to applying loop unrolling by hand)</li>
 <li>Encourage ADT’s that are as efficient as primitive types</li>
-<li>Benefit: cleaner, higher level code gets written</li>
 </ol>
-<p>The main problem with performance is how to chose the algorithm</p>
+</section>
+<section class="slide level2">
+
+<p>Over time hardware has become more of a challenge for compilers, for example caches are not predictable at compile time. So compilers have to guess</p>
+<p>And hardware can ignore features of the compiler can deal with them - for example interlock</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
