@@ -1,5 +1,5 @@
 ---
-title: "EECS7398 Weekly Schedule"
+title: "EECS7398 Weekly Schedule fa 2024"
 format: html
 tbl-colwidths: [10,20,20,20, 15, 15 ]
 ---
@@ -9,177 +9,39 @@ tbl-colwidths: [10,20,20,20, 15, 15 ]
 
 Since the is the first time this course is offered.
 This is a tentative schedule.
-
-::: {.callout-warning}
-Need to figure out where discussions are kept. Is it on github? or in canvas?
 :::
 
-|week  | day     | Date    | topic  | discussions | Due |
-|------|---------|---------|--------|----         | ----|
-| 1    |Friday|Sept  6|[Compiler overview and structure](./lectures/010_compiler_overview.qmd) |
 
-|      |         |         |        |             |     |
-|------|---------|---------|--------|----         | ----|
-|2     | Tuesday | Sept 10 |[Performance Measurement](./lectures/01a_performance_measurement.qmd)|| [hw0](homework/hw0)
+|week  | Date    | topic  | papers | due | discussions|
+-------|---------|--------| -------| ----| -----------|
+| 1    |Sept  6  |Compiler overview and structure
+| 2    |Sept 10  |Performance Measurement| p1
+|2     |Sept 13  |Representing programs
+|3     |Sept 17  |Overview of Bril   ||
+ 3     |Sept 20  |Local analysis and optimization||
+ 4     |Sept 24  | Value numbering    ||  hw1 
+ 4     |Sept 27  |Data flow
+ 5     |Oct 1    |Global analysis      hw2 
+ 5     |Oct 4    |loop invariant code motion| p2
+ 6     | Oct 8  |Static single assignment  || hw3
+ 6     | Oct 11| Global value numbers
+ 7   | Oct 15 |LLVM  | p3 
+ 7   | Oct 18 |      ||  project proposal
+ |8    | Oct 22 |GPU Compilers||  hw 5
+ |8    | Oct 25 | Classical loop optimizations
+ |9    | Oct 29 |
+ |9    | Nov 1 | MLIR   extra hw6
+ |10   | Nov 5 | | p4 
+ |10  | Nov 8 | Interprocedural Analysis p5
+|11   | Nov 12  | papers | |
+|11  | Nov 15  | [Memory Management]
+ |12   | Nov 19 | papers   | |
+ |12   | Nov 22  |  
+ |13  | Nov 26  |  papers 
+ |13  | Nov 29 | **Thanksgiving**  | |
+ |14  |  Dec 3 | Dynamic compilers
+ |14  |  Dec 6 |Polyhedral analysis 
 
-
-paper 1 - [Producing Wrong Data Without Doing Anything Obviously Wrong!](https://dl.acm.org/citation.cfm?id=1508275)
-Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.
-
-LEADER: Norm using Adrian's blog)
-
-[SIGPLAN Empirical Evaluation Guidelines](https://www.sigplan.org/Resources/EmpiricalEvaluation/)
-
-
-
-|      |         |         |        |             |     |
-|------|---------|---------|--------|----         | ----|
-|2  | Friday  | Sept 13  |[Representing programs](./lectures/02a_representation.qmd)| |
-
-
-
-|      |         |         |        |             |     |
-|------|---------|---------|--------|----         | ----|
-|3   | Tuesday | Sept 17 | [Overview of Bril](./lectures/02b_bril.qmd)  |
-
-|      |         |         |        |             |     |
-|------|---------|---------|--------|----         | ----|
- 3   | Friday  | Sept 20 | [Local analysis and optimization](./lectures/03_local.qmd)  
-
-|      |         |         |        |             |     |
-|------|---------|---------|--------|----         | ----|
- 4  | Tuesday | Sept 24    | [Value numbering](./lectures 03b_local_value_numbering/qmd) | |[hw1](homework/1.hw.qmd)
-
-|      |         |         |        |             |     |
-|------|---------|---------|--------|----         | ----|
- 4   | Friday  | Sept 27 |  [Data flow](./lectures/04_data_flow.qmd)
-
-
-|      |         |         |        |             |     |
-|------|---------|---------|--------|----         | ----|
- 5  | Tuesday | Oct 1 | [Global analysis](./lectures/05_global.qmd)|| [hw2](homework/2_hw.qmd)
-
- |      |         |         |       |             |     |
-|------|---------|---------|--------|----         | ----|
- 5   | Friday  | Oct 4 |   [loop invariant code motion](./lectures/05b_licm.qmd)
-
-
-paper 2 - [iterative data-flow analysis, revisited](https://repository.rice.edu/server/api/core/bitstreams/790ce776-44cf-4474-8f60-4c1f5959ee74/content)
-Cooper, Keith D.; Harvey, Timothy J.; Kennedy, Ken (2004-03-26) [November 2002]. pldi 2002
-  
-  
- |      |         |         |       |             |     |
-|------|---------|---------|--------|----         | ----|
- 6  | Tuesday | Oct 8  |[Static single assignment](./lectures/06_ssa.qmd)
- 
-Dynamo: A Transparent Dynamic Optimization System Vasanth Bala vas@hpl.hp.com 
-chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://dl.acm.org/doi/pdf/10.1145/349299.349303
-
-
- |      |         |         |       |             |     |
-|------|---------|---------|--------|----         | ----|
- 6  | Friday  | Oct 11 | continued 
- Global value numbers and redundant computations
-chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://dl.acm.org/doi/pdf/10.1145/73560.73562
-
- |      |         |         |       |             |     |
-|------|---------|---------|--------|----         | ----|
- |7   | Tuesday | Oct 15 |[LLVM](./lectures/07_llvm.ipynb)
-
-
- https://dl.acm.org/doi/10.1145/1064978.1065042 Threads cannot be implemented as a library
- 
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |7   | Friday | Oct 18 | continued
-
- final project propsal ????
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |8| Tuesday | Oct 22 |  [Classical loop optimizations](./lectures/)
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |8   | Friday | Oct 25 |[Polyhedral analysis](./lectures/09_poly.qmd)
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |9   | Tuesday | Oct 29  | continued
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |9   | Friday | Nov 1 | [MLIR](./lectures/100_mlir.qmd)
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |10   | Tuesday | Nov 5 | continued  | |
-
- Superoptimizer: A Look at the Smallest Program
-Alexia Massalin. ASPLOS 1987.
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |10  | Friday | Nov 8 | [Interprocedural Analysis](./lectures/110_whole_program.qmd)
-
- Formal Verification of a Realistic Compiler
-Xavier Leroy. CACM in 2009.
-
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
-11   | Tuesday | Nov 12  | continued  | |
-
-Efficient Path Profiling
-Thomas Ball and James R. Larus. MICRO 1996.
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |11  | Friday | Nov 15  | [Memory Management](./lectures/12_memory.qmd)
- An Efficient Implementation of SELF, a Dynamically-Typed Object-Oriented Language Based on Prototypes
-C. Chambers, D. Ungar, and E. Lee. OOPSLA 1989.
-
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |12   | Tuesday | Nov 19 | continued  | |
-
- "Partial Redundancy Elimination" by Jens Knoop, Oliver Rüthing, and Bernhard Steffen
-
-Year: 1992
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |12   | Friday | Nov 22  |  [Dynamic compilers](./lectures/13_dynamic_compilers.qmd)
-
- Formal Verification of a Realistic Compiler
-Xavier Leroy. CACM in 2009.
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |13  | Tuesday | Nov 26  | continued  | |
-
- 
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |13  | Friday | Nov 29 | **Thanksgiving**  | |
-
-  https://dada.cs.washington.edu/research/tr/2017/12/UW-CSE-17-12-01.pdf
- 12-01 TVM:End-to-End Optimization Stack for Deep Learnin
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |14  | Tuesday | Dec 3 |  [GPU Compilers](./lectures/14_gpu_compilers.qmd)
-
- Revealing Compiler Heuristics through Automated Discovery and Optimization, V. Seeker, C. Cummins, M. Cole, B. Franke, K. Hazelwood, H. Leather
-
- |      |         |         |        |            |     |
-|------|---------|---------|--------|----         | ----|
- |14  | Friday | Dec 6 | continued  | |
-
- End-to-end deep learning of optimization heuristics - Chris Cummins, Pavlos Petoumenos, Zheng Wang, and Hugh Leather PACT 2017.
- https://ieeexplore.ieee.org/document/8091247
 
 final project deadline ------ 
         
@@ -195,22 +57,56 @@ https://dl.acm.org/doi/pdf/10.1145/3620665.3640366
 PyTorch 2: Faster Machine Learning Through Dynamic Python Bytecode Transformation and Graph Compilation ASPLOS '24: Proceedings of the 29th ACM International Conference on Architectural Support for Programming Languages and Operating Systems, Volume 2
 
 
-https://scontent-bos5-1.xx.fbcdn.net/v/t39.2365-6/448997590_1496256481254967_2304975057370160015_n.pdf?_nc_cat=106&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=4Yn8V9DFdbsQ7kNvgEwOdGk&_nc_ht=scontent-bos5-1.xx&oh=00_AYD-0YTCXuS11WU8rqC3N2aA-AfiflOptch_BD__V1V3xA&oe=6684630D
 
-Meta Large Language Model Compiler: Foundation Models of Compiler Optimization Chris Cummins†, Volker Seeker†, Dejan Grubisic, Baptiste Rozière, Jonas Gehring, Gabriel Synnaeve, Hugh Leather†
+
+Meta Large Language Model Compiler: Foundation Models of Compiler Optimization Chris Cummins†, Volker Seeker†, Dejan Grubisic, Baptiste Rozière, Jonas Gehring, Gabriel Synnaeve, Hugh Leather /https://scontent-bos5-1.xx.fbcdn.net/v/t39.2365-6/448997590_1496256481254967_2304975057370160015_n.pdf?_nc_cat=106&ccb=1-7&_nc_sid=3c67a6&_nc_ohc=4Yn8V9DFdbsQ7kNvgEwOdGk&_nc_ht=scontent-bos5-1.xx&oh=00_AYD-0YTCXuS11WU8rqC3N2aA-AfiflOptch_BD__V1V3xA&oe=6684630D
 
 
 
 ---- papers 
 
-1987 
-[Superoptimizer: A Look at the Smallest Program](https://dl.acm.org/doi/abs/10.1145/36177.36194)
+
+paper 1 - [Producing Wrong Data Without Doing Anything Obviously Wrong!]
+
+paper 2 - [iterative data-flow analysis, revisited](https://repository.rice.edu/server/api/core/bitstreams/790ce776-44cf-4474-8f60-4c1f5959ee74/content)
+Cooper, Keith D.; Harvey, Timothy J.; Kennedy, Ken (2004-03-26) [November 2002]. pldi 2002
+
+paper 3  https://dl.acm.org/doi/10.1145/1064978.1065042 Threads cannot be implemented as a library
+
+paper 4 [Superoptimizer: A Look at the Smallest Program](https://dl.acm.org/doi/abs/10.1145/36177.36194)
 Alexia Massalin. ASPLOS 1987.
+
+paper 5 pappe 5 Formal Verification of a Realistic Compiler
+Xavier Leroy. CACM in 2009.
+
+
+paper 6 Efficient Path Profiling
+Thomas Ball and James R. Larus. MICRO 1996.
+ 
+ paper 7 An Efficient Implementation of SELF, a Dynamically-Typed Object-Oriented Language Based on Prototypes
+C. Chambers, D. Ungar, and E. Lee. OOPSLA 1989.
+
+paper 8  "Partial Redundancy Elimination" by Jens Knoop, Oliver Rüthing, and Bernhard Steffen
+
+ Formal Verification of a Realistic Compiler
+Xavier Leroy. CACM in 2009.
+
+ paper [Dynamo: A Transparent Dynamic Optimization System] (https://dl.acm.org/doi/pdf/10.1145/349299.349303)
+ Vasanth Bala
+
+   https://dada.cs.washington.edu/research/tr/2017/12/UW-CSE-17-12-01.pdf
+ 12-01 TVM:End-to-End Optimization Stack for Deep Learnin
+
+  Revealing Compiler Heuristics through Automated Discovery and Optimization, V. Seeker, C. Cummins, M. Cole, B. Franke, K. Hazelwood, H. Leather
+
+
+
+ End-to-end deep learning of optimization heuristics - Chris Cummins, Pavlos Petoumenos, Zheng Wang, and Hugh Leather PACT 2017.
+ https://ieeexplore.ieee.org/document/8091247
 
 
 1988 
-[Global value numbers and redundant computations](/https://dl.acm.org/doi/pdf/10.1145/73560.73562)
-Rosen, B.K., Wegman, M.N. and Zadeck, F.K., popl 1988
+
 
 2000
 
@@ -282,22 +178,21 @@ David F. Bacon, Perry Cheng, and V. T. Rajan. OOPSLA 2004.
 Type-Based Alias Analysis
 Amer Diwan, Kathryn S. McKinley, and J. Eliot B. Moss.
 
-Aho, Alfred V., Monica S. Lam, Ravi Sethi, and Jeffrey D. Ullman. "Compilers: Principles, Techniques, and Tools."
-Alpern, Bowen, Mark N. Wegman, and F. Kenneth Zadeck. "Detecting equality of variables in programs." ACM SIGPLAN Notices 23.7 (1988): 1-11.
 Bodik, Rastislav, Rajiv Gupta, and Vivek Sarkar. "ABC: Path-sensitive dynamic test generation." ACM SIGPLAN Notices 35.5 (2000): 61-73.
-Chaitin, Gregory J., et al. "Register allocation via coloring." Computer languages 6.1 (1981): 47-57.
+
 Cooper, Keith D., and Linda Torczon. "Tiling for improved register usage." ACM SIGPLAN Notices 28.6 (1993): 279-290.
 Cytron, Ron, et al. "Efficiently computing static single assignment form and the control dependence graph." ACM Transactions on Programming Languages and Systems (TOPLAS) 13.4 (1991): 451-490.
-Ertl, M. Anton. "Threaded code." ACM Computing Surveys (CSUR) 32.2 (2000): 290-318.
+Ertl, M. Anton. "Threaded code." ACM Computing Surveys (CSUR) 32.2 (2000): 290-318
 Ferrante, Jeanne, Karl J. Ottenstein, and Joe D. Warren. "The program dependence graph and its use in optimization." ACM Transactions on Programming Languages and Systems (TOPLAS) 9.3 (1987): 319-349.
 Ganapathi, Madhusudhan, et al. "Experience with the MIPS compiler." ACM SIGPLAN Notices 21.7 (1986): 175-187.
-Goldberg, David. "What every computer scientist should know about floating-point arithmetic." ACM Computing Surveys (CSUR) 23.1 (1991): 5-48.
+
+Go
 Hall, Mary W., and Ken Kennedy. "Efficient call graph analysis." ACM Letters on Programming Languages and Systems (LOPLAS) 1.3 (1992): 227-242.
-Johnson, Mark. "Attribute grammars and the lambda calculus." ACM SIGPLAN Notices 18.6 (1983): 39-45.
+
 Kennedy, Ken, and Kathryn S. McKinley. "Loop distribution with arbitrary control flow." ACM SIGPLAN Notices 29.6 (1994): 140-151.
 Knoop, Jens, Oliver Rüthing, and Bernhard Steffen. "Lazy code motion." ACM SIGPLAN Notices 27.7 (1992): 224-234.
 Lamport, Leslie. "The parallel execution of DO loops." Communications of the ACM 17.2 (1974): 83-93.
-Muchnick, Steven S. "Advanced compiler design and implementation." Elsevier, 1997.
+
 
 Sarkar, Vivek. "Partitioning parallel programs for macro-dataflow." ACM SIGPLAN Notices 23.7 (1988): 98-106.
 Shivers, Olin. "Control-flow analysis in Scheme." ACM SIGPLAN Notices 23.7 (1988): 164-174.
@@ -309,16 +204,14 @@ Yaccarino, Joseph, and Keshav Pingali. "Data-flow analysis for distributed-memor
 Zadeck, F. Kenneth, and Olivier Rüthing. "Incremental data flow analysis." ACM SIGPLAN Notices 23.7 (1988): 132-146.
 
 
-Here is a revised list of 25 important papers, focusing on middle-end optimizations, broader compiler topics, garbage collection, and parallelism, and excluding books:
-
 
 2. Bodik, Rastislav, Rajiv Gupta, and Vivek Sarkar. "ABC: Path-sensitive dynamic test generation." ACM SIGPLAN Notices 35.5 (2000): 61-73.
-3. Chaitin, Gregory J., et al. "Register allocation via coloring." Computer languages 6.1 (1981): 47-57.
+
 4. Cooper, Keith D., and Linda Torczon. "Tiling for improved register usage." ACM SIGPLAN Notices 28.6 (1993): 279-290.
 5. Cytron, Ron, et al. "Efficiently computing static single assignment form and the control dependence graph." ACM Transactions on Programming Languages and Systems (TOPLAS) 13.4 (1991): 451-490.
 6. Ferrante, Jeanne, Karl J. Ottenstein, and Joe D. Warren. "The program dependence graph and its use in optimization." ACM Transactions on Programming Languages and Systems (TOPLAS) 9.3 (1987): 319-349.
 7. Ganapathi, Madhusudhan, et al. "Experience with the MIPS compiler." ACM SIGPLAN Notices 21.7 (1986): 175-187.
-8. Goldberg, David. "What every computer scientist should know about floating-point arithmetic." ACM Computing Surveys (CSUR) 23.1 (1991): 5-48.
+
 9. Hall, Mary W., and Ken Kennedy. "Efficient call graph analysis." ACM Letters on Programming Languages and Systems (LOPLAS) 1.3 (1992): 227-242.
 10. Kennedy, Ken, and Kathryn S. McKinley. "Loop distribution with arbitrary control flow." ACM SIGPLAN Notices 29.6 (1994): 140-151.
 11. Knoop, Jens, Oliver Rüthing, and Bernhard Steffen. "Lazy code motion." ACM SIGPLAN Notices 27.7 (1992): 224-234.
@@ -326,62 +219,198 @@ Here is a revised list of 25 important papers, focusing on middle-end optimizati
 13. McKinley, Kathryn S., Steve Carr, and Chau-Wen Tseng. "Improving data locality with loop transformations." ACM Transactions on Programming Languages and Systems (TOPLAS) 18.4 (1996): 424-453.
 
 15. Sarkar, Vivek. "Partitioning parallel programs for macro-dataflow." ACM SIGPLAN Notices 23.7 (1988): 98-106.
+
 16. Shivers, Olin. "Control-flow analysis in Scheme." ACM SIGPLAN Notices 23.7 (1988): 164-174.
+
 17. Steensgaard, Bjarne. "Points-to analysis in almost linear time." ACM SIGPLAN Notices 31.5 (1996): 32-41.
-18. Tarjan, Robert E. "Depth-first search and linear graph algorithms." SIAM journal on computing 1.2 (1972): 146-160.
+
+
 19. Tichy, Walter F. "Smart recompilation." ACM Transactions on Programming Languages and Systems (TOPLAS) 8.3 (1986): 273-291.
+
 20. Wolf, Michael E., and Monica S. Lam. "A data locality optimizing algorithm." ACM SIGPLAN Notices 26.6 (1991): 30-44.
+
 21. Appel, Andrew W. "Simple generational garbage collection and fast allocation." Software: Practice and Experience 19.2 (1989): 171-183.
-22. Boehm, Hans-Juergen, and Mark Weiser. "Garbage collection in an uncooperative environment." Software: Practice and Experience 18.9 (1988): 807-820.
-23. Dijkstra, Edsger W., et al. "On-the-fly garbage collection: An exercise in cooperation." Communications of the ACM 21.11 (1978): 965-975.
-24. Bacon, David F., Perry Cheng, and V. T. Rajan. "A real-time garbage collector with low overhead and consistent utilization." ACM SIGPLAN Notices. Vol. 38. No. 5. 2003.
-25. Lea, Doug. "A Java fork/join framework." Proceedings of the ACM 2000 conference on Java Grande. 2000.
 
 
-Here is a list of 15 papers that discuss the differences and challenges between compiling for CPUs and GPUs, focusing on performance optimization, memory management, parallelism, and execution models:
+23. 
+Dijkstra, Edsger W., et al. "On-the-fly garbage collection: An exercise in cooperation." Communications of the ACM 21.11 (1978): 965-975.
+24. 
+Bacon, David F., Perry Cheng, and V. T. Rajan. "A real-time garbage collector with low overhead and consistent utilization." ACM SIGPLAN Notices. Vol. 38. No. 5. 2003.
 
-1. **Fatahalian, Kayvon, and Mike Houston.** "A closer look at GPUs." *Communications of the ACM* 51.10 (2008): 50-57.
+
+
+Wegman & Zadeck, Constant Propagation with Conditional Branches, ACM Transactions on Programming Languages and Systems, 13(2):181-210, April 1991.
+
+
 2. **Garland, Michael, et al.** "Parallel computing experiences with CUDA." *IEEE Micro* 28.4 (2008): 13-27.
-3. **Ryoo, Seongbeom, et al.** "Optimization principles and application performance evaluation of a multithreaded GPU using CUDA." *Proceedings of the 13th ACM SIGPLAN Symposium on Principles and practice of parallel programming.* 2008.
-4. **Hong, Sunpyo, and Hyesoon Kim.** "An analytical model for a GPU architecture with memory-level and thread-level parallelism awareness." *ACM SIGARCH Computer Architecture News.* Vol. 37. No. 3. 2009.
+
+
+| Date    | topic  | due | discussions|
+|---------|--------| ----| -----------|
+|Sept  6  |[Compiler overview and structure](lectures/010_compiler_overview.qmd)
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Sept 10  |Performance Measurement
+Sept 13  |Representing programs         
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Sept 17  |Overview of Bril                   | hw0 
+Sept 20  |Local analysis and optimization
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Sept 24  | Value numbering                    |hw1          
+Sept 27  |Data flow
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 1    |Global analysis                     |hw2
+Oct 4    |loop invariant code motion
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 8   |Static single assignment              |hw3
+Oct 11  |LLVM
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 15  |Global value number                  |hw4
+Oct 18  |testing reg allocator                |project proposal 
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 22  | papers 
+Oct 25  | GPU Compilers
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 29  | papers                             |hw5
+Nov 1   |Dynamic compilers
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 5   | papers 
+Nov 8   |  Classical loop optimizations     
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 12  | papers                           |hw6 (extra credit)
+Nov 15   |  Polyhedral analysis 
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 19   | papers 
+Nov 22   | Memory Management
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 26   | papers 
+Nov 29   | **Thanksgiving**  
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Dec 3    |  Interprocedural Analysis 
+Dec 6    |  MLIR  
+
+
+02a_representation.qmd.saved
+02b_bril.qmd
+03_local.qmd
+05_global.qmd
+09_poly.qmd
+13_dynamic_compilers.qmd
+ra-checking.qmd
+
+02a_representation.quarto_ipynb  
+02b_bril_qmd
+04_data_flow.qmd
+06_ssa.qmd
+100_mlir.qmd
+14_gpu_compilers.qmd
+01a_performance_measurement.qmd
+02b_bril.html
+02b_bril.qmd.saved
+05b_licm.qmd
+07_llvm.ipynb
+110_whole_program.qmd
+bril.qmd
+02a_representation.qmd
+02b_bril.ipynb
+03b_local_value_numbering.qmd  
+05c_pre.qmd
+08_classic_loop_ops.qmd
+12_memory.qmd
+images
+
+
+
+
+
+
+
+papers new 
+
+[Retargeting and Respecializing GPU Workloads for Performance Portability] (https://ieeexplore.ieee.org/document/10444828)
+Ivanov, I.R., Zinenko, O., Domke, J., Endo, T. and Moses, W.S., cgo 2024 
+
+
+[LOOPer: A Learned Automatic Code Optimizer For Polyhedral Compilers](https://arxiv.org/abs/2403.11522}
+Merouani, M., Boudaoud, K.A., Aouadj, I.N., Tchoulak, N., Bernou, I.K., Benyamina, H., Tayeb, F.B.S., Benatchba, K., Leather, H. and Baghdadi, R. arXiv preprint arXiv:2403.11522
+after polyhedrial
+
+
+papers classics 
+
+[Improving Data Locality with Loop Transformations](https://dl.acm.org/doi/pdf/10.1145/233561.233564)
+McKinley, Carr, & Tseng toplas 1996
+
+
+[Adaptive Online Context-Sensitive Inlining](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1191550)
+K. Hazelwood, and D. Grove cgo 2003 
+
+[High-performance code generation for stencil computations on GPU architectures.](https://www.cs.colostate.edu/~pouchet/doc/ics-article.12.pdf)
+*Holewinski, Jan, Louis-Noël Pouchet, and P. Sadayappan. supercomputing 2012
+
+
+
+Context Threading: A flexible and efficient dispatch technique for virtual machine interpreters
+chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.cs.toronto.edu/syslab/pubs/demkea_context.pdf  Marc Berndl, Benjamin Vitale, Mathew Zaleski and Angela Demke Brown
+
+
+[Program optimization space pruning for a multithreaded gpu](https://dl.acm.org/doi/pdf/10.1145/1356058.1356084)
+Shane Ryoo, Christopher I. Rodrigues, Sam S. Stone, Sara S. Baghsorkhi, Sain-Zee Ueng, John A. Stratton, and Wen-mei W. Hwu cgo 2008
+
+[Detecting equality of variables in programs](https://dl.acm.org/doi/10.1145/73560.73561)
+ Alpern, Bowen, Mark N. Wegman, and F. Kenneth Zadeck.   ?? 
+
+
+
+
+ https://dl.acm.org/doi/pdf/10.1145/1133255.1134000
+ DieHard: probabilistic memory safety for unsafe languages
+ 
+maybes 
+
+[The Garbage Collection Advantage: Improving Program Locality](https://dl.acm.org/doi/10.1145/1028976.1028983)
+X. Huang, S. M. Blackburn, K. S. McKinley, J. E. B. Moss, Z. Wang, and P. Cheng, oopsla 2004
+
+Pradelle, B., Baskaran, M., Henretty, T., Meister, B., Konstantinidis, A. and Lethin, R., 2016, September. Polyhedral compilation for energy efficiency. In 2016 IEEE High Performance Extreme Computing Conference (HPEC) (pp. 1-7). IEEE.  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7761595
+
 5. **Baskaran, Muthu Manikandan, et al.** "Automatic data movement and computation mapping for multi-level parallel architectures with explicitly managed memories." *Proceedings of the 13th ACM SIGPLAN Symposium on Principles and practice of parallel programming.* 2010.
-6. **Diamos, Gregory, and Sudhakar Yalamanchili.** "Harmony: an execution model and runtime for heterogeneous many core systems." *Proceedings of the 17th international symposium on High performance distributed computing.* 2008.
-7. **Kerr, Andrew, Gregory Diamos, and Sudhakar Yalamanchili.** "A characterization and analysis of PTX kernels." *IEEE International Symposium on Workload Characterization (IISWC).* 2009.
-8. **Wong, Hing-Cheong, et al.** "Pangaea: a tightly-coupled IA32 heterogeneous chip multiprocessor." *ACM SIGARCH Computer Architecture News.* Vol. 36. No. 3. 2008.
-9. **Magni, Alessandro, et al.** "Exploiting user-defined kernel threads on GPUs." *ACM Transactions on Architecture and Code Optimization (TACO)* 8.3 (2011): 1-29.
-10. **Pai, Siddhartha, et al.** "Improving GPGPU concurrency with elastic kernels." *Proceedings of the eighteenth international conference on Architectural support for programming languages and operating systems.* 2013.
-11. **Zhang, Yixin, et al.** "Synk: a framework for optimal synchronization selection." *Proceedings of the 19th International Conference on Architectural Support for Programming Languages and Operating Systems.* 2014.
-12. **Baghsorkhi, S. Shams, et al.** "An adaptive performance modeling tool for GPU architectures." *ACM SIGPLAN Notices* 45.5 (2010): 105-114.
-13. **Boyd, Eric, et al.** "Characterization of performance of data-parallel kernels on Intel's experimental single-chip cloud computer." *Proceedings of the 2011 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS).* 2011.
-14. **Aila, Timo, and Samuli Laine.** "Understanding the efficiency of ray traversal on GPUs." *Proceedings of the conference on High Performance Graphics 2009.* 2009.
-15. **Holewinski, Jan, Louis-Noël Pouchet, and P. Sadayappan.** "High-performance code generation for stencil computations on GPU architectures." *Proceedings of the 26th ACM international conference on Supercomputing.* 2012.
 
-These papers provide insights into the challenges and differences in compiling for CPUs and GPUs, highlighting the architectural differences and how they influence compilation strategies and performance optimizations.
+3. **Ryoo, Seongbeom, et al.** "Optimization principles and application performance evaluation of a multithreaded GPU using CUDA." *Proceedings of the 13th ACM SIGPLAN Symposium on Principles and practice of parallel programming.* 2008.
+
+ 22. Boehm, Hans-Juergen, and Mark Weiser. "Garbage collection in an uncooperative environment." Software: Practice and Experience 18.9 (1988): 807-820.
+possible lectures 
+
+ [cranelift checking correctness in register allocator])(https://cfallin.org/blog/2021/03/15/cranelift-isel-3/) 
+ this is a blog post - after ssa 
 
 
-Baghdadi, S., Größlinger, A. and Cohen, A., 2010. Putting automatic polyhedral compilation for GPGPU to work. In Proceedings of the 15th Workshop on Compilers for Parallel Computers (CPC'10).
+ [Value Numbering](https://www.cs.tufts.edu/~nr/cs257/archive/keith-cooper/value-numbering.pdf)
+ P. Briggs, K. D. Cooper, L. Taylor Simpson,  Software-Practice & Experience, 1997
+ global value numbering in ssa, congruence 
 
-Pradelle, B., Baskaran, M., Henretty, T., Meister, B., Konstantinidis, A. and Lethin, R., 2016, September. Polyhedral compilation for energy efficiency. In 2016 IEEE High Performance Extreme Computing Conference (HPEC) (pp. 1-7). IEEE.
-
-Merouani, M., Boudaoud, K.A., Aouadj, I.N., Tchoulak, N., Bernou, I.K., Benyamina, H., Tayeb, F.B.S., Benatchba, K., Leather, H. and Baghdadi, R., 2024. LOOPer: A Learned Automatic Code Optimizer For Polyhedral Compilers. arXiv preprint arXiv:2403.11522.
-
-
-	Wegman & Zadeck, Constant Propagation with Conditional Branches, ACM Transactions on Programming Languages and Systems, 13(2):181-210, April 1991.
-
-
-    	P. Briggs, K. D. Cooper, L. Taylor Simpson, Value Numbering, Software-Practice & Experience, 27(6): 701-724, 1997
-
-
-        	K. Hazelwood, and D. Grove, Adaptive Online Context-Sensitive Inlining Conference on Code Generation and Optimization, pp. 253-264, San Francisco, CA March 2003.
-
-    	X. Huang, S. M. Blackburn, K. S. McKinley, J. E. B. Moss, Z. Wang, and P. Cheng, The Garbage Collection Advantage: Improving Program Locality, ACM Conference on Object Oriented Programming, Systems, Languages, and Applications (OOPSLA), pp. 69-80, Vancouver, Canada, October 2004.
-
-
-        	McKinley, Carr, & Tseng, Improving Data Locality with Loop Transformations, ACM Transactions on Programming Languages and Systems, 18(4):424-453, July 1996.
-
-
-            https://cfallin.org/blog/2021/03/15/cranelift-isel-3/  cranelift checking correctness in register allocator 
-            uses data flow, value numbering and fuzzing 
-
-            Retargeting and Respecializing GPU Workloads for Performance Portability
-            Ivanov, I.R., Zinenko, O., Domke, J., Endo, T. and Moses, W.S., 2024, March. Retargeting and Respecializing GPU Workloads for Performance Portability. In 2024 IEEE/ACM International Symposium on Code Generation and Optimization (CGO) (pp. 119-132). IEEE.
+ Wilson PR. Uniprocessor garbage collection techniques. InInternational Workshop on Memory Management 1992 Sep 17 (pp. 1-42). Berlin, Heidelberg: Springer Berlin Heidelberg.
