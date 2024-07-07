@@ -178,7 +178,7 @@ Some changes since early 2000's:
 
 ## How well do compilers do 
 
-At	the	scale	of	datacenters,	every	single	performance	percent	matters!	Just	take	a	look	at	Google's	(and	other's)	publicly	available	numbers	on	expenditures	on	datacenters.	We	are	talking	about	billions	of	dollars.	A	single	percent	improvement	can	mean	millions	of	dollars	from	more	program	features	or	improved	utilization.
+At	the	scale	of	data-centers,	every	single	performance	percent	matters!	Just	take	a	look	at	Google's	(and	other's)	publicly	available	numbers	on	expenditures	on	datacenters.	We	are	talking	about	billions	of	dollars.	A	single	percent	improvement	can	mean	millions	of	dollars	from	more	program	features	or	improved	utilization.
 
 
 [proebsting's law](https://proebsting.cs.arizona.edu/law.html)
@@ -205,12 +205,15 @@ Remove performance penalty for:
 
 1. using higher level constructs
 1. safety checks (e.g., array bounds checks)
-1. writing clean, simple code
-  a. no benefit to applying loop unrolling by hand
+1. writing clean, simple code (no benefit to applying loop unrolling by hand)
 1. Encourage ADT’s that are as efficient as primitive types
-1. Benefit: cleaner, higher level code gets written
 
-The main problem with performance is how to chose the  algorithm 
+---
+
+Over time hardware has become more of a challenge for compilers, for example caches are not predictable at compile time. So compilers have to guess 
+
+And hardware can ignore features of the compiler can deal with them - for example interlock
+
 
 
 
