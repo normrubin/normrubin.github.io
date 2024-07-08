@@ -1,5 +1,5 @@
 ---
-title: "__  Performance and Measurement"
+title: "Performance and Measurement"
 format:
   html: default
   revealjs: 
@@ -30,8 +30,10 @@ Prior work in computer system evaluation does not adequately consider measuremen
 1. Measurement bias occurs for all benchmarks and architectures. ​
 1. Measurement bias due to link order can significantly fluctuate conclusions. ​
 1. Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​
-1. o avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​
+1. To avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​
  ---
+
+---
 
 A sample blog post about this paper
 [blog](https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/)
@@ -58,14 +60,16 @@ import numpy as np
 df = pd.read_csv('images/chip_dataset.csv')
 print(df.head())
 
-df_gpu = df[df.Type == 'GPU']
 sns.set_palette("pastel")
-
-
 
 sns.violinplot(x=df["Vendor"], y=np.log(df["Freq (MHz)"]), hue=df['Type'])
 
+
 ```
+
+I might want to take date  into account in these plots
+
+----
 
 A violin plot shows density curves.  The width is the approximate frequency of data points at that value 
 
