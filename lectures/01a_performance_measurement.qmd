@@ -12,11 +12,10 @@ format:
 # Measurement 
 
 
-##example 1
+## example 1
 
-lets look at the paper 
 
-[ Producing Wrong Data Without Doing Anything Obviously Wrong!](<https://dl.acm.org/citation.cfm?id=1508275>) Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.
+[ Producing Wrong Data Without Doing Anything Obviously Wrong!](papers/wrong_data.pdf) Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.
 
 445 references 
 
@@ -42,3 +41,41 @@ A sample blog post about this paper
 [Strangely, Matrix Multiplications on GPUs Run Faster When Given "Predictable" Data!](https://www.thonking.ai/p/strangely-matrix-multiplications)
 
 [SIGPLAN Empirical Evaluation Guidelines](https://www.sigplan.org/Resources/EmpiricalEvaluation/)
+
+
+## violin plots 
+
+[data](https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data)
+
+```{python}
+
+# library & dataset
+import seaborn as sns
+import pandas as pd
+import numpy as np
+
+
+df = pd.read_csv('images/chip_dataset.csv')
+print(df.head())
+
+df_gpu = df[df.Type == 'GPU']
+sns.set_palette("pastel")
+
+
+
+sns.violinplot(x=df["Vendor"], y=np.log(df["Freq (MHz)"]), hue=df['Type'])
+
+```
+
+A violin plot shows density curves.  The width is the approximate frequency of data points at that value 
+
+Best for comparing distributions 
+
+consider ordering the groups 
+
+The details 
+
+1. the white dot represents the median
+1. the thick gray bar in the center represents the inter-quartile range
+1. the thin gray line represents the rest of the distribution, except for points that are determined to be “outliers” using a method that is a function of the inter-quartile range.
+1. On each side of the gray line is a kernel density estimation to show the distribution shape of the data. Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability.
