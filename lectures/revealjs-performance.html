@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.53">
 
-  <title>EECE7398 Fall 2024 – __ Performance and Measurement</title>
+  <title>EECE7398 Fall 2024 – Performance and Measurement</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -322,7 +322,7 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="__ Performance and Measurement – EECE7398 Fall 2024">
+<meta property="og:title" content="Performance and Measurement – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -330,7 +330,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">__ Performance and Measurement</h1>
+  <h1 class="title">Performance and Measurement</h1>
 
 <div class="quarto-title-authors">
 </div>
@@ -339,9 +339,11 @@
 <section>
 <section id="measurement" class="title-slide slide level1 center">
 <h1>Measurement</h1>
-<p>##example 1</p>
-<p>lets look at the paper</p>
-<p><a href="https://dl.acm.org/citation.cfm?id=1508275">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
+
+</section>
+<section id="example-1" class="slide level2">
+<h2>example 1</h2>
+<p><a href="papers/wrong_data.pdf">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
 <p>445 references</p>
 </section>
 <section class="slide level2 scrollable">
@@ -353,14 +355,66 @@
 <li>Measurement bias occurs for all benchmarks and architectures. ​</li>
 <li>Measurement bias due to link order can significantly fluctuate conclusions. ​</li>
 <li>Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​</li>
-<li>o avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​ —</li>
+<li>To avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​ —</li>
 </ol>
+</section>
+<section class="slide level2">
+
 <p>A sample blog post about this paper <a href="https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/">blog</a></p>
 </section>
 <section id="another-example" class="slide level2">
 <h2>another example</h2>
 <p><a href="https://www.thonking.ai/p/strangely-matrix-multiplications">Strangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!</a></p>
 <p><a href="https://www.sigplan.org/Resources/EmpiricalEvaluation/">SIGPLAN Empirical Evaluation Guidelines</a></p>
+</section>
+<section id="violin-plots" class="slide level2">
+<h2>violin plots</h2>
+<p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
+<div id="5ffe72ab" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-stdout">
+<pre><code>   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \
+0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   
+1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   
+2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   
+3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   
+4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   
+
+   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \
+0     45.0             77.0                  122.0      2200.0  Unknown   
+1     35.0            192.0                 4800.0      3200.0  Unknown   
+2     28.0              NaN                    NaN      2600.0    Intel   
+3     80.0            160.0                 1400.0      1800.0    Intel   
+4    125.0            258.0                  758.0      3700.0  Unknown   
+
+  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  
+0    AMD          NaN          NaN          NaN  
+1    AMD          NaN          NaN          NaN  
+2  Intel          NaN          NaN          NaN  
+3  Intel          NaN          NaN          NaN  
+4    AMD          NaN          NaN          NaN  </code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="01a_performance_measurement_files/figure-revealjs/cell-2-output-2.png" width="799" height="429"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>I might want to take date into account in these plots</p>
+</section>
+<section class="slide level2 scrollable">
+
+<p>A violin plot shows density curves. The width is the approximate frequency of data points at that value</p>
+<p>Best for comparing distributions</p>
+<p>consider ordering the groups</p>
+<p>The details</p>
+<ol type="1">
+<li>the white dot represents the median</li>
+<li>the thick gray bar in the center represents the inter-quartile range</li>
+<li>the thin gray line represents the rest of the distribution, except for points that are determined to be “outliers” using a method that is a function of the inter-quartile range.</li>
+<li>On each side of the gray line is a kernel density estimation to show the distribution shape of the data. Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability.</li>
+</ol>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
