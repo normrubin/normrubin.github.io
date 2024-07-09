@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.54">
 
-  <title>EECE7398 Fall 2024 – 2 Representation of programs</title>
+  <title>EECE7398 Fall 2024 – Overview of Bril</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -386,10 +387,7 @@
       margin-right: 0; 
     }
   </style>
-  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
-<meta property="og:title" content="2 Representation of programs – EECE7398 Fall 2024">
+<meta property="og:title" content="Overview of Bril – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -397,330 +395,519 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">2 Representation of programs</h1>
+  <h1 class="title">Overview of Bril</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="how-do-we-represent-programs" class="slide level2">
-<h2>How do we represent programs</h2>
-<p>The representation of a program</p>
-<p>What we read in and read out when transforming a program.</p>
-<p>What kind of properties make a good representation?</p>
-</section>
-<section id="concrete-syntax" class="slide level2">
-<h2>Concrete Syntax</h2>
-<p>One possible representation is called <strong><em>concrete syntax form</em></strong> Programs are text or surface syntax- just what you would type into an editor.</p>
-<pre><code>value = 8
-result = 1
-for i in range(value):
-  result = result + i
-print(result)</code></pre>
-<p>What is good and what is bad about this representation?</p>
-<p>What is the level of abstraction?</p>
-<p>How do you understand the semantics.</p>
-</section>
-<section id="abstract-syntax" class="slide level2">
-<h2>Abstract syntax</h2>
-<p>Tree structure</p>
+<section id="how-to-use-bril-with-real-code" class="slide level2 scrollable">
+<h2>How to use Bril with real code</h2>
 <ol type="1">
-<li>Nodes are parts of the program,</li>
-<li>Edges show how they are connected.</li>
-</ol>
-<p>We can write this as a list or a graph</p>
-<div class="columns">
-<div class="column">
-<pre><code>def pgm():
-    value = 8
-    result = 1
-    for i in range(value):
-        result = result * i
-    print(result)</code></pre>
-</div><div class="column">
-<p><img data-src="images/abst.png"></p>
-</div></div>
-</section>
-<section id="ast-tree-representation" class="slide level2">
-<h2>AST tree representation</h2>
-<p>An AST is a tree structure, nodes like ‘if’, ‘test’, ‘body’, assign’.</p>
-<p>Each node is one concept from the program</p>
-<p>Recursive function can walk over the tree, one chunk of code for each node.</p>
-<ol type="1">
-<li>Good - each type of node is different, making special cases are easy</li>
-<li>Bad - each type of node is different so analysis has to know about every type, making general cases hard</li>
-</ol>
-<p>This is the classic way to write an interpreter.</p>
-<p>Simple (non optimizing) compilers often use this format.</p>
-</section>
-<section id="a-more-regular-representation" class="slide level2">
-<h2>A more regular representation</h2>
-<p>Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.</p>
-<p><strong><em>ts2bril images/toy.ts | bril2txt</em></strong></p>
-<div class="columns">
-<div class="column" style="width:45%;">
-<pre><code>    //typescript program 
-    let value = 8
-    let result = 1
-    for (let i = 0; i &lt; value;
-         i = i+1)
-    {
-        result = result * i
-    }
-    console.log(result )</code></pre>
-</div><div class="column" style="width:5%;">
-<!-- empty column to create gap -->
-</div><div class="column" style="width:40%;">
-<pre><code>@main {
-  v0: float = const 8;
-  value: float = id v0;
-  v1: float = const 1;
-  result: float = id v1;
-  v3: float = const 0;
-  i: float = id v3;
-.for.cond.2:
-  v4: float = id i;
-  v5: float = id value;
-  v6: bool = flt v4 v5;
-  br v6 .for.body.2 .for.end.2;
-.for.body.2:
-  v7: float = id result;
-  v8: float = id i;
-  v9: float = fmul v7 v8;
-  result: float = id v9;
-  v10: float = id i;
-  v11: float = const 1;
-  v12: float = fadd v10 v11;
-  i: float = id v12;
-  jmp .for.cond.2;
-.for.end.2:
-  v13: float = id result;
-  print v13;
-  v14: int = const 0;
-}
-</code></pre>
-</div></div>
-</section>
-<section id="bril" class="slide level2">
-<h2>bril</h2>
-<ol type="1">
-<li><p>Looks like assembly</p></li>
-<li><p>no limit on registers,</p></li>
-<li><p>no condition codes.</p></li>
-<li><p>fully typed,</p></li>
-<li><p>no complex addressing modes.</p></li>
-<li><p>easy to extend</p></li>
+<li>Bril is very simple, very regular, ir.</li>
+<li>Bril can be extended easily.</li>
+<li>Bril has lots of tools and examples.</li>
+<li>Bril tools are written in lots of languages so setup can be messy</li>
 </ol>
 </section>
-<section id="bril-syntax" class="slide level2">
-<h2>Bril syntax</h2>
-<p>Declare functions, labels, instructions</p>
-<p>instruction:</p>
-<ol type="1">
-<li>variable type = opcode arguments</li>
-<li>opcode list of arguments</li>
-</ol>
-<p>Form 1, variable is the destination, like a: int = add b, c</p>
-<p>Form 2, no destination, like print a</p>
-<p>what is good and what is about this representation?</p>
-</section>
-<section>
-<section id="using-bril---control-flow-graph" class="title-slide slide level1 center">
-<h1>Using Bril - Control Flow Graph</h1>
-<p>extract info from this representation.</p>
-</section>
-<section id="control-flow-graph-cfg-version-1" class="slide level2">
-<h2>control flow graph (CFG) (version 1)</h2>
-<p>Representation is a directed graph.</p>
-<ol type="1">
-<li>Nodes are instructions,</li>
-<li>edges indicate <strong><em>possible</em></strong> flow of control,</li>
-<li>one entry and one exit node.</li>
-</ol>
-</section>
-<section id="example-one" class="slide level2">
-<h2>Example one</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource {bril} number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a></a>@main {</span>
-<span id="cb5-2"><a></a>    v: int = const 5;</span>
-<span id="cb5-3"><a></a>    print v;</span>
-<span id="cb5-4"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="10" data-fig-height="9" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-A[const] --&gt; B[print]
-</pre>
+<section id="lets-look-at-a-bril-program." class="slide level2">
+<h2>Lets look at a bril program.</h2>
+<p>Bril is written in JSON format. Almost all programming languages have a way to read json.</p>
+<div id="fe909418" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> json</span>
+<span id="cb1-2"><a></a><span class="im">import</span> subprocess</span>
+<span id="cb1-3"><a></a><span class="im">import</span> os </span>
+<span id="cb1-4"><a></a></span>
+<span id="cb1-5"><a></a><span class="co"># read from a file </span></span>
+<span id="cb1-6"><a></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>,<span class="st">"r"</span>) <span class="im">as</span> f:</span>
+<span id="cb1-7"><a></a>    bril_program <span class="op">=</span> json.load(f)</span>
+<span id="cb1-8"><a></a></span>
+<span id="cb1-9"><a></a><span class="co"># read from a pipe</span></span>
+<span id="cb1-10"><a></a><span class="co"># bril_program = json.load(sys.stdin)</span></span>
+<span id="cb1-11"><a></a>    </span>
+<span id="cb1-12"><a></a><span class="bu">print</span>(json.dumps(bril_program, </span>
+<span id="cb1-13"><a></a>    indent<span class="op">=</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="second-example" class="slide level2">
-<h2>second example</h2>
-<pre><code>    @main {
-        v: int = const 4;
-        jmp  .somewhere;
-        v: int = const 2;
-        .somewhere;
-        print v;
-    }</code></pre>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="6.5" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[const 4] --&gt; B[jmp]
-  B --&gt; C[print]
-  D[const 2] --&gt; C
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>notice label does not produce a node</p>
-<p>Easy to see a dead instruction.</p>
-</div>
-</section>
-<section id="third-example" class="slide level2">
-<h2>Third example:</h2>
-<pre><code>    @main {
-        v: int = const 4;
-        b: bool = const false;
-        br b .there .here;
-    .here:
-        v: int = const 2;
-    .there;
-        print v;
-    }</code></pre>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="6.5" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[v: int const 4] --&gt; B[b: bool const false]
-  B --&gt; C[br b .there, .false]
-  C --&gt; D[v: const 2]
-  C --&gt; E[print v]
-  D --&gt; E
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>which is the true edge and which is the false edge , could mark the edges or use a convention</p>
-<p>Which is the entry, which is the exit?</p>
-<p>There is a long chain of instructions entered at the top, exit at the bottom, no branches inside.</p>
-</div>
-</section>
-<section id="cfg-cfg-form-2" class="slide level2">
-<h2>CFG (cfg form 2)</h2>
-<ol type="1">
-<li>nodes ares sequences of instructions.</li>
-<li>jumps and branches can only be at the end of a sequence</li>
-<li>only label has to be at the start</li>
-<li>every instruction in the sequence executes the same number of times</li>
-</ol>
-</section>
-<section id="construct-cfg" class="slide level2">
-<h2>construct cfg</h2>
-<p>walk over the instructions:</p>
-<p>As we construct basic blocks, we can add instructions up till something that ends the block (<strong><em>terminator</em></strong>)</p>
-<p>Option: do all blocks end in a terminator or not?</p>
-<p>given a block b, the <strong><em>predecessors</em></strong> of <span class="math inline">\(b\)</span> are the blocks <span class="math inline">\(b_{in}\)</span> where there is an edge <span class="math inline">\(b_{in}-&gt;b\)</span>. And the <strong><em>successors</em></strong> of <span class="math inline">\(b\)</span> are the <span class="math inline">\(b_{out}\)</span> where <span class="math inline">\(b-&gt;b_{out}\)</span> is an edge.</p>
-</section>
-<section id="what-is-an-algorithm-that-forms-a-cfg" class="slide level2">
-<h2>What is an algorithm that forms a cfg</h2>
-<div class="fragment">
-<ol type="1">
-<li>just find all the basic blocks</li>
-<li>add the control flow edges</li>
-</ol>
-</div>
-</section>
-<section id="pseudo-code-to-construct-cfg" class="slide level2">
-<h2>pseudo code to construct cfg</h2>
-<ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
-</ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []</code></pre>
-</section>
-<section class="slide level2">
 
-<p>step 2 we need a map from labels to basic blocks</p>
-<ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
-</ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []
-    
-
-for block in blocks:
-   last = block[-1]
-   if last is a jmp (one successor)
-      add edge from block to last.dest 
-   else if last is a br (two successors)
-      add two edges from block to last.true, last.false 
-   else  fall through 
-      add edge to next block (if it exists)</code></pre>
 </section>
-<section id="how-to-look-at-a-bril-program" class="slide level2">
-<h2>How to look at a Bril program</h2>
-<div id="4110e625" class="cell" data-execution_count="2">
+<section id="lets-look-at-a-bril-program.-output" class="slide level2 output-location-slide"><h2>Lets look at a bril program.</h2><div class="cell output-location-slide" data-execution_count="1">
 <div class="cell-output cell-output-stdout">
 <pre><code>{
   "functions": [
     {
       "name": "main",
       "instrs": [
-        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
-        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
-        { "op": "add", "type": "int", "dest": "v2",
-          "args": ["v0", "v1"] },
-        { "op": "print", "args": ["v2"] }
+        {
+          "op": "const",
+          "type": "int",
+          "dest": "v0",
+          "value": 1
+        },
+        {
+          "op": "const",
+          "type": "int",
+          "dest": "v1",
+          "value": 2
+        },
+        {
+          "op": "add",
+          "type": "int",
+          "dest": "v2",
+          "args": [
+            "v0",
+            "v1"
+          ]
+        },
+        {
+          "op": "print",
+          "args": [
+            "v2"
+          ]
+        }
       ],
       "args": []
     }
   ]
-}
+}</code></pre>
+</div>
+</div></section><section id="formatted" class="slide level2">
+<h2>Formatted</h2>
+<pre><code>{
+  "functions": [
+    {
+      "instrs": [
+        {"dest": "v0", "op": "const","type": "int","value": 1},
+        {"dest": "v1", "op": "const","type": "int","value": 2},
+        {"dest": "v2", "op": "add",  "type": "int","args": ["v0","v1"],},
+                       "op": "print","args": [ "v2"],}],
+      "name": "main",
+    }
+  ]
+}</code></pre>
+</section>
+<section id="getting-started" class="slide level2 scrollable">
+<h2>getting started</h2>
+<p>links:</p>
+<ol type="1">
+<li><a href="https://capra.cs.cornell.edu/bril/">Language specification</a></li>
+<li><a href="https://github.com/sampsyo/bril.git">github site</a></li>
+</ol>
+</section>
+<section id="step-1-clone-the-bril-repo-on-a-linux-or-wsl-machine" class="slide level2">
+<h2>step 1 clone the bril repo on a linux or wsl machine</h2>
+<p>git clone https://github.com/sampsyo/bril.git</p>
+</section>
+<section id="step-2-support-packages" class="slide level2 scrollable">
+<h2>step 2 support packages</h2>
+<ol type="1">
+<li><a href="https://deno.com/">deno</a> is the runtime for typescript/javascript</li>
+</ol>
+<p>curl -fsSL https://deno.land/install.sh | sh</p>
+<p>on my ubuntu machine ‘sudo snap install deno’ also worked</p>
+<p>you may need to add $HOME/.deno/bin to your $PATH.</p>
+<ol start="2" type="1">
+<li><a href="https://flit.pypa.io/en/stable/">flit</a> a python package manager</li>
+</ol>
+<p>python3 -m pip install flit</p>
+</section>
+<section id="step-3-install-the-bril-interpreter-and-the-typescript-to-bril-compiler" class="slide level2">
+<h2>step 3 install the bril interpreter, and the typescript to bril compiler</h2>
+<pre><code>cd bril
+deno install brili.ts 
+deno install --allow-env --allow-read ts2bril.ts
+ </code></pre>
+</section>
+<section id="running-the-interpreter" class="slide level2">
+<h2>running the interpreter</h2>
+<p>brili &lt;images/add.json</p>
+<p>brili -p &lt;images/add.json</p>
+<p>the -p flag turns on profiling</p>
+</section>
+<section id="text-to-json-and-back" class="slide level2">
+<h2>text to json and back</h2>
+<p>There are programs <strong><em>bril2txt</em></strong> and <strong><em>bril2json</em></strong> that make it easy to convert. Keep in mind that the json format is Bril and thats where you will do all the work.</p>
+<p>install text tools</p>
+<pre><code>cd bril-txt
+flit install --symlink --user</code></pre>
+<p>run json to text</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource {bash} number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a></a>bril2txt &lt; images/add.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="connect-tools-via-pipes" class="slide level2">
+<h2>connect tools via pipes</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource {bash} number-lines code-with-copy"><code class="sourceCode"><span id="cb7-1"><a></a>cat images/add.json'</span>
+<span id="cb7-2"><a></a>bril2txt &lt; images/add.json | bril2json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="other-tools" class="slide level2">
+<h2>Other tools</h2>
+<p>There is also a fast interpreter written in <a href="https://www.rust-lang.org/tools/install">Rust</a> see docs for installation</p>
+</section>
+<section id="turnt-tiny-unified-runner-and-tester" class="slide level2">
+<h2><a href="https://github.com/cucapra/turnt">turnt</a> Tiny unified runner and tester</h2>
+<p>Bril uses <a href="https://github.com/cucapra/turnt">turnt</a> as a test tool</p>
+<p>Turnt is a simple snapshot testing tool inspired by LLVM’s lit. It’s good for testing things that translate text files to other text files, like compilers. The idea is that each test is one input file, and you want to run a command and check that it still matches the saved output file.</p>
+<p>pip install –user turnt</p>
+<p>As you think about your projects, you might consider adding a new tool. you can setup Bril on your local linux (can be wsl) machine</p>
+</section>
+<section id="gen-cfg" class="slide level2 scrollable">
+<h2>Gen CFG</h2>
+<p>Lets write a sample program - that generates the cfg</p>
+<p>How would you do that?</p>
+<div class="fragment">
+<p>I’ll do this in two steps</p>
+<ol type="1">
+<li>find all the basic blocks</li>
+<li>add all the cfg edges</li>
+</ol>
+<p>You can also do this in a single step, adding cfg edges as soon as you reach the successor node.</p>
+</div>
+</section>
+<section id="basic-blocks-from-a-list-of-instructions-" class="slide level2">
+<h2>basic blocks from a list of instructions-</h2>
+<p>keep adding instructions till we get to a terminator or a label (do we add labels?)</p>
+<div class="fragment">
+<pre><code>in: list of instrs 
+out: list of lists of instrs 
+ 
+blocks = []
+curr_block = []
+for each instr in list 
+    if the instruction is not a label put it on curr_block
+    if instr is a label or terminator 
+       put curr_block on blocks
+       curr_block = []
+ 
+ if curr_block is not empty add it to blocks
+ return blocks </code></pre>
+<p>two labels in a row do not need another block</p>
+</div>
+</section>
+<section id="step-2-add-edges" class="slide level2">
+<h2>step 2 add edges</h2>
+<pre><code>find cfg: in: is bril program in json 
+for each function find the list of basic blocks
+for each basic block
+   get last_instr 
+   if it is a terminator  br/jmp/ret 
+     add edge from current block to successor  
+    --- what do we want to do with call? 
+   else it is a fall through
+      add edge to next block</code></pre>
+<div class="fragment">
+<p>we need a map (block_map) label-&gt;block so we can add edges for blocks that end in br/jmp - can build this while getting the blocks or we can put the label as the first instruction</p>
+<p>how do we handle fall through?</p>
+<p>what about a return</p>
+<p>if every block ends with a terminator, and every block has a label, then no fall through case</p>
+<p>what happens if try to delete the terminator (because the block never executes)</p>
+</div>
+</section>
+<section id="code" class="slide level2">
+<h2>code</h2>
+<p>I’ll use a python data structure called <strong><em>OrderedDict</em></strong>, when you iterate over the items in a ordered dict, they come back in the order that they were installed.</p>
+</section>
+<section class="slide level2">
+
+<p>GitHub Copilot says:</p>
+<p>OrderedDict in Python is a dictionary subclass that maintains the order in which keys are inserted. When iterating over an OrderedDict, the items are returned in the order they were added. This behavior contrasts with a standard dictionary in Python 3.6 and earlier, where the iteration order was not guaranteed. However, starting from Python 3.7, the built-in dict type also maintains insertion order by default, making OrderedDict less necessary for most applications. OrderedDict still provides additional functionality, such as the move_to_end method, which allows moving an existing key to either end of the dictionary.</p>
+</section>
+<section id="ill-use-a-generator" class="slide level2 scrollable">
+<h2>I’ll use a generator</h2>
+<p>In Python, a generator is an iterator that is defined with a function using the yield statement.</p>
+<ol type="1">
+<li>Produce items only once</li>
+<li>Do not store all the items in memory</li>
+<li>When items from the generator are requested, the function executes until it reaches a yield statement, which produces the next value. Execution then pauses, preserving the function’s state, until the next item is requested.</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<p>Given a list of Bril instructions, generate a sequence of instruction lists representing the basic blocks in the program.</p>
+<p>Every instruction in <code>instr</code> will show up in exactly one block. Jump and branch instructions may only appear at the end of a block, and control can transfer only to the top of a basic block—so labels can only appear at the <em>start</em> of a basic block. Basic blocks may not be empty.</p>
+</section>
+<section class="slide level2">
+
+<div id="ae1ecb14" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>    <span class="co">#Instructions that terminate a basic block.</span></span>
+<span id="cb10-2"><a></a>    TERMINATORS <span class="op">=</span> <span class="st">'br'</span>, <span class="st">'jmp'</span>, <span class="st">'ret'</span></span>
+<span id="cb10-3"><a></a></span>
+<span id="cb10-4"><a></a>    <span class="kw">def</span> form_blocks(instrs):</span>
+<span id="cb10-5"><a></a>        <span class="co">""" comment """</span></span>
+<span id="cb10-6"><a></a>    </span>
+<span id="cb10-7"><a></a>        <span class="co"># Start with an empty block.</span></span>
+<span id="cb10-8"><a></a>        cur_block <span class="op">=</span> []</span>
+<span id="cb10-9"><a></a>    </span>
+<span id="cb10-10"><a></a>        <span class="cf">for</span> instr <span class="kw">in</span> instrs:</span>
+<span id="cb10-11"><a></a>            <span class="cf">if</span> <span class="st">'op'</span> <span class="kw">in</span> instr:  <span class="co"># It's an instruction.</span></span>
+<span id="cb10-12"><a></a>                <span class="co"># Add the instruction to the currently-being-formed block.</span></span>
+<span id="cb10-13"><a></a>                cur_block.append(instr)</span>
+<span id="cb10-14"><a></a>    </span>
+<span id="cb10-15"><a></a>                <span class="co"># If this is a terminator (branching instruction), it's the</span></span>
+<span id="cb10-16"><a></a>                <span class="co"># last instruction in the block. Finish this block and</span></span>
+<span id="cb10-17"><a></a>                <span class="co"># start a new one.</span></span>
+<span id="cb10-18"><a></a>                <span class="cf">if</span> instr[<span class="st">'op'</span>] <span class="kw">in</span> TERMINATORS:</span>
+<span id="cb10-19"><a></a>                    <span class="cf">yield</span> cur_block</span>
+<span id="cb10-20"><a></a>                    cur_block <span class="op">=</span> []</span>
+<span id="cb10-21"><a></a>            </span>
+<span id="cb10-22"><a></a>            <span class="cf">else</span>:  <span class="co"># It's a label.</span></span>
+<span id="cb10-23"><a></a>                <span class="co"># End the block here (if it contains anything).</span></span>
+<span id="cb10-24"><a></a>                <span class="cf">if</span> cur_block:</span>
+<span id="cb10-25"><a></a>                    <span class="cf">yield</span> cur_block</span>
+<span id="cb10-26"><a></a></span>
+<span id="cb10-27"><a></a>                <span class="co"># Start a new block with the label.</span></span>
+<span id="cb10-28"><a></a>                cur_block <span class="op">=</span> [instr]</span>
+<span id="cb10-29"><a></a></span>
+<span id="cb10-30"><a></a>        <span class="co"># Produce the final block, if any.</span></span>
+<span id="cb10-31"><a></a>        <span class="cf">if</span> cur_block:</span>
+<span id="cb10-32"><a></a>            <span class="cf">yield</span> cur_block</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="" class="slide level2 output-location-slide"><div class="cell output-location-slide" data-execution_count="2">
+
+</div></section><section id="as-a-test-lets-print-out-the-blocks" class="slide level2">
+<h2>as a test, lets print out the blocks</h2>
+<div id="2edfc664" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="kw">def</span> print_blocks(bril):</span>
+<span id="cb11-2"><a></a>    <span class="co">"""Given a Bril program, print out its basic blocks.</span></span>
+<span id="cb11-3"><a></a><span class="co">    """</span></span>
+<span id="cb11-4"><a></a></span>
+<span id="cb11-5"><a></a></span>
+<span id="cb11-6"><a></a>    func <span class="op">=</span> bril[<span class="st">'functions'</span>][<span class="dv">0</span>]  <span class="co"># We only process one function.</span></span>
+<span id="cb11-7"><a></a>    <span class="cf">for</span> block <span class="kw">in</span> form_blocks(func[<span class="st">'instrs'</span>]):</span>
+<span id="cb11-8"><a></a>        <span class="co"># Mark the block.</span></span>
+<span id="cb11-9"><a></a>        leader <span class="op">=</span> block[<span class="dv">0</span>]</span>
+<span id="cb11-10"><a></a>        <span class="cf">if</span> <span class="st">'label'</span> <span class="kw">in</span> leader:</span>
+<span id="cb11-11"><a></a>            <span class="bu">print</span>( <span class="ss">f"block </span><span class="sc">{</span>leader[<span class="st">'label'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-12"><a></a>            block <span class="op">=</span> block[<span class="dv">1</span>:]  <span class="co"># Hide the label</span></span>
+<span id="cb11-13"><a></a>        <span class="cf">else</span>:</span>
+<span id="cb11-14"><a></a>            <span class="bu">print</span>(<span class="st">'anonymous block:'</span>)</span>
+<span id="cb11-15"><a></a></span>
+<span id="cb11-16"><a></a>        <span class="co"># Print the instructions.</span></span>
+<span id="cb11-17"><a></a>        <span class="cf">for</span> instr <span class="kw">in</span> block:</span>
+<span id="cb11-18"><a></a>            <span class="bu">print</span>(instr)</span>
+<span id="cb11-19"><a></a></span>
+<span id="cb11-20"><a></a>print_blocks(bril_program)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+<p>this test program has one block so pretty easy</p>
+</section>
+<section id="as-a-test-lets-print-out-the-blocks-output" class="slide level2 output-location-slide"><h2>as a test, lets print out the blocks</h2><div class="cell output-location-slide" data-execution_count="3">
+<div class="cell-output cell-output-stdout">
+<pre><code>anonymous block:
+{'op': 'const', 'type': 'int', 'dest': 'v0', 'value': 1}
+{'op': 'const', 'type': 'int', 'dest': 'v1', 'value': 2}
+{'op': 'add', 'type': 'int', 'dest': 'v2', 'args': ['v0', 'v1']}
+{'op': 'print', 'args': ['v2']}</code></pre>
+</div>
+</div></section><section id="lets-try-a-second-example-with-a-jmp" class="slide level2">
+<h2>lets try a second example with a jmp</h2>
+<pre><code>@main {
+  v: int = const 4;
+  jmp .somewhere;
+  v: int = const 2;
+.somewhere:
+  print v;
+}</code></pre>
+</section>
+<section id="running-commands-inside-python" class="slide level2">
+<h2>running commands inside python</h2>
+<p>GitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.</p>
+</section>
+<section class="slide level2">
+
+<div id="f93309db" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">import</span> subprocess</span>
+<span id="cb14-2"><a></a></span>
+<span id="cb14-3"><a></a><span class="co"># Run a command and capture its output</span></span>
+<span id="cb14-4"><a></a>output <span class="op">=</span> subprocess.check_output([<span class="st">'ls'</span>, <span class="st">'-l'</span>])</span>
+<span id="cb14-5"><a></a></span>
+<span id="cb14-6"><a></a><span class="co"># Convert the byte string to a regular string (assuming UTF-8 encoding)</span></span>
+<span id="cb14-7"><a></a>output_str <span class="op">=</span> output.decode(<span class="st">'utf-8'</span>)</span>
+<span id="cb14-8"><a></a></span>
+<span id="cb14-9"><a></a><span class="bu">print</span>(output_str)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment" data-execution_count="4">
+<div class="cell-output cell-output-stdout">
+<pre><code>total 1052
+-rw-r--r-- 1 runner docker  8199 Jul  9 14:42 010_compiler_overview.qmd
+-rw-r--r-- 1 runner docker 31270 Jul  9 14:43 01a_performance_measurement.html
+-rw-r--r-- 1 runner docker  2852 Jul  9 14:42 01a_performance_measurement.qmd
+drwxr-xr-x 4 runner docker  4096 Jul  9 14:43 01a_performance_measurement_files
+-rw-r--r-- 1 runner docker 37423 Jul  9 14:43 02a_representation.html
+-rw-r--r-- 1 runner docker  7210 Jul  9 14:42 02a_representation.qmd
+-rw-r--r-- 1 runner docker 12737 Jul  9 14:43 02a_representation.quarto_ipynb
+-rw-r--r-- 1 runner docker 11732 Jul  9 14:42 02b_bril.qmd
+-rw-r--r-- 1 runner docker 20172 Jul  9 14:43 02b_bril.quarto_ipynb
+-rw-r--r-- 1 runner docker 30945 Jul  9 14:43 03_local.html
+-rw-r--r-- 1 runner docker  6884 Jul  9 14:42 03_local.qmd
+-rw-r--r-- 1 runner docker 30926 Jul  9 14:43 03b_local_value_numbering.html
+-rw-r--r-- 1 runner docker  7828 Jul  9 14:42 03b_local_value_numbering.qmd
+-rw-r--r-- 1 runner docker 35160 Jul  9 14:43 04_data_flow.html
+-rw-r--r-- 1 runner docker 10402 Jul  9 14:42 04_data_flow.qmd
+-rw-r--r-- 1 runner docker 37370 Jul  9 14:43 05_global.html
+-rw-r--r-- 1 runner docker  9254 Jul  9 14:42 05_global.qmd
+-rw-r--r-- 1 runner docker  4717 Jul  9 14:42 05b_licm.qmd
+-rw-r--r-- 1 runner docker 26293 Jul  9 14:43 05c_pre.html
+-rw-r--r-- 1 runner docker  3100 Jul  9 14:42 05c_pre.qmd
+-rw-r--r-- 1 runner docker 16254 Jul  9 14:42 06_ssa.qmd
+-rw-r--r-- 1 runner docker 59561 Jul  9 14:43 07_llvm.html
+-rwxr-xr-x 1 runner docker 29710 Jul  9 14:42 07_llvm.ipynb
+-rw-r--r-- 1 runner docker 27187 Jul  9 14:43 08_classic_loop_ops.html
+-rw-r--r-- 1 runner docker  5471 Jul  9 14:42 08_classic_loop_ops.qmd
+-rw-r--r-- 1 runner docker 37063 Jul  9 14:43 09_poly.html
+-rwxr-xr-x 1 runner docker 13829 Jul  9 14:42 09_poly.qmd
+-rw-r--r-- 1 runner docker 23553 Jul  9 14:43 100_mlir.html
+-rw-r--r-- 1 runner docker    78 Jul  9 14:42 100_mlir.qmd
+-rw-r--r-- 1 runner docker    87 Jul  9 14:42 110_whole_program.qmd
+-rw-r--r-- 1 runner docker 23568 Jul  9 14:43 12_memory.html
+-rw-r--r-- 1 runner docker    79 Jul  9 14:42 12_memory.qmd
+-rw-r--r-- 1 runner docker    86 Jul  9 14:42 13_dynamic_compilers.qmd
+-rw-r--r-- 1 runner docker 23584 Jul  9 14:43 14_gpu_compilers.html
+-rw-r--r-- 1 runner docker    82 Jul  9 14:42 14_gpu_compilers.qmd
+-rw-r--r-- 1 runner docker 23199 Jul  9 14:43 bril.html
+-rw-r--r-- 1 runner docker    69 Jul  9 14:42 bril.qmd
+drwxr-xr-x 2 runner docker  4096 Jul  9 14:42 images
+drwxr-xr-x 2 runner docker  4096 Jul  9 14:42 papers
+-rw-r--r-- 1 runner docker 36091 Jul  9 14:43 ra-checking.html
+-rw-r--r-- 1 runner docker  7846 Jul  9 14:42 ra-checking.qmd
+-rw-r--r-- 1 runner docker 46378 Jul  9 14:43 revealjs-data-flow.html
+-rw-r--r-- 1 runner docker 48350 Jul  9 14:43 revealjs-global-anal.html
+-rw-r--r-- 1 runner docker 42545 Jul  9 14:43 revealjs-local.html
+-rw-r--r-- 1 runner docker 42653 Jul  9 14:43 revealjs-lvn.html
+-rw-r--r-- 1 runner docker 38096 Jul  9 14:43 revealjs-partial-redun.html
+-rw-r--r-- 1 runner docker 37465 Jul  9 14:43 revealjs-performance.html
+-rw-r--r-- 1 runner docker 46427 Jul  9 14:43 revealjs-rep.html
 </code></pre>
 </div>
 </div>
+</section>
+<section id="print-the-blocks" class="slide level2">
+<h2>print the blocks</h2>
+<div id="1f71e739" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a><span class="im">import</span> json </span>
+<span id="cb16-2"><a></a><span class="im">import</span> os</span>
+<span id="cb16-3"><a></a><span class="im">import</span> subprocess</span>
+<span id="cb16-4"><a></a></span>
+<span id="cb16-5"><a></a>result <span class="op">=</span>  subprocess.check_output(<span class="st">'bril2json &lt; images/jmp.bril'</span>, shell<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb16-6"><a></a>test2json <span class="op">=</span> json.loads(result)</span>
+<span id="cb16-7"><a></a>print_blocks(test2json)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment" data-execution_count="5">
+<div class="cell-output cell-output-stdout">
+<pre><code>anonymous block:
+{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 4}
+{'labels': ['somewhere'], 'op': 'jmp'}
+anonymous block:
+{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 2}
+block somewhere
+{'args': ['v'], 'op': 'print'}</code></pre>
+</div>
+</div>
+</section>
+<section id="the-map-label-names-to-blocks" class="slide level2">
+<h2>the map (label names to blocks)</h2>
+<div id="aa195a0a" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
+<span id="cb18-2"><a></a></span>
+<span id="cb18-3"><a></a></span>
+<span id="cb18-4"><a></a><span class="kw">def</span> block_map(blocks):</span>
+<span id="cb18-5"><a></a>    <span class="co">"""Given a sequence of basic blocks, which are lists of instructions,</span></span>
+<span id="cb18-6"><a></a><span class="co">    produce a `OrderedDict` mapping names to blocks.</span></span>
+<span id="cb18-7"><a></a></span>
+<span id="cb18-8"><a></a><span class="co">    The name of the block comes from the label it starts with, if any.</span></span>
+<span id="cb18-9"><a></a><span class="co">    Anonymous blocks, which don't start with a label, get an</span></span>
+<span id="cb18-10"><a></a><span class="co">    automatically generated name. Blocks in the mapping have their</span></span>
+<span id="cb18-11"><a></a><span class="co">    labels removed.</span></span>
+<span id="cb18-12"><a></a><span class="co">    """</span></span>
+<span id="cb18-13"><a></a>    by_name <span class="op">=</span> OrderedDict()</span>
+<span id="cb18-14"><a></a></span>
+<span id="cb18-15"><a></a>    <span class="cf">for</span> block <span class="kw">in</span> blocks:</span>
+<span id="cb18-16"><a></a>        <span class="co"># Generate a name for the block.</span></span>
+<span id="cb18-17"><a></a>        <span class="cf">if</span> <span class="st">'label'</span> <span class="kw">in</span> block[<span class="dv">0</span>]:</span>
+<span id="cb18-18"><a></a>            <span class="co"># The block has a label. Remove the label but use it for the</span></span>
+<span id="cb18-19"><a></a>            <span class="co"># block's name.</span></span>
+<span id="cb18-20"><a></a>            name <span class="op">=</span> block[<span class="dv">0</span>][<span class="st">'label'</span>]</span>
+<span id="cb18-21"><a></a>            block <span class="op">=</span> block[<span class="dv">1</span>:]</span>
+<span id="cb18-22"><a></a>        <span class="cf">else</span>:</span>
+<span id="cb18-23"><a></a>            <span class="co"># Make up a new name for this anonymous block.</span></span>
+<span id="cb18-24"><a></a>            name <span class="op">=</span> <span class="ss">f'gen_bk_</span><span class="sc">{</span><span class="bu">len</span>(by_name)<span class="sc">}</span><span class="ss">'</span></span>
+<span id="cb18-25"><a></a></span>
+<span id="cb18-26"><a></a>        <span class="co"># Add the block to the mapping.</span></span>
+<span id="cb18-27"><a></a>        by_name[name] <span class="op">=</span> block</span>
+<span id="cb18-28"><a></a></span>
+<span id="cb18-29"><a></a>    <span class="cf">return</span> by_name</span>
+<span id="cb18-30"><a></a></span>
+<span id="cb18-31"><a></a></span>
+<span id="cb18-32"><a></a>blks <span class="op">=</span> form_blocks(test2json[<span class="st">'functions'</span>][<span class="dv">0</span>][<span class="st">'instrs'</span>])</span>
+<span id="cb18-33"><a></a>od <span class="op">=</span> block_map(blks)</span>
+<span id="cb18-34"><a></a><span class="cf">for</span> (name, instrs) <span class="kw">in</span> od.items():</span>
+<span id="cb18-35"><a></a>    <span class="bu">print</span> (name, instrs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+</section>
+<section id="the-map-label-names-to-blocks-output" class="slide level2 output-location-slide"><h2>the map (label names to blocks)</h2><div class="cell output-location-slide" data-execution_count="6">
+<div class="cell-output cell-output-stdout">
+<pre><code>gen_bk_0 [{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 4}, {'labels': ['somewhere'], 'op': 'jmp'}]
+gen_bk_1 [{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 2}]
+somewhere [{'args': ['v'], 'op': 'print'}]</code></pre>
+</div>
+</div></section><section id="the-cfg-given-the-block-map-pseudo-code" class="slide level2">
+<h2>the cfg given the block map (pseudo code)</h2>
+<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource {pseudo} number-lines code-with-copy"><code class="sourceCode"><span id="cb20-1"><a></a>out cfg = {} </span>
+<span id="cb20-2"><a></a># map label -&gt; list of labels the successors of the block</span>
+<span id="cb20-3"><a></a></span>
+<span id="cb20-4"><a></a>for i,block in enumerate(blocks)  # blocks is a ordereddict </span>
+<span id="cb20-5"><a></a>    last = block[i]  # last instruction</span>
+<span id="cb20-6"><a></a>    if last is jmp:</span>
+<span id="cb20-7"><a></a>        cfg[block_name] = jmp.dest</span>
+<span id="cb20-8"><a></a>    elif last is br:</span>
+<span id="cb20-9"><a></a>        cfg[block.name] = [ last.if_label, last.else_label]</span>
+<span id="cb20-10"><a></a>    else</span>
+<span id="cb20-11"><a></a>        # fall through</span>
+<span id="cb20-12"><a></a>        cfg[block_name] = blocks[i+1].name  ## special case for last block</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="cfg" class="slide level2">
+<h2>cfg</h2>
+<div id="caf25244" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a></a><span class="kw">def</span> get_cfg(ordered_blocks):</span>
+<span id="cb21-2"><a></a>    cfg <span class="op">=</span> {}</span>
+<span id="cb21-3"><a></a></span>
+<span id="cb21-4"><a></a>    labels <span class="op">=</span> <span class="bu">list</span>(ordered_blocks.keys())</span>
+<span id="cb21-5"><a></a></span>
+<span id="cb21-6"><a></a>    <span class="cf">for</span> i, (block_name, block) <span class="kw">in</span> <span class="bu">enumerate</span>(ordered_blocks.items()):</span>
+<span id="cb21-7"><a></a>        last <span class="op">=</span> block[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb21-8"><a></a>        op <span class="op">=</span> last[<span class="st">'op'</span>]</span>
+<span id="cb21-9"><a></a></span>
+<span id="cb21-10"><a></a>        <span class="cf">if</span> op <span class="op">==</span> <span class="st">'jmp'</span>:</span>
+<span id="cb21-11"><a></a>            cfg[block_name] <span class="op">=</span> last[<span class="st">'labels'</span>]</span>
+<span id="cb21-12"><a></a>        <span class="cf">elif</span> op <span class="op">==</span> <span class="st">'br'</span>:</span>
+<span id="cb21-13"><a></a>            cfg[block_name] <span class="op">=</span> last[<span class="st">'labels'</span>]</span>
+<span id="cb21-14"><a></a>        <span class="cf">else</span>:</span>
+<span id="cb21-15"><a></a>            <span class="cf">if</span> i<span class="op">+</span><span class="dv">1</span> <span class="op">&lt;</span> <span class="bu">len</span>(labels):  <span class="co"># last block does not fall through</span></span>
+<span id="cb21-16"><a></a>                cfg[block_name] <span class="op">=</span> [labels[i<span class="op">+</span><span class="dv">1</span>]]</span>
+<span id="cb21-17"><a></a>            <span class="cf">else</span>:</span>
+<span id="cb21-18"><a></a>                cfg[block_name] <span class="op">=</span> []</span>
+<span id="cb21-19"><a></a>    <span class="cf">return</span> cfg</span>
+<span id="cb21-20"><a></a></span>
+<span id="cb21-21"><a></a></span>
+<span id="cb21-22"><a></a>blks <span class="op">=</span> form_blocks(test2json[<span class="st">'functions'</span>][<span class="dv">0</span>][<span class="st">'instrs'</span>])</span>
+<span id="cb21-23"><a></a>od <span class="op">=</span> block_map(blks)</span>
+<span id="cb21-24"><a></a>cfg <span class="op">=</span> get_cfg(od)</span>
+<span id="cb21-25"><a></a></span>
+<span id="cb21-26"><a></a><span class="bu">print</span>(cfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section></section>
-    </div>
+</section>
+    <section id="cfg-output" class="slide level2 output-location-slide"><h2>cfg</h2><div class="cell output-location-slide" data-execution_count="7">
+<div class="cell-output cell-output-stdout">
+<pre><code>{'gen_bk_0': ['somewhere'], 'gen_bk_1': ['somewhere'], 'somewhere': []}</code></pre>
+</div>
+</div></section></div>
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
