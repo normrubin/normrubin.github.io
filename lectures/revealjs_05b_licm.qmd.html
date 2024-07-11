@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.54">
 
-  <title>EECE7398 Fall 2024 – _ local value numbering</title>
+  <title>EECE7398 Fall 2024 – loop invariant code motion</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -28,6 +28,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -322,7 +387,10 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="_ local value numbering – EECE7398 Fall 2024">
+  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<meta property="og:title" content="loop invariant code motion – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -330,286 +398,330 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">_ local value numbering</h1>
+  <h1 class="title">loop invariant code motion</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section class="slide level2">
-
-<h3 id="local-value-numbering">Local Value Numbering</h3>
-<p>Value numbering is a very powerful technique that removes <strong><em>redunancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
+<section id="licm" class="slide level2">
+<h2>licm</h2>
+<p>Loop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop.</p>
 </section>
-<section class="slide level2">
-
-<p>The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)</p>
-<p>Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives tha a new value number.</p>
-<p>Two instructions are redundant if they have same op code and operands, which means the same value number</p>
-</section>
-<section class="slide level2">
-
-<p><span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> have the same value number if and only if <span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> are provably equal for all possible operands of the expressions.</p>
-</section>
-<section id="local-value-numbering-covers-lot-of-optimizations-that-look-different" class="slide level2">
-<h2>local value numbering covers lot of optimizations that look different</h2>
-<pre><code>dead code elimination
-
-main {
-    a: int = const 100;
-    a: int = const 42;
-    print a;
-
-}
-
-copy propagation
-
-main{
-    x: int = const 4;
-    copy1: int = id x;
-    copy2: int = id copy1;
-    print copy2;
-}
-
-common sub-expression elimination cse 
-
-main {
-    a: int = const 4;
-    b: int = const 2;
-    sum1: int = add a b;
-    sum2: int = add a b;
-    prod: int = mul sum1 sum2;
-    print prod;
+<section id="a-very-common-case-for-this-is-matrix-addressing" class="slide level2">
+<h2>A very common case for this is matrix addressing</h2>
+<p>a[i,j] might expand to to <span class="math inline">\(i*4*\operatorname{stride_{a}} + j *4\)</span></p>
+<pre><code>for j 
+  a[i,j] = f(a[i,j+1])</code></pre>
+<p>turns into</p>
+<pre><code>a = 
+b = 
+result = 0
+for (){
+    result += a*b
 }</code></pre>
 </section>
-<section id="variables-vis-values" class="slide level2">
-<h2>variables vis values</h2>
-<p>We want to stop thinking about variables and think about values. Two instructions are redundant if they compute the same value.</p>
-</section>
-<section class="slide level2">
-
-<p>for example in a JIT compiler we want computation to be fast so we can get rid of all the variables</p>
-<pre><code>b: int const 1;
-c: int cont 2;
-a:  int b c;  </code></pre>
-<p>becomes:</p>
-<pre><code>[  int const 1
-   int const 2 
-   int 0 1
-]</code></pre>
-<p>less storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.</p>
-</section>
-<section class="slide level2 scrollable">
-
-<p>Pseudo code (similar to an interpreter)</p>
+<section id="pre-steps" class="slide level2 scrollable">
+<h2>pre steps</h2>
 <ol type="1">
-<li><p>hash table constants and expressions of value numbers to value numbers and to a variable holding the value</p></li>
-<li><p>reverse map from variables to value numbers</p></li>
+<li>find the natural loops</li>
+<li>add pre-header</li>
+</ol>
+<p>if we are going to move code we often need to add a special basic block which is called a landing pad or a a <strong><em>pre-header</em></strong> create a new block b. change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header</p>
+<ol start="3" type="1">
+<li>need reaching definitions</li>
 </ol>
 </section>
-<section class="slide level2">
-
+<section id="licm-steps" class="slide level2 scrollable">
+<h2>licm steps</h2>
+<ol type="1">
+<li>find loop invariant instructions,</li>
+<li>move some of the loop invariant instructions to the pre-header</li>
+</ol>
+</section>
+<section id="step-1" class="slide level2 scrollable">
+<h2>step 1</h2>
+<p>An instruction instr in a loop is loop invariant of:</p>
+<p>every operand is:</p>
+<ol type="1">
+<li>constant or</li>
+<li>all reaching definitions of this operand are outside of the loop</li>
+<li>there is exactly one def in loop reaching this operand and that def is loop invariant</li>
+</ol>
+</section>
+<section id="naturally-iterative" class="slide level2">
+<h2>naturally iterative</h2>
+<pre><code>iterate to convergence
+ for each instr in  the loop
+  mark it as loop invar  iff 
+     for all arguments x either
+         all reaching defs of x are outside of the loop (this covers constants)
+         or there is exactly one def of instr in the loop and that def is loop invar, and there are no uses of the dest before instr on any path in the loop</code></pre>
+</section>
+<section id="step-2" class="slide level2 scrollable">
+<h2>step 2</h2>
+<p>when is ok to move an instr? We call this <strong><em>safe</em></strong> to move.</p>
 <div class="columns">
 <div class="column">
-<pre><code>  main {
-    a: int = const 4;
-    b: int = const 2;
-    sum1: int = add a b;
-    sum2: int = add a b;
-    prod: int = mult sum1 sum2;
-    print prod
-
-  }</code></pre>
-</div><div class="column" style="font-size: 60%;">
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>key</th>
-<th>value</th>
-<th>canonical name</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>const 4</td>
-<td>1</td>
-<td>a</td>
-</tr>
-<tr class="even">
-<td>const 2</td>
-<td>2</td>
-<td>b</td>
-</tr>
-<tr class="odd">
-<td>add 1 2</td>
-<td>3</td>
-<td>sum1</td>
-</tr>
-<tr class="even">
-<td>mul 3 3</td>
-<td>4</td>
-<td>prod</td>
-</tr>
-</tbody>
-</table>
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>name</th>
-<th>value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>a</td>
-<td>1</td>
-</tr>
-<tr class="even">
-<td>b</td>
-<td>2</td>
-</tr>
-<tr class="odd">
-<td>sum1</td>
-<td>3</td>
-</tr>
-<tr class="even">
-<td>sum2</td>
-<td>3</td>
-</tr>
-<tr class="odd">
-<td>prod</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a></a>graph TD</span>
+<span id="cb4-2"><a></a>   b1[" n= 0"]</span>
+<span id="cb4-3"><a></a>   p["preheader"]</span>
+<span id="cb4-4"><a></a>   b3</span>
+<span id="cb4-5"><a></a>   b4["n = 2"]</span>
+<span id="cb4-6"><a></a>   b5["m = n *2"]</span>
+<span id="cb4-7"><a></a>   b6</span>
+<span id="cb4-8"><a></a>   b1--&gt;p</span>
+<span id="cb4-9"><a></a>   p--&gt; b3</span>
+<span id="cb4-10"><a></a>   b3--&gt; b4</span>
+<span id="cb4-11"><a></a>   b4--&gt; b5</span>
+<span id="cb4-12"><a></a>   b3--&gt; b5</span>
+<span id="cb4-13"><a></a>   b5--&gt; b3</span>
+<span id="cb4-14"><a></a>   b5--&gt; b6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+   b1[" n= 0"]
+   p["preheader"]
+   b3
+   b4["n = 2"]
+   b5["m = n *2"]
+   b6
+   b1--&gt;p
+   p--&gt; b3
+   b3--&gt; b4
+   b4--&gt; b5
+   b3--&gt; b5
+   b5--&gt; b3
+   b5--&gt; b6
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>can we move n = 2</p>
+</div><div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a></a>graph TD</span>
+<span id="cb5-2"><a></a>  b1[" n= 0"]</span>
+<span id="cb5-3"><a></a>   p["preheader"]</span>
+<span id="cb5-4"><a></a>   b3</span>
+<span id="cb5-5"><a></a>   b4["n = 2"]</span>
+<span id="cb5-6"><a></a>   b5</span>
+<span id="cb5-7"><a></a>   b6</span>
+<span id="cb5-8"><a></a>   b1--&gt;p</span>
+<span id="cb5-9"><a></a>   p--&gt; b3</span>
+<span id="cb5-10"><a></a>   b3--&gt; b4</span>
+<span id="cb5-11"><a></a>   b4--&gt; b5</span>
+<span id="cb5-12"><a></a>   b3--&gt; b5</span>
+<span id="cb5-13"><a></a>   b5--&gt; b3</span>
+<span id="cb5-14"><a></a>   b5--&gt; b6</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+  b1[" n= 0"]
+   p["preheader"]
+   b3
+   b4["n = 2"]
+   b5
+   b6
+   b1--&gt;p
+   p--&gt; b3
+   b3--&gt; b4
+   b4--&gt; b5
+   b3--&gt; b5
+   b5--&gt; b3
+   b5--&gt; b6
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 </div></div>
-</section>
-<section>
-<section id="steps" class="title-slide slide level1 center">
-<h1>steps</h1>
-<pre><code>for each instruction 
-   build a temp instruction  
-   for each arg,  
-       see if the argument has a value number, if it does 
-      update the temp instruction to use the canonical name
-      if the argument has no vn give it one 
-  see if  the temp instruction is in the table, if is,
-      delete it 
-      give the dest the value number that was found </code></pre>
-</section>
-<section class="slide level2 scrollable">
-
-<p>extensions:</p>
+<p>all uses of the variable dest in the loop, must come from this instr The basic block containing instr must execute every time around the loop</p>
+<p>more formally</p>
 <ol type="1">
-<li>a: int id b</li>
-</ol>
-<p>a gets the value number of b. No copy required</p>
-<ol start="2" type="1">
-<li>add a b; for add sort value numbers so add a b; and add b a; get the same value number</li>
+<li>the def must dominate all the uses</li>
+<li>no other defs of the same variable</li>
+<li>def dominates all the loop exits</li>
 </ol>
 </section>
-<section id="extension-3" class="slide level2 scrollable">
-<h2>extension 3</h2>
-<pre><code>constant folding 
-   a: int const 1;
-   b: int const 2;
-   c: add a b;</code></pre>
-<ol start="3" type="1">
-<li>if both value numbers are pointing to constants- actually do the add</li>
-</ol>
+<section id="zero-trip-count-loops" class="slide level2">
+<h2>zero trip count loops</h2>
+<pre><code>   loop {
+     if cond goto exit
+     x = a*b 
+       = x
+   }</code></pre>
+<p>For cond 3</p>
+<p>if the loop runs zero times, a*b is never executed</p>
+<p>We can remove this condition if the dest variable is dead after the loop or the instruction can not cause a exception, this is called <strong><em>speculative</em></strong> exceptions.</p>
 </section>
-<section id="problem-canonical-variables-might-be-overwritten" class="slide level2">
-<h2>problem: canonical variables might be overwritten</h2>
-<p><code>x = a+b       x =        = a+b</code></p>
-<div class="fragment">
-<p>one option is to save the value, if x will be overwritten add a temp</p>
-<pre><code>t = a+b
-x = t 
-x = 
-  = t </code></pre>
+<section id="how-about-an-example" class="slide level2 scrollable">
+<h2>How about an example:</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb7-2"><a></a>    graph  LR;</span>
+<span id="cb7-3"><a></a>B1["B1:</span>
+<span id="cb7-4"><a></a>     1: b = 2</span>
+<span id="cb7-5"><a></a>     2: i = 1"]</span>
+<span id="cb7-6"><a></a></span>
+<span id="cb7-7"><a></a>B2["b2:</span>
+<span id="cb7-8"><a></a>   i lessthen 100"]</span>
+<span id="cb7-9"><a></a>B3["B3:</span>
+<span id="cb7-10"><a></a>   3: a = b+1</span>
+<span id="cb7-11"><a></a>   4: c = 2</span>
+<span id="cb7-12"><a></a>   i mod 2 == 0"]</span>
+<span id="cb7-13"><a></a>B4["b4: </span>
+<span id="cb7-14"><a></a>    5: d = a + d </span>
+<span id="cb7-15"><a></a>    6: e = 1 +d"]</span>
+<span id="cb7-16"><a></a>B5["B5:</span>
+<span id="cb7-17"><a></a>    7: d= -c</span>
+<span id="cb7-18"><a></a>    8: f = 1+a"]</span>
+<span id="cb7-19"><a></a>B6["B6:</span>
+<span id="cb7-20"><a></a>  9: i = i + 1</span>
+<span id="cb7-21"><a></a>     a lessthen 2"]</span>
+<span id="cb7-22"><a></a>Entry --&gt; B1</span>
+<span id="cb7-23"><a></a>B1--&gt; B2</span>
+<span id="cb7-24"><a></a>B2 -- y --&gt;exit;</span>
+<span id="cb7-25"><a></a>B2 --n --&gt; B3</span>
+<span id="cb7-26"><a></a>B3 --y --&gt; B4</span>
+<span id="cb7-27"><a></a>B3 --n --&gt; B5</span>
+<span id="cb7-28"><a></a>B4--&gt; B6</span>
+<span id="cb7-29"><a></a>B5 --&gt; B6</span>
+<span id="cb7-30"><a></a>B6 --y --&gt; exit</span>
+<span id="cb7-31"><a></a>B6 --n --&gt; B2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+    graph  LR;
+B1["B1:
+     1: b = 2
+     2: i = 1"]
+
+B2["b2:
+   i lessthen 100"]
+B3["B3:
+   3: a = b+1
+   4: c = 2
+   i mod 2 == 0"]
+B4["b4: 
+    5: d = a + d 
+    6: e = 1 +d"]
+B5["B5:
+    7: d= -c
+    8: f = 1+a"]
+B6["B6:
+  9: i = i + 1
+     a lessthen 2"]
+Entry --&gt; B1
+B1--&gt; B2
+B2 -- y --&gt;exit;
+B2 --n --&gt; B3
+B3 --y --&gt; B4
+B3 --n --&gt; B5
+B4--&gt; B6
+B5 --&gt; B6
+B6 --y --&gt; exit
+B6 --n --&gt; B2
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>steps</p>
+<div class="r-stack">
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>create pre header</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b2.1 not loop invar (i &lt; 100) i reached by def outside of loop</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b3.3 loop inv ( a = b+1) b only def outside of the loop</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b3.4 loop inv (c =2) 2 is a constant</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b3.cond (i mod 2 ==0 ) not loop inv</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b4.5 (d = a +d ) not loop inv a is but not d</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b4.6 (e = 1 + d ) not loop inver</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b5.7 (d = -c ) not loop inv other def of d</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b5.8 (f = 1 +a) loop invar</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b6.9 not loop inv</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<ol type="1">
+<li>b6.cond loop inv</li>
+</ol>
+</div>
+<div class="fragment fade-in-then-out">
+<p>changed two instructions to loop invar</p>
+</div>
+<div class="fragment fade-in-then-out">
+<p>repeat</p>
+</div>
 </div>
 </section>
-<section id="pseudo-code" class="slide level2">
-<h2>pseudo code</h2>
-<pre><code>   table = mapping from value tuples to canonical variables,
-     with each row numbered
-   
-   var2num = mapping from variable names to their current
-     value numbers (i.e., rows in table)
-
-   for instr in block:
-       value = (instr.op, var2num[instr.args[0]], ...)
-
-       if value in table:
-           # The value has been computed before; reuse it.
-           num, var = table[value]
-           delete the instruction 
-
-       else:
-           # A newly computed value.
-           num = fresh value number
-
-           dest = instr.dest
-           if instr.dest  will be overwritten later:
-                dest = fresh variable name
-                instr.dest = dest
-           else:
-                dest = instr.dest
-
-           table[value] = num, dest
-
-           for a in instr.args:
-               replace a with table[var2num[a]].var
-
-       var2num[instr.dest] = num</code></pre>
-</section>
-<section id="local-value-numbering." class="slide level2">
-<h2>Local value numbering.</h2>
-<p>You can see one implementation in <code>lvn.py</code> in the Bril repository. But seriously, don’t be tempted! You want to write your implementation without looking at mine!</p>
-<p><a href="https://github.com/normrubin/bril/tree/main/examples">examples</a></p>
-</section>
-<section id="testing-your-optimizations" class="slide level2 scrollable">
-<h2>Testing Your Optimizations</h2>
-<p>As part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:</p>
-<ol type="1">
-<li>Not break programs.</li>
-<li>Make programs faster, most of the time.</li>
-</ol>
-</section>
 <section class="slide level2">
 
-<p>As with every task in this class, part of the work is checking that you have done what you set out to do — in this case, that your optimizations do those two things.</p>
 </section>
-<section id="think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria." class="slide level2">
-<h2>Think carefully about how to make a convincing case for each of those criteria.</h2>
-<p>One tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).</p>
-</section>
-<section class="slide level2">
-
-<p>While there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available <a href="https://capra.cs.cornell.edu/bril/tools/bench.html">Bril benchmark</a>, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.</p>
-</section>
-<section class="slide level2 scrollable">
-
-<p>If this is the route you choose, you can do it however you like, There is a simple tool that you can consider using, called Brench. Brench is not very fancy; it does three things:</p>
+<section id="possible-to-move" class="title-slide slide level1 center scrollable">
+<h1>possible to move</h1>
 <ol type="1">
-<li><p>It makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)</p></li>
-<li><p>It checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)</p></li>
-<li><p>It can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)</p></li>
+<li>a = b +1</li>
+<li>f = 1 + a</li>
+<li>a &lt; 2</li>
 </ol>
-<p>Those three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!</p>
-<p>:::</p>
-<ol type="1">
-<li>run multiple commands over a list of tests</li>
-<li>check the each command got the same output for each text</li>
-<li>collect a statistic for each command</li>
-</ol>
+<p>If we forward propagate values we could find a = 3, is a &lt; 2 is always false and loop does not repeat</p>
+<p>moving the instructions out of the loop reduces the number of instructions which is good, but it also extends life times and therefore register pressure which is bad.</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section></section>
+</section>
     </div>
   </div>
 

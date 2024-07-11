@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.54">
 
-  <title>EECE7398 Fall 2024 – 2 Representation of programs</title>
+  <title>EECE7398 Fall 2024 – Data Flow</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -389,7 +390,7 @@
   <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
   <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
   <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
-<meta property="og:title" content="2 Representation of programs – EECE7398 Fall 2024">
+<meta property="og:title" content="Data Flow – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -397,329 +398,410 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">2 Representation of programs</h1>
+  <h1 class="title">Data Flow</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="how-do-we-represent-programs" class="slide level2">
-<h2>How do we represent programs</h2>
-<p>The representation of a program</p>
-<p>What we read in and read out when transforming a program.</p>
-<p>What kind of properties make a good representation?</p>
+<section id="reasoning-about-data-flow-global-analysis" class="slide level2">
+<h2>Reasoning about data flow (global analysis)</h2>
+<p>We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.</p>
+<p>There is some theory to look at for this. How do we know if the algorithm will converge for any possible cfg.</p>
+<p>and some naming for each kind of problem</p>
 </section>
-<section id="concrete-syntax" class="slide level2">
-<h2>Concrete Syntax</h2>
-<p>One possible representation is called <strong><em>concrete syntax form</em></strong> Programs are text or surface syntax- just what you would type into an editor.</p>
-<pre><code>value = 8
-result = 1
-for i in range(value):
-  result = result + i
-print(result)</code></pre>
-<p>What is good and what is bad about this representation?</p>
-<p>What is the level of abstraction?</p>
-<p>How do you understand the semantics.</p>
-</section>
-<section id="abstract-syntax" class="slide level2">
-<h2>Abstract syntax</h2>
-<p>Tree structure</p>
-<ol type="1">
-<li>Nodes are parts of the program,</li>
-<li>Edges show how they are connected.</li>
-</ol>
-<p>We can write this as a list or a graph</p>
+<section id="example" class="slide level2">
+<h2>example</h2>
 <div class="columns">
 <div class="column">
-<pre><code>def pgm():
-    value = 8
-    result = 1
-    for i in range(value):
-        result = result * i
-    print(result)</code></pre>
+<pre><code>     main(cond)
+     a int = const 47
+     b :int = const 42
+     br cond .left .right
+    .left
+     b: int = const 1
+     c:int = const 5 
+    jmp .end
+   .right
+     a :int = const 2
+     c: int = const 10
+   jmp .end
+   .end
+    d: int sub  a b
+    print d
+    ret</code></pre>
 </div><div class="column">
-<p><img data-src="images/abst.png"></p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a></a>graph TD</span>
+<span id="cb2-2"><a></a>style A text-align: left</span>
+<span id="cb2-3"><a></a>style B  text-align: left</span>
+<span id="cb2-4"><a></a>%% nodes </span>
+<span id="cb2-5"><a></a>     A["1: main cond\n2: a int = const 47\n3: b :int = const 42\n4:br cond left .right"] </span>
+<span id="cb2-6"><a></a>   </span>
+<span id="cb2-7"><a></a>   B["5: b: int = const 1</span>
+<span id="cb2-8"><a></a>   6 c:int = const 5 </span>
+<span id="cb2-9"><a></a>   7 jmp .end"]</span>
+<span id="cb2-10"><a></a>  </span>
+<span id="cb2-11"><a></a>   C["8: a :int = const 2</span>
+<span id="cb2-12"><a></a>   9: c: int = const 10</span>
+<span id="cb2-13"><a></a>   10 jmp .end"]</span>
+<span id="cb2-14"><a></a>    D["11: d: int sub  a b</span>
+<span id="cb2-15"><a></a>    12 print d</span>
+<span id="cb2-16"><a></a>    13 ret"]</span>
+<span id="cb2-17"><a></a>%% edges</span>
+<span id="cb2-18"><a></a>    A  -- true --&gt; B</span>
+<span id="cb2-19"><a></a>    A  --false --&gt; C</span>
+<span id="cb2-20"><a></a>    B --&gt; D</span>
+<span id="cb2-21"><a></a>    C --&gt; D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+style A text-align: left
+style B  text-align: left
+%% nodes 
+     A["1: main cond\n2: a int = const 47\n3: b :int = const 42\n4:br cond left .right"] 
+   
+   B["5: b: int = const 1
+   6 c:int = const 5 
+   7 jmp .end"]
+  
+   C["8: a :int = const 2
+   9: c: int = const 10
+   10 jmp .end"]
+    D["11: d: int sub  a b
+    12 print d
+    13 ret"]
+%% edges
+    A  -- true --&gt; B
+    A  --false --&gt; C
+    B --&gt; D
+    C --&gt; D
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 </div></div>
 </section>
-<section id="ast-tree-representation" class="slide level2">
-<h2>AST tree representation</h2>
-<p>An AST is a tree structure, nodes like ‘if’, ‘test’, ‘body’, assign’.</p>
-<p>Each node is one concept from the program</p>
-<p>Recursive function can walk over the tree, one chunk of code for each node.</p>
+<section id="first-we-are-going-to-look-at-a-specific-problem-reaching-definitions" class="slide level2">
+<h2>first we are going to look at a specific problem “reaching definitions”</h2>
+<p><em>Reaching definitions</em> are an example of a global property that require you to look at an entire CFG.</p>
+</section>
+<section id="definitions" class="slide level2">
+<h2>definitions</h2>
+<p>A <strong><em>Use:</em></strong> An instruction uses all of its arguments. (So any instruction with arguments is a “use.”), a binary instruction is two uses.</p>
+<p>A <strong><em>definition</em></strong> is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest )</p>
+<p>A definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and the variable in D is not overwritten on the path.</p>
+<p><strong><em>Available:</em></strong> Definitions that reach a given point in the program are available at that point.</p>
+<p>if an instruction writes a variable it <strong><em>kills</em></strong> all prior definitions that write the same variable</p>
+</section>
+<section id="reaching-definitions-problem-determine-which-definitions-reach-which-uses." class="slide level2">
+<h2>Reaching definitions problem: determine which definitions reach which uses.</h2>
+<p>The above program has 8 definitions, Which we could represent by a bit vector of size 8.</p>
+<p>We could build a 2d matrix - definitions by uses, where a 1 bit indicates that this definition reaches this use. As a matrix this would be very sparse, later when we do ssa forms will see a very cool compression technique. Algorithms that use this kind of matrix are called bit-vector methods.</p>
+</section>
+<section id="a-program-point-is-an-instruction" class="slide level2 scrollable">
+<h2>A <strong><em>program point</em></strong> is an instruction</h2>
+<p>A definition of a variable v reaches just after a program point p if and only if:</p>
 <ol type="1">
-<li>Good - each type of node is different, making special cases are easy</li>
-<li>Bad - each type of node is different so analysis has to know about every type, making general cases hard</li>
+<li>the definition reaches the point just before p</li>
+<li>the variable v is not redefined at p</li>
 </ol>
-<p>This is the classic way to write an interpreter.</p>
-<p>Simple (non optimizing) compilers often use this format.</p>
-</section>
-<section id="a-more-regular-representation" class="slide level2">
-<h2>A more regular representation</h2>
-<p>Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.</p>
-<p><strong><em>ts2bril images/toy.ts | bril2txt</em></strong></p>
-<div class="columns">
-<div class="column" style="width:45%;">
-<pre><code>    //typescript program 
-    let value = 8
-    let result = 1
-    for (let i = 0; i &lt; value;
-         i = i+1)
-    {
-        result = result * i
-    }
-    console.log(result )</code></pre>
-</div><div class="column" style="width:5%;">
-<!-- empty column to create gap -->
-</div><div class="column" style="width:40%;">
-<pre><code>@main {
-  v0: float = const 8;
-  value: float = id v0;
-  v1: float = const 1;
-  result: float = id v1;
-  v3: float = const 0;
-  i: float = id v3;
-.for.cond.2:
-  v4: float = id i;
-  v5: float = id value;
-  v6: bool = flt v4 v5;
-  br v6 .for.body.2 .for.end.2;
-.for.body.2:
-  v7: float = id result;
-  v8: float = id i;
-  v9: float = fmul v7 v8;
-  result: float = id v9;
-  v10: float = id i;
-  v11: float = const 1;
-  v12: float = fadd v10 v11;
-  i: float = id v12;
-  jmp .for.cond.2;
-.for.end.2:
-  v13: float = id result;
-  print v13;
-  v14: int = const 0;
-}
-</code></pre>
-</div></div>
-</section>
-<section id="bril" class="slide level2">
-<h2>bril</h2>
+<p>or</p>
 <ol type="1">
-<li><p>Looks like assembly</p></li>
-<li><p>no limit on registers,</p></li>
-<li><p>no condition codes.</p></li>
-<li><p>fully typed,</p></li>
-<li><p>no complex addressing modes.</p></li>
-<li><p>easy to extend</p></li>
+<li>the variable v is defined at p.</li>
 </ol>
-</section>
-<section id="bril-syntax" class="slide level2">
-<h2>Bril syntax</h2>
-<p>Declare functions, labels, instructions</p>
-<p>instruction:</p>
-<ol type="1">
-<li>variable type = opcode arguments</li>
-<li>opcode list of arguments</li>
-</ol>
-<p>Form 1, variable is the destination, like a: int = add b, c</p>
-<p>Form 2, no destination, like print a</p>
-<p>what is good and what is about this representation?</p>
-</section>
-<section>
-<section id="using-bril---control-flow-graph" class="title-slide slide level1 center">
-<h1>Using Bril - Control Flow Graph</h1>
-<p>extract info from this representation.</p>
-</section>
-<section id="control-flow-graph-cfg-version-1" class="slide level2">
-<h2>control flow graph (CFG) (version 1)</h2>
-<p>Representation is a directed graph.</p>
-<ol type="1">
-<li>Nodes are instructions,</li>
-<li>edges indicate <strong><em>possible</em></strong> flow of control,</li>
-<li>one entry and one exit node.</li>
-</ol>
-</section>
-<section id="example-one" class="slide level2">
-<h2>Example one</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource {bril} number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a></a>@main {</span>
-<span id="cb5-2"><a></a>    v: int = const 5;</span>
-<span id="cb5-3"><a></a>    print v;</span>
-<span id="cb5-4"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="10" data-fig-height="9" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-A[const] --&gt; B[print]
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="second-example" class="slide level2">
-<h2>second example</h2>
-<pre><code>    @main {
-        v: int = const 4;
-        jmp  .somewhere;
-        v: int = const 2;
-        .somewhere;
-        print v;
-    }</code></pre>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="6.5" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[const 4] --&gt; B[jmp]
-  B --&gt; C[print]
-  D[const 2] --&gt; C
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>notice label does not produce a node</p>
-<p>Easy to see a dead instruction.</p>
-</div>
-</section>
-<section id="third-example" class="slide level2">
-<h2>Third example:</h2>
-<pre><code>    @main {
-        v: int = const 4;
-        b: bool = const false;
-        br b .there .here;
-    .here:
-        v: int = const 2;
-    .there;
-        print v;
-    }</code></pre>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="6.5" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-  A[v: int const 4] --&gt; B[b: bool const false]
-  B --&gt; C[br b .there, .false]
-  C --&gt; D[v: const 2]
-  C --&gt; E[print v]
-  D --&gt; E
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>which is the true edge and which is the false edge , could mark the edges or use a convention</p>
-<p>Which is the entry, which is the exit?</p>
-<p>There is a long chain of instructions entered at the top, exit at the bottom, no branches inside.</p>
-</div>
-</section>
-<section id="cfg-cfg-form-2" class="slide level2">
-<h2>CFG (cfg form 2)</h2>
-<ol type="1">
-<li>nodes ares sequences of instructions.</li>
-<li>jumps and branches can only be at the end of a sequence</li>
-<li>only label has to be at the start</li>
-<li>every instruction in the sequence executes the same number of times</li>
-</ol>
-</section>
-<section id="construct-cfg" class="slide level2">
-<h2>construct cfg</h2>
-<p>walk over the instructions:</p>
-<p>As we construct basic blocks, we can add instructions up till something that ends the block (<strong><em>terminator</em></strong>)</p>
-<p>Option: do all blocks end in a terminator or not?</p>
-<p>given a block b, the <strong><em>predecessors</em></strong> of <span class="math inline">\(b\)</span> are the blocks <span class="math inline">\(b_{in}\)</span> where there is an edge <span class="math inline">\(b_{in}-&gt;b\)</span>. And the <strong><em>successors</em></strong> of <span class="math inline">\(b\)</span> are the <span class="math inline">\(b_{out}\)</span> where <span class="math inline">\(b-&gt;b_{out}\)</span> is an edge.</p>
-</section>
-<section id="what-is-an-algorithm-that-forms-a-cfg" class="slide level2">
-<h2>What is an algorithm that forms a cfg</h2>
-<div class="fragment">
-<ol type="1">
-<li>just find all the basic blocks</li>
-<li>add the control flow edges</li>
-</ol>
-</div>
-</section>
-<section id="pseudo-code-to-construct-cfg" class="slide level2">
-<h2>pseudo code to construct cfg</h2>
-<ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
-</ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []</code></pre>
 </section>
 <section class="slide level2">
 
-<p>step 2 we need a map from labels to basic blocks</p>
-<ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
-</ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []
-    
-
-for block in blocks:
-   last = block[-1]
-   if last is a jmp (one successor)
-      add edge from block to last.dest 
-   else if last is a br (two successors)
-      add two edges from block to last.true, last.false 
-   else  fall through 
-      add edge to next block (if it exists)</code></pre>
+<p>What about multiple predecessors? p is the first instruction of a block with multiple preds.</p>
+<p>If a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.</p>
+<p>This is a <strong><em>union</em></strong> operation.</p>
+<p>We are moving information down from definition. This is called <strong><em>forward</em></strong> propagation</p>
 </section>
-<section id="how-to-look-at-a-bril-program" class="slide level2">
-<h2>How to look at a Bril program</h2>
-<div id="4110e625" class="cell" data-execution_count="2">
-<div class="cell-output cell-output-stdout">
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
-        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
-        { "op": "add", "type": "int", "dest": "v2",
-          "args": ["v0", "v1"] },
-        { "op": "print", "args": ["v2"] }
-      ],
-      "args": []
+<section class="slide level2">
+
+<p>Define two sets IN and OUT that hold definitions</p>
+<p>IN is the set of definitions that reach a point immediately before p</p>
+<p>OUT is the set of definitions that reach a point immediately after p</p>
+</section>
+<section class="slide level2">
+
+<p>To illustrate this, I”ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def</p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a></a>graph TD</span>
+<span id="cb3-2"><a></a>style A text-align: left</span>
+<span id="cb3-3"><a></a>style B  text-align: left</span>
+<span id="cb3-4"><a></a>%% nodes </span>
+<span id="cb3-5"><a></a>A_IN["A_IN={}"]</span>
+<span id="cb3-6"><a></a>A_OUT["A_OUT={(cond,1),(a,2),(b,3)}"]</span>
+<span id="cb3-7"><a></a></span>
+<span id="cb3-8"><a></a>B_IN["B_IN={(cond,1),(a,2),(b,3)}"]</span>
+<span id="cb3-9"><a></a>B_OUT["B_OUT={(cond,1),(a,2),(b,5),(c,6)}"]</span>
+<span id="cb3-10"><a></a></span>
+<span id="cb3-11"><a></a>C_IN["IN={(cond,1),(a,2),(b,3)}"]</span>
+<span id="cb3-12"><a></a>C_OUT["OUT={(cond,1),(a,8),(b,3,(c,9)}"]</span>
+<span id="cb3-13"><a></a></span>
+<span id="cb3-14"><a></a>D_IN["IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}"]</span>
+<span id="cb3-15"><a></a> </span>
+<span id="cb3-16"><a></a>  A["blk a</span>
+<span id="cb3-17"><a></a>    1: main cond</span>
+<span id="cb3-18"><a></a>   2: a int = const 47</span>
+<span id="cb3-19"><a></a>   3: b :int = const 42</span>
+<span id="cb3-20"><a></a>   4:br cond .left .right"] </span>
+<span id="cb3-21"><a></a>   </span>
+<span id="cb3-22"><a></a>   B["blk b</span>
+<span id="cb3-23"><a></a>   5: b: int = const 1</span>
+<span id="cb3-24"><a></a>   6 c:int = const 5 </span>
+<span id="cb3-25"><a></a>   7 jmp .end"]</span>
+<span id="cb3-26"><a></a>  </span>
+<span id="cb3-27"><a></a>   C["blk c</span>
+<span id="cb3-28"><a></a>     8: a :int = const 2</span>
+<span id="cb3-29"><a></a>   9: c: int = const 10</span>
+<span id="cb3-30"><a></a>   10 jmp .end"]</span>
+<span id="cb3-31"><a></a>    D["11: d: int sub  a b</span>
+<span id="cb3-32"><a></a>    12 print d</span>
+<span id="cb3-33"><a></a>    13 ret"]</span>
+<span id="cb3-34"><a></a>%% edges</span>
+<span id="cb3-35"><a></a>    A_IN --&gt; A </span>
+<span id="cb3-36"><a></a>    A --&gt; A_OUT</span>
+<span id="cb3-37"><a></a>    A_OUT  -- true --&gt; B_IN</span>
+<span id="cb3-38"><a></a>    B_IN --&gt; B</span>
+<span id="cb3-39"><a></a>    B --&gt; B_OUT</span>
+<span id="cb3-40"><a></a>    A_OUT --false --&gt; C_IN</span>
+<span id="cb3-41"><a></a>    C_IN --&gt; C</span>
+<span id="cb3-42"><a></a>    C--&gt;   C_OUT</span>
+<span id="cb3-43"><a></a>    B_OUT--&gt; D_IN</span>
+<span id="cb3-44"><a></a>    C_OUT--&gt; D_IN</span>
+<span id="cb3-45"><a></a>    D_IN --&gt; D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+style A text-align: left
+style B  text-align: left
+%% nodes 
+A_IN["A_IN={}"]
+A_OUT["A_OUT={(cond,1),(a,2),(b,3)}"]
+
+B_IN["B_IN={(cond,1),(a,2),(b,3)}"]
+B_OUT["B_OUT={(cond,1),(a,2),(b,5),(c,6)}"]
+
+C_IN["IN={(cond,1),(a,2),(b,3)}"]
+C_OUT["OUT={(cond,1),(a,8),(b,3,(c,9)}"]
+
+D_IN["IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}"]
+ 
+  A["blk a
+    1: main cond
+   2: a int = const 47
+   3: b :int = const 42
+   4:br cond .left .right"] 
+   
+   B["blk b
+   5: b: int = const 1
+   6 c:int = const 5 
+   7 jmp .end"]
+  
+   C["blk c
+     8: a :int = const 2
+   9: c: int = const 10
+   10 jmp .end"]
+    D["11: d: int sub  a b
+    12 print d
+    13 ret"]
+%% edges
+    A_IN --&gt; A 
+    A --&gt; A_OUT
+    A_OUT  -- true --&gt; B_IN
+    B_IN --&gt; B
+    B --&gt; B_OUT
+    A_OUT --false --&gt; C_IN
+    C_IN --&gt; C
+    C--&gt;   C_OUT
+    B_OUT--&gt; D_IN
+    C_OUT--&gt; D_IN
+    D_IN --&gt; D
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-in-and-out" class="slide level2 scrollable">
+<h2>calculate in and out</h2>
+<p>For a given block b, we can compute two sets (of definitions):</p>
+<ol type="1">
+<li>kill(b) = all defs in the program that assign to y, and there is a def of y in b<br>
+</li>
+<li>gen(b) = definitions in b that reach the bottom of b</li>
+</ol>
+<p>Reaching defs will need iteration. but these sets do not change</p>
+</section>
+<section id="and-now-globally" class="slide level2 scrollable">
+<h2>And now globally:</h2>
+<ol type="1">
+<li><span class="math inline">\(OUT(b) = (in(b) - kill(b) ) \cup gen(b)\)</span></li>
+<li><span class="math inline">\(IN(b) = \cup \left( \operatorname{OUT}(p) \mid p \in predecessors(b) \right))\)</span></li>
+</ol>
+<p>We call the function for 1 the <strong><em>transfer</em></strong> function for the block, and the function for 2 the <strong><em>merge</em></strong> function</p>
+</section>
+<section id="pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist" class="slide level2">
+<h2>pseudo code : We can solve for IN and OUT iteratively using a worklist</h2>
+<pre><code>// Initialize
+for all CFG nodes n in N,
+    OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];
+
+// put all nodes into the changed set
+// N is all nodes in graph,
+Changed = N;
+
+// Iterate 
+while (Changed != emptyset)
+{
+    choose a node n in Changed;
+    // remove it from the changed set
+    Changed = Changed -{ n };
+
+    // init IN[n] to be empty
+    IN[n] = emptyset;
+  
+    // calculate IN[n] from predecessors' OUT[p]
+    for all nodes p in predecessors(n)
+         IN[n] = IN[n] Union OUT[p];
+
+    oldout = OUT[n]; // save old OUT[n]
+    
+    // update OUT[n] using transfer function f_n ()
+    OUT[n] = GEN[n] Union (IN[n] -KILL[n]);
+
+    // any change to OUT[n] compared to previous value?
+    if (OUT[n] changed) // compare oldout vs. OUT[n]
+    {    
+        // if yes, put all successors of n into the changed set
+        for all nodes s in successors(n)
+             Changed = Changed U { s };
     }
-  ]
-}
-</code></pre>
+}</code></pre>
+</section>
+<section id="questions" class="slide level2">
+<h2>questions</h2>
+<p>Does this always converge?</p>
+<p>what order do we want to select nodes (basic blocks)?</p>
+<div class="fragment">
+<p>allways since the sets change in one direction</p>
+<p>visit a node after visiting its preds. Reverse post order.</p>
 </div>
-</div>
+</section>
+<section id="a-second-problem-liveness-" class="slide level2">
+<h2>a second problem liveness-</h2>
+<p>A variable is live at some point if it holds a value that may be needed in the future, or equivalently if its value may be read before the next time the variable is written to.</p>
+<pre><code>             live = {}
+b = 3        live = b
+c = 5        live = b c 
+a = f(b * c) live = a</code></pre>
+</section>
+<section class="slide level2 scrollable">
+
+<p>We had to consider flow starting at the bottom so this is a <strong><em>backwards</em></strong> analysis</p>
+<p>for a basic block (b):</p>
+<ol type="1">
+<li>GEN(s) the set of variables used in s before any assignment to s in the same block</li>
+<li>kill(s) the set of variables assigned in s</li>
+</ol>
+</section>
+<section id="global-liveness" class="slide level2 scrollable">
+<h2>global liveness</h2>
+<ol type="1">
+<li>OUT(exit) = {}</li>
+<li>IN(b) = gen(b) union ( OUT(b) - KILL(b))</li>
+<li>OUT(b) = union IN(b)</li>
+</ol>
+</section>
+<section id="an-example" class="slide level2">
+<h2>An example</h2>
+<pre><code>// in: {}; predecessor blocks: none
+b1: a = 3; 
+    b = 5;
+    d = 4;
+    x = 100; //x is never being used later thus not in the out set {a,b,d}
+    t = a &gt; b
+    br t .t .f 
+   // out: {a,b,d}    //union of all (in) successors of b1 =&gt; b2: {a,b}, and b3:{b,d}  
+
+
+
+.t   // in: {a,b}; predecessor blocks: b1
+b2: c = a + b;
+    d = 2;
+// out: {b,d}
+
+
+.f 
+b3:  in: {b,d}; predecessor blocks: b1 and b2
+    c = 4;
+    return b * d + c;
+// out:{}</code></pre>
+<p>This can be solved using the same code as before, flip pred, successors because its backward, reverse in and out, set elements are variable names</p>
+</section>
+<section id="data-flow-framework" class="slide level2 scrollable">
+<h2>data flow framework</h2>
+<p>The data flow framework. Here’s how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:</p>
+<ol type="1">
+<li>Figure out the thing you want to know at the entry and exit of each block.</li>
+<li>Write an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a <em>local analysis</em> for the block.), calculate GEN and KILL</li>
+<li>Generate equalities according to the edges in the CFG.</li>
+<li>Solve the system of equations! (Using a general solver algorithm that you don’t need to adapt to every problem.)</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<p>step 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL</p>
+</section>
+<section id="loops" class="slide level2">
+<h2>loops</h2>
+<p>This algorithm has no problems with loops!</p>
+<p>Theory – the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?</p>
+</section>
+<section id="partial-orders" class="slide level2">
+<h2>partial orders</h2>
+<p>The domain of values you’re trying compute needs to form a <em>partial order</em> with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.</p>
+<p>In terms of a partial order ⊑, the merge function is the <em>meet</em> (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so <code>x ⊑ y</code> implies <code>f(x) ⊑ f(y)</code>.</p>
+</section>
+<section class="slide level2">
+
+<p>The usual definition of a “correct” solution to a data-flow problem is the <em>meet-over-all-paths</em> solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block</p>
+</section>
+<section id="other-data-flow-problems" class="slide level2 scrollable">
+<h2>other data flow problems</h2>
+<p>More examples of things you can do with the data flow framework.</p>
+<ol type="1">
+<li>Reaching definitions.</li>
+<li>Live variables: which variables are both defined and going to be used at some point in the future?</li>
+<li>Constant propagation: which variables have statically knowable constant values?</li>
+<li>Available expressions: which <em>expressions</em> have already been computed in the past? (Useful in CSE.)</li>
+<li>Initialized variables: like in Java, which variables have had <em>something</em> written to them?</li>
+<li>Interval analysis: what is the numerical range of values that a given variable might hold?</li>
+</ol>
+</section>
+<section id="ud-chains" class="slide level2">
+<h2>ud chains</h2>
+<p>In data flow we talked about a matrix <strong><em>definitions by uses</em></strong> which is very sparse and very slow to process.</p>
+<p>use-def chains, for each use build a list of all defs that might reach that use.</p>
+<p>def-use chains for each def calculate the set of all uses that the def might reach.</p>
+<p>Both of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section></section>
+</section>
     </div>
   </div>
 

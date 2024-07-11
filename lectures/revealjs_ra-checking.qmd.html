@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.54">
 
-  <title>EECE7398 Fall 2024 – 1 Compiler Overview</title>
+  <title>EECE7398 Fall 2024 – Testing Register allocators</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -28,6 +28,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -325,7 +390,7 @@
   <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
   <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
   <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
-<meta property="og:title" content="1 Compiler Overview – EECE7398 Fall 2024">
+<meta property="og:title" content="Testing Register allocators – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -333,61 +398,211 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">1 Compiler Overview</h1>
+  <h1 class="title">Testing Register allocators</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section>
-<section id="introduction" class="title-slide slide level1 center scrollable">
-<h1>Introduction</h1>
-<p>A compiler writer builds bridges between people and machines, and this task is each day more challenging.</p>
-<ol type="a">
-<li>Software engineers want abstractions<br>
+<section id="this-is-based-on-the-cranelift-compiler-used-for-web-assembly-and-rust" class="slide level2">
+<h2>this is based on the <a href="https://cranelift.dev/">cranelift</a> compiler used for web-assembly and rust</h2>
+</section>
+<section id="what-is-register-allocation" class="slide level2">
+<h2>what is register allocation</h2>
+<p>In Bril and LLVM a program can use an arbitrary number of registers,</p>
+<pre><code>void f() {
+    int x0 = compute(0);
+    int x1 = compute(1);
+    // ...
+    int x99 = compute(99);
+    
+    // --- 100 possibly different values were computed 
+    // --- where are those values stored?
+    
+    consume(x0);
+    consume(x1);
+    // ...
+    consume(x99);
+}
+</code></pre>
+</section>
+<section id="storing-variables" class="slide level2 scrollable">
+<h2>storing variables</h2>
+<p>one option</p>
+<p>Allocate a memory location for each local variable. All of the <span class="math inline">\(x_N\)</span> variables above semantically live in memory. When the function is called, it allocates a nwe area on the stack called the stack frame and uses it to store local variables.</p>
+<p>This means that adding two variables, takes two loads, one add, and one store so it is very slow</p>
+<p>Compiling code in this way is very fast because we need to make almost no decisions: a variable reference always becomes a memory load,</p>
+<p>On computers we have a limited set of registers</p>
+<p>Register allocation: is assigning a value in the program to a register for storage. The register allocator decides how to shuffle values between memory and registers, and between register.</p>
+<p>In Bril and LLVM we have virtual registers - as many as you want. The register allocator has to rewrite the instructions to use physical registers. Since the number of physical registers is limited, The allocator might insert additional instructions:</p>
+<ol type="1">
+<li>stores (called spills) to move a register to memory</li>
+<li>loads (called reloads) to move memory to a register</li>
+<li>moves to copy from one register to another</li>
+</ol>
+<p>The locations in memory are usually on the stack and are called spill-slots</p>
+</section>
+<section id="example-of-register-allocation-on-a-machine-with-two-physical-registers" class="slide level2">
+<h2>example of register allocation on a machine with two physical registers</h2>
+<pre><code>virtual register code          physical register code 
+                               {v0 -&gt; r0, v1 -&gt; r1}
+                               store r1, [sp+0]  a spill
+add v2, v0, v1                 add r1, r0, r1 
+                               {v0 -&gt; r0, v1-&gt; [sp+-0], v2-&gt; r1}
+sub v3, v2, v0                 sub r1, r1, r0
+                               load r0, [sp+0]  a reload 
+mul  v4, v3, v1                mul r0, r1, r0
+                               {v4-&gt; r0}
+store v4, [sp+48]              store r0, [sp+48]</code></pre>
+</section>
+<section id="complexity" class="slide level2">
+<h2>complexity</h2>
+<p>if you do register allocation for code that is not in SSA, this is NP-complete But if you do it on code that is in SSA, the time complexity is polynomial.</p>
+<p>There are lots of approximate algorithms- all complicated, lots of machines have extra constraints for instance there is a GPU load instruction that read 128 bits from memory and puts the value into 4 consecutive registers</p>
+<p>I’m not going to talk about these algorithms here</p>
+</section>
+<section id="how-to-verify-correctness-of-an-allocator" class="slide level2">
+<h2>How to Verify Correctness of an allocator?</h2>
+<p>Before and after the allocator, we have the same instructions (except for those added by the allocator)</p>
+<p>assume we have a machine with an infinite register set and a second machine with a finite register set.</p>
+<p>Correct means both programs executed on these two machines get the same answer for all possible inputs</p>
+</section>
+<section id="how-do-we-test-this" class="slide level2">
+<h2>how do we test this?</h2>
+<p>How do we test this equivalence?</p>
+<p>pick a random program and a random input. interpret and see if the result is the same.</p>
+<p>could try more random inputs, could generate more random programs (fuzzer tools)</p>
+<p>Could reasonably confident but not 100% and very expensive</p>
+</section>
+<section id="use-value-numbering-check-one-program-one-basic-block-all-possible-inputs" class="slide level2">
+<h2>use value numbering check one program, one basic block, all possible inputs</h2>
+<pre><code>// original               // allocated 
+ld v0, [A]                ld r0, [A]
+ld v1, [B]                ld r1, [B]
+ld v2, [C]                ld r2, [C]
+add v3, v0, v1            add r0, r0, r1
+add v4, v2, v3            add r0, r2, r0
+return v4                 return r0
+</code></pre>
+<pre><code>v0 -&gt; vn 1 ld [A]         r0 -&gt; vn 1 ld [A]
+v1 -&gt; vn 2 ld [B]         r1 -&gt; vn 2 ld [B]
+v2 -&gt; vn 3 ld [C]         r2 -&gt; vn 3 ld [C]
+v3 -&gt; vn 4 add 1,2        r0 -&gt; vn 4 add 1,2 
+v4 -&gt; vn 5 add 3,4        r0 -&gt; vn 5 add 3,4 
+return vn 5               return vn 5</code></pre>
+</section>
+<section id="check-more-then-one-program-all-programs-at-once" class="slide level2">
+<h2>check more then one program (all programs at once)</h2>
+<p>This requires a proof that the two programs get the same result - this is an active research question -</p>
+<p>some success but not easy</p>
+<p>not used in production</p>
+</section>
+<section id="best-we-can-do-is-generate-lots-of-programs-check-each-one" class="slide level2">
+<h2>best we can do is generate lots of programs check each one</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a></a>graph LR</span>
+<span id="cb5-2"><a></a>A[Virtual code]</span>
+<span id="cb5-3"><a></a>B[Register allocator]</span>
+<span id="cb5-4"><a></a>C[Machine code]</span>
+<span id="cb5-5"><a></a>D[Checker]</span>
+<span id="cb5-6"><a></a>E[Fuzzing engine]</span>
+<span id="cb5-7"><a></a>A--&gt; B</span>
+<span id="cb5-8"><a></a>B--&gt; C</span>
+<span id="cb5-9"><a></a>C --&gt; D</span>
+<span id="cb5-10"><a></a>D --&gt; E</span>
+<span id="cb5-11"><a></a>E --&gt; A</span>
+<span id="cb5-12"><a></a>A --&gt; D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR
+A[Virtual code]
+B[Register allocator]
+C[Machine code]
+D[Checker]
+E[Fuzzing engine]
+A--&gt; B
+B--&gt; C
+C --&gt; D
+D --&gt; E
+E --&gt; A
+A --&gt; D
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>We could use the fuzzer to generate random programs or we could use a test set</p>
+</section>
+<section id="algorithm-linear-in-number-of-instructions" class="slide level2">
+<h2>algorithm (linear in number of instructions)</h2>
+<p>for each instruction we need to form pairs - virtual and physical register that holds the same value</p>
+<p>for instruction v and p, check that the arguments are equal, if not fail add the pair dest of v == dest of p</p>
+<p>does not matter what the original op code was, just need register names</p>
+</section>
+<section id="more-general" class="slide level2 scrollable">
+<h2>more general</h2>
+<p>Treat the allocated program as containing:</p>
+<ol type="1">
+<li>Spill <spillslot>, <cpu register="">: copy data (symbol representing virtual register) from a register to a spill slot.</cpu></spillslot></li>
+<li>Reload <cpu register="">, <spillslot>: copy data from a spill slot to a register.</spillslot></cpu></li>
+<li>copy <cpu register="">, <cpu register="">: move data from one CPU register to another (N.B.: only regalloc-inserted moves are recognized as a Move, not moves in the original input program.)</cpu></cpu></li>
+<li>Op read:<cpu register="" list="">, read_orig:<virtual register="" list=""> write:<cpu register="" list=""> write_orig:<virtual register="" list="">: some arbitrary operation that reads some registers and writes some other registers.</virtual></cpu></virtual></cpu></li>
+</ol>
+<p>Run the value number over this:</p>
+<p>state: for each physical register, and spill slot</p>
+<p>we need either:</p>
+<ol type="1">
+<li>the virtual register name</li>
+<li>unknown -<br>
 </li>
-<li>Hardware engineers want efficiency</li>
+<li>conflicted if it has more then one virtual register</li>
 </ol>
 </section>
-<section id="early-compilers" class="slide level2">
-<h2>Early Compilers</h2>
-<p>Originally, a compiler was a person doing calculations.</p>
-<p>In 1952, Grace Hopper an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”</p>
-<p>[<img data-src="images/Grace_Hopper_and_UNIVAC.jpg" alt="hopper">]</p>
+<section id="steps-still-no-control-flow" class="slide level2">
+<h2>steps (still no control flow )</h2>
+<p>When we see a Spill, Reload, or Move, we copy the symbolic state from the source location (register or spill slot) to the destination location.</p>
+<p>When we see an Op, we do some checks then some updates:</p>
+<p>For each read (input) register, we examine the symbolic value stored in the given register.</p>
+<p>If that symbol matches the virtual register that the original instruction used, then the allocator has properly conveyed the virtual register’s value to its use here, and thus the allocation is correct</p>
+<p>If not, we can signal a checker error, and look for the bug in our register allocator. why are there no false positives?</p>
+<p>For each write (output) register, we set the symbolic value stored in the given CPU register to be the given virtual register.</p>
 </section>
-<section id="fortran" class="slide level2">
-<h2>FORTRAN</h2>
-<p>In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).</p>
-<p>2/3 of the cost and 90% of the time for solving a problem was coding</p>
-<p>FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.</p>
-</section>
-<section id="development-model" class="slide level2 scrollable">
-<h2>development model</h2>
-<p>In these early years, the development model was:</p>
-<ol type="1">
-<li>build a new machine</li>
-<li>design a new language</li>
-<li>implement the compiler</li>
-</ol>
-<p>Vendors sometimes built compilers but often used small startup compiler companies.</p>
-</section>
-<section class="slide level2 scrollable">
-
-<p>Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.</p>
-<ol type="1">
-<li>Front end - parse the program into IR</li>
-<li>Middle end - machine independent optimizations and analyses</li>
-<li>Back end - machine specific stuff where machine code is generated</li>
-</ol>
+<section id="control-flow" class="slide level2">
+<h2>control flow</h2>
+<p>We can use data flow and a lattice</p>
+<p>here is the lattice</p>
 <div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>graph TD</span>
+<span id="cb6-2"><a></a>A[Unknown]</span>
+<span id="cb6-3"><a></a>B[VR0]</span>
+<span id="cb6-4"><a></a>C[VR1]</span>
+<span id="cb6-5"><a></a>D[VR2]</span>
+<span id="cb6-6"><a></a>E[Conflicted]</span>
+<span id="cb6-7"><a></a>A--&gt;B</span>
+<span id="cb6-8"><a></a>A--&gt;C</span>
+<span id="cb6-9"><a></a>A--&gt;D</span>
+<span id="cb6-10"><a></a>B --&gt;E</span>
+<span id="cb6-11"><a></a>C--&gt; E</span>
+<span id="cb6-12"><a></a>D--&gt; E</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph LR;
-A[Front end]--IR--&gt; B[Middle end];
-B--IR--&gt; C[Back end];
-A--IR--&gt; C;
+<pre class="mermaid mermaid-js">graph TD
+A[Unknown]
+B[VR0]
+C[VR1]
+D[VR2]
+E[Conflicted]
+A--&gt;B
+A--&gt;C
+A--&gt;D
+B --&gt;E
+C--&gt; E
+D--&gt; E
 </pre>
 </div>
 <p></p></figure><p></p>
@@ -395,191 +610,55 @@ A--IR--&gt; C;
 </div>
 </div>
 </section>
-<section class="slide level2 scrollable">
-
-<p>This course focuses on part 2</p>
-<p>A goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.</p>
-<p> There are many ways to compare the performance of programs:</p>
-<ol type="1">
-<li>Time</li>
-<li>Space</li>
-<li>Energy</li>
-</ol>
+<section id="now-for-the-data-flow" class="slide level2">
+<h2>now for the data flow</h2>
+<p>We start out with all physical registers and spill slots as ‘unknown’ At each join point move down the lattice</p>
+<p>conflicted is ok, so long as it is not used</p>
+<p>Since the number of physical registers and spill slots is finite we can can merge all of them at the top of each basic block.</p>
+<p>like usual we might pick a good order to process basic blocks</p>
 </section>
-<section id="gcc" class="slide level2">
-<h2>gcc</h2>
-<p>In 1987, GCC was released. It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR. Adding an optimization or reordering optimizations is quite hard.</p>
-<p>Vendors could use one front end, one middle end and only need to write a new back end.</p>
-</section>
-<section class="slide level2">
-
-<p>This ended almost all the compiler startups. Free front end, middle end.</p>
-<p>In gcc the IR is somewhat C based, for instance there are pointers but there is no simple way to talk about garbage collection without hacks.</p>
-</section>
-<section id="llvm" class="slide level2">
-<h2>LLVM</h2>
-<p>in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.</p>
-<p>The core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.</p>
+<section id="how-about-an-example" class="slide level2">
+<h2>How about an example:</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>graph TD</span>
+<span id="cb7-2"><a></a>A[p0-&gt;v1, [sp+4] -&gt; v2]</span>
+<span id="cb7-3"><a></a>B[p0-&gt;v9, [sp+4] -&gt; v2]</span>
+<span id="cb7-4"><a></a>C["top,</span>
+<span id="cb7-5"><a></a>   reload p0 from  [sp+4]]</span>
+<span id="cb7-6"><a></a>A--&gt; C</span>
+<span id="cb7-7"><a></a>B --&gt; C</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph LR;
-A[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};
-A--IR--&gt; C;
+<pre class="mermaid mermaid-js">graph TD
+A[p0-&gt;v1, [sp+4] -&gt; v2]
+B[p0-&gt;v9, [sp+4] -&gt; v2]
+C["top,
+   reload p0 from  [sp+4]]
+A--&gt; C
+B --&gt; C
 </pre>
 </div>
 <p></p></figure><p></p>
 </div>
 </div>
 </div>
+<p>at the top of C, we see that physical p0 is conflicted -<br>
+but that is not a error</p>
+<p>after the reload we find it contains v2</p>
 </section>
-<section class="slide level2">
-
-<p>Optimizations form <em>passes</em>. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments.</p>
-</section>
-<section id="bril" class="slide level2">
-<h2>bril</h2>
-<p>In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.</p>
-<div class="cell" data-reveal="true" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">graph TB;
-A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[BRIL interpreter];
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</section>
-<section id="cost-of-a-compiler." class="slide level2">
-<h2>Cost of a compiler.</h2>
-<p>Compilers are massive and expensive to build.</p>
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>Compiler</th>
-<th style="text-align: right;">Year Started</th>
-<th style="text-align: right;">Developers</th>
-<th style="text-align: right;">Lines Of Code</th>
-<th style="text-align: right;">Est Cost $</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>GCC 9.2.0</td>
-<td style="text-align: right;">1988</td>
-<td style="text-align: right;">617</td>
-<td style="text-align: right;">5,591,759</td>
-<td style="text-align: right;">425,747,279</td>
-</tr>
-<tr class="even">
-<td>LLVM 8.0.1</td>
-<td style="text-align: right;">2001</td>
-<td style="text-align: right;">1,210</td>
-<td style="text-align: right;">6,877,489</td>
-<td style="text-align: right;">529,894,190</td>
-</tr>
-<tr class="odd">
-<td>OpenJDK 14+10</td>
-<td style="text-align: right;">2007</td>
-<td style="text-align: right;">883</td>
-<td style="text-align: right;">7,955,827</td>
-<td style="text-align: right;">616,517,789</td>
-</tr>
-<tr class="even">
-<td>v8 7.8.112</td>
-<td style="text-align: right;">2008</td>
-<td style="text-align: right;">736</td>
-<td style="text-align: right;">3,043,793</td>
-<td style="text-align: right;">225,195,832</td>
-</tr>
-<tr class="odd">
-<td>Rust 1.37.0</td>
-<td style="text-align: right;">2010</td>
-<td style="text-align: right;">2,737</td>
-<td style="text-align: right;">852,877</td>
-<td style="text-align: right;">59,109,425</td>
-</tr>
-<tr class="even">
-<td>Swift</td>
-<td style="text-align: right;">2010</td>
-<td style="text-align: right;">857</td>
-<td style="text-align: right;">665,238</td>
-<td style="text-align: right;">45,535,689</td>
-</tr>
-<tr class="odd">
-<td>Intel Graphics 1.0.10</td>
-<td style="text-align: right;">2018</td>
-<td style="text-align: right;">149</td>
-<td style="text-align: right;">694,688</td>
-<td style="text-align: right;">46,934,626</td>
-</tr>
-</tbody>
-</table>
-<p>From CGO 2022 keynote</p>
-</section>
-<section class="slide level2">
-
-<p>Some observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.</p>
-</section>
-<section id="compiler-assumptions-lets-talk-about-how-many-are-still-true" class="slide level2 scrollable">
-<h2>Compiler Assumptions (Let’s talk about how many are still true)</h2>
-<ol type="1">
-<li>The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.</li>
-<li>Users are ok with large programs taking minutes to compile</li>
-<li>Compilers run on machines that are memory-limited.</li>
-<li>Compilers run on single-threaded machines.</li>
-<li>Most targets are C-like.</li>
-</ol>
-</section>
-<section class="slide level2 scrollable">
-
-<p>Some changes since early 2000’s:</p>
-<ol type="1">
-<li>Integrated development environments. When you type a.b what has to happen?</li>
-<li>DSL (Doman specific languages for AI)</li>
-<li>More kinds of hardware</li>
-</ol>
-</section>
-<section id="how-well-do-compilers-do" class="slide level2">
-<h2>How well do compilers do</h2>
-<p>At the scale of data-centers, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
-<p><a href="https://proebsting.cs.arizona.edu/law.html">proebsting’s law</a></p>
-<p>Compiler Advances Double Computing Power Every 18 Years.<br>
-while hardware computing horsepower doubles every 18 months. How would you prove this?</p>
-<p><a href="https://zeux.io/2022/01/08/on-proebstings-law/">one attempt</a></p>
-</section>
-<section id="why-are-compilers-not-better" class="slide level2">
-<h2>why are compilers not better</h2>
-<p>Talk given by KAI’s Arch Robison</p>
-<p>Compile-time program optimizations are similar to poetry: more are written than actually published in commercial compilers. Hard economic reality is that many interesting optimizations have too narrow an audience to justify their cost in a general-purpose compiler and custom compilers are too expensive to write.</p>
-</section>
-<section id="effects-of-optimization" class="slide level2 scrollable">
-<h2>effects of optimization</h2>
-<p>Remove performance penalty for:</p>
-<ol type="1">
-<li>using higher level constructs</li>
-<li>safety checks (e.g., array bounds checks)</li>
-<li>writing clean, simple code (no benefit to applying loop unrolling by hand)</li>
-<li>Encourage ADT’s that are as efficient as primitive types</li>
-</ol>
-</section>
-<section class="slide level2">
-
-<p>Over time hardware has become more of a challenge for compilers, for example caches are not predictable at compile time. So compilers have to guess</p>
-<p>And hardware can ignore features of the compiler can deal with them - for example interlock</p>
+<section id="tracing-pointers--" class="slide level2">
+<h2>tracing pointers -</h2>
+<p>Since we know what virtual registers are in each spill-slot, and virtual registers have types we can tell which spill slots contain pointers</p>
+<p>suppose we have a spot where we might call a gc, we could force spilling of all live vrs that contain a pointer and then tell the gc which spill locations to consider</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section></section>
+</section>
     </div>
   </div>
 

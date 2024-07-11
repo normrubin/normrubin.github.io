@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.54">
 
-  <title>EECE7398 Fall 2024 – _ partial_redundancy elimination</title>
+  <title>EECE7398 Fall 2024 – Dynamic Memory Management</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -322,10 +322,7 @@
       margin-right: 0; 
     }
   </style>
-  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
-<meta property="og:title" content="_ partial_redundancy elimination – EECE7398 Fall 2024">
+<meta property="og:title" content="Dynamic Memory Management – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -333,179 +330,34 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">_ partial_redundancy elimination</h1>
+  <h1 class="title">Dynamic Memory Management</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="partial-redundancy-elimination" class="slide level2">
-<h2>partial redundancy elimination</h2>
-<div class="columns">
-<div class="column">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
-b1[a = b + c]
-b2[" "]
-b3[d = b + c]
-b1--&gt; b3
-b2--&gt; b3
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div><div class="column">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
-b1["t = b + c
-    a = t"]
-b2[t = b + c]
-b3[d =t]
-b1--&gt; b3
-b2--&gt; b3
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="simplifications" class="slide level2 scrollable">
-<h2>simplifications</h2>
-<ol type="1">
-<li>only going to look at one expression <span class="math inline">\(b + c\)</span></li>
-<li>initially all nodes in the cfg contain at most one assignment statement</li>
-<li>if there is a node that has multiple successors (a branch node) and one of the successors has multiple predecessors (a join) node we have added a extra node between them</li>
-</ol>
-</section>
-<section id="down-safe" class="slide level2">
-<h2>down safe</h2>
-<p>we are moving computations earlier in the cfg</p>
-<p>don’t move so far that it might not be used, or that an argument gets changed</p>
-<div class="columns">
-<div class="column">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
-b1[" "]
-b2[" "]
-b3[b = d + e]
-b4[a = b + c]
-b5[" "]
-b6[d = b + c]
-b1 --&gt; b2
-b1 --&gt; b3
-b2 --&gt; b4
-b4 --&gt; b5
-b5 --&gt; b4
-b3 --&gt; b6
-b4 --&gt; exit
-b6 --&gt; exit
+<section class="slide level2">
 
-</pre>
+<div class="callout callout-warning callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<p></p></figure><p></p>
+<p><strong>Warning</strong></p>
 </div>
-</div>
-</div>
-</div><div class="column">
-<p>cannot move b +c to top, because b changes</p>
-</div></div>
-</section>
-<section id="down-safe-1" class="title-slide slide level1 center">
-<h1>down safe</h1>
-<p>a node n is <strong><em>down–safe</em></strong> if we can move the computation of <span class="math inline">\(b+c\)</span> to the top of n if the result would be definitely used before any of the arguments are changed.</p>
-<p>that means it would be useful to compute it here</p>
-<p>This is also called <strong><em>anticipatable</em></strong> or <strong><em>very busy</em></strong></p>
-<p>down-safe can be setup as a data flow problem</p>
-</section>
-
-<section>
-<section id="data-flow-for-down-safe" class="title-slide slide level1 center scrollable">
-<h1>data flow for down-safe</h1>
-<ol type="1">
-<li>local operations:
-<ol type="a">
-<li>define Used(block) is <span class="math inline">\(b +c\)</span> is used in the block</li>
-<li>define transparent(block) is neither b or c is assigned in the block</li>
-</ol></li>
-</ol>
-<p><span class="math display">\[
-D_{\text{safe}}(\text{exit}) = \text{false}
-\]</span></p>
-<p><span class="math display">\[
-D_{\text{safe}}(n)=\text{used}(n) \cap [ \text{trans}(n) \cap_{s \in \text{succs}(n)}D_{\text{safe}}(s)]
-\]</span></p>
-</section>
-<section id="up-safe" class="slide level2">
-<h2>up-safe</h2>
-<p>We can add a computation of <span class="math inline">\(b+c\)</span> in any down-safe node. We want to pick a good one.</p>
-<p>define <strong><em>up-safe</em></strong>(block) (also called <strong><em>available</em></strong>) if <span class="math inline">\(b+c\)</span> will be definitely used without being killed, computed on every path from entry to the block and not killed</p>
-<p>Do not add <span class="math inline">\(b+c\)</span> to a block if the expression is available at that block</p>
-<p>up-safe is a second data flow problem</p>
-<p><span class="math display">\[
-U_{\text{safe}}(\text{entry}) = \text{false}
-\]</span></p>
-<p><span class="math display">\[
-U_{\text{safe}}(n)=  \text{trans}(n) \cap_{p \in \text{preds}(n)} \text{used}(p) \cup \text{U}_{\text{safwe}}(p)
-\]</span></p>
-</section>
-<section id="placement" class="slide level2 scrollable">
-<h2>placement</h2>
-<p>want a down-safe node, that is not up-safe</p>
-<ol type="1">
-<li>pick the closest to the entry (min number of computations)</li>
-<li>pick a later node to lower register pressure</li>
-</ol>
-<div class="cell" data-reveal="true" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
-A[a: Down-safe]
-B[b+c  :avail]
-C[c: Down-safe]
-D[:avail,Down-safe]
-E[e: Down-safe]
-F[b+c: Down-safe]
-A--&gt;C
-B--&gt;D
-C--&gt; E
-D--&gt; E
-E--&gt; F
-</pre>
-</div>
-<p></p></figure><p></p>
+<div class="callout-content">
+<p>not done</p>
 </div>
 </div>
 </div>
-<p>We could move b+c in nodes a,c or e, but e does not help</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section></section>
+</section>
     </div>
   </div>
 

@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.54">
 
-  <title>EECE7398 Fall 2024 – Performance and Measurement</title>
+  <title>EECE7398 Fall 2024 – local value numbering</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -322,7 +322,7 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="Performance and Measurement – EECE7398 Fall 2024">
+<meta property="og:title" content="local value numbering – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -330,90 +330,278 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Performance and Measurement</h1>
+  <h1 class="title">local value numbering</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section>
-<section id="measurement" class="title-slide slide level1 center">
-<h1>Measurement</h1>
+<section class="slide level2">
 
+<h3 id="local-value-numbering">Local Value Numbering</h3>
+<p>Value numbering is a very powerful technique that removes <strong><em>redunancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
 </section>
-<section id="example-1" class="slide level2">
-<h2>example 1</h2>
-<p><a href="papers/wrong_data.pdf">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
-<p>445 references</p>
+<section class="slide level2">
+
+<p>The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)</p>
+<p>Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives tha a new value number.</p>
+<p>Two instructions are redundant if they have same op code and operands, which means the same value number</p>
+</section>
+<section class="slide level2">
+
+<p><span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> have the same value number if and only if <span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> are provably equal for all possible operands of the expressions.</p>
+</section>
+<section id="local-value-numbering-covers-lot-of-optimizations-that-look-different" class="slide level2">
+<h2>local value numbering covers lot of optimizations that look different</h2>
+<pre><code>dead code elimination
+
+main {
+    a: int = const 100;
+    a: int = const 42;
+    print a;
+
+}
+
+copy propagation
+
+main{
+    x: int = const 4;
+    copy1: int = id x;
+    copy2: int = id copy1;
+    print copy2;
+}
+
+common sub-expression elimination cse 
+
+main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add a b;
+    prod: int = mul sum1 sum2;
+    print prod;
+}</code></pre>
+</section>
+<section id="variables-vis-values" class="slide level2">
+<h2>variables vis values</h2>
+<p>We want to stop thinking about variables and think about values. Two instructions are redundant if they compute the same value.</p>
+</section>
+<section class="slide level2">
+
+<p>for example in a JIT compiler we want computation to be fast so we can get rid of all the variables</p>
+<pre><code>b: int const 1;
+c: int cont 2;
+a:  int b c;  </code></pre>
+<p>becomes:</p>
+<pre><code>[  int const 1
+   int const 2 
+   int 0 1
+]</code></pre>
+<p>less storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.</p>
 </section>
 <section class="slide level2 scrollable">
 
+<p>Pseudo code (similar to an interpreter)</p>
 <ol type="1">
-<li>Measurement bias is significant</li>
-<li>Changing aspects of an experimental setup can introduce measurement bias. ​ Measurement bias is unpredictable and there are no obvious ways to avoid it. ​ Prior work in computer system evaluation does not adequately consider measurement bias. ​</li>
-<li>The paper discusses two techniques for dealing with measurement bias: experimental setup randomization and causal analysis. ​</li>
-<li>Measurement bias occurs for all benchmarks and architectures. ​</li>
-<li>Measurement bias due to link order can significantly fluctuate conclusions. ​</li>
-<li>Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​</li>
-<li>To avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​ —</li>
+<li><p>hash table constants and expressions of value numbers to value numbers and to a variable holding the value</p></li>
+<li><p>reverse map from variables to value numbers</p></li>
 </ol>
 </section>
 <section class="slide level2">
 
-<p>A sample blog post about this paper <a href="https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/">blog</a></p>
-</section>
-<section id="another-example" class="slide level2">
-<h2>another example</h2>
-<p><a href="https://www.thonking.ai/p/strangely-matrix-multiplications">Strangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!</a></p>
-<p><a href="https://www.sigplan.org/Resources/EmpiricalEvaluation/">SIGPLAN Empirical Evaluation Guidelines</a></p>
-</section>
-<section id="violin-plots" class="slide level2">
-<h2>violin plots</h2>
-<p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
-<div id="b6acb2c2" class="cell" data-execution_count="1">
-<div class="cell-output cell-output-stdout">
-<pre><code>   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \
-0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   
-1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   
-2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   
-3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   
-4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   
+<div class="columns">
+<div class="column">
+<pre><code>  main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add a b;
+    prod: int = mult sum1 sum2;
+    print prod
 
-   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \
-0     45.0             77.0                  122.0      2200.0  Unknown   
-1     35.0            192.0                 4800.0      3200.0  Unknown   
-2     28.0              NaN                    NaN      2600.0    Intel   
-3     80.0            160.0                 1400.0      1800.0    Intel   
-4    125.0            258.0                  758.0      3700.0  Unknown   
-
-  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  
-0    AMD          NaN          NaN          NaN  
-1    AMD          NaN          NaN          NaN  
-2  Intel          NaN          NaN          NaN  
-3  Intel          NaN          NaN          NaN  
-4    AMD          NaN          NaN          NaN  </code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure>
-<p><img data-src="01a_performance_measurement_files/figure-revealjs/cell-2-output-2.png" width="799" height="429"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>I might want to take date into account in these plots</p>
+  }</code></pre>
+</div><div class="column" style="font-size: 60%;">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>key</th>
+<th>value</th>
+<th>canonical name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>const 4</td>
+<td>1</td>
+<td>a</td>
+</tr>
+<tr class="even">
+<td>const 2</td>
+<td>2</td>
+<td>b</td>
+</tr>
+<tr class="odd">
+<td>add 1 2</td>
+<td>3</td>
+<td>sum1</td>
+</tr>
+<tr class="even">
+<td>mul 3 3</td>
+<td>4</td>
+<td>prod</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>name</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>b</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td>sum1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td>sum2</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td>prod</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</section>
+<section>
+<section id="steps" class="title-slide slide level1 center">
+<h1>steps</h1>
+<pre><code>for each instruction 
+   build a temp instruction  
+   for each arg,  
+       see if the argument has a value number, if it does 
+      update the temp instruction to use the canonical name
+      if the argument has no vn give it one 
+  see if  the temp instruction is in the table, if is,
+      delete it 
+      give the dest the value number that was found </code></pre>
 </section>
 <section class="slide level2 scrollable">
 
-<p>A violin plot shows density curves. The width is the approximate frequency of data points at that value</p>
-<p>Best for comparing distributions</p>
-<p>consider ordering the groups</p>
-<p>The details</p>
+<p>extensions:</p>
 <ol type="1">
-<li>the white dot represents the median</li>
-<li>the thick gray bar in the center represents the inter-quartile range</li>
-<li>the thin gray line represents the rest of the distribution, except for points that are determined to be “outliers” using a method that is a function of the inter-quartile range.</li>
-<li>On each side of the gray line is a kernel density estimation to show the distribution shape of the data. Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability.</li>
+<li>a: int id b</li>
+</ol>
+<p>a gets the value number of b. No copy required</p>
+<ol start="2" type="1">
+<li>add a b; for add sort value numbers so add a b; and add b a; get the same value number</li>
+</ol>
+</section>
+<section id="extension-3" class="slide level2 scrollable">
+<h2>extension 3</h2>
+<pre><code>constant folding 
+   a: int const 1;
+   b: int const 2;
+   c: add a b;</code></pre>
+<ol start="3" type="1">
+<li>if both value numbers are pointing to constants- actually do the add</li>
+</ol>
+</section>
+<section id="problem-canonical-variables-might-be-overwritten" class="slide level2">
+<h2>problem: canonical variables might be overwritten</h2>
+<p><code>x = a+b       x =        = a+b</code></p>
+<div class="fragment">
+<p>one option is to save the value, if x will be overwritten add a temp</p>
+<pre><code>t = a+b
+x = t 
+x = 
+  = t </code></pre>
+</div>
+</section>
+<section id="pseudo-code" class="slide level2">
+<h2>pseudo code</h2>
+<pre><code>   table = mapping from value tuples to canonical variables,
+     with each row numbered
+   
+   var2num = mapping from variable names to their current
+     value numbers (i.e., rows in table)
+
+   for instr in block:
+       value = (instr.op, var2num[instr.args[0]], ...)
+
+       if value in table:
+           # The value has been computed before; reuse it.
+           num, var = table[value]
+           delete the instruction 
+
+       else:
+           # A newly computed value.
+           num = fresh value number
+
+           dest = instr.dest
+           if instr.dest  will be overwritten later:
+                dest = fresh variable name
+                instr.dest = dest
+           else:
+                dest = instr.dest
+
+           table[value] = num, dest
+
+           for a in instr.args:
+               replace a with table[var2num[a]].var
+
+       var2num[instr.dest] = num</code></pre>
+</section>
+<section id="local-value-numbering." class="slide level2">
+<h2>Local value numbering.</h2>
+<p>You can see one implementation in <code>lvn.py</code> in the Bril repository. But seriously, don’t be tempted! You want to write your implementation without looking at mine!</p>
+<p><a href="https://github.com/normrubin/bril/tree/main/examples">examples</a></p>
+</section>
+<section id="testing-your-optimizations" class="slide level2 scrollable">
+<h2>Testing Your Optimizations</h2>
+<p>As part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:</p>
+<ol type="1">
+<li>Not break programs.</li>
+<li>Make programs faster, most of the time.</li>
+</ol>
+</section>
+<section class="slide level2">
+
+<p>As with every task in this class, part of the work is checking that you have done what you set out to do — in this case, that your optimizations do those two things.</p>
+</section>
+<section id="think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria." class="slide level2">
+<h2>Think carefully about how to make a convincing case for each of those criteria.</h2>
+<p>One tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).</p>
+</section>
+<section class="slide level2">
+
+<p>While there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available <a href="https://capra.cs.cornell.edu/bril/tools/bench.html">Bril benchmark</a>, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.</p>
+</section>
+<section class="slide level2 scrollable">
+
+<p>If this is the route you choose, you can do it however you like, There is a simple tool that you can consider using, called Brench. Brench is not very fancy; it does three things:</p>
+<ol type="1">
+<li><p>It makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)</p></li>
+<li><p>It checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)</p></li>
+<li><p>It can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)</p></li>
+</ol>
+<p>Those three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!</p>
+<p>:::</p>
+<ol type="1">
+<li>run multiple commands over a list of tests</li>
+<li>check the each command got the same output for each text</li>
+<li>collect a statistic for each command</li>
 </ol>
 
 <div class="quarto-auto-generated-content">
