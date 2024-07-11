@@ -1,5 +1,4 @@
----
-format:
+---format:
   html: default
 tbl-colwidths:
 - 10
@@ -9,7 +8,6 @@ tbl-colwidths:
 - 15
 - 15
 title: EECS7398 Weekly Schedule fa 2024
-
 ---
 
 

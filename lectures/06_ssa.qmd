@@ -1,17 +1,19 @@
 ---
-title: "6 Static single Assignment"
-sidebar: false 
-format: 
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-line-numbers: true
+    output-file: revealjs_06_ssa.qmd
+    scrollable: true
+sidebar: false
+title: Static Single Assignment
 
-    revealjs:
-        chalkboard: true
-        output-file: revealjs-ssa
-        scrollable: true
-keep-ipynb: true
-python: kaggle_comp
 ---
 
-    html: default
+
 
 
 ## Static single assignment (SSA) 
@@ -60,9 +62,9 @@ variable i has two static assignments 0 and 4, so this program is not in SSA
 Variable s has two static assignments, x has one static assignment but x has lots of dynamic assignments (when the program executes)
 
 
-## straightline code 
+## straight line code 
 
-We call a program without branches a piece of ***straightline code***. 
+We call a program without branches a piece of ***straight line code***. 
 
 ```
     @main {

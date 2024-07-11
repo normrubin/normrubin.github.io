@@ -3,8 +3,8 @@ project:
   resources: 
     - lectures/images/*
     - notebooks/*
-  # pre-render:
-  #     - python runfirst.py
+  pre-render:
+       - python fix_meta.py
 
 website:
 
@@ -13,7 +13,9 @@ website:
   description: "Homepage EECS7398 - Special Topic: Compilers, Fall 2024."
   site-url: "https://normrubin.github.io/"
   repo-url: https://github.com/normrubin/normrubin.github.io
-  repo-actions: [edit, issue]
+  repo-actions: [issue]
+  search:
+    type: textbox
 
 
 
