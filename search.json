@@ -414,7 +414,343 @@
     "href": "lectures/14_gpu_compilers.html",
     "title": "GPU Compilers",
     "section": "",
-    "text": "Warning\n\n\n\nnot done\n\n\n\n\n\n Back to top"
+    "text": "Why is it hard to learn about gpus?\n\narchitectural variations - all the vendors keep changing the architecture. Different vendors build different hardware Graphics programs run on all vendors, because vendors ship the ir and do finalization on the device\ninconsistent terminology - vendors use different terms for the same features and reuse cpu terms somewhat differently for instance a “Cuda core” is not the same as a ‘cpu core’\nLegacy terminology - some terms come from gpu history of graphics for example a shader is a program\nsoftware abstractions - big frameworks high the details\nCUDA is the market leader, so most explanations use CUDA terms. For instance AMD uses ‘wave’ to mean more or less the same as a CUDA ‘warp’ but lots of AMD documentation uses ‘warps’\nCUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA python etc."
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#gpu-architecture",
+    "href": "lectures/14_gpu_compilers.html#gpu-architecture",
+    "title": "GPU Compilers",
+    "section": "",
+    "text": "Why is it hard to learn about gpus?\n\narchitectural variations - all the vendors keep changing the architecture. Different vendors build different hardware Graphics programs run on all vendors, because vendors ship the ir and do finalization on the device\ninconsistent terminology - vendors use different terms for the same features and reuse cpu terms somewhat differently for instance a “Cuda core” is not the same as a ‘cpu core’\nLegacy terminology - some terms come from gpu history of graphics for example a shader is a program\nsoftware abstractions - big frameworks high the details\nCUDA is the market leader, so most explanations use CUDA terms. For instance AMD uses ‘wave’ to mean more or less the same as a CUDA ‘warp’ but lots of AMD documentation uses ‘warps’\nCUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA python etc."
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#hardware-styles-nvidia-model",
+    "href": "lectures/14_gpu_compilers.html#hardware-styles-nvidia-model",
+    "title": "GPU Compilers",
+    "section": "hardware styles nvidia model",
+    "text": "hardware styles nvidia model\n\ncompute and graphics parts have same programmable parts, compute leaves out non-programmable features\ngraphics customers pay a tax for the compute instructions\nmore transistors for compute instructions\none big die"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#hardware-styles-amd-model",
+    "href": "lectures/14_gpu_compilers.html#hardware-styles-amd-model",
+    "title": "GPU Compilers",
+    "section": "hardware styles AMD model",
+    "text": "hardware styles AMD model\n\ncompute has extra instructions (no tax on graphics customers to support compute)\nchiplet model (great engineering)\nR series is graphics, C series is compute"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#threading-model",
+    "href": "lectures/14_gpu_compilers.html#threading-model",
+    "title": "GPU Compilers",
+    "section": "threading model",
+    "text": "threading model"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#warps-waveswavefronts",
+    "href": "lectures/14_gpu_compilers.html#warps-waveswavefronts",
+    "title": "GPU Compilers",
+    "section": "warps/ waves/wavefronts",
+    "text": "warps/ waves/wavefronts\n\nthreads are grouped together into warps.\nSize is fixed by hardware (usually 32), programmers know this and often make data set sizes a multiple of 32.\nsince all threads in a warp are running the same instruction, there is no need for explicit synchronization\nthere are a few instructions that work across a warp, - which break the model and give the compiler problems"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#thread-blocks-groups-of-warps",
+    "href": "lectures/14_gpu_compilers.html#thread-blocks-groups-of-warps",
+    "title": "GPU Compilers",
+    "section": "thread blocks groups of warps,",
+    "text": "thread blocks groups of warps,\n\nthreads within a block can access a fast scratchpad memory (called shared or LDS) - Violates the C memory model.\n\nthreads are identified by a 3d index inside a block\nthread blocks need synchronization operations.\n\nhardware schedules each block into execution units. Max block size is limited by the size of a execution unit."
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#grid-groups-of-blocks",
+    "href": "lectures/14_gpu_compilers.html#grid-groups-of-blocks",
+    "title": "GPU Compilers",
+    "section": "grid groups of blocks,",
+    "text": "grid groups of blocks,\n\n3d collection of blocks,\nusually hardware limits mean that all the threads in a grid do not run at the same time\nprogrammers need to make grids big enough to fill the hardware\nsoftware launches a grid and a program\nthreads within a grid but in different blocks do not have sync operations"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#heterogeneous-programming",
+    "href": "lectures/14_gpu_compilers.html#heterogeneous-programming",
+    "title": "GPU Compilers",
+    "section": "Heterogeneous programming",
+    "text": "Heterogeneous programming\nthe cpu is called the host\nthe gpu is called the device\ncpu launches grids and kernels to gpu\nComputations launched on the device execute asynchronously with respect to the host, and it is the user’s responsibility to synchronize"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#memory-spaces",
+    "href": "lectures/14_gpu_compilers.html#memory-spaces",
+    "title": "GPU Compilers",
+    "section": "memory spaces",
+    "text": "memory spaces\n\ncpu and gpu have different memory spaces (cpu can copy from one to the other). Some amount of combined memory (slower the not combined)\ngpu has shared/lds memory which can be accessed by threads within a block, passing an address to a different block does not work\nmain gpu memory is called global accessible by all threads\ngpu has per thread memory called local or scratch ot private memory - unlike C, passing an address in local memory to another thread does not work. (under some restrictions AMD implements part of the C memory model)\na few special gpu memory types: constant, texture, surface (left over from graphics)\ngpu can treat registers as fast memory"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#hardware",
+    "href": "lectures/14_gpu_compilers.html#hardware",
+    "title": "GPU Compilers",
+    "section": "Hardware",
+    "text": "Hardware\nNVIDIA\n\n\n\nnv image level 0\n\n\nEach box here is hardware, an int32/fp32/fp64 can perform one operation, so here we have 32 fp32 units which can do 32 float operations in parallel as well as 16 int32 and 16 fp64 units , there are also 8 units can do loads or stores and a final special function unit that can do transcendental operations like sin/cos\nunder some conditions two instructions (a float and an int) from the same warp can execute at the same time\nI’m not going to talk much about the tensor cores\nall these units execute the same instruction (SIMT) Simple instruction multiple thread (not the same as SIMD but related )"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#one-instruction-does-vector-work",
+    "href": "lectures/14_gpu_compilers.html#one-instruction-does-vector-work",
+    "title": "GPU Compilers",
+    "section": "one instruction does vector work",
+    "text": "one instruction does vector work\nadd 32 float32 values (all coming from registers) and store the result in 32 other registers\nNotice no branch prediction, no out of order execution\ngreat at switching a warp holds the instruction, it knows which registers it owns (continuous set, so it just needs a start and length) switching to a different warp, means changing these two numbers and the pc (this is done by the dispatch unt )\nWhen we do a load, we need to wait for the result. CPU might do some kind of out of order execution, a gpu switches to another warp\nfinally we need to pick the warp to switch to, this is done by the warp scheduler (half of the hardware scheduler)"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#streaming-multiprocessors-sm",
+    "href": "lectures/14_gpu_compilers.html#streaming-multiprocessors-sm",
+    "title": "GPU Compilers",
+    "section": "streaming multiprocessors (SM)",
+    "text": "streaming multiprocessors (SM)\nnvidia packs 4 execution engines into a SM (streaming multi-processor) ands an L1 instruction cache, a special memory accelerator for tensors and 256kb l1 data cache/ shared memory block"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#pack-sms-together",
+    "href": "lectures/14_gpu_compilers.html#pack-sms-together",
+    "title": "GPU Compilers",
+    "section": "pack sm’s together",
+    "text": "pack sm’s together"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#amd",
+    "href": "lectures/14_gpu_compilers.html#amd",
+    "title": "GPU Compilers",
+    "section": "AMD",
+    "text": "AMD"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#and",
+    "href": "lectures/14_gpu_compilers.html#and",
+    "title": "GPU Compilers",
+    "section": "and",
+    "text": "and\n\nAMD has a similar block with some important differences\n\nAt the bottom of a compute core there are 4 general purpose simd engines each of length 16 and one scalar engine\n\nGiven 5 waves, this compute core can execute 4 vector instructions and one scalar instruction per clock Two instructions from the same wave never execute at the same time\nThe SIMD engines can execute different instructions\nThe simd sizes vary over different chips"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#amd-cdna",
+    "href": "lectures/14_gpu_compilers.html#amd-cdna",
+    "title": "GPU Compilers",
+    "section": "amd CDNA",
+    "text": "amd CDNA"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#packing-sms",
+    "href": "lectures/14_gpu_compilers.html#packing-sms",
+    "title": "GPU Compilers",
+    "section": "packing sms",
+    "text": "packing sms"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#simd-and-control-flow",
+    "href": "lectures/14_gpu_compilers.html#simd-and-control-flow",
+    "title": "GPU Compilers",
+    "section": "simd and control flow",
+    "text": "simd and control flow\nto execute an if then else\n\ncompute the if condition\nturn off the lanes where the condition is false\nexecute the if side\nflip the lanes\nexecute the else side\n\ntime is the sum of the times for then and the else"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#number-of-warps-in-flight",
+    "href": "lectures/14_gpu_compilers.html#number-of-warps-in-flight",
+    "title": "GPU Compilers",
+    "section": "number of warps in flight",
+    "text": "number of warps in flight\nsince an entire block has to fit on one compute unit/sm, the resources used in the block limit the number of warps on a sm,\nif a warp needs 100 registers and there are 256 vector registers on the compute unit, then two warps can run at once, compiler controls number of registers"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#latency",
+    "href": "lectures/14_gpu_compilers.html#latency",
+    "title": "GPU Compilers",
+    "section": "latency",
+    "text": "latency\ngpu is a throughput machine- how many threads finish in a unit of time not how long a single thread takes to finish\nunlike the cpu, gpu can have lots of loads in flight, time for these loads overlap so compiler tries to group loads together, but this needs extra registers\n\na warp issues a group of loads\nwarp issues a wait for loads to finish (hardware in cpu, software in gpu)\nhardware switches to another warp (if there is on), good to have a lot of warps 1, if all warps waiting for memory, alu units are idle"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#compiler-model",
+    "href": "lectures/14_gpu_compilers.html#compiler-model",
+    "title": "GPU Compilers",
+    "section": "compiler model",
+    "text": "compiler model\n\nlike a regular compiler for a scalar machine\nnew problem: registers used in warp limits number of warps in flight, so ra is different\nnew problem: control flow is more critical\nnew problem: latency means grouping loads but not to much\nnew problem: arch keeps changing"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#thread-coarsening",
+    "href": "lectures/14_gpu_compilers.html#thread-coarsening",
+    "title": "GPU Compilers",
+    "section": "thread coarsening",
+    "text": "thread coarsening\nSuppose we are computing a matrix multiply\nwe could say each thread writes one result so a 32 x 32 matrix would need 32 * 32 threads each thread reads one column and one row of the input,\nwe have a lot of reuse (redundant loads of data )\nwe could say each thread writes 4 results, so we need 1/4 of the threads each thread reads a raw and 4 columns"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#technique",
+    "href": "lectures/14_gpu_compilers.html#technique",
+    "title": "GPU Compilers",
+    "section": "technique",
+    "text": "technique\n\nmerge multiple threads so each resulting thread writes multiple outputs\ndo the redundant work once and save in registers\nuse the registers for computing all the outputs\n\nBut\n\nneeds extra registers\nincreased efficiency but reduced parallelism\n\nAfter thread coarsening, computation from merged threads can see each others results"
+  },
+  {
+    "objectID": "lectures/14_gpu_compilers.html#doing-this-by-hand",
+    "href": "lectures/14_gpu_compilers.html#doing-this-by-hand",
+    "title": "GPU Compilers",
+    "section": "doing this by hand",
+    "text": "doing this by hand\nfor (atomid=0; atomid&lt;numatoms; atomid++) { \n  float dy = coory - atominfo[atomid].y; \n  float dysqpdzsq = (dy * dy) + atominfo[atomid].z; \n  float dx1 = coorx1 - atominfo[atomid].x; \n  float dx2 = coorx2 - atominfo[atomid].x; \n  float dx3 = coorx3 - atominfo[atomid].x; \n  float dx4 = coorx4 - atominfo[atomid].x; \n  energyvalx1 += atominfo[atomid].w * (1.0f / sqrtf(dx1*dx1 + dysqpdzsq));\n  energyvalx2 += atominfo[atomid].w * (1.0f / sqrtf(dx2*dx2 + dysqpdzsq)); \n  energyvalx3 += atominfo[atomid].w * (1.0f / sqrtf(dx3*dx3 + dysqpdzsq)); \n  energyvalx4 += atominfo[atomid].w * (1.0f / sqrtf(dx4*dx4 + dysqpdzsq)); } …"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#gpu-architecture",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#gpu-architecture",
+    "title": "GPU Compilers",
+    "section": "gpu architecture",
+    "text": "gpu architecture\nWhy is it hard to learn about gpus?\n\narchitectural variations - all the vendors keep changing the architecture. Different vendors build different hardware Graphics programs run on all vendors, because vendors ship the ir and do finalization on the device\ninconsistent terminology - vendors use different terms for the same features and reuse cpu terms somewhat differently for instance a “Cuda core” is not the same as a ‘cpu core’\nLegacy terminology - some terms come from gpu history of graphics for example a shader is a program\nsoftware abstractions - big frameworks high the details\nCUDA is the market leader, so most explanations use CUDA terms. For instance AMD uses ‘wave’ to mean more or less the same as a CUDA ‘warp’ but lots of AMD documentation uses ‘warps’\nCUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA python etc."
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#hardware-styles-nvidia-model",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#hardware-styles-nvidia-model",
+    "title": "GPU Compilers",
+    "section": "hardware styles nvidia model",
+    "text": "hardware styles nvidia model\n\ncompute and graphics parts have same programmable parts, compute leaves out non-programmable features\ngraphics customers pay a tax for the compute instructions\nmore transistors for compute instructions\none big die"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#hardware-styles-amd-model",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#hardware-styles-amd-model",
+    "title": "GPU Compilers",
+    "section": "hardware styles AMD model",
+    "text": "hardware styles AMD model\n\ncompute has extra instructions (no tax on graphics customers to support compute)\nchiplet model (great engineering)\nR series is graphics, C series is compute"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#threading-model",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#threading-model",
+    "title": "GPU Compilers",
+    "section": "threading model",
+    "text": "threading model"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#warps-waveswavefronts",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#warps-waveswavefronts",
+    "title": "GPU Compilers",
+    "section": "warps/ waves/wavefronts",
+    "text": "warps/ waves/wavefronts\n\nthreads are grouped together into warps.\nSize is fixed by hardware (usually 32), programmers know this and often make data set sizes a multiple of 32.\nsince all threads in a warp are running the same instruction, there is no need for explicit synchronization\nthere are a few instructions that work across a warp, - which break the model and give the compiler problems"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#thread-blocks-groups-of-warps",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#thread-blocks-groups-of-warps",
+    "title": "GPU Compilers",
+    "section": "thread blocks groups of warps,",
+    "text": "thread blocks groups of warps,\n\nthreads within a block can access a fast scratchpad memory (called shared or LDS) - Violates the C memory model.\n\nthreads are identified by a 3d index inside a block\nthread blocks need synchronization operations.\n\nhardware schedules each block into execution units. Max block size is limited by the size of a execution unit."
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#grid-groups-of-blocks",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#grid-groups-of-blocks",
+    "title": "GPU Compilers",
+    "section": "grid groups of blocks,",
+    "text": "grid groups of blocks,\n\n3d collection of blocks,\nusually hardware limits mean that all the threads in a grid do not run at the same time\nprogrammers need to make grids big enough to fill the hardware\nsoftware launches a grid and a program\nthreads within a grid but in different blocks do not have sync operations"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#heterogeneous-programming",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#heterogeneous-programming",
+    "title": "GPU Compilers",
+    "section": "Heterogeneous programming",
+    "text": "Heterogeneous programming\nthe cpu is called the host\nthe gpu is called the device\ncpu launches grids and kernels to gpu\nComputations launched on the device execute asynchronously with respect to the host, and it is the user’s responsibility to synchronize"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#memory-spaces",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#memory-spaces",
+    "title": "GPU Compilers",
+    "section": "memory spaces",
+    "text": "memory spaces\n\ncpu and gpu have different memory spaces (cpu can copy from one to the other). Some amount of combined memory (slower the not combined)\ngpu has shared/lds memory which can be accessed by threads within a block, passing an address to a different block does not work\nmain gpu memory is called global accessible by all threads\ngpu has per thread memory called local or scratch ot private memory - unlike C, passing an address in local memory to another thread does not work. (under some restrictions AMD implements part of the C memory model)\na few special gpu memory types: constant, texture, surface (left over from graphics)\ngpu can treat registers as fast memory"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#hardware",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#hardware",
+    "title": "GPU Compilers",
+    "section": "Hardware",
+    "text": "Hardware\nNVIDIA\n\nnv image level 0Each box here is hardware, an int32/fp32/fp64 can perform one operation, so here we have 32 fp32 units which can do 32 float operations in parallel as well as 16 int32 and 16 fp64 units , there are also 8 units can do loads or stores and a final special function unit that can do transcendental operations like sin/cos\nunder some conditions two instructions (a float and an int) from the same warp can execute at the same time\nI’m not going to talk much about the tensor cores\nall these units execute the same instruction (SIMT) Simple instruction multiple thread (not the same as SIMD but related )"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#one-instruction-does-vector-work",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#one-instruction-does-vector-work",
+    "title": "GPU Compilers",
+    "section": "one instruction does vector work",
+    "text": "one instruction does vector work\nadd 32 float32 values (all coming from registers) and store the result in 32 other registers\nNotice no branch prediction, no out of order execution\ngreat at switching a warp holds the instruction, it knows which registers it owns (continuous set, so it just needs a start and length) switching to a different warp, means changing these two numbers and the pc (this is done by the dispatch unt )\nWhen we do a load, we need to wait for the result. CPU might do some kind of out of order execution, a gpu switches to another warp\nfinally we need to pick the warp to switch to, this is done by the warp scheduler (half of the hardware scheduler)"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#streaming-multiprocessors-sm",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#streaming-multiprocessors-sm",
+    "title": "GPU Compilers",
+    "section": "streaming multiprocessors (SM)",
+    "text": "streaming multiprocessors (SM)\nnvidia packs 4 execution engines into a SM (streaming multi-processor) ands an L1 instruction cache, a special memory accelerator for tensors and 256kb l1 data cache/ shared memory block"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#pack-sms-together",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#pack-sms-together",
+    "title": "GPU Compilers",
+    "section": "pack sm’s together",
+    "text": "pack sm’s together"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#amd",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#amd",
+    "title": "GPU Compilers",
+    "section": "AMD",
+    "text": "AMD"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#and",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#and",
+    "title": "GPU Compilers",
+    "section": "and",
+    "text": "and\n\nAMD has a similar block with some important differences\n\nAt the bottom of a compute core there are 4 general purpose simd engines each of length 16 and one scalar engine\n\nGiven 5 waves, this compute core can execute 4 vector instructions and one scalar instruction per clock Two instructions from the same wave never execute at the same time\nThe SIMD engines can execute different instructions\nThe simd sizes vary over different chips"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#amd-cdna",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#amd-cdna",
+    "title": "GPU Compilers",
+    "section": "amd CDNA",
+    "text": "amd CDNA"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#packing-sms",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#packing-sms",
+    "title": "GPU Compilers",
+    "section": "packing sms",
+    "text": "packing sms"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#simd-and-control-flow",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#simd-and-control-flow",
+    "title": "GPU Compilers",
+    "section": "simd and control flow",
+    "text": "simd and control flow\nto execute an if then else\n\ncompute the if condition\nturn off the lanes where the condition is false\nexecute the if side\nflip the lanes\nexecute the else side\n\ntime is the sum of the times for then and the else"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#number-of-warps-in-flight",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#number-of-warps-in-flight",
+    "title": "GPU Compilers",
+    "section": "number of warps in flight",
+    "text": "number of warps in flight\nsince an entire block has to fit on one compute unit/sm, the resources used in the block limit the number of warps on a sm,\nif a warp needs 100 registers and there are 256 vector registers on the compute unit, then two warps can run at once, compiler controls number of registers"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#latency",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#latency",
+    "title": "GPU Compilers",
+    "section": "latency",
+    "text": "latency\ngpu is a throughput machine- how many threads finish in a unit of time not how long a single thread takes to finish\nunlike the cpu, gpu can have lots of loads in flight, time for these loads overlap so compiler tries to group loads together, but this needs extra registers\n\na warp issues a group of loads\nwarp issues a wait for loads to finish (hardware in cpu, software in gpu)\nhardware switches to another warp (if there is on), good to have a lot of warps 1, if all warps waiting for memory, alu units are idle"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#compiler-model",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#compiler-model",
+    "title": "GPU Compilers",
+    "section": "compiler model",
+    "text": "compiler model\n\nlike a regular compiler for a scalar machine\nnew problem: registers used in warp limits number of warps in flight, so ra is different\nnew problem: control flow is more critical\nnew problem: latency means grouping loads but not to much\nnew problem: arch keeps changing"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#thread-coarsening",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#thread-coarsening",
+    "title": "GPU Compilers",
+    "section": "thread coarsening",
+    "text": "thread coarsening\nSuppose we are computing a matrix multiply\nwe could say each thread writes one result so a 32 x 32 matrix would need 32 * 32 threads each thread reads one column and one row of the input,\nwe have a lot of reuse (redundant loads of data )\nwe could say each thread writes 4 results, so we need 1/4 of the threads each thread reads a raw and 4 columns"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#technique",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#technique",
+    "title": "GPU Compilers",
+    "section": "technique",
+    "text": "technique\n\nmerge multiple threads so each resulting thread writes multiple outputs\ndo the redundant work once and save in registers\nuse the registers for computing all the outputs\n\nBut\n\nneeds extra registers\nincreased efficiency but reduced parallelism\n\nAfter thread coarsening, computation from merged threads can see each others results"
+  },
+  {
+    "objectID": "lectures/revealjs_14_gpu_compilers.qmd.html#doing-this-by-hand",
+    "href": "lectures/revealjs_14_gpu_compilers.qmd.html#doing-this-by-hand",
+    "title": "GPU Compilers",
+    "section": "doing this by hand",
+    "text": "doing this by hand\nfor (atomid=0; atomid&lt;numatoms; atomid++) { \n  float dy = coory - atominfo[atomid].y; \n  float dysqpdzsq = (dy * dy) + atominfo[atomid].z; \n  float dx1 = coorx1 - atominfo[atomid].x; \n  float dx2 = coorx2 - atominfo[atomid].x; \n  float dx3 = coorx3 - atominfo[atomid].x; \n  float dx4 = coorx4 - atominfo[atomid].x; \n  energyvalx1 += atominfo[atomid].w * (1.0f / sqrtf(dx1*dx1 + dysqpdzsq));\n  energyvalx2 += atominfo[atomid].w * (1.0f / sqrtf(dx2*dx2 + dysqpdzsq)); \n  energyvalx3 += atominfo[atomid].w * (1.0f / sqrtf(dx3*dx3 + dysqpdzsq)); \n  energyvalx4 += atominfo[atomid].w * (1.0f / sqrtf(dx4*dx4 + dysqpdzsq)); } …"
   },
   {
     "objectID": "lectures/07_llvm.html",
@@ -1520,7 +1856,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 536\n-rw-r--r-- 1 runner docker  8263 Jul 11 16:23 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  2927 Jul 11 16:23 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 39145 Jul 11 16:23 02a_representation.html\n-rw-r--r-- 1 runner docker  7247 Jul 11 16:23 02a_representation.qmd\n-rw-r--r-- 1 runner docker 11712 Jul 11 16:23 02b_bril.qmd\n-rw-r--r-- 1 runner docker 19575 Jul 11 16:23 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  6885 Jul 11 16:23 03_local.qmd\n-rw-r--r-- 1 runner docker  7846 Jul 11 16:23 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 43341 Jul 11 16:23 04_data_flow.html\n-rw-r--r-- 1 runner docker 10399 Jul 11 16:23 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9250 Jul 11 16:23 05_global.qmd\n-rw-r--r-- 1 runner docker  4717 Jul 11 16:23 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3092 Jul 11 16:23 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16255 Jul 11 16:23 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Jul 11 16:22 07_llvm.ipynb\n-rw-r--r-- 1 runner docker 27225 Jul 11 16:23 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5635 Jul 11 16:23 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 13980 Jul 11 16:23 09_poly.qmd\n-rw-r--r-- 1 runner docker   246 Jul 11 16:23 100_mlir.qmd\n-rw-r--r-- 1 runner docker 20103 Jul 11 16:23 110_whole_program.html\n-rw-r--r-- 1 runner docker   264 Jul 11 16:23 110_whole_program.qmd\n-rw-r--r-- 1 runner docker   260 Jul 11 16:23 12_memory.qmd\n-rw-r--r-- 1 runner docker   368 Jul 11 16:23 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker   255 Jul 11 16:23 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4595 Jul 11 16:22 errors\ndrwxr-xr-x 2 runner docker  4096 Jul 11 16:22 images\ndrwxr-xr-x 2 runner docker  4096 Jul 11 16:22 papers\n-rw-r--r-- 1 runner docker  8017 Jul 11 16:23 ra-checking.qmd\n-rw-r--r-- 1 runner docker 48567 Jul 11 16:23 revealjs_02a_representation.qmd.html\n-rw-r--r-- 1 runner docker 53509 Jul 11 16:23 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Jul 11 16:23 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Jul 11 16:23 revealjs_110_whole_program.qmd.html"
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 548\n-rw-r--r-- 1 runner docker  8263 Jul 12 15:32 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  2927 Jul 12 15:32 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Jul 12 15:31 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker 39145 Jul 12 15:32 02a_representation.html\n-rw-r--r-- 1 runner docker  7247 Jul 12 15:32 02a_representation.qmd\n-rw-r--r-- 1 runner docker 11712 Jul 12 15:32 02b_bril.qmd\n-rw-r--r-- 1 runner docker 19575 Jul 12 15:32 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  6885 Jul 12 15:32 03_local.qmd\n-rw-r--r-- 1 runner docker  7846 Jul 12 15:32 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 43341 Jul 12 15:32 04_data_flow.html\n-rw-r--r-- 1 runner docker 10399 Jul 12 15:32 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9250 Jul 12 15:32 05_global.qmd\n-rw-r--r-- 1 runner docker  4717 Jul 12 15:32 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3092 Jul 12 15:32 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16255 Jul 12 15:32 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Jul 12 15:31 07_llvm.ipynb\n-rw-r--r-- 1 runner docker 27225 Jul 12 15:32 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5635 Jul 12 15:32 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 13980 Jul 12 15:32 09_poly.qmd\n-rw-r--r-- 1 runner docker   246 Jul 12 15:32 100_mlir.qmd\n-rw-r--r-- 1 runner docker 20103 Jul 12 15:32 110_whole_program.html\n-rw-r--r-- 1 runner docker   264 Jul 12 15:32 110_whole_program.qmd\n-rw-r--r-- 1 runner docker   260 Jul 12 15:32 12_memory.qmd\n-rw-r--r-- 1 runner docker   368 Jul 12 15:32 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker  9887 Jul 12 15:32 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4595 Jul 12 15:31 errors\ndrwxr-xr-x 2 runner docker  4096 Jul 12 15:31 images\ndrwxr-xr-x 2 runner docker  4096 Jul 12 15:31 papers\n-rw-r--r-- 1 runner docker  8017 Jul 12 15:32 ra-checking.qmd\n-rw-r--r-- 1 runner docker 48567 Jul 12 15:32 revealjs_02a_representation.qmd.html\n-rw-r--r-- 1 runner docker 53509 Jul 12 15:32 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Jul 12 15:32 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Jul 12 15:32 revealjs_110_whole_program.qmd.html"
   },
   {
     "objectID": "lectures/02b_bril.html#print-the-blocks",

@@ -68,6 +68,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 <meta property="og:title" content="GPU Compilers – EECE7398 Fall 2024">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
@@ -103,21 +104,233 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<section id="gpu-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="gpu-architecture">gpu architecture</h2>
+<p>Why is it hard to learn about gpus?</p>
+<ol type="1">
+<li>architectural variations - all the vendors keep changing the architecture. Different vendors build different hardware Graphics programs run on all vendors, because vendors ship the ir and do finalization on the device</li>
+<li>inconsistent terminology - vendors use different terms for the same features and reuse cpu terms somewhat differently for instance a “Cuda core” is not the same as a ‘cpu core’</li>
+<li>Legacy terminology - some terms come from gpu history of graphics for example a shader is a program</li>
+<li>software abstractions - big frameworks high the details</li>
+<li>CUDA is the market leader, so most explanations use CUDA terms. For instance AMD uses ‘wave’ to mean more or less the same as a CUDA ‘warp’ but lots of AMD documentation uses ‘warps’</li>
+<li>CUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA python etc.</li>
+</ol>
+</section>
+<section id="hardware-styles-nvidia-model" class="level2">
+<h2 class="anchored" data-anchor-id="hardware-styles-nvidia-model">hardware styles nvidia model</h2>
+<ol type="1">
+<li>compute and graphics parts have same programmable parts, compute leaves out non-programmable features</li>
+<li>graphics customers pay a <strong><em>tax</em></strong> for the compute instructions</li>
+<li>more transistors for compute instructions</li>
+<li>one big die</li>
+</ol>
+</section>
+<section id="hardware-styles-amd-model" class="level2">
+<h2 class="anchored" data-anchor-id="hardware-styles-amd-model">hardware styles AMD model</h2>
+<ol type="1">
+<li>compute has extra instructions (no tax on graphics customers to support compute)</li>
+<li>chiplet model (great engineering)</li>
+<li>R series is graphics, C series is compute</li>
+</ol>
+</section>
+<section id="programming-model" class="level1">
+<h1>programming model</h1>
+<p>both vendors use the CUDA programming model</p>
+<p>machines have multiple SIMD processors, each SIMD can be running a different instruction but each <strong><em>lane</em></strong> of a SIMD runs the same instruction</p>
+<p>a <strong><em>lane</em></strong> of a SIMD is called a <strong><em>thread</em></strong></p>
+<hr>
+<p>the programming model is SIMT (single instruction multiple threads)</p>
+<p>User writes a scalar program, compiler maps that program to a lane of a SIMD, many instances of the program run at once, hardware combines copies of the scalar program into <strong><em>warps</em></strong>, hardware schedules warps into the SIMD engines</p>
+<p>programs are called <strong><em>kernels</em></strong></p>
+<section id="threading-model" class="level2">
+<h2 class="anchored" data-anchor-id="threading-model">threading model</h2>
+</section>
+<section id="warps-waveswavefronts" class="level2">
+<h2 class="anchored" data-anchor-id="warps-waveswavefronts"><strong><em>warps/ waves/wavefronts</em></strong></h2>
+<ol type="1">
+<li>threads are grouped together into <strong><em>warps</em></strong>.</li>
+<li>Size is fixed by hardware (usually 32), programmers know this and often make data set sizes a multiple of 32.</li>
+<li>since all threads in a warp are running the same instruction, there is no need for explicit synchronization</li>
+<li>there are a few instructions that work across a warp, - which break the model and give the compiler problems</li>
+</ol>
+</section>
+<section id="thread-blocks-groups-of-warps" class="level2">
+<h2 class="anchored" data-anchor-id="thread-blocks-groups-of-warps"><strong><em>thread blocks</em></strong> groups of warps,</h2>
+<ol type="1">
+<li>threads within a block can access a fast scratchpad memory (called shared or LDS) - Violates the C memory model.<br>
+</li>
+<li>threads are identified by a 3d index inside a block</li>
+<li>thread blocks need synchronization operations.<br>
+</li>
+<li>hardware schedules each block into execution units. Max block size is limited by the size of a execution unit.</li>
+</ol>
+</section>
+<section id="grid-groups-of-blocks" class="level2">
+<h2 class="anchored" data-anchor-id="grid-groups-of-blocks"><strong><em>grid</em></strong> groups of blocks,</h2>
+<ol type="1">
+<li>3d collection of blocks,</li>
+<li>usually hardware limits mean that all the threads in a grid do not run at the same time</li>
+<li>programmers need to make grids big enough to fill the hardware</li>
+<li>software launches a grid and a program</li>
+<li>threads within a grid but in different blocks do not have sync operations</li>
+</ol>
+</section>
+<section id="heterogeneous-programming" class="level2">
+<h2 class="anchored" data-anchor-id="heterogeneous-programming">Heterogeneous programming</h2>
+<p>the cpu is called the <strong><em>host</em></strong></p>
+<p>the gpu is called the <strong><em>device</em></strong></p>
+<p>cpu launches grids and kernels to gpu</p>
+<p>Computations launched on the device execute asynchronously with respect to the host, and it is the user’s responsibility to synchronize</p>
+</section>
+<section id="memory-spaces" class="level2">
+<h2 class="anchored" data-anchor-id="memory-spaces">memory spaces</h2>
+<ol type="1">
+<li>cpu and gpu have different memory spaces (cpu can copy from one to the other). Some amount of combined memory (slower the not combined)</li>
+<li>gpu has <strong><em>shared/lds</em></strong> memory which can be accessed by threads within a block, passing an address to a different block does not work</li>
+<li>main gpu memory is called <strong><em>global</em></strong> accessible by all threads</li>
+<li>gpu has per thread memory called <strong><em>local</em></strong> or <strong><em>scratch</em></strong> ot <strong><em>private</em></strong> memory - unlike C, passing an address in local memory to another thread does not work. (under some restrictions AMD implements part of the C memory model)</li>
+<li>a few special gpu memory types: constant, texture, surface (left over from graphics)</li>
+<li>gpu can treat registers as fast memory</li>
+</ol>
+</section>
+<section id="hardware" class="level2">
+<h2 class="anchored" data-anchor-id="hardware">Hardware</h2>
+<p>NVIDIA</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/level0-nv.png" class="img-fluid figure-img"></p>
+<figcaption>nv image level 0</figcaption>
+</figure>
 </div>
-<div class="callout-title-container flex-fill">
-Warning
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>not done</p>
-</div>
-</div>
+<p>Each box here is hardware, an int32/fp32/fp64 can perform one operation, so here we have 32 fp32 units which can do 32 float operations in parallel as well as 16 int32 and 16 fp64 units , there are also 8 units can do loads or stores and a final special function unit that can do transcendental operations like sin/cos</p>
+<p>under some conditions two instructions (a float and an int) from the same warp can execute at the same time</p>
+<p>I’m not going to talk much about the tensor cores</p>
+<p>all these units execute the same instruction (SIMT) Simple instruction multiple thread (not the same as SIMD but related )</p>
+</section>
+<section id="one-instruction-does-vector-work" class="level2">
+<h2 class="anchored" data-anchor-id="one-instruction-does-vector-work">one instruction does vector work</h2>
+<p>add 32 float32 values (all coming from registers) and store the result in 32 other registers</p>
+<p>Notice no branch prediction, no out of order execution</p>
+<p>great at switching a warp holds the instruction, it knows which registers it owns (continuous set, so it just needs a start and length) switching to a different warp, means changing these two numbers and the pc (this is done by the dispatch unt )</p>
+<p>When we do a load, we need to wait for the result. CPU might do some kind of out of order execution, a gpu switches to another warp</p>
+<p>finally we need to pick the warp to switch to, this is done by the warp scheduler (half of the hardware scheduler)</p>
+</section>
+<section id="streaming-multiprocessors-sm" class="level2">
+<h2 class="anchored" data-anchor-id="streaming-multiprocessors-sm">streaming multiprocessors (SM)</h2>
+<p>nvidia packs 4 execution engines into a SM (streaming multi-processor) ands an L1 instruction cache, a special memory accelerator for tensors and 256kb l1 data cache/ shared memory block</p>
+<p><img src="images/nv-1-sm.bmp" class="img-fluid"></p>
+</section>
+<section id="pack-sms-together" class="level2">
+<h2 class="anchored" data-anchor-id="pack-sms-together">pack sm’s together</h2>
+<p><img src="images/nv-sms.jpg" class="img-fluid"></p>
+</section>
+<section id="amd" class="level2">
+<h2 class="anchored" data-anchor-id="amd">AMD</h2>
+</section>
+<section id="and" class="level2">
+<h2 class="anchored" data-anchor-id="and">and</h2>
+<p><img src="images/amd-compute-unit.svg" class="img-fluid"></p>
+<p>AMD has a similar block with some important differences</p>
+<ol type="1">
+<li>At the bottom of a compute core there are 4 general purpose simd engines each of length 16 and one scalar engine</li>
+</ol>
+<p>Given 5 waves, this compute core can execute 4 vector instructions and one scalar instruction per clock Two instructions from the same wave never execute at the same time</p>
+<p>The SIMD engines can execute different instructions</p>
+<p>The simd sizes vary over different chips</p>
+</section>
+<section id="amd-cdna" class="level2">
+<h2 class="anchored" data-anchor-id="amd-cdna">amd CDNA</h2>
+<p><img src="images/amd-cu.png" class="img-fluid"></p>
+</section>
+<section id="packing-sms" class="level2">
+<h2 class="anchored" data-anchor-id="packing-sms">packing sms</h2>
+<p><img src="images/cdna2_gcd.png" class="img-fluid"></p>
+</section>
+<section id="simd-and-control-flow" class="level2">
+<h2 class="anchored" data-anchor-id="simd-and-control-flow">simd and control flow</h2>
+<p>to execute an if then else</p>
+<ol type="1">
+<li>compute the if condition</li>
+<li>turn off the lanes where the condition is false</li>
+<li>execute the if side</li>
+<li>flip the lanes</li>
+<li>execute the else side</li>
+</ol>
+<p>time is the sum of the times for then and the else</p>
+</section>
+<section id="number-of-warps-in-flight" class="level2">
+<h2 class="anchored" data-anchor-id="number-of-warps-in-flight">number of warps in flight</h2>
+<p>since an entire block has to fit on one compute unit/sm, the resources used in the block limit the number of warps on a sm,</p>
+<p>if a warp needs 100 registers and there are 256 vector registers on the compute unit, then two warps can run at once, compiler controls number of registers</p>
+</section>
+<section id="latency" class="level2">
+<h2 class="anchored" data-anchor-id="latency">latency</h2>
+<p>gpu is a throughput machine- how many threads finish in a unit of time not how long a single thread takes to finish</p>
+<p>unlike the cpu, gpu can have lots of loads in flight, time for these loads overlap so compiler tries to group loads together, but this needs extra registers</p>
+<ol type="1">
+<li>a warp issues a group of loads</li>
+<li>warp issues a wait for loads to finish (hardware in cpu, software in gpu)</li>
+<li>hardware switches to another warp (if there is on), good to have a lot of warps 1, if all warps waiting for memory, alu units are idle</li>
+</ol>
+</section>
+</section>
+<section id="differences" class="level1">
+<h1>differences</h1>
+<ol type="1">
+<li>NVIDA committed to AI, and cut down on the non-tensor operations, AND did not</li>
+<li>Generally you need more waves on an AMD processor</li>
+<li>AMD added infinity connectors so that they could use chiplets</li>
+<li>AMD has a scalar processor - The programming model does not - So its up to the compiler to use it</li>
+<li>NVIDIA has 1 architecture for the compiler, AMD has two</li>
+</ol>
+<section id="compiler-model" class="level2">
+<h2 class="anchored" data-anchor-id="compiler-model">compiler model</h2>
+<ol type="1">
+<li>like a regular compiler for a scalar machine</li>
+<li>new problem: registers used in warp limits number of warps in flight, so ra is different</li>
+<li>new problem: control flow is more critical</li>
+<li>new problem: latency means grouping loads but not to much</li>
+<li>new problem: arch keeps changing</li>
+</ol>
+</section>
+<section id="thread-coarsening" class="level2">
+<h2 class="anchored" data-anchor-id="thread-coarsening">thread coarsening</h2>
+<p>Suppose we are computing a matrix multiply</p>
+<p>we could say each thread writes one result so a 32 x 32 matrix would need 32 * 32 threads each thread reads one column and one row of the input,</p>
+<p>we have a lot of reuse (redundant loads of data )</p>
+<p>we could say each thread writes 4 results, so we need 1/4 of the threads each thread reads a raw and 4 columns</p>
+</section>
+<section id="technique" class="level2">
+<h2 class="anchored" data-anchor-id="technique">technique</h2>
+<ol type="1">
+<li>merge multiple threads so each resulting thread writes multiple outputs</li>
+<li>do the redundant work once and save in registers</li>
+<li>use the registers for computing all the outputs</li>
+</ol>
+<p>But</p>
+<ol type="1">
+<li>needs extra registers</li>
+<li>increased efficiency but reduced parallelism</li>
+</ol>
+<p>After thread coarsening, computation from merged threads can see each others results</p>
+</section>
+<section id="doing-this-by-hand" class="level2">
+<h2 class="anchored" data-anchor-id="doing-this-by-hand">doing this by hand</h2>
+<pre><code>for (atomid=0; atomid&lt;numatoms; atomid++) { 
+  float dy = coory - atominfo[atomid].y; 
+  float dysqpdzsq = (dy * dy) + atominfo[atomid].z; 
+  float dx1 = coorx1 - atominfo[atomid].x; 
+  float dx2 = coorx2 - atominfo[atomid].x; 
+  float dx3 = coorx3 - atominfo[atomid].x; 
+  float dx4 = coorx4 - atominfo[atomid].x; 
+  energyvalx1 += atominfo[atomid].w * (1.0f / sqrtf(dx1*dx1 + dysqpdzsq));
+  energyvalx2 += atominfo[atomid].w * (1.0f / sqrtf(dx2*dx2 + dysqpdzsq)); 
+  energyvalx3 += atominfo[atomid].w * (1.0f / sqrtf(dx3*dx3 + dysqpdzsq)); 
+  energyvalx4 += atominfo[atomid].w * (1.0f / sqrtf(dx4*dx4 + dysqpdzsq)); } …</code></pre>
 
 
+</section>
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
