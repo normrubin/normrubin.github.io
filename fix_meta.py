@@ -88,7 +88,6 @@ execute:
     echo: true
 """
 
-
 for file in files:
 
     #print(file)
@@ -123,7 +122,7 @@ for file in files:
                     yaml_template['format']['revealjs']['output-location'] = yaml_from_file['format']['revealjs']['output-location'] 
                 yaml_template['format']['revealjs']['output-file'] =  'revealjs_' + file_name
                 yaml_from_file['format']['revealjs']['output-file'] = 'revealjs_' + file_name
-                yaml_from_file['format']['revealjs']['code-line-numbers'] = 'true'
+                yaml_from_file['format']['revealjs']['code-line-numbers'] = True
 
             compare_dicts(file, yaml_from_file, yaml_template)
     
