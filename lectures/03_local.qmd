@@ -7,9 +7,10 @@ format:
     chalkboard: true
     code-line-numbers: true
     output-file: revealjs_03_local.qmd
-    scrollable: true
+    scrollable: true 
+    echo: false 
 sidebar: false
-title: 3 Local Analysis & Optimization
+title: Local Analysis & Optimization
 
 ---
 
@@ -27,7 +28,7 @@ a global optimization might take much longer, and an inter-procedural longer sti
 
 ---
 
-when would running an optimization speedup compilation?
+When would running an optimization speedup compilation?
 
 For a local optimization,
  instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.
@@ -40,6 +41,7 @@ For a local optimization,
 One special case is JIT (just in time) compilers, where programs get compiled at the start of execution.  GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called ***Hotspot*** compiling.  Some JIT compilers use ***hot/cold*** compiling, where they only run the fancy compiler on basic blocks that are hot , i.e., execute a lot.
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 flowchart LR
 A[application] -- offline --> B[byte code/ptx]
 B --> C[quick run time compiler/ finalizer]

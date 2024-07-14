@@ -14,20 +14,32 @@ title: GPU Compilers
 ---
 
 
-## gpu architecture 
-
-Why is it hard to learn about gpus?
-
-1. architectural variations - all the vendors keep changing the architecture. Different vendors build different hardware
-Graphics programs run on all vendors, because vendors ship the ir and do finalization on the device 
-1. inconsistent terminology - vendors use different terms for the same features and reuse cpu terms somewhat differently for instance a "Cuda core" is not the same as a 'cpu core'
-1. Legacy terminology - some terms come from gpu history of graphics for example a shader is a program
-1. software abstractions - big frameworks hide the details 
-1. CUDA is the market leader, so most explanations use CUDA terms. For instance AMD uses 'wave' to mean  more or less the same as a CUDA 'warp' but lots of AMD documentation uses 'warps'
-1. CUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA python etc. 
+## Challenges in Learning About GPUs
 
 
-## hardware styles nvidia model
+
+1. **Architectural Variations**
+   - All the vendors keep changing the architecture. Different vendors build different hardware. Graphics programs run on all vendors' hardware because vendors ship their own drivers and do finalization on the device.
+
+2. **Inconsistent Terminology**
+   - Vendors use different terms for the same features and reuse CPU terms somewhat differently. For instance, a "Cuda core" is not the same as a 'CPU core'.
+
+3. **Legacy Terminology**
+   - Some terms come from the GPU's history of graphics. For example, a shader is a program.
+
+4. **Software Abstractions**
+   - Big frameworks hide the details.
+
+5. **CUDA's Market Dominance**
+   - Most explanations use CUDA terms since CUDA is the market leader. For instance, AMD uses 'wave' to mean more or less the same as a CUDA 'warp', but lots of AMD documentation uses 'warps'.
+
+6. **CUDA: Language and Model**
+   - CUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA Python, etc.
+
+ 
+
+
+## hardware styles NVIDIA  model
 
 1. compute and graphics parts have same programmable parts, compute leaves out non-programmable features 
 1. graphics customers pay a ***tax*** for the compute instructions
@@ -37,12 +49,12 @@ Graphics programs run on all vendors, because vendors ship the ir and do finaliz
 ## hardware styles AMD model
 
 1. compute has extra instructions (no tax on graphics customers to support compute)
-1. chiplet model (great engineering)
+1. chiplet model (great engineering!)
 1. R series is graphics, C series is compute 
 
-# programming model
+##  programming model
 
-both vendors use the CUDA programming model  
+both vendors use the CUDA programming model. AMD supports a variation of the CUDA language   
 
 machines have multiple SIMD processors, each SIMD can be running a different instruction but each ***lane*** of a SIMD runs the same instruction 
 
