@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3 Local Analysis &amp; Optimization – EECE7398 Fall 2024</title>
+<title>Local Analysis &amp; Optimization – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -133,7 +133,7 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="3 Local Analysis &amp; Optimization – EECE7398 Fall 2024">
+<meta property="og:title" content="Local Analysis &amp; Optimization – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -153,7 +153,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">3 Local Analysis &amp; Optimization</h1>
+<h1 class="title">Local Analysis &amp; Optimization</h1>
 </div>
 
 
@@ -179,23 +179,25 @@ window.Quarto = {
 <hr>
 <p>Usually an optimization takes time that is more then linear in some property, For example a local optimization might take time <span class="math inline">\(n^2\)</span> in the number of instructions in the block. a global optimization might take much longer, and an inter-procedural longer still. To keep compile time reasonable many compilers limit the number of global optimizations and skip inter-procedural optimizations. As a consequence many more optimizations get published but not used in production.</p>
 <hr>
-<p>when would running an optimization speedup compilation?</p>
+<p>When would running an optimization speedup compilation?</p>
 <p>For a local optimization, instructions within a block are ordered, so it makes sense to talk about instructions coming before or after others.</p>
 <p>For a global optimization, two instructions are ordered by a path from one block to another and different paths through the program give different orders.</p>
 <hr>
 <p>One special case is JIT (just in time) compilers, where programs get compiled at the start of execution. GPU compilers (and java compilers) look like this. They may use run-time information to decide of recompiling a function is a good idea. This is called <strong><em>Hotspot</em></strong> compiling. Some JIT compilers use <strong><em>hot/cold</em></strong> compiling, where they only run the fancy compiler on basic blocks that are hot , i.e., execute a lot.</p>
 <div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>A[application] -- offline --&gt; B[byte code/ptx]</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>B --&gt; C[quick run time compiler/ finalizer]</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>C --&gt; D[isa]</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>B --&gt; C1[fancy compiler - only run on long running functions];</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>C1 --&gt; D;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>A[application] -- offline --&gt; B[byte code/ptx]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>B --&gt; C[quick run time compiler/ finalizer]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>C --&gt; D[isa]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>B --&gt; C1[fancy compiler - only run on long running functions];</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>C1 --&gt; D;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+flowchart LR
 A[application] -- offline --&gt; B[byte code/ptx]
 B --&gt; C[quick run time compiler/ finalizer]
 C --&gt; D[isa]

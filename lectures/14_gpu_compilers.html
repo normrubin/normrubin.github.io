@@ -104,20 +104,37 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="gpu-architecture" class="level2">
-<h2 class="anchored" data-anchor-id="gpu-architecture">gpu architecture</h2>
-<p>Why is it hard to learn about gpus?</p>
+<section id="challenges-in-learning-about-gpus" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-in-learning-about-gpus">Challenges in Learning About GPUs</h2>
 <ol type="1">
-<li>architectural variations - all the vendors keep changing the architecture. Different vendors build different hardware Graphics programs run on all vendors, because vendors ship the ir and do finalization on the device</li>
-<li>inconsistent terminology - vendors use different terms for the same features and reuse cpu terms somewhat differently for instance a “Cuda core” is not the same as a ‘cpu core’</li>
-<li>Legacy terminology - some terms come from gpu history of graphics for example a shader is a program</li>
-<li>software abstractions - big frameworks hide the details</li>
-<li>CUDA is the market leader, so most explanations use CUDA terms. For instance AMD uses ‘wave’ to mean more or less the same as a CUDA ‘warp’ but lots of AMD documentation uses ‘warps’</li>
-<li>CUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA python etc.</li>
+<li><strong>Architectural Variations</strong>
+<ul>
+<li>All the vendors keep changing the architecture. Different vendors build different hardware. Graphics programs run on all vendors’ hardware because vendors ship their own drivers and do finalization on the device.</li>
+</ul></li>
+<li><strong>Inconsistent Terminology</strong>
+<ul>
+<li>Vendors use different terms for the same features and reuse CPU terms somewhat differently. For instance, a “Cuda core” is not the same as a ‘CPU core’.</li>
+</ul></li>
+<li><strong>Legacy Terminology</strong>
+<ul>
+<li>Some terms come from the GPU’s history of graphics. For example, a shader is a program.</li>
+</ul></li>
+<li><strong>Software Abstractions</strong>
+<ul>
+<li>Big frameworks hide the details.</li>
+</ul></li>
+<li><strong>CUDA’s Market Dominance</strong>
+<ul>
+<li>Most explanations use CUDA terms since CUDA is the market leader. For instance, AMD uses ‘wave’ to mean more or less the same as a CUDA ‘warp’, but lots of AMD documentation uses ‘warps’.</li>
+</ul></li>
+<li><strong>CUDA: Language and Model</strong>
+<ul>
+<li>CUDA is both a programming language and a programming model, so you can have CUDA Fortran, CUDA Python, etc.</li>
+</ul></li>
 </ol>
 </section>
 <section id="hardware-styles-nvidia-model" class="level2">
-<h2 class="anchored" data-anchor-id="hardware-styles-nvidia-model">hardware styles nvidia model</h2>
+<h2 class="anchored" data-anchor-id="hardware-styles-nvidia-model">hardware styles NVIDIA model</h2>
 <ol type="1">
 <li>compute and graphics parts have same programmable parts, compute leaves out non-programmable features</li>
 <li>graphics customers pay a <strong><em>tax</em></strong> for the compute instructions</li>
@@ -129,19 +146,20 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="hardware-styles-amd-model">hardware styles AMD model</h2>
 <ol type="1">
 <li>compute has extra instructions (no tax on graphics customers to support compute)</li>
-<li>chiplet model (great engineering)</li>
+<li>chiplet model (great engineering!)</li>
 <li>R series is graphics, C series is compute</li>
 </ol>
 </section>
-<section id="programming-model" class="level1">
-<h1>programming model</h1>
-<p>both vendors use the CUDA programming model</p>
+<section id="programming-model" class="level2">
+<h2 class="anchored" data-anchor-id="programming-model">programming model</h2>
+<p>both vendors use the CUDA programming model. AMD supports a variation of the CUDA language</p>
 <p>machines have multiple SIMD processors, each SIMD can be running a different instruction but each <strong><em>lane</em></strong> of a SIMD runs the same instruction</p>
 <p>a <strong><em>lane</em></strong> of a SIMD is called a <strong><em>thread</em></strong></p>
 <hr>
 <p>the programming model is SIMT (single instruction multiple threads)</p>
 <p>User writes a scalar program, compiler maps that program to a lane of a SIMD, many instances of the program run at once, hardware combines copies of the scalar program into <strong><em>warps</em></strong>, hardware schedules warps into the SIMD engines</p>
 <p>programs are called <strong><em>kernels</em></strong></p>
+</section>
 <section id="threading-model" class="level2">
 <h2 class="anchored" data-anchor-id="threading-model">threading model</h2>
 </section>
@@ -272,7 +290,6 @@ ul.task-list li input[type="checkbox"] {
 <li>warp issues a wait for loads to finish (hardware in cpu, software in gpu)</li>
 <li>hardware switches to another warp (if there is on), good to have a lot of warps 1, if all warps waiting for memory, alu units are idle</li>
 </ol>
-</section>
 </section>
 <section id="differences" class="level1">
 <h1>differences</h1>
