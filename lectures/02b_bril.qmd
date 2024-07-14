@@ -263,16 +263,14 @@ not be empty.
     TERMINATORS = 'br', 'jmp', 'ret'
 
     def form_blocks(instrs):
-        """ comment """
-    
         # Start with an empty block.
         cur_block = []
-    
+
         for instr in instrs:
             if 'op' in instr:  # It's an instruction.
                 # Add the instruction to the currently-being-formed block.
                 cur_block.append(instr)
-    
+
                 # If this is a terminator (branching instruction), it's the
                 # last instruction in the block. Finish this block and
                 # start a new one.
@@ -438,7 +436,7 @@ for i,block in enumerate(blocks)  # blocks is a ordereddict
 
 ## cfg  
 
-```{python}
+```{python, output-location=fragment}
 def get_cfg(ordered_blocks):
     cfg = {}
 
@@ -468,3 +466,11 @@ print(cfg)
 
 ```
 
+## graph
+
+```{mermaid}
+graph TD
+gen_bk_0--> somewhere
+gen_bk_1 --> somewhere
+
+```
