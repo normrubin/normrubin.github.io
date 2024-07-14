@@ -387,6 +387,9 @@
       margin-right: 0; 
     }
   </style>
+  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <meta property="og:title" content="Overview of Bril – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -413,7 +416,7 @@
 <section id="lets-look-at-a-bril-program." class="slide level2">
 <h2>Lets look at a bril program.</h2>
 <p>Bril is written in JSON format. Almost all programming languages have a way to read json.</p>
-<div id="899ad2a1" class="cell" data-execution_count="1">
+<div id="5a470c0d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a></a><span class="im">import</span> subprocess</span>
 <span id="cb1-3"><a></a><span class="im">import</span> os </span>
@@ -625,39 +628,37 @@ for each basic block
 </section>
 <section class="slide level2">
 
-<div id="35df7587" class="cell" data-execution_count="2">
+<div id="b35a5aaa" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>    <span class="co">#Instructions that terminate a basic block.</span></span>
 <span id="cb10-2"><a></a>    TERMINATORS <span class="op">=</span> <span class="st">'br'</span>, <span class="st">'jmp'</span>, <span class="st">'ret'</span></span>
 <span id="cb10-3"><a></a></span>
 <span id="cb10-4"><a></a>    <span class="kw">def</span> form_blocks(instrs):</span>
-<span id="cb10-5"><a></a>        <span class="co">""" comment """</span></span>
-<span id="cb10-6"><a></a>    </span>
-<span id="cb10-7"><a></a>        <span class="co"># Start with an empty block.</span></span>
-<span id="cb10-8"><a></a>        cur_block <span class="op">=</span> []</span>
-<span id="cb10-9"><a></a>    </span>
-<span id="cb10-10"><a></a>        <span class="cf">for</span> instr <span class="kw">in</span> instrs:</span>
-<span id="cb10-11"><a></a>            <span class="cf">if</span> <span class="st">'op'</span> <span class="kw">in</span> instr:  <span class="co"># It's an instruction.</span></span>
-<span id="cb10-12"><a></a>                <span class="co"># Add the instruction to the currently-being-formed block.</span></span>
-<span id="cb10-13"><a></a>                cur_block.append(instr)</span>
-<span id="cb10-14"><a></a>    </span>
-<span id="cb10-15"><a></a>                <span class="co"># If this is a terminator (branching instruction), it's the</span></span>
-<span id="cb10-16"><a></a>                <span class="co"># last instruction in the block. Finish this block and</span></span>
-<span id="cb10-17"><a></a>                <span class="co"># start a new one.</span></span>
-<span id="cb10-18"><a></a>                <span class="cf">if</span> instr[<span class="st">'op'</span>] <span class="kw">in</span> TERMINATORS:</span>
-<span id="cb10-19"><a></a>                    <span class="cf">yield</span> cur_block</span>
-<span id="cb10-20"><a></a>                    cur_block <span class="op">=</span> []</span>
-<span id="cb10-21"><a></a>            </span>
-<span id="cb10-22"><a></a>            <span class="cf">else</span>:  <span class="co"># It's a label.</span></span>
-<span id="cb10-23"><a></a>                <span class="co"># End the block here (if it contains anything).</span></span>
-<span id="cb10-24"><a></a>                <span class="cf">if</span> cur_block:</span>
-<span id="cb10-25"><a></a>                    <span class="cf">yield</span> cur_block</span>
-<span id="cb10-26"><a></a></span>
-<span id="cb10-27"><a></a>                <span class="co"># Start a new block with the label.</span></span>
-<span id="cb10-28"><a></a>                cur_block <span class="op">=</span> [instr]</span>
-<span id="cb10-29"><a></a></span>
-<span id="cb10-30"><a></a>        <span class="co"># Produce the final block, if any.</span></span>
-<span id="cb10-31"><a></a>        <span class="cf">if</span> cur_block:</span>
-<span id="cb10-32"><a></a>            <span class="cf">yield</span> cur_block</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-5"><a></a>        <span class="co"># Start with an empty block.</span></span>
+<span id="cb10-6"><a></a>        cur_block <span class="op">=</span> []</span>
+<span id="cb10-7"><a></a></span>
+<span id="cb10-8"><a></a>        <span class="cf">for</span> instr <span class="kw">in</span> instrs:</span>
+<span id="cb10-9"><a></a>            <span class="cf">if</span> <span class="st">'op'</span> <span class="kw">in</span> instr:  <span class="co"># It's an instruction.</span></span>
+<span id="cb10-10"><a></a>                <span class="co"># Add the instruction to the currently-being-formed block.</span></span>
+<span id="cb10-11"><a></a>                cur_block.append(instr)</span>
+<span id="cb10-12"><a></a></span>
+<span id="cb10-13"><a></a>                <span class="co"># If this is a terminator (branching instruction), it's the</span></span>
+<span id="cb10-14"><a></a>                <span class="co"># last instruction in the block. Finish this block and</span></span>
+<span id="cb10-15"><a></a>                <span class="co"># start a new one.</span></span>
+<span id="cb10-16"><a></a>                <span class="cf">if</span> instr[<span class="st">'op'</span>] <span class="kw">in</span> TERMINATORS:</span>
+<span id="cb10-17"><a></a>                    <span class="cf">yield</span> cur_block</span>
+<span id="cb10-18"><a></a>                    cur_block <span class="op">=</span> []</span>
+<span id="cb10-19"><a></a>            </span>
+<span id="cb10-20"><a></a>            <span class="cf">else</span>:  <span class="co"># It's a label.</span></span>
+<span id="cb10-21"><a></a>                <span class="co"># End the block here (if it contains anything).</span></span>
+<span id="cb10-22"><a></a>                <span class="cf">if</span> cur_block:</span>
+<span id="cb10-23"><a></a>                    <span class="cf">yield</span> cur_block</span>
+<span id="cb10-24"><a></a></span>
+<span id="cb10-25"><a></a>                <span class="co"># Start a new block with the label.</span></span>
+<span id="cb10-26"><a></a>                cur_block <span class="op">=</span> [instr]</span>
+<span id="cb10-27"><a></a></span>
+<span id="cb10-28"><a></a>        <span class="co"># Produce the final block, if any.</span></span>
+<span id="cb10-29"><a></a>        <span class="cf">if</span> cur_block:</span>
+<span id="cb10-30"><a></a>            <span class="cf">yield</span> cur_block</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 </section>
@@ -665,7 +666,7 @@ for each basic block
 
 </div></section><section id="as-a-test-lets-print-out-the-blocks" class="slide level2">
 <h2>as a test, lets print out the blocks</h2>
-<div id="6374407b" class="cell" data-execution_count="3">
+<div id="7fc97865" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="kw">def</span> print_blocks(bril):</span>
 <span id="cb11-2"><a></a>    <span class="co">"""Given a Bril program, print out its basic blocks.</span></span>
 <span id="cb11-3"><a></a><span class="co">    """</span></span>
@@ -714,7 +715,7 @@ for each basic block
 </section>
 <section class="slide level2">
 
-<div id="e8da6ad6" class="cell" data-execution_count="4">
+<div id="964707cc" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">import</span> subprocess</span>
 <span id="cb14-2"><a></a></span>
 <span id="cb14-3"><a></a><span class="co"># Run a command and capture its output</span></span>
@@ -728,47 +729,47 @@ for each basic block
 <div class="cell fragment" data-execution_count="4">
 <div class="cell-output cell-output-stdout">
 <pre><code>total 608
--rw-r--r-- 1 runner docker  8263 Jul 14 13:28 010_compiler_overview.qmd
--rw-r--r-- 1 runner docker  2927 Jul 14 13:28 01a_performance_measurement.qmd
--rw-r--r-- 1 runner docker 39145 Jul 14 13:29 02a_representation.html
--rw-r--r-- 1 runner docker  7247 Jul 14 13:28 02a_representation.qmd
--rw-r--r-- 1 runner docker 58334 Jul 14 13:29 02b_bril.html
--rw-r--r-- 1 runner docker 11712 Jul 14 13:28 02b_bril.qmd
--rw-r--r-- 1 runner docker 19967 Jul 14 13:29 02b_bril.quarto_ipynb
-drwxr-xr-x 4 runner docker  4096 Jul 14 13:29 02b_bril_files
--rw-r--r-- 1 runner docker  6951 Jul 14 13:28 03_local.qmd
--rw-r--r-- 1 runner docker  7846 Jul 14 13:28 03b_local_value_numbering.qmd
--rw-r--r-- 1 runner docker 43341 Jul 14 13:29 04_data_flow.html
--rw-r--r-- 1 runner docker 10399 Jul 14 13:28 04_data_flow.qmd
--rw-r--r-- 1 runner docker  9250 Jul 14 13:28 05_global.qmd
--rw-r--r-- 1 runner docker  4717 Jul 14 13:28 05b_licm.qmd
--rw-r--r-- 1 runner docker  3092 Jul 14 13:28 05c_pre.qmd
--rw-r--r-- 1 runner docker 16255 Jul 14 13:28 06_ssa.qmd
--rwxr-xr-x 1 runner docker 29710 Jul 14 13:28 07_llvm.ipynb
--rw-r--r-- 1 runner docker 27225 Jul 14 13:29 08_classic_loop_ops.html
--rw-r--r-- 1 runner docker  5635 Jul 14 13:28 08_classic_loop_ops.qmd
--rwxr-xr-x 1 runner docker 13980 Jul 14 13:28 09_poly.qmd
--rw-r--r-- 1 runner docker   246 Jul 14 13:28 100_mlir.qmd
--rw-r--r-- 1 runner docker 20103 Jul 14 13:29 110_whole_program.html
--rw-r--r-- 1 runner docker   264 Jul 14 13:28 110_whole_program.qmd
--rw-r--r-- 1 runner docker   260 Jul 14 13:28 12_memory.qmd
--rw-r--r-- 1 runner docker   368 Jul 14 13:28 13_dynamic_compilers.qmd
--rw-r--r-- 1 runner docker 10060 Jul 14 13:28 14_gpu_compilers.qmd
--rw-r--r-- 1 runner docker  4595 Jul 14 13:28 errors
-drwxr-xr-x 2 runner docker  4096 Jul 14 13:28 images
-drwxr-xr-x 2 runner docker  4096 Jul 14 13:28 papers
--rw-r--r-- 1 runner docker  8017 Jul 14 13:28 ra-checking.qmd
--rw-r--r-- 1 runner docker 48567 Jul 14 13:29 revealjs_02a_representation.qmd.html
--rw-r--r-- 1 runner docker 53509 Jul 14 13:29 revealjs_04_data_flow.qmd.html
--rw-r--r-- 1 runner docker 39234 Jul 14 13:29 revealjs_08_classic_loop_ops.qmd.html
--rw-r--r-- 1 runner docker 33153 Jul 14 13:29 revealjs_110_whole_program.qmd.html
+-rw-r--r-- 1 runner docker  8263 Jul 14 15:12 010_compiler_overview.qmd
+-rw-r--r-- 1 runner docker  2927 Jul 14 15:12 01a_performance_measurement.qmd
+-rw-r--r-- 1 runner docker 39145 Jul 14 15:13 02a_representation.html
+-rw-r--r-- 1 runner docker  7247 Jul 14 15:12 02a_representation.qmd
+-rw-r--r-- 1 runner docker 59043 Jul 14 15:13 02b_bril.html
+-rw-r--r-- 1 runner docker 11782 Jul 14 15:12 02b_bril.qmd
+-rw-r--r-- 1 runner docker 20267 Jul 14 15:13 02b_bril.quarto_ipynb
+drwxr-xr-x 4 runner docker  4096 Jul 14 15:13 02b_bril_files
+-rw-r--r-- 1 runner docker  6951 Jul 14 15:12 03_local.qmd
+-rw-r--r-- 1 runner docker  7846 Jul 14 15:12 03b_local_value_numbering.qmd
+-rw-r--r-- 1 runner docker 43341 Jul 14 15:12 04_data_flow.html
+-rw-r--r-- 1 runner docker 10399 Jul 14 15:12 04_data_flow.qmd
+-rw-r--r-- 1 runner docker  9250 Jul 14 15:12 05_global.qmd
+-rw-r--r-- 1 runner docker  4717 Jul 14 15:12 05b_licm.qmd
+-rw-r--r-- 1 runner docker  3092 Jul 14 15:12 05c_pre.qmd
+-rw-r--r-- 1 runner docker 16255 Jul 14 15:12 06_ssa.qmd
+-rwxr-xr-x 1 runner docker 29710 Jul 14 15:12 07_llvm.ipynb
+-rw-r--r-- 1 runner docker 27225 Jul 14 15:13 08_classic_loop_ops.html
+-rw-r--r-- 1 runner docker  5635 Jul 14 15:12 08_classic_loop_ops.qmd
+-rwxr-xr-x 1 runner docker 13980 Jul 14 15:12 09_poly.qmd
+-rw-r--r-- 1 runner docker   246 Jul 14 15:12 100_mlir.qmd
+-rw-r--r-- 1 runner docker 20103 Jul 14 15:12 110_whole_program.html
+-rw-r--r-- 1 runner docker   264 Jul 14 15:12 110_whole_program.qmd
+-rw-r--r-- 1 runner docker   260 Jul 14 15:12 12_memory.qmd
+-rw-r--r-- 1 runner docker   368 Jul 14 15:12 13_dynamic_compilers.qmd
+-rw-r--r-- 1 runner docker 10060 Jul 14 15:12 14_gpu_compilers.qmd
+-rw-r--r-- 1 runner docker  4595 Jul 14 15:12 errors
+drwxr-xr-x 2 runner docker  4096 Jul 14 15:12 images
+drwxr-xr-x 2 runner docker  4096 Jul 14 15:12 papers
+-rw-r--r-- 1 runner docker  8017 Jul 14 15:12 ra-checking.qmd
+-rw-r--r-- 1 runner docker 48567 Jul 14 15:13 revealjs_02a_representation.qmd.html
+-rw-r--r-- 1 runner docker 53509 Jul 14 15:12 revealjs_04_data_flow.qmd.html
+-rw-r--r-- 1 runner docker 39234 Jul 14 15:13 revealjs_08_classic_loop_ops.qmd.html
+-rw-r--r-- 1 runner docker 33153 Jul 14 15:12 revealjs_110_whole_program.qmd.html
 </code></pre>
 </div>
 </div>
 </section>
 <section id="print-the-blocks" class="slide level2">
 <h2>print the blocks</h2>
-<div id="649d4e13" class="cell" data-execution_count="5">
+<div id="61f2599b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a><span class="im">import</span> json </span>
 <span id="cb16-2"><a></a><span class="im">import</span> os</span>
 <span id="cb16-3"><a></a><span class="im">import</span> subprocess</span>
@@ -791,7 +792,7 @@ block somewhere
 </section>
 <section id="the-map-label-names-to-blocks" class="slide level2">
 <h2>the map (label names to blocks)</h2>
-<div id="959acee4" class="cell" data-execution_count="6">
+<div id="c0f6ad44" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
 <span id="cb18-2"><a></a></span>
 <span id="cb18-3"><a></a></span>
@@ -853,7 +854,7 @@ somewhere [{'args': ['v'], 'op': 'print'}]</code></pre>
 </section>
 <section id="cfg" class="slide level2">
 <h2>cfg</h2>
-<div id="b74bf503" class="cell" data-execution_count="7">
+<div id="c112b834" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a></a><span class="kw">def</span> get_cfg(ordered_blocks):</span>
 <span id="cb21-2"><a></a>    cfg <span class="op">=</span> {}</span>
 <span id="cb21-3"><a></a></span>
@@ -882,6 +883,19 @@ somewhere [{'args': ['v'], 'op': 'print'}]</code></pre>
 <span id="cb21-26"><a></a><span class="bu">print</span>(cfg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
+</section>
+<section id="cfg-output" class="slide level2 output-location-slide"><h2>cfg</h2><div class="cell output-location-slide" data-execution_count="7">
+<div class="cell-output cell-output-stdout">
+<pre><code>{'gen_bk_0': ['somewhere'], 'gen_bk_1': ['somewhere'], 'somewhere': []}</code></pre>
+</div>
+</div></section><section id="graph" class="slide level2">
+<h2>graph</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a></a>graph TD</span>
+<span id="cb23-2"><a></a>gen_bk_0--&gt; somewhere</span>
+<span id="cb23-3"><a></a>gen_bk_1 --&gt; somewhere</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
@@ -889,9 +903,19 @@ somewhere [{'args': ['v'], 'op': 'print'}]</code></pre>
 </div>
 </div>
 </section>
-    <section id="cfg-output" class="slide level2 output-location-slide"><h2>cfg</h2><div class="cell output-location-slide" data-execution_count="7">
-<div class="cell-output cell-output-stdout">
-<pre><code>{'gen_bk_0': ['somewhere'], 'gen_bk_1': ['somewhere'], 'somewhere': []}</code></pre>
+    <section id="graph-output" class="slide level2 output-location-slide"><h2>graph</h2><div class="cell output-location-slide" data-reveal="true" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+gen_bk_0--&gt; somewhere
+gen_bk_1 --&gt; somewhere
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
 </div>
 </div></section></div>
   </div>
