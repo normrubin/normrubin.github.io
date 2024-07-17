@@ -2,25 +2,863 @@
 execute:
   echo: true
 format:
-  html: default
   revealjs:
     chalkboard: true
     code-line-numbers: true
     output-file: revealjs_13_dynamic_compilers.qmd
-    scrollable: true
+    scrollable: true 
+    echo: false 
+  html: default
 sidebar: false
 title: Dynamic Compilers
 
 ---
 
-:::{.callout-warning}
-not done
+## jit (just in time) compilers vs aot(ahead of time)  compilers 
+
+a jit compiler translates code into isa while the program executes 
+
+some options
+
+- compile a function the first time it is called
+- compile a function after it has been called a lot (needs an interpreter) We call these hot functions 
+- build a trace of instructions executed and compile the hot traces (a trace has no branches)
+- A variation I  used ran the program to completion using a tracing interpreter, recompile off line, future execution is  a mix of interpreter and compiled code  
+
+## Can jit compiled code run faster then aot code?
+
+
+## Comparison  
+
+
+aot | jit
+----| ----
+cannot inline libraries | can inline (even class methods)
+no runtime code gen | can use run time code gen
+no speculative opts |  can use spec opts 
+less information    | more information 
+overall performance lower | overall performance often higher 
+full speed from the start | requires warmup
+no compile cost at run time | overhead to run compiler 
+
+
+## Tradeoffs 
+
+1. The time to compile is part of the total execution time 
+1. might run less optimizations to speed up execution time 
+1. might look at run time info
+1. same code might be compiled many times 
+
+Wt would the same code be compiled more than once?
+
+
+## tiered compilers 
+
+Since compilation is costly, do not compile functions 
+that are only called once and do not contain a long running loop
+
+we have a series of compilers, each with more aggressive optimization and each allowed to take longer
+
+- the lowest tier is the interpreter 
+- the next is the base line compiler 
+
+---
+
+1. start interpreting the code 
+1. if some part of the code takes a long time, compile it with the next higher tier 
+1. is some runtime info changes, compile it again
+
+## magic numbers 
+
+associate a counter with branches and functions 
+if the counter reaches some magic number use one of the compilers
+
+if the counter for a backward branch, you  recompile, but the code is executing in  the middle of a loop, so how do you insert the newly compiled code?
+
+
+
+## questions when building a  JIT
+
+- what strategy do you use to invoke the jit
+- do you have to execute for a while before calling the jit
+-  how much info do you need
+-  what is the price of wrong info
+-  are there easy and hard programs 
+-  do the easy programs match up with users common programs
+
+## Speculation 
+
+- assume some property is true, compile using that info
+this is always a gamble, so you need to recover if the assumption was wrong 
+- assume a variable is an int, and does not overflow 
+- assume properties of an object is fixed 
+- assume the target of call is always the same 
+- assume past behavior predicts future behavior 
+
+## flow 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
+interpreter -- hot? --> profiling 
+profiling -- stats --> optimizing_compiler
+optimizing_compiler --> compiled_code
+compiled_code -- deoptimze --> interpreter
+interpreter -- already_compiled --> compiled_code
+```
+
+
+## boxed values 
+
+Many languages do not use strong static typeing 
+
+for example in python
+
+x = x + 1 
+
+x could be an int/float/object
+
+the value of x needs to carry a type. Represent x as a pair (type, pointer or bits)
+The pair is called a boxed value 
+
+then to generate code for the plus we have to figure out what kind of add, based on the type
+
+
+## inline caches 
+
+in languages like python, calls to a method are more expensive then calls to a 
+method in c++ why?
+
+. . . 
+
+Python objects are  implemented as  hash tables. While C++ uses virtual tables
+
+how does that effect the cost?
+
+
+## first C++ virtual tables 
+
+in C++ a method call takes two dereferences 
+
+1. first find the v-table
+1. second used a ***fixed offset*** from the table start to find the address
+
+## What do we need to keep the offset fixed?
+ 
+
+if derived inherits from base, and both have a function f.
+the offset to f has to be the same.
+
+in languages where objects are hash tables, the c++ dereference becomes a hash table lookup, which is slower 
+
+## tradeoffs 
+
+In a dynamically typed language like python we can add or remove methods easily
+
+but method calls are expensive 
+
+we want to make these calls cheaper 
+
+## inline caches at te call site 
+
+the first time we call a method, we know the type (because we are generating code at runtime)
+
+
+::: {.columns}
+
+::: {.column}
+
+```
+def func(a,b,c):
+  for i in range(10):
+     foo(a,b,c)
+```
+
 :::
 
-tiered compilers 
+::: {.column}
 
-how does runtime manage this 
+```
+def func(a,b,c):
+  for i in range(1):
+    if isinstance(a, type1)
+      body of foo  
+    else:
+      other = lookup 'foo' in the hash
+      call other(a,b,c
+      )
+```
 
-fast and slow compilers 
+:::
 
-how doe this work on a gpu
+:::
+
+
+
+## inline caches at the function site 
+
+::: {.columns}
+
+::: {.column width="30%"}
+
+```
+def func(a,b,c):
+  for i in range(10):
+     _foo(a,b,c
+```
+
+:::
+
+::: {.column}
+
+```
+def _foo(a,b,c)
+  if isinstance(a, type1)
+      body of foo  
+    else:
+      other = lookup 'foo' in a
+      call other(a,b,c)
+```
+:::
+
+::: 
+
+
+is it better to do this at the call site or at the function site?
+
+
+## polymorphic calls 
+
+if the type changes at runtime (the call to other
+is taken)  does the optimization help?
+
+could invalidate the table and rebuild it with another case 
+
+## what are the costs 
+
+for example v8 compiler
+
+monomorphic inline hit - 10 instructions 
+
+polymorphic hit - 35 instructions for 10 types, 60 instructions for 20 types 
+
+cache miss 1000-4000 instructions 
+
+## value specialization 
+
+Oddly many functions are called with the same arguments 
+ 
+
+## an example 
+
+ given a vector v of size n, and a parameter q
+ find the element of v that is closest to q
+
+```
+ function closest(v, q, n) {
+    if (n == 0) {
+          throw "Error";
+    } else {
+        var i = 0;
+        var d = 0ffffffff;
+        while (i < n) {
+           var nd = abs(v[i] - q);
+           if (nd <= d) d = nd; 
+           i++;
+        }    
+        return d;  
+      } 
+}
+```
+
+## the cfg 
+
+we want to recompile this for specific v,q, and n, where we restart at the while test 
+
+
+---
+
+::: {.columns}
+
+::: {.column width="40%"}
+
+```
+ function closest(v, q, n) {
+    if (n == 0) {
+          throw "Error";
+    } else {
+      var i = 0;
+      var d = 0ffffffff;
+      while (i < n) {
+         var nd = abs(v[i] - q);
+         if (nd <= d) d = nd; 
+         i++;
+        }    
+        return d;  
+      } 
+}
+```
+
+:::
+
+::: {.column width="40%"}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+normal_entry["function entry
+              v = param[0]
+              q = param[1]
+              n = param[2]
+              if (n ==0) goto l1"]
+
+l1["l1: throw error"]
+l2[" l2: i0 = 0
+     d = 0fffffff"]
+normal_entry --> l1
+normal_entry--> l2
+l3["l3: i1 = phi(i0, i2, i3)
+    d1 = phi(d0, d3, d4)
+    if (i1 < n) go to l5"  ]
+l2--> l3
+entry_on_stack_rep["start replace
+                   v = param[0]
+                  q = param[1]
+                  n = param[2]
+                  i3 = stack[0]
+                  d4 = stack[1]"]
+entry_on_stack_rep --> l3
+l5["l5: t0 = 4* i
+     t1 = v[t0]
+     notinbounds(t1, n) go to l8"]
+
+l3 --> l5 
+l3--> l4
+l4["l4: return d1"]
+l5--> l7
+l7[" l7: nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   goto l3"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l8["l8: throw boundsError"]
+l5 --> l8
+l9--> l3
+```
+
+:::
+
+::: 
+
+
+## two entries 
+
+First entry is the regular starting point,
+second is the entry if we are currently running the loop in the interpreter 
+
+Since we are compiling the function while in the loop
+we can ask the interpreter for values 
+
+- v == load[0]
+- q = 42
+- n = 100
+- i = 40 
+- d = 0fffffff
+
+
+--- 
+
+::: {.columns}
+
+::: {.column width="30%"}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+normal_entry["function entry
+              v = param[0]
+              q = param[1]
+              n = param[2]
+              if (n ==0) goto l1"]
+
+l1["l1: throw error"]
+l2[" l2: i0 = 0
+     d = 0fffffff"]
+normal_entry --> l1
+normal_entry--> l2
+l3["l3: i1 = phi(i0, i2, i3)
+    d1 = phi(d0, d3, d4)
+    if (i1 < n) go to l5"  ]
+l2--> l3
+entry_on_stack_rep["start replace
+                   v = param[0]
+                  q = param[1]
+                  n = param[2]
+                  i3 = stack[0]
+                  d4 = stack[1]"]
+entry_on_stack_rep --> l3
+l5["l5: t0 = 4* i
+     t1 = v[t0]
+     notinbounds(t1, n) go to l8"]
+
+l3 --> l5 
+l3--> l4
+l4["l4: return d1"]
+l5--> l7
+l7[" l7: nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   goto l3"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l8["l8: throw boundsError"]
+l5 --> l8
+l9--> l3
+```
+
+:::
+
+::: {.column width="40%"}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+normal_entry["function entry
+              v = load[0]
+              q = q = 42 
+              n = 100
+              if (n ==0) goto l1"]
+
+l1["l1: throw error"]
+l2[" l2: i0 = 0
+     d = 0fffffff"]
+normal_entry --> l1
+normal_entry--> l2
+l3["l3: i1 = phi(i2, i3)
+    d1 = phi(d3, d4)
+    if (i1 < n) go to l5"  ]
+l2--> l3
+entry_on_stack_rep["start replace
+                   v = load [0]
+                  q = 42
+                  n = 100
+                  i3 = 40
+                  d4 = offfffff"]
+entry_on_stack_rep --> l3
+l5["l5: t0 = 4* i
+     t1 = v[t0]
+     notinbounds(t1, n) go to l8"]
+
+l3 --> l5 
+l3--> l4
+l4["l4: return d1"]
+l5--> l7
+l7[" l7: nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   goto l3"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l8["l8: throw boundsError"]
+l5 --> l8
+l9--> l3
+```
+
+:::
+
+::: 
+
+
+
+## dead code elimination
+After this the all calls to the function assume these arguments so no need to keep the regular entry 
+
+
+::: {.columns}
+
+::: {.column width="30%"}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+normal_entry["function entry
+              v = load[0]
+              q = q = 42 
+              n = 100
+              if (n ==0) goto l1"]
+
+l1["l1: throw error"]
+l2[" l2: i0 = 0
+     d = 0fffffff"]
+normal_entry --> l1
+normal_entry--> l2
+l3["l3: i1 = phi(i2, i3)
+    d1 = phi(d3, d4)
+    if (i1 < n) go to l5"  ]
+l2--> l3
+entry_on_stack_rep["start replace
+                   v = load [0]
+                  q = 42
+                  n = 100
+                  i3 = 40
+                  d4 = offfffff"]
+entry_on_stack_rep --> l3
+l5["l5: t0 = 4* i
+     t1 = v[t0]
+     notinbounds(t1, n) go to l8"]
+
+l3 --> l5 
+l3--> l4
+l4["l4: return d1"]
+l5--> l7
+l7[" l7: nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   goto l3"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l8["l8: throw boundsError"]
+l5 --> l8
+l9--> l3
+```
+
+
+:::
+
+::: {.column width="45%"}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+
+l3["l3: i1 = phi(i2, i3)
+    d1 = phi(dd3, d4)
+    if (i1 < n) go to l5"  ]
+entry_on_stack_rep["start replace
+                   v = load [0]
+                  q = 42
+                  n = 100
+                  i3 = 40
+                  d4 = offfffff"]
+entry_on_stack_rep --> l3
+l5["l5: t0 = 4* i
+     t1 = v[t0]
+     notinbounds(t1, n) go to l8"]
+
+l3 --> l5 
+l3--> l4
+l4["l4: return d1"]
+l5--> l7
+l7[" l7: nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   goto l3"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l8["l8: throw boundsError"]
+l5 --> l8
+l9--> l3
+```
+
+
+:::
+
+:::
+
+
+## array in bounds check
+
+we can pattern match loops with bounds checks if we know the limit 
+
+---
+
+::: {.columns}
+
+::: {.column width="30%"}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+
+l3["l3: i1 = phi(i2, i3)
+    d1 = phi(dd3, d4)
+    if (i1 < n) go to l5"  ]
+entry_on_stack_rep["start replace
+                   v = load [0]
+                  q = 42
+                  n = 100
+                  i3 = 40
+                  d4 = offfffff"]
+entry_on_stack_rep --> l3
+l5["l5: t0 = 4* i
+     t1 = v[t0]
+     notinbounds(t1, n) go to l8"]
+
+l3 --> l5 
+l3--> l4
+l4["l4: return d1"]
+l5--> l7
+l7[" l7: nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   goto l3"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l8["l8: throw boundsError"]
+l5 --> l8
+l9--> l3
+```
+
+
+
+:::
+
+::: {.column width="45"}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+
+l3["l3: i1 = phi(i0, i2, i3)
+    d1 = phi(d0, d3, d4)
+    if (i1 < n) go to l5"  ]
+entry_on_stack_rep["start replace
+                   v = load [0]
+                  q = 42
+                  n = 100
+                  i3 = 40
+                  d4 = offfffff"]
+entry_on_stack_rep --> l3
+l5["l5: t0 = 4* i
+     t1 = v[t0]
+     "]
+
+l3 --> l5 
+l3--> l4
+l4["l4: return d1"]
+l5--> l7
+l7[" l7: nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   goto l3"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l9--> l3
+```
+
+:::
+
+::: 
+
+
+
+## loop inversion 
+
+a general while loop
+
+```
+while(cond){
+  ...
+}
+``` 
+can be changed into 
+```
+if (cond){
+  do {
+    ...
+  } while(cond)
+}
+```
+
+for this loop the first time around i = 40, n = 100 
+so the first condition is true 
+
+## after loop inversion 
+
+```{mermaid height="40%"}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+l3["l3: i1 = phi(i2, i3)
+    d1 = phi(d3, d4)" ]
+entry_on_stack_rep["v = load [0]
+                  q = 42
+                  n = 100
+                  i3 = 40
+                  d4 = offfffff"]
+entry_on_stack_rep --> l3
+l3 --> l7
+
+
+l4["l4: return d1"]
+l7[" l7: l5: t0 = 4* i
+t1 = v[t0]
+nd = abs(t1, q)
+   if (nd > d1) go to l9"]
+
+l9["l9: d3 = phi(d1, d2)
+   i2 = i1 + 1
+   if (i2 > n) goto l4"]
+l7--> l9
+l7--> l6["l6: d2 = nd"]
+l6--> l9
+l9--> l3
+l9--> l4
+```
+
+## results 
+
+specialized code is shorter and compiles faster 
+
+since we know that the loop goes from 42 to 100, we could unroll the loop  
+
+## trace compilation 
+
+tracing jit: extract a hot path (not a function)
+
+Hot paths are compiled as a single basic block, but the path might go through a call 
+
+gamble: next execution starting at this point,  go the same way, no branches leave the path
+
+generate machine code for hot paths interpret the rest of the program 
+
+
+unlike specialization, tracing assumes the same path but not the same values 
+
+## an example  (x = 42)
+::: {.columns}
+::: {.column}
+
+```
+function main(x){
+   y = x +1 
+   if x <100 {
+      z = f(y)
+   } else {
+      z = g(y)
+   }
+   return z
+}
+
+function f(a){
+   return a -1 
+}
+```
+:::
+::: {.column}
+
+:::{.incremental}
++ y = x +1 
++ guard(x < 100)
++ a = y
++ z = a - 1
++ return z 
+
+:::
+
+:::
+
+:::
+
+guards at divergence, guards never return 
+
+optimize assuming guards are true, ok to be slow if guard is false 
+
+## move guards up
+
+why is this a good idea?  
+
+. . . 
+
+- fail fast
+- longer region to optimize 
+
+## use local value numbering 
+
+::: {.columns}
+
+::: {.column}
+
++ guard(x < 100)
++  y = x + 1 
++ a = y
++ z = a - 1
++ return z 
+
+:::
+
+::: {.column}
+
++ guard(x < 100)
++ return x
+
+::: 
+
+:::
+
+## how do this in Bril?
+
+3 new operations (sort of like out-of-order instructions)
+
+1. speculate
+1. commit 
+1. guard 
+
+[speculative execution extension](https://github.com/sampsyo/bril/blob/main/docs/lang/spec.md)
+
+
+you can nest speculate 
+
+it does not role back stores 
+
+we can approximate trace compilation by running the program twice
+
+How to modify the reference interpreter  (warning typescript!)
+
+[brili](https://github.com/sampsyo/bril/blob/main/brili.ts)
+
+
+there are two functions to consider 
+
+1. evalFunc interprets a function by calling evalInstr on each instruction 
+1. evalInstr interprets one instruction, large case statement 
+for each instruction 
+
+
+you will need to print instructions as they execute
+
+1. figure out when to start and when to stop 
+1. how to print instructions (modify evalInstr by printing instructions)
+console.log(instr)
+
+you have to optimize the trace and put it back 
+
+
+

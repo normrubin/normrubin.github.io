@@ -9,7 +9,6 @@ tbl-colwidths:
 - 15
 - 15
 title: EECS7398 Weekly Schedule fa 2024
-
 ---
 
 
@@ -20,39 +19,149 @@ This is a tentative schedule.
 :::
 
 
-|week  | Date    | topic  | papers | due | discussions|
--------|---------|--------| -------| ----| -----------|
-| 1    |Sept  6  |Compiler overview and structure
-| 2    |Sept 10  |Performance Measurement| p1
-|2     |Sept 13  |Representing programs
-|3     |Sept 17  |Overview of Bril   ||
- 3     |Sept 20  |Local analysis and optimization||
- 4     |Sept 24  | Value numbering    ||  hw1 
- 4     |Sept 27  |Data flow
- 5     |Oct 1    |Global analysis      hw2 
- 5     |Oct 4    |loop invariant code motion| p2
- 6     | Oct 8  |Static single assignment  || hw3
- 6     | Oct 11| Global value numbers
- 7   | Oct 15 |LLVM  | p3 
- 7   | Oct 18 |      ||  project proposal
- |8    | Oct 22 |GPU Compilers||  hw 5
- |8    | Oct 25 | Classical loop optimizations
- |9    | Oct 29 |
- |9    | Nov 1 | MLIR   extra hw6
- |10   | Nov 5 | | p4 
- |10  | Nov 8 | Interprocedural Analysis p5
-|11   | Nov 12  | papers | |
-|11  | Nov 15  | [Memory Management]
- |12   | Nov 19 | papers   | |
- |12   | Nov 22  |  
- |13  | Nov 26  |  papers 
- |13  | Nov 29 | **Thanksgiving**  | |
- |14  |  Dec 3 | Dynamic compilers
- |14  |  Dec 6 |Polyhedral analysis 
+
+| Date    | topic  | due | discussions|
+|---------|--------| ----| -----------|
+|Sept  6  |[Compiler overview and structure](lectures/010_compiler_overview.qmd)
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Sept 10  |[Performance Measurement](lectures/01a_performance_measurement.qmd)
+Sept 13  |[Representing programs](lectures/02a_representation.qmd)     
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Sept 17  |[Overview of Bril](lectures/02b_bril.qmd)                | hw0 
+Sept 20  |[Local analysis and optimization](lectures/03_local.qmd)
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Sept 24  | Value numbering                    |hw1          
+Sept 27  |Data flow
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 1    |Global analysis                     |hw2
+Oct 4    |loop invariant code motion
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 8   |Static single assignment              |hw3
+Oct 11  |LLVM
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 15  |Global value number                  |hw4
+Oct 18  |testing reg allocator                |project proposal 
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 22  | papers 
+Oct 25  | [GPU Compilers might need two classes](lectures/14_gpu_compilers.qmd)
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Oct 29  | papers                             |hw5
+Nov 1   |[Dynamic compilers 1 ](lectures/13_dynamic_compilers.qmd) | [homework needs two weeks ](homework/dynamic.qmd)
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 5   | [Dynamic compilers 2 ](lectures/13_dynamic_compilers.qmd)
+Nov 8   |  Classical loop optimizations     
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 12  | papers                           |hw6 (extra credit)
+Nov 15   |  Polyhedral analysis 
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 19   | papers 
+Nov 22   | papers 
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Nov 26   | papers 
+Nov 29   | **Thanksgiving**  
+
+|         |        |     |            |
+|---------|--------| ----| -----------|
+Dec 3    |  Interprocedural Analysis (could drop)
+Dec 6    |  MLIR  (could drop)
 
 
-final project deadline ------ 
-        
+
+
+
+
+
+papers new 
+
+[Retargeting and Respecializing GPU Workloads for Performance Portability] (https://ieeexplore.ieee.org/document/10444828)
+Ivanov, I.R., Zinenko, O., Domke, J., Endo, T. and Moses, W.S., cgo 2024 
+
+
+[LOOPer: A Learned Automatic Code Optimizer For Polyhedral Compilers](https://arxiv.org/abs/2403.11522}
+Merouani, M., Boudaoud, K.A., Aouadj, I.N., Tchoulak, N., Bernou, I.K., Benyamina, H., Tayeb, F.B.S., Benatchba, K., Leather, H. and Baghdadi, R. arXiv preprint arXiv:2403.11522
+after polyhedrial
+
+
+papers classics 
+
+[Improving Data Locality with Loop Transformations](https://dl.acm.org/doi/pdf/10.1145/233561.233564)
+McKinley, Carr, & Tseng toplas 1996
+
+
+[Adaptive Online Context-Sensitive Inlining](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1191550)
+K. Hazelwood, and D. Grove cgo 2003 
+
+[High-performance code generation for stencil computations on GPU architectures.](https://www.cs.colostate.edu/~pouchet/doc/ics-article.12.pdf)
+*Holewinski, Jan, Louis-Noël Pouchet, and P. Sadayappan. supercomputing 2012
+
+
+
+Context Threading: A flexible and efficient dispatch technique for virtual machine interpreters
+chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.cs.toronto.edu/syslab/pubs/demkea_context.pdf  Marc Berndl, Benjamin Vitale, Mathew Zaleski and Angela Demke Brown
+
+
+[Program optimization space pruning for a multithreaded gpu](https://dl.acm.org/doi/pdf/10.1145/1356058.1356084)
+Shane Ryoo, Christopher I. Rodrigues, Sam S. Stone, Sara S. Baghsorkhi, Sain-Zee Ueng, John A. Stratton, and Wen-mei W. Hwu cgo 2008
+
+[Detecting equality of variables in programs](https://dl.acm.org/doi/10.1145/73560.73561)
+ Alpern, Bowen, Mark N. Wegman, and F. Kenneth Zadeck.   ?? 
+
+
+
+
+ https://dl.acm.org/doi/pdf/10.1145/1133255.1134000
+ DieHard: probabilistic memory safety for unsafe languages
+ 
+maybes 
+
+[The Garbage Collection Advantage: Improving Program Locality](https://dl.acm.org/doi/10.1145/1028976.1028983)
+X. Huang, S. M. Blackburn, K. S. McKinley, J. E. B. Moss, Z. Wang, and P. Cheng, oopsla 2004
+
+Pradelle, B., Baskaran, M., Henretty, T., Meister, B., Konstantinidis, A. and Lethin, R., 2016, September. Polyhedral compilation for energy efficiency. In 2016 IEEE High Performance Extreme Computing Conference (HPEC) (pp. 1-7). IEEE.  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7761595
+
+5. **Baskaran, Muthu Manikandan, et al.** "Automatic data movement and computation mapping for multi-level parallel architectures with explicitly managed memories." *Proceedings of the 13th ACM SIGPLAN Symposium on Principles and practice of parallel programming.* 2010.
+
+3. **Ryoo, Seongbeom, et al.** "Optimization principles and application performance evaluation of a multithreaded GPU using CUDA." *Proceedings of the 13th ACM SIGPLAN Symposium on Principles and practice of parallel programming.* 2008.
+
+ 22. Boehm, Hans-Juergen, and Mark Weiser. "Garbage collection in an uncooperative environment." Software: Practice and Experience 18.9 (1988): 807-820.
+possible lectures 
+
+ [cranelift checking correctness in register allocator])(https://cfallin.org/blog/2021/03/15/cranelift-isel-3/) 
+ this is a blog post - after ssa 
+
+
+ [Value Numbering](https://www.cs.tufts.edu/~nr/cs257/archive/keith-cooper/value-numbering.pdf)
+ P. Briggs, K. D. Cooper, L. Taylor Simpson,  Software-Practice & Experience, 1997
+ global value numbering in ssa, congruence 
+
+ Wilson PR. Uniprocessor garbage collection techniques. InInternational Workshop on Memory Management 1992 Sep 17 (pp. 1-42). Berlin, Heidelberg: Springer Berlin Heidelberg.
+
+
+
 https://ieeexplore.ieee.org/document/10444819
 A. Murtovi, G. Georgakoudis, K. Parasyris, C. Liao, I. Laguna and B. Steffen, "Enhancing Performance Through Control-Flow Unmerging and Loop Unrolling on GPUs," 2024 IEEE/ACM International Symposium on Code Generation and Optimization (CGO), Edinburgh, United Kingdom, 2024, pp. 106-118, doi: 10.1109/CGO57630.2024.10444819. keywords: {Codes;Costs;Graphics processing units;Prototypes;Benchmark testing;Predictive models;Optimization;compiler;code duplication;LLVM;GPU},
 
@@ -71,7 +180,7 @@ Meta Large Language Model Compiler: Foundation Models of Compiler Optimization C
 
 
 
----- papers 
+------------------- papers 
 
 
 paper 1 - [Producing Wrong Data Without Doing Anything Obviously Wrong!]
@@ -251,174 +360,3 @@ Wegman & Zadeck, Constant Propagation with Conditional Branches, ACM Transaction
 
 
 2. **Garland, Michael, et al.** "Parallel computing experiences with CUDA." *IEEE Micro* 28.4 (2008): 13-27.
-
-
-| Date    | topic  | due | discussions|
-|---------|--------| ----| -----------|
-|Sept  6  |[Compiler overview and structure](lectures/010_compiler_overview.qmd)
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Sept 10  |[Performance Measurement](lectures/01a_performance_measurement.qmd)
-Sept 13  |[Representing programs](lectures/02a_representation.qmd)     
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Sept 17  |[Overview of Bril](lectures/02b_bril.qmd)                | hw0 
-Sept 20  |[Local analysis and optimization](lectures/03_local.qmd)
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Sept 24  | Value numbering                    |hw1          
-Sept 27  |Data flow
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Oct 1    |Global analysis                     |hw2
-Oct 4    |loop invariant code motion
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Oct 8   |Static single assignment              |hw3
-Oct 11  |LLVM
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Oct 15  |Global value number                  |hw4
-Oct 18  |testing reg allocator                |project proposal 
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Oct 22  | papers 
-Oct 25  | [GPU Compilers](lectures/14_gpu_compilers.qmd)
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Oct 29  | papers                             |hw5
-Nov 1   |Dynamic compilers
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Nov 5   | papers 
-Nov 8   |  Classical loop optimizations     
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Nov 12  | papers                           |hw6 (extra credit)
-Nov 15   |  Polyhedral analysis 
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Nov 19   | papers 
-Nov 22   | Memory Management
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Nov 26   | papers 
-Nov 29   | **Thanksgiving**  
-
-|         |        |     |            |
-|---------|--------| ----| -----------|
-Dec 3    |  Interprocedural Analysis 
-Dec 6    |  MLIR  
-
-
-02a_representation.qmd.saved
-
-03_local.qmd
-05_global.qmd
-09_poly.qmd
-13_dynamic_compilers.qmd
-ra-checking.qmd
-
-02a_representation.quarto_ipynb  
-02b_bril_qmd
-04_data_flow.qmd
-06_ssa.qmd
-100_mlir.qmd
-14_gpu_compilers.qmd
-
-02b_bril.html
-02b_bril.qmd.saved
-05b_licm.qmd
-07_llvm.ipynb
-110_whole_program.qmd
-bril.qmd
-02a_representation.qmd
-02b_bril.ipynb
-03b_local_value_numbering.qmd  
-05c_pre.qmd
-08_classic_loop_ops.qmd
-12_memory.qmd
-images
-
-
-
-
-
-
-
-papers new 
-
-[Retargeting and Respecializing GPU Workloads for Performance Portability] (https://ieeexplore.ieee.org/document/10444828)
-Ivanov, I.R., Zinenko, O., Domke, J., Endo, T. and Moses, W.S., cgo 2024 
-
-
-[LOOPer: A Learned Automatic Code Optimizer For Polyhedral Compilers](https://arxiv.org/abs/2403.11522}
-Merouani, M., Boudaoud, K.A., Aouadj, I.N., Tchoulak, N., Bernou, I.K., Benyamina, H., Tayeb, F.B.S., Benatchba, K., Leather, H. and Baghdadi, R. arXiv preprint arXiv:2403.11522
-after polyhedrial
-
-
-papers classics 
-
-[Improving Data Locality with Loop Transformations](https://dl.acm.org/doi/pdf/10.1145/233561.233564)
-McKinley, Carr, & Tseng toplas 1996
-
-
-[Adaptive Online Context-Sensitive Inlining](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1191550)
-K. Hazelwood, and D. Grove cgo 2003 
-
-[High-performance code generation for stencil computations on GPU architectures.](https://www.cs.colostate.edu/~pouchet/doc/ics-article.12.pdf)
-*Holewinski, Jan, Louis-Noël Pouchet, and P. Sadayappan. supercomputing 2012
-
-
-
-Context Threading: A flexible and efficient dispatch technique for virtual machine interpreters
-chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.cs.toronto.edu/syslab/pubs/demkea_context.pdf  Marc Berndl, Benjamin Vitale, Mathew Zaleski and Angela Demke Brown
-
-
-[Program optimization space pruning for a multithreaded gpu](https://dl.acm.org/doi/pdf/10.1145/1356058.1356084)
-Shane Ryoo, Christopher I. Rodrigues, Sam S. Stone, Sara S. Baghsorkhi, Sain-Zee Ueng, John A. Stratton, and Wen-mei W. Hwu cgo 2008
-
-[Detecting equality of variables in programs](https://dl.acm.org/doi/10.1145/73560.73561)
- Alpern, Bowen, Mark N. Wegman, and F. Kenneth Zadeck.   ?? 
-
-
-
-
- https://dl.acm.org/doi/pdf/10.1145/1133255.1134000
- DieHard: probabilistic memory safety for unsafe languages
- 
-maybes 
-
-[The Garbage Collection Advantage: Improving Program Locality](https://dl.acm.org/doi/10.1145/1028976.1028983)
-X. Huang, S. M. Blackburn, K. S. McKinley, J. E. B. Moss, Z. Wang, and P. Cheng, oopsla 2004
-
-Pradelle, B., Baskaran, M., Henretty, T., Meister, B., Konstantinidis, A. and Lethin, R., 2016, September. Polyhedral compilation for energy efficiency. In 2016 IEEE High Performance Extreme Computing Conference (HPEC) (pp. 1-7). IEEE.  https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7761595
-
-5. **Baskaran, Muthu Manikandan, et al.** "Automatic data movement and computation mapping for multi-level parallel architectures with explicitly managed memories." *Proceedings of the 13th ACM SIGPLAN Symposium on Principles and practice of parallel programming.* 2010.
-
-3. **Ryoo, Seongbeom, et al.** "Optimization principles and application performance evaluation of a multithreaded GPU using CUDA." *Proceedings of the 13th ACM SIGPLAN Symposium on Principles and practice of parallel programming.* 2008.
-
- 22. Boehm, Hans-Juergen, and Mark Weiser. "Garbage collection in an uncooperative environment." Software: Practice and Experience 18.9 (1988): 807-820.
-possible lectures 
-
- [cranelift checking correctness in register allocator])(https://cfallin.org/blog/2021/03/15/cranelift-isel-3/) 
- this is a blog post - after ssa 
-
-
- [Value Numbering](https://www.cs.tufts.edu/~nr/cs257/archive/keith-cooper/value-numbering.pdf)
- P. Briggs, K. D. Cooper, L. Taylor Simpson,  Software-Practice & Experience, 1997
- global value numbering in ssa, congruence 
-
- Wilson PR. Uniprocessor garbage collection techniques. InInternational Workshop on Memory Management 1992 Sep 17 (pp. 1-42). Berlin, Heidelberg: Springer Berlin Heidelberg.
