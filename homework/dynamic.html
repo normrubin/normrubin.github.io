@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Performance and Measurement – EECE7398 Fall 2024</title>
+<title>homework dynamic compile – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -101,26 +67,94 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Performance and Measurement – EECE7398 Fall 2024">
+<meta property="og:title" content="homework dynamic compile – EECE7398 Fall 2024">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body>
+<body class="nav-sidebar docked fullcontent">
 
 <div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      EECE7398 Fall 2024
+      </li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">EECE7398 Fall 2024</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true">
+ <span class="menu-text">EECS 7398</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../weekly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weekly Schedule</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to submit assignments</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bril Documentation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bril github</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs_01a_performance_measurement.qmd.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
+    
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Performance and Measurement</h1>
+<h1 class="title">homework dynamic compile</h1>
 </div>
 
 
@@ -137,92 +171,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="measurement" class="level1">
-<h1>Measurement</h1>
-<section id="example-1" class="level2">
-<h2 class="anchored" data-anchor-id="example-1">example 1</h2>
-<p><a href="papers/wrong_data.pdf">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
-<p>445 references</p>
-<hr>
+<p>This task is to implement a trace-based speculative optimizer for Bril. You’ll implement the same concept as in a tracing JIT, but in a profile-guided AOT setting: profiling, transformation, and execution will be distinct phases. The idea is to implement the “heavy lifting” for a trace-based JIT without needing all the scaffolding that a complete JIT requires, such as on-stack replacement.</p>
+<p>Concretely, there are three main phases:</p>
 <ol type="1">
-<li>Measurement bias is significant</li>
-<li>Changing aspects of an experimental setup can introduce measurement bias. ​ Measurement bias is unpredictable and there are no obvious ways to avoid it. ​ Prior work in computer system evaluation does not adequately consider measurement bias. ​</li>
-<li>The paper discusses two techniques for dealing with measurement bias: experimental setup randomization and causal analysis. ​</li>
-<li>Measurement bias occurs for all benchmarks and architectures. ​</li>
-<li>Measurement bias due to link order can significantly fluctuate conclusions. ​</li>
-<li>Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​</li>
-<li>To avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​ —</li>
+<li>Modify the reference interpreter to produce traces.</li>
+<li>Build an optimizer that injects traces back into the original program using the speculation extension to provide a “fast path.”</li>
+<li>Check that the whole process is correct and had some effect on performance (it needn’t actually be good!).</li>
 </ol>
-<hr>
-<p>A sample blog post about this paper <a href="https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/">blog</a></p>
-</section>
-<section id="another-example" class="level2">
-<h2 class="anchored" data-anchor-id="another-example">another example</h2>
-<p><a href="https://www.thonking.ai/p/strangely-matrix-multiplications">Strangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!</a></p>
-<p><a href="https://www.sigplan.org/Resources/EmpiricalEvaluation/">SIGPLAN Empirical Evaluation Guidelines</a></p>
-</section>
-<section id="violin-plots" class="level2">
-<h2 class="anchored" data-anchor-id="violin-plots">violin plots</h2>
-<p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
-<div id="4d755f7d" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library &amp; dataset</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'images/chip_dataset.csv'</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sns.set_palette(<span class="st">"pastel"</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sns.violinplot(x<span class="op">=</span>df[<span class="st">"Vendor"</span>], y<span class="op">=</span>np.log(df[<span class="st">"Freq (MHz)"</span>]), hue<span class="op">=</span>df[<span class="st">'Type'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \
-0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   
-1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   
-2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   
-3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   
-4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   
-
-   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \
-0     45.0             77.0                  122.0      2200.0  Unknown   
-1     35.0            192.0                 4800.0      3200.0  Unknown   
-2     28.0              NaN                    NaN      2600.0    Intel   
-3     80.0            160.0                 1400.0      1800.0    Intel   
-4    125.0            258.0                  758.0      3700.0  Unknown   
-
-  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  
-0    AMD          NaN          NaN          NaN  
-1    AMD          NaN          NaN          NaN  
-2  Intel          NaN          NaN          NaN  
-3  Intel          NaN          NaN          NaN  
-4    AMD          NaN          NaN          NaN  </code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="01a_performance_measurement_files/figure-html/cell-2-output-2.png" width="576" height="429" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>I might want to take date into account in these plots</p>
-<hr>
-<p>A violin plot shows density curves. The width is the approximate frequency of data points at that value</p>
-<p>Best for comparing distributions</p>
-<p>consider ordering the groups</p>
-<p>The details</p>
+<p>Start by reading the documentation for the speculation extension (and watch the video!). That should give you an idea of what’s required to augment a program with a speculative execution of an extracted trace. Then make a plan for how you’ll hack the interpreter to produce one of those traces.</p>
+<p>Here’s a recipe:</p>
 <ol type="1">
-<li>the white dot represents the median</li>
-<li>the thick gray bar in the center represents the inter-quartile range</li>
-<li>the thin gray line represents the rest of the distribution, except for points that are determined to be “outliers” using a method that is a function of the inter-quartile range.</li>
-<li>On each side of the gray line is a kernel density estimation to show the distribution shape of the data. Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability.</li>
+<li>Start interpreting normally.</li>
+<li>At some point during execution (at the very beginning of main, for example, or when reaching a backedge), start tracing.</li>
+<li>While tracing, record every instruction as it executes. Eliminate jumps; replace branches with guard instructions. Feel free to do the interprocedural version, and to bail out on any other instruction you don’t want to handle.</li>
+<li>Stop tracing at some point (after a fixed number of instructions, for example, or at the next backedge) and save the trace to a file.</li>
+<li>For bonus “points,” statically optimize the trace by eliminating instructions that depend on foregone conclusions enforced by guards.</li>
+<li>Transform the program to stitch the trace back into the program using speculate and commit instructions.</li>
+<li>For these tasks, unlike some previous lessons, I recommend not attempting to support all the benchmarks. It’s more important that you understand a few programs well than you apply your transformation to a large body of code. (In other words, I recommend that you work depth-first instead of breadth-first.)</li>
 </ol>
+<p>In particular, you do not need to support Bril’s memory extension, which makes things more complicated because it doesn’t get automatically rolled back on speculation aborts. If you are feeling very ambitious, you can try devising a scheme to manually roll back memory modifications on aborts (consider an “undo log” or “redo log,” which are concepts from databases).</p>
+<p>Finally, evaluate your work:</p>
+<ul>
+<li><p>Check that you didn’t break programs. For at least one benchmark (and ideally a few), create multiple inputs to the program that result in different outputs. Use one input to generate the trace and optimize the program, and use other inputs to check correctness. This approach guards against cases where your tracing optimization “overfits” and you end up with code that only works on one input. Measure performance impact, i.e., the effect of your transformation on the dynamic instruction count.</p></li>
+<li><p>for at least one benchmark, use at least two inputs to evaluate tracing’s impact on executions that are not identical to the traced execution. If you implemented optimizations on the traced code, consider comparing the optimized vs.&nbsp;un-optimized versions. (It’s OK if your tracing apparatus makes programs slower, especially on unseen inputs! We just want to measure the difference.)</p></li>
+</ul>
 
 
-</section>
-</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
