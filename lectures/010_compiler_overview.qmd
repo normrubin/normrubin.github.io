@@ -8,6 +8,8 @@ format:
     code-line-numbers: true
     output-file: revealjs_010_compiler_overview.qmd
     scrollable: true
+    execute: 
+      echo: false 
 sidebar: false
 title: 1 Compiler Overview
 
@@ -33,7 +35,6 @@ In 1952,  Grace Hopper an operational link-loader, which she called a compiler. 
 In 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).
 
 ::: {.content-hidden  when-format="revealjs"}
- Will only appear in HTML and not in Reveal.js
 
 Their  paper is located at <https://dl.acm.org/doi/10.1145/1455567.1455599>.
 
@@ -52,7 +53,7 @@ The goal of the FORTRAN project was to enable the programmer to specify a numeri
 
 FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters. 
 
-## development model
+## Compiler Development Model
 
 In these early years, the development model was:
 
@@ -72,6 +73,7 @@ Compilers stabilized on a classic structure (using an ir intermediate language).
 1) Back end -  machine specific stuff where machine code is generated
 
 ```{mermaid}
+%%| echo: false 
 graph LR;
 A[Front end]--IR--> B[Middle end];
 B--IR--> C[Back end];
@@ -81,7 +83,7 @@ A--IR--> C;
 
 ---
 
-This course focuses on part 2
+This course focuses on stage  2 (The middle end)
 
 
 A goal of this course is to explain  how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.
@@ -112,6 +114,7 @@ The core of LLVM is the intermediate representation (IR), a low-level programmin
 
 
 ```{mermaid}
+%%| echo: false 
 graph LR;
 A[Front end]--IR--> B0[OP0] --IR--> B1[OP1] --IR--> B2[OPT2]--IR --> BN[OPTn]--IR -->C{Back end};
 A--IR--> C;
@@ -131,6 +134,7 @@ In this course we are going to an IR call BRIL, which is a very simplified versi
 
 
 ```{mermaid}
+%%| echo: false 
 graph TB;
 A[TEXT_Version of BRIL]--> B0[BRIL in JSON] --> B1["new pass"] --> B2[BRIL interpreter];
 ```
@@ -163,7 +167,7 @@ Some observations:
 
 
 
-## Compiler Assumptions (Let's talk about how many are still true)
+## Compiler Assumptions (How many are still true)
 
 1) The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.
 1) Users are ok with large programs taking minutes to compile
@@ -195,7 +199,7 @@ How would you prove this?
 
 [one attempt](https://zeux.io/2022/01/08/on-proebstings-law/)
 
-## why are compilers not better
+## why compilers are not better
 
 Talk given by KAI's Arch Robison 
 
