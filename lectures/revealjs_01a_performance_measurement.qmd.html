@@ -8,7 +8,7 @@
 <link href="../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../site_libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.5.54">
+  <meta name="generator" content="quarto-1.5.55">
 
   <title>EECE7398 Fall 2024 – Performance and Measurement</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -435,7 +435,8 @@
 <section id="violin-plots" class="slide level2">
 <h2>violin plots</h2>
 <p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
-<div id="9f172c61" class="cell" data-execution_count="1">
+<p>A dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle</p>
+<div id="5016f6cd" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="co"># library &amp; dataset</span></span>
 <span id="cb1-2"><a></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb1-3"><a></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -478,6 +479,10 @@
 </div>
 </div>
 </div>
+<p>apply np.log to the Freq (MHz) column. Because of wide range of values</p>
+<p>Set a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot</p>
+<p>Hue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette</p>
+<p>Data Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.</p>
 <p>I might want to take date into account in these plots</p>
 </section>
 <section class="slide level2 scrollable">

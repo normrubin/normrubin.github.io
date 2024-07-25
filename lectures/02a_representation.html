@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.54">
+<meta name="generator" content="quarto-1.5.55">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -175,7 +175,8 @@ window.Quarto = {
 <p>The representation of a program</p>
 <p>What we read in and read out when transforming a program.</p>
 <p>What kind of properties make a good representation?</p>
-<div id="6be83c2d" class="cell" data-execution_count="1">
+<p>This lecture explores different representations and their implications.</p>
+<div id="f350e5c5" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ast</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os </span>
@@ -206,7 +207,8 @@ window.Quarto = {
 </section>
 <section id="concrete-syntax" class="level2">
 <h2 class="anchored" data-anchor-id="concrete-syntax">Concrete Syntax</h2>
-<p>One possible representation is called <strong><em>concrete syntax form</em></strong> Programs are text or surface syntax- just what you would type into an editor.</p>
+<p><strong><em>Concrete syntax</em></strong>, or surface syntax, represents programs as they are written</p>
+<p>Programs are text or surface syntax- just what you would type into an editor.</p>
 <pre><code>value = 8
 result = 1
 for i in range(value):
@@ -218,7 +220,7 @@ print(result)</code></pre>
 </section>
 <section id="abstract-syntax" class="level2">
 <h2 class="anchored" data-anchor-id="abstract-syntax">Abstract syntax</h2>
-<p>Tree structure</p>
+<p>Abstract syntax represents programs as tree structures, focusing on the nodes and their connections.</p>
 <ol type="1">
 <li>Nodes are parts of the program,</li>
 <li>Edges show how they are connected.</li>
@@ -265,7 +267,7 @@ print(result)</code></pre>
     {
         result = result * i
     }
-    console.log(result )</code></pre>
+    console.log(result)</code></pre>
 </div><div class="column" style="width:5%;">
 <!-- empty column to create gap -->
 </div><div class="column" style="width:40%;">
@@ -496,32 +498,6 @@ for block in blocks:
       add two edges from block to last.true, last.false 
    else  fall through 
       add edge to next block (if it exists)</code></pre>
-</section>
-<section id="how-to-look-at-a-bril-program" class="level2">
-<h2 class="anchored" data-anchor-id="how-to-look-at-a-bril-program">How to look at a Bril program</h2>
-<div id="aa9c2b3b" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  bril_program <span class="op">=</span> f.read()</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(bril_program)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
-        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
-        { "op": "add", "type": "int", "dest": "v2",
-          "args": ["v0", "v1"] },
-        { "op": "print", "args": ["v2"] }
-      ],
-      "args": []
-    }
-  ]
-}
-</code></pre>
-</div>
-</div>
 
 
 </section>

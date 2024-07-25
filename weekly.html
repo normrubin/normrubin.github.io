@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.54">
+<meta name="generator" content="quarto-1.5.55">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -170,8 +170,25 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>tbl-colwidths: [10,20,20,20, 15, 15 ]</p>
-<p>Since the is the first time this course is offered. This is a tentative schedule. :::</p>
+<p>Since the is the first time this course is offered. This is a tentative schedule.</p>
+<p>do to ********</p>
+<section id="ai-in-compilers" class="level2">
+<h2 class="anchored" data-anchor-id="ai-in-compilers">ai in compilers</h2>
+<p>papers</p>
+<p>Generating GPU Compiler Heuristics using Reinforcement Learning https://arxiv.org/abs/2111.12055 Ian Colbert, Jake Daly, Norm Rubin</p>
+<p>Revealing Compiler Heuristics Through Automated Discovery and Optimization Volker Seeker; Chris Cummins; Murray Cole; Björn Franke; Kim Hazelwood; Hugh Leather https://ieeexplore.ieee.org/document/10444847</p>
+<p>End-to-End Deep Learning of Optimization Heuristics Chris Cummins; Pavlos Petoumenos; Zheng Wang; Hugh Leather https://ieeexplore.ieee.org/document/8091247</p>
+<p>possible lecture source Machine Learning in Compilers: Past, Present and Future https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=9232934 Hugh Leather; Chris Cummins</p>
+</section>
+<section id="optimizing-compiler-deep-learning" class="level2">
+<h2 class="anchored" data-anchor-id="optimizing-compiler-deep-learning">optimizing compiler deep learning</h2>
+<p>papers</p>
+<p>TVM: An Automated End-to-End Optimizing Compiler for Deep Learning https://www.usenix.org/conference/osdi18/presentation/chen Tianqi Chen and Thierry Moreau, University of Washington; Ziheng Jiang, University of Washington, AWS; Lianmin Zheng, Shanghai Jiao Tong University; Eddie Yan, Haichen Shen, and Meghan Cowan, University of Washington; Leyuan Wang, UC Davis, AWS; Yuwei Hu, Cornell; Luis Ceze, Carlos Guestrin, and Arvind Krishnamurthy, University of Washington</p>
+<p>ProGraML: Graph-based Deep Learning for Program Optimization and Analysis https://arxiv.org/abs/2003.10536 Chris Cummins, Zacharias V. Fisches, Tal Ben-Nun, Torsten Hoefler, Hugh Leather</p>
+<p>A comprehensive study of deep learning compiler bugs https://dl.acm.org/doi/abs/10.1145/3468264.3468591?casa_token=Aj2H-DPPcmQAAAAA:7gy0bCEqaIBDoYDSS6MTtMtGYNTUYySFlmyNjrzsc0d1S8DAEC9yuCUwv0Sx4SLk2ujUhKWijbvo Qingchao Shen, Haoyang Ma, Junjie Chen, Yongqiang Tian, Shing-Chi Cheung, and Xiang ChenAuthors Info &amp; Claims</p>
+<p>Relay: A High-Level Compiler for Deep Learning https://arxiv.org/abs/1904.08368 Jared Roesch, Steven Lyubomirsky, Marisa Kirisame, Logan Weber, Josh Pollock, Luis Vega, Ziheng Jiang, Tianqi Chen, Thierry Moreau, Zachary Tatlock</p>
+<p>possible lecture source https://huyenchip.com/2021/09/07/a-friendly-introduction-to-machine-learning-compilers-and-optimizers.html https://medium.com/geekculture/ai-compilers-ae28afbc4907</p>
+<p>:::</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 10%">
@@ -191,7 +208,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td>Sept 6</td>
 <td><a href="./lectures/010_compiler_overview.html">Compiler overview and structure</a></td>
-<td></td>
+<td><a href="./homework/hw0.html">hw0 needs 1 week</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -229,7 +246,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td>Sept 17</td>
 <td><a href="./lectures/02b_bril.html">Overview of Bril</a></td>
-<td>hw0</td>
+<td>hw0 due</td>
 <td></td>
 </tr>
 <tr class="even">
@@ -484,7 +501,7 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <p>papers new</p>
 <p>[Retargeting and Respecializing GPU Workloads for Performance Portability] (https://ieeexplore.ieee.org/document/10444828) Ivanov, I.R., Zinenko, O., Domke, J., Endo, T. and Moses, W.S., cgo 2024</p>
-<p>[LOOPer: A Learned Automatic Code Optimizer For Polyhedral Compilers](https://arxiv.org/abs/2403.11522} Merouani, M., Boudaoud, K.A., Aouadj, I.N., Tchoulak, N., Bernou, I.K., Benyamina, H., Tayeb, F.B.S., Benatchba, K., Leather, H. and Baghdadi, R. arXiv preprint arXiv:2403.11522 after polyhedrial</p>
+<p><a href="https://arxiv.org/abs/2403.11522">LOOPer: A Learned Automatic Code Optimizer For Polyhedral Compilers</a> Merouani, M., Boudaoud, K.A., Aouadj, I.N., Tchoulak, N., Bernou, I.K., Benyamina, H., Tayeb, F.B.S., Benatchba, K., Leather, H. and Baghdadi, R. arXiv preprint arXiv:2403.11522 after polyhedrial</p>
 <p>papers classics</p>
 <p><a href="https://dl.acm.org/doi/pdf/10.1145/233561.233564">Improving Data Locality with Loop Transformations</a> McKinley, Carr, &amp; Tseng toplas 1996</p>
 <p><a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=1191550">Adaptive Online Context-Sensitive Inlining</a> K. Hazelwood, and D. Grove cgo 2003</p>
@@ -571,6 +588,7 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
