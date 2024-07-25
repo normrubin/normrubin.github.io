@@ -35,230 +35,6 @@
     "text": "Task3: Implement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.\n\n\n\n Back to top"
   },
   {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
-    "title": "Dynamic Compilers",
-    "section": "jit (just in time) compilers vs aot(ahead of time) compilers",
-    "text": "jit (just in time) compilers vs aot(ahead of time) compilers\na jit compiler translates code into isa while the program executes\nsome options\n\ncompile a function the first time it is called\ncompile a function after it has been called a lot (needs an interpreter) We call these hot functions\nbuild a trace of instructions executed and compile the hot traces (a trace has no branches)\nA variation I used ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#can-jit-compiled-code-run-faster-then-aot-code",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#can-jit-compiled-code-run-faster-then-aot-code",
-    "title": "Dynamic Compilers",
-    "section": "Can jit compiled code run faster then aot code?",
-    "text": "Can jit compiled code run faster then aot code?"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#comparison",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#comparison",
-    "title": "Dynamic Compilers",
-    "section": "Comparison",
-    "text": "Comparison\n\n\n\naot\njit\n\n\n\n\ncannot inline libraries\ncan inline (even class methods)\n\n\nno runtime code gen\ncan use run time code gen\n\n\nno speculative opts\ncan use spec opts\n\n\nless information\nmore information\n\n\noverall performance lower\noverall performance often higher\n\n\nfull speed from the start\nrequires warmup\n\n\nno compile cost at run time\noverhead to run compiler"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs",
-    "title": "Dynamic Compilers",
-    "section": "Tradeoffs",
-    "text": "Tradeoffs\n\nThe time to compile is part of the total execution time\nmight run less optimizations to speed up execution time\nmight look at run time info\nsame code might be compiled many times\n\nWt would the same code be compiled more than once?"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tiered-compilers",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tiered-compilers",
-    "title": "Dynamic Compilers",
-    "section": "tiered compilers",
-    "text": "tiered compilers\nSince compilation is costly, do not compile functions that are only called once and do not contain a long running loop\nwe have a series of compilers, each with more aggressive optimization and each allowed to take longer\n\nthe lowest tier is the interpreter\nthe next is the base line compiler"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#magic-numbers",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#magic-numbers",
-    "title": "Dynamic Compilers",
-    "section": "magic numbers",
-    "text": "magic numbers\nassociate a counter with branches and functions if the counter reaches some magic number use one of the compilers\nif the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, so how do you insert the newly compiled code?"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#questions-when-building-a-jit",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#questions-when-building-a-jit",
-    "title": "Dynamic Compilers",
-    "section": "questions when building a JIT",
-    "text": "questions when building a JIT\n\nwhat strategy do you use to invoke the jit\ndo you have to execute for a while before calling the jit\nhow much info do you need\nwhat is the price of wrong info\nare there easy and hard programs\ndo the easy programs match up with users common programs"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#speculation",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#speculation",
-    "title": "Dynamic Compilers",
-    "section": "Speculation",
-    "text": "Speculation\n\nassume some property is true, compile using that info this is always a gamble, so you need to recover if the assumption was wrong\nassume a variable is an int, and does not overflow\nassume properties of an object is fixed\nassume the target of call is always the same\nassume past behavior predicts future behavior"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#flow",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#flow",
-    "title": "Dynamic Compilers",
-    "section": "flow",
-    "text": "flow\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\ninterpreter -- hot? --&gt; profiling \nprofiling -- stats --&gt; optimizing_compiler\noptimizing_compiler --&gt; compiled_code\ncompiled_code -- deoptimze --&gt; interpreter\ninterpreter -- already_compiled --&gt; compiled_code"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#boxed-values",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#boxed-values",
-    "title": "Dynamic Compilers",
-    "section": "boxed values",
-    "text": "boxed values\nMany languages do not use strong static typeing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches",
-    "title": "Dynamic Compilers",
-    "section": "inline caches",
-    "text": "inline caches\nin languages like python, calls to a method are more expensive then calls to a method in c++ why?\n\nPython objects are implemented as hash tables. While C++ uses virtual tables\nhow does that effect the cost?"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#first-c-virtual-tables",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#first-c-virtual-tables",
-    "title": "Dynamic Compilers",
-    "section": "first C++ virtual tables",
-    "text": "first C++ virtual tables\nin C++ a method call takes two dereferences\n\nfirst find the v-table\nsecond used a fixed offset from the table start to find the address"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-do-we-need-to-keep-the-offset-fixed",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-do-we-need-to-keep-the-offset-fixed",
-    "title": "Dynamic Compilers",
-    "section": "What do we need to keep the offset fixed?",
-    "text": "What do we need to keep the offset fixed?\nif derived inherits from base, and both have a function f. the offset to f has to be the same.\nin languages where objects are hash tables, the c++ dereference becomes a hash table lookup, which is slower"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs-1",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs-1",
-    "title": "Dynamic Compilers",
-    "section": "tradeoffs",
-    "text": "tradeoffs\nIn a dynamically typed language like python we can add or remove methods easily\nbut method calls are expensive\nwe want to make these calls cheaper"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-te-call-site",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-te-call-site",
-    "title": "Dynamic Compilers",
-    "section": "inline caches at te call site",
-    "text": "inline caches at te call site\nthe first time we call a method, we know the type (because we are generating code at runtime)\n\n\ndef func(a,b,c):\n  for i in range(10):\n     foo(a,b,c)\n\ndef func(a,b,c):\n  for i in range(1):\n    if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in the hash\n      call other(a,b,c\n      )"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-the-function-site",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-the-function-site",
-    "title": "Dynamic Compilers",
-    "section": "inline caches at the function site",
-    "text": "inline caches at the function site\n\n\ndef func(a,b,c):\n  for i in range(10):\n     _foo(a,b,c\n\ndef _foo(a,b,c)\n  if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in a\n      call other(a,b,c)\n\nis it better to do this at the call site or at the function site?"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#polymorphic-calls",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#polymorphic-calls",
-    "title": "Dynamic Compilers",
-    "section": "polymorphic calls",
-    "text": "polymorphic calls\nif the type changes at runtime (the call to other is taken) does the optimization help?\ncould invalidate the table and rebuild it with another case"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-are-the-costs",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-are-the-costs",
-    "title": "Dynamic Compilers",
-    "section": "what are the costs",
-    "text": "what are the costs\nfor example v8 compiler\nmonomorphic inline hit - 10 instructions\npolymorphic hit - 35 instructions for 10 types, 60 instructions for 20 types\ncache miss 1000-4000 instructions"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#value-specialization",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#value-specialization",
-    "title": "Dynamic Compilers",
-    "section": "value specialization",
-    "text": "value specialization\nOddly many functions are called with the same arguments"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example",
-    "title": "Dynamic Compilers",
-    "section": "an example",
-    "text": "an example\ngiven a vector v of size n, and a parameter q find the element of v that is closest to q\n function closest(v, q, n) {\n    if (n == 0) {\n          throw \"Error\";\n    } else {\n        var i = 0;\n        var d = 0ffffffff;\n        while (i &lt; n) {\n           var nd = abs(v[i] - q);\n           if (nd &lt;= d) d = nd; \n           i++;\n        }    \n        return d;  \n      } \n}"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#the-cfg",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#the-cfg",
-    "title": "Dynamic Compilers",
-    "section": "the cfg",
-    "text": "the cfg\nwe want to recompile this for specific v,q, and n, where we restart at the while test"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#two-entries",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#two-entries",
-    "title": "Dynamic Compilers",
-    "section": "two entries",
-    "text": "two entries\nFirst entry is the regular starting point, second is the entry if we are currently running the loop in the interpreter\nSince we are compiling the function while in the loop we can ask the interpreter for values\n\nv == load[0]\nq = 42\nn = 100\ni = 40\nd = 0fffffff"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#dead-code-elimination",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#dead-code-elimination",
-    "title": "Dynamic Compilers",
-    "section": "dead code elimination",
-    "text": "dead code elimination\nAfter this the all calls to the function assume these arguments so no need to keep the regular entry\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#array-in-bounds-check",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#array-in-bounds-check",
-    "title": "Dynamic Compilers",
-    "section": "array in bounds check",
-    "text": "array in bounds check\nwe can pattern match loops with bounds checks if we know the limit"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#loop-inversion",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#loop-inversion",
-    "title": "Dynamic Compilers",
-    "section": "loop inversion",
-    "text": "loop inversion\na general while loop\nwhile(cond){\n  ...\n}\ncan be changed into\nif (cond){\n  do {\n    ...\n  } while(cond)\n}\nfor this loop the first time around i = 40, n = 100 so the first condition is true"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#after-loop-inversion",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#after-loop-inversion",
-    "title": "Dynamic Compilers",
-    "section": "after loop inversion",
-    "text": "after loop inversion\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\" ]\nentry_on_stack_rep[\"v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl3 --&gt; l7\n\n\nl4[\"l4: return d1\"]\nl7[\" l7: l5: t0 = 4* i\nt1 = v[t0]\nnd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   if (i2 &gt; n) goto l4\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl9--&gt; l3\nl9--&gt; l4"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#results",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#results",
-    "title": "Dynamic Compilers",
-    "section": "results",
-    "text": "results\nspecialized code is shorter and compiles faster\nsince we know that the loop goes from 42 to 100, we could unroll the loop"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation",
-    "title": "Dynamic Compilers",
-    "section": "trace compilation",
-    "text": "trace compilation\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-x-42",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-x-42",
-    "title": "Dynamic Compilers",
-    "section": "an example (x = 42)",
-    "text": "an example (x = 42)\n\n\nfunction main(x){\n   y = x +1 \n   if x &lt;100 {\n      z = f(y)\n   } else {\n      z = g(y)\n   }\n   return z\n}\n\nfunction f(a){\n   return a -1 \n}\n\n\n\ny = x +1\nguard(x &lt; 100)\na = y\nz = a - 1\nreturn z\n\n\n\nguards at divergence, guards never return\noptimize assuming guards are true, ok to be slow if guard is false"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#move-guards-up",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#move-guards-up",
-    "title": "Dynamic Compilers",
-    "section": "move guards up",
-    "text": "move guards up\nwhy is this a good idea?\n\n\nfail fast\nlonger region to optimize"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#use-local-value-numbering",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#use-local-value-numbering",
-    "title": "Dynamic Compilers",
-    "section": "use local value numbering",
-    "text": "use local value numbering\n\n\n\nguard(x &lt; 100)\ny = x + 1\na = y\nz = a - 1\nreturn z\n\n\n\nguard(x &lt; 100)\nreturn x"
-  },
-  {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-do-this-in-bril",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-do-this-in-bril",
-    "title": "Dynamic Compilers",
-    "section": "how do this in Bril?",
-    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not role back stores\nwe can approximate trace compilation by running the program twice\nHow to modify the reference interpreter (warning typescript!)\nbrili\nthere are two functions to consider\n\nevalFunc interprets a function by calling evalInstr on each instruction\nevalInstr interprets one instruction, large case statement for each instruction\n\nyou will need to print instructions as they execute\n\nfigure out when to start and when to stop\nhow to print instructions (modify evalInstr by printing instructions) console.log(instr)\n\nyou have to optimize the trace and put it back"
-  },
-  {
     "objectID": "lectures/13_dynamic_compilers.html",
     "href": "lectures/13_dynamic_compilers.html",
     "title": "Dynamic Compilers",
@@ -490,6 +266,230 @@
     "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not role back stores\nwe can approximate trace compilation by running the program twice\nHow to modify the reference interpreter (warning typescript!)\nbrili\nthere are two functions to consider\n\nevalFunc interprets a function by calling evalInstr on each instruction\nevalInstr interprets one instruction, large case statement for each instruction\n\nyou will need to print instructions as they execute\n\nfigure out when to start and when to stop\nhow to print instructions (modify evalInstr by printing instructions) console.log(instr)\n\nyou have to optimize the trace and put it back"
   },
   {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
+    "title": "Dynamic Compilers",
+    "section": "jit (just in time) compilers vs aot(ahead of time) compilers",
+    "text": "jit (just in time) compilers vs aot(ahead of time) compilers\na jit compiler translates code into isa while the program executes\nsome options\n\ncompile a function the first time it is called\ncompile a function after it has been called a lot (needs an interpreter) We call these hot functions\nbuild a trace of instructions executed and compile the hot traces (a trace has no branches)\nA variation I used ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#can-jit-compiled-code-run-faster-then-aot-code",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#can-jit-compiled-code-run-faster-then-aot-code",
+    "title": "Dynamic Compilers",
+    "section": "Can jit compiled code run faster then aot code?",
+    "text": "Can jit compiled code run faster then aot code?"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#comparison",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#comparison",
+    "title": "Dynamic Compilers",
+    "section": "Comparison",
+    "text": "Comparison\n\n\n\naot\njit\n\n\n\n\ncannot inline libraries\ncan inline (even class methods)\n\n\nno runtime code gen\ncan use run time code gen\n\n\nno speculative opts\ncan use spec opts\n\n\nless information\nmore information\n\n\noverall performance lower\noverall performance often higher\n\n\nfull speed from the start\nrequires warmup\n\n\nno compile cost at run time\noverhead to run compiler"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs",
+    "title": "Dynamic Compilers",
+    "section": "Tradeoffs",
+    "text": "Tradeoffs\n\nThe time to compile is part of the total execution time\nmight run less optimizations to speed up execution time\nmight look at run time info\nsame code might be compiled many times\n\nWt would the same code be compiled more than once?"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tiered-compilers",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tiered-compilers",
+    "title": "Dynamic Compilers",
+    "section": "tiered compilers",
+    "text": "tiered compilers\nSince compilation is costly, do not compile functions that are only called once and do not contain a long running loop\nwe have a series of compilers, each with more aggressive optimization and each allowed to take longer\n\nthe lowest tier is the interpreter\nthe next is the base line compiler"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#magic-numbers",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#magic-numbers",
+    "title": "Dynamic Compilers",
+    "section": "magic numbers",
+    "text": "magic numbers\nassociate a counter with branches and functions if the counter reaches some magic number use one of the compilers\nif the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, so how do you insert the newly compiled code?"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#questions-when-building-a-jit",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#questions-when-building-a-jit",
+    "title": "Dynamic Compilers",
+    "section": "questions when building a JIT",
+    "text": "questions when building a JIT\n\nwhat strategy do you use to invoke the jit\ndo you have to execute for a while before calling the jit\nhow much info do you need\nwhat is the price of wrong info\nare there easy and hard programs\ndo the easy programs match up with users common programs"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#speculation",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#speculation",
+    "title": "Dynamic Compilers",
+    "section": "Speculation",
+    "text": "Speculation\n\nassume some property is true, compile using that info this is always a gamble, so you need to recover if the assumption was wrong\nassume a variable is an int, and does not overflow\nassume properties of an object is fixed\nassume the target of call is always the same\nassume past behavior predicts future behavior"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#flow",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#flow",
+    "title": "Dynamic Compilers",
+    "section": "flow",
+    "text": "flow\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\ninterpreter -- hot? --&gt; profiling \nprofiling -- stats --&gt; optimizing_compiler\noptimizing_compiler --&gt; compiled_code\ncompiled_code -- deoptimze --&gt; interpreter\ninterpreter -- already_compiled --&gt; compiled_code"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#boxed-values",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#boxed-values",
+    "title": "Dynamic Compilers",
+    "section": "boxed values",
+    "text": "boxed values\nMany languages do not use strong static typeing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches",
+    "title": "Dynamic Compilers",
+    "section": "inline caches",
+    "text": "inline caches\nin languages like python, calls to a method are more expensive then calls to a method in c++ why?\n\nPython objects are implemented as hash tables. While C++ uses virtual tables\nhow does that effect the cost?"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#first-c-virtual-tables",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#first-c-virtual-tables",
+    "title": "Dynamic Compilers",
+    "section": "first C++ virtual tables",
+    "text": "first C++ virtual tables\nin C++ a method call takes two dereferences\n\nfirst find the v-table\nsecond used a fixed offset from the table start to find the address"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-do-we-need-to-keep-the-offset-fixed",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-do-we-need-to-keep-the-offset-fixed",
+    "title": "Dynamic Compilers",
+    "section": "What do we need to keep the offset fixed?",
+    "text": "What do we need to keep the offset fixed?\nif derived inherits from base, and both have a function f. the offset to f has to be the same.\nin languages where objects are hash tables, the c++ dereference becomes a hash table lookup, which is slower"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs-1",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs-1",
+    "title": "Dynamic Compilers",
+    "section": "tradeoffs",
+    "text": "tradeoffs\nIn a dynamically typed language like python we can add or remove methods easily\nbut method calls are expensive\nwe want to make these calls cheaper"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-te-call-site",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-te-call-site",
+    "title": "Dynamic Compilers",
+    "section": "inline caches at te call site",
+    "text": "inline caches at te call site\nthe first time we call a method, we know the type (because we are generating code at runtime)\n\n\ndef func(a,b,c):\n  for i in range(10):\n     foo(a,b,c)\n\ndef func(a,b,c):\n  for i in range(1):\n    if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in the hash\n      call other(a,b,c\n      )"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-the-function-site",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-the-function-site",
+    "title": "Dynamic Compilers",
+    "section": "inline caches at the function site",
+    "text": "inline caches at the function site\n\n\ndef func(a,b,c):\n  for i in range(10):\n     _foo(a,b,c\n\ndef _foo(a,b,c)\n  if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in a\n      call other(a,b,c)\n\nis it better to do this at the call site or at the function site?"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#polymorphic-calls",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#polymorphic-calls",
+    "title": "Dynamic Compilers",
+    "section": "polymorphic calls",
+    "text": "polymorphic calls\nif the type changes at runtime (the call to other is taken) does the optimization help?\ncould invalidate the table and rebuild it with another case"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-are-the-costs",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#what-are-the-costs",
+    "title": "Dynamic Compilers",
+    "section": "what are the costs",
+    "text": "what are the costs\nfor example v8 compiler\nmonomorphic inline hit - 10 instructions\npolymorphic hit - 35 instructions for 10 types, 60 instructions for 20 types\ncache miss 1000-4000 instructions"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#value-specialization",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#value-specialization",
+    "title": "Dynamic Compilers",
+    "section": "value specialization",
+    "text": "value specialization\nOddly many functions are called with the same arguments"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example",
+    "title": "Dynamic Compilers",
+    "section": "an example",
+    "text": "an example\ngiven a vector v of size n, and a parameter q find the element of v that is closest to q\n function closest(v, q, n) {\n    if (n == 0) {\n          throw \"Error\";\n    } else {\n        var i = 0;\n        var d = 0ffffffff;\n        while (i &lt; n) {\n           var nd = abs(v[i] - q);\n           if (nd &lt;= d) d = nd; \n           i++;\n        }    \n        return d;  \n      } \n}"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#the-cfg",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#the-cfg",
+    "title": "Dynamic Compilers",
+    "section": "the cfg",
+    "text": "the cfg\nwe want to recompile this for specific v,q, and n, where we restart at the while test"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#two-entries",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#two-entries",
+    "title": "Dynamic Compilers",
+    "section": "two entries",
+    "text": "two entries\nFirst entry is the regular starting point, second is the entry if we are currently running the loop in the interpreter\nSince we are compiling the function while in the loop we can ask the interpreter for values\n\nv == load[0]\nq = 42\nn = 100\ni = 40\nd = 0fffffff"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#dead-code-elimination",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#dead-code-elimination",
+    "title": "Dynamic Compilers",
+    "section": "dead code elimination",
+    "text": "dead code elimination\nAfter this the all calls to the function assume these arguments so no need to keep the regular entry\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#array-in-bounds-check",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#array-in-bounds-check",
+    "title": "Dynamic Compilers",
+    "section": "array in bounds check",
+    "text": "array in bounds check\nwe can pattern match loops with bounds checks if we know the limit"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#loop-inversion",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#loop-inversion",
+    "title": "Dynamic Compilers",
+    "section": "loop inversion",
+    "text": "loop inversion\na general while loop\nwhile(cond){\n  ...\n}\ncan be changed into\nif (cond){\n  do {\n    ...\n  } while(cond)\n}\nfor this loop the first time around i = 40, n = 100 so the first condition is true"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#after-loop-inversion",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#after-loop-inversion",
+    "title": "Dynamic Compilers",
+    "section": "after loop inversion",
+    "text": "after loop inversion\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\" ]\nentry_on_stack_rep[\"v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl3 --&gt; l7\n\n\nl4[\"l4: return d1\"]\nl7[\" l7: l5: t0 = 4* i\nt1 = v[t0]\nnd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   if (i2 &gt; n) goto l4\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl9--&gt; l3\nl9--&gt; l4"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#results",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#results",
+    "title": "Dynamic Compilers",
+    "section": "results",
+    "text": "results\nspecialized code is shorter and compiles faster\nsince we know that the loop goes from 42 to 100, we could unroll the loop"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation",
+    "text": "trace compilation\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-x-42",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-x-42",
+    "title": "Dynamic Compilers",
+    "section": "an example (x = 42)",
+    "text": "an example (x = 42)\n\n\nfunction main(x){\n   y = x +1 \n   if x &lt;100 {\n      z = f(y)\n   } else {\n      z = g(y)\n   }\n   return z\n}\n\nfunction f(a){\n   return a -1 \n}\n\n\n\ny = x +1\nguard(x &lt; 100)\na = y\nz = a - 1\nreturn z\n\n\n\nguards at divergence, guards never return\noptimize assuming guards are true, ok to be slow if guard is false"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#move-guards-up",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#move-guards-up",
+    "title": "Dynamic Compilers",
+    "section": "move guards up",
+    "text": "move guards up\nwhy is this a good idea?\n\n\nfail fast\nlonger region to optimize"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#use-local-value-numbering",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#use-local-value-numbering",
+    "title": "Dynamic Compilers",
+    "section": "use local value numbering",
+    "text": "use local value numbering\n\n\n\nguard(x &lt; 100)\ny = x + 1\na = y\nz = a - 1\nreturn z\n\n\n\nguard(x &lt; 100)\nreturn x"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-do-this-in-bril",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-do-this-in-bril",
+    "title": "Dynamic Compilers",
+    "section": "how do this in Bril?",
+    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not role back stores\nwe can approximate trace compilation by running the program twice\nHow to modify the reference interpreter (warning typescript!)\nbrili\nthere are two functions to consider\n\nevalFunc interprets a function by calling evalInstr on each instruction\nevalInstr interprets one instruction, large case statement for each instruction\n\nyou will need to print instructions as they execute\n\nfigure out when to start and when to stop\nhow to print instructions (modify evalInstr by printing instructions) console.log(instr)\n\nyou have to optimize the trace and put it back"
+  },
+  {
     "objectID": "lectures/05_global.html",
     "href": "lectures/05_global.html",
     "title": "5 Global Analysis",
@@ -522,7 +522,7 @@
     "href": "lectures/05_global.html#an-example",
     "title": "5 Global Analysis",
     "section": "an example",
-    "text": "an example\n\n\nA control flow graph\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\n\nThe dominator tree\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;"
+    "text": "an example\n\n\nA control flow graph\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\n\nThe dominator tree\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;"
   },
   {
     "objectID": "lectures/05_global.html#simple-implementation-dominators",
@@ -557,7 +557,7 @@
     "href": "lectures/05_global.html#a-more-complex-example",
     "title": "5 Global Analysis",
     "section": "a more complex example",
-    "text": "a more complex example\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\n\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\n\n\nneed n4 and n8\n\nboth are dominated by n0"
+    "text": "a more complex example\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\n\n\nneed n4 and n8\n\nboth are dominated by n0"
   },
   {
     "objectID": "lectures/05_global.html#subproblem-find-lowest-common-ancestor-in-dt-of-two-nodes-a-and-b",
@@ -613,7 +613,7 @@
     "href": "lectures/05_global.html#example",
     "title": "5 Global Analysis",
     "section": "example",
-    "text": "example\n\n\n\ngraph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\n\n\nBackedges B -&gt; H2,\nB-&gt; H1\n\nfor B-&gt; H2, loop is H2,\nfor B-&gt; H1, loop is H1, A, H2, B"
+    "text": "example\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\n\n\nBackedges B -&gt; H2,\nB-&gt; H1\n\nfor B-&gt; H2, loop is H2,\nfor B-&gt; H1, loop is H1, A, H2, B"
   },
   {
     "objectID": "lectures/05_global.html#reducible-control-flow",
@@ -641,7 +641,7 @@
     "href": "lectures/05_global.html#t1-t2",
     "title": "5 Global Analysis",
     "section": "t1 / t2",
-    "text": "t1 / t2\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]"
+    "text": "t1 / t2\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]"
   },
   {
     "objectID": "lectures/05_global.html#example-1",
@@ -655,7 +655,7 @@
     "href": "lectures/05_global.html#simplified-control-flow",
     "title": "5 Global Analysis",
     "section": "simplified control flow",
-    "text": "simplified control flow\n\ngraph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\nnot reducible"
+    "text": "simplified control flow\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\nnot reducible"
   },
   {
     "objectID": "lectures/05_global.html#other-optimizations-interactions",
@@ -669,7 +669,7 @@
     "href": "lectures/05_global.html#inline-the-function-combine-jmps-to-jmps",
     "title": "5 Global Analysis",
     "section": "inline the function, combine jmps to jmps",
-    "text": "inline the function, combine jmps to jmps\n\n\nloop: if (cond) goto past_loop\n    s1\n    b1\n    if () go to next\n    b2\n    next:\ngoto loop\n\n\ngraph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n    graph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n\n\nNow we have two back edges so two loops"
+    "text": "inline the function, combine jmps to jmps\n\n\nloop: if (cond) goto past_loop\n    s1\n    b1\n    if () go to next\n    b2\n    next:\ngoto loop\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n\n\nNow we have two back edges so two loops"
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#graph-properties",
@@ -697,7 +697,7 @@
     "href": "lectures/revealjs_05_global.qmd.html#an-example",
     "title": "5 Global Analysis",
     "section": "an example",
-    "text": "an example\n\n\nA control flow graph\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\n\nThe dominator tree\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;\n\n\n\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;"
+    "text": "an example\n\n\nA control flow graph\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;\nn1 --&gt; n3;\nn2 --&gt; n4;\nn3 --&gt; n4;\n\n\n\n\n\n\n\nThe dominator tree\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n1;\nn1 --&gt; n2;n1 --&gt; n3\nn1 --&gt; n4;"
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#simple-implementation-dominators",
@@ -732,7 +732,7 @@
     "href": "lectures/revealjs_05_global.qmd.html#a-more-complex-example",
     "title": "5 Global Analysis",
     "section": "a more complex example",
-    "text": "a more complex example\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\n\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\n\n\nneed n4 and n8\n\nboth are dominated by n0"
+    "text": "a more complex example\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0 --&gt; n5;\nn0 --&gt; n1;\nn5 --&gt; n7;\nn5 --&gt; n6;\nn1 --&gt; n2 ;\nn1 --&gt; n3;\nn7 --&gt; n8;\nn6 --&gt; n4;\nn2 --&gt; n4;\nn4 --&gt; n8 ;\nn3 --&gt; n8;\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nn0--&gt; n5\nn0 --&gt; n1\nn5--&gt; n7\nn5--&gt; n6\nn1--&gt; n2\nn1 --&gt; n3\n\n\n\n\n\n\nneed n4 and n8\n\nboth are dominated by n0"
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#subproblem-find-lowest-common-ancestor-in-dt-of-two-nodes-a-and-b",
@@ -767,14 +767,14 @@
     "href": "lectures/revealjs_05_global.qmd.html#natural-loops",
     "title": "5 Global Analysis",
     "section": "natural loops",
-    "text": "natural loops\n\ngraph TD;\n  entry --&gt; loop\n  loop --&gt; if \n  if --&gt; then\n  if --&gt; else\n  then --&gt; endif\n  else --&gt; endif\n  endif --&gt; loop\n  loop --&gt; exit\n\n\n\n\n  graph TD;\n  entry --&gt; loop\n  loop --&gt; if \n  if --&gt; then\n  if --&gt; else\n  then --&gt; endif\n  else --&gt; endif\n  endif --&gt; loop\n  loop --&gt; exit\n\n\n\n\n\n\n\nhas to have a cycle in cfg (strongly connected)\nsingle entry point (called the header ) header"
+    "text": "natural loops\n\n\n\n\n\n  graph TD;\n  entry --&gt; loop\n  loop --&gt; if \n  if --&gt; then\n  if --&gt; else\n  then --&gt; endif\n  else --&gt; endif\n  endif --&gt; loop\n  loop --&gt; exit\n\n\n\n\n\n\n\nhas to have a cycle in cfg (strongly connected)\nsingle entry point (called the header ) header"
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#cycle-but-not-header",
     "href": "lectures/revealjs_05_global.qmd.html#cycle-but-not-header",
     "title": "5 Global Analysis",
     "section": "cycle but not header",
-    "text": "cycle but not header\nHow about an example that has a cycle and no header\n\ngraph TD;\n    entry --&gt; if;\n    if --&gt; loop1\n    if --&gt; loop2\n    loop2 --&gt; loop1\nloop1 --&gt; loop2\n\n\n\n\n    graph TD;\n    entry --&gt; if;\n    if --&gt; loop1\n    if --&gt; loop2\n    loop2 --&gt; loop1\nloop1 --&gt; loop2\n\n\n\n\n\n\nThis loop has two entry points."
+    "text": "cycle but not header\nHow about an example that has a cycle and no header\n\n\n\n\n\n    graph TD;\n    entry --&gt; if;\n    if --&gt; loop1\n    if --&gt; loop2\n    loop2 --&gt; loop1\nloop1 --&gt; loop2\n\n\n\n\n\n\nThis loop has two entry points."
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#natural-loops-1",
@@ -788,7 +788,7 @@
     "href": "lectures/revealjs_05_global.qmd.html#example",
     "title": "5 Global Analysis",
     "section": "example",
-    "text": "example\n\n\n\ngraph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\n\n\nBackedges B -&gt; H2,\nB-&gt; H1\n\nfor B-&gt; H2, loop is H2,\nfor B-&gt; H1, loop is H1, A, H2, B"
+    "text": "example\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    entry --&gt; H1\n    H1 --&gt; A\n    A --&gt; H2\n    H2 --&gt; B\n    B --&gt; H2\n    B --&gt; H1\n    H1 --&gt; exit\n\n\n\n\n\n\n\n\nBackedges B -&gt; H2,\nB-&gt; H1\n\nfor B-&gt; H2, loop is H2,\nfor B-&gt; H1, loop is H1, A, H2, B"
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#reducible-control-flow",
@@ -816,7 +816,7 @@
     "href": "lectures/revealjs_05_global.qmd.html#t1-t2",
     "title": "5 Global Analysis",
     "section": "t1 / t2",
-    "text": "t1 / t2\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\ngraph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]\n\n\n\n\n    graph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]"
+    "text": "t1 / t2\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\nn --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n1\na1[\" \"] --&gt; n1\nn1 --&gt; n2\nn2--&gt; n1\n n2 --&gt; b[\" \"]\nn2 --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n\na1[\" \"] --&gt; n\n n --&gt; b[\" \"]\nn --&gt; b1[\" \"]\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    a0[\" \"] --&gt; n1[\"n1_n2\"]\na1[\" \"] --&gt; n1\n n1 --&gt; b[\" \"]\nn1 --&gt; b1[\" \"]"
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#example-1",
@@ -830,7 +830,7 @@
     "href": "lectures/revealjs_05_global.qmd.html#simplified-control-flow",
     "title": "5 Global Analysis",
     "section": "simplified control flow",
-    "text": "simplified control flow\n\ngraph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\nnot reducible"
+    "text": "simplified control flow\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    entry --&gt; switch;\n    switch --&gt; case0-7\n    switch --&gt; case1\n    switch --&gt; case2\n    case0-7 --&gt; case2\n    case2--&gt; case1\n    case1 --&gt; dowhile\n    dowhile --&gt; case0-7\n    dowhile --&gt; exit\n\n\n\n\n\n\nnot reducible"
   },
   {
     "objectID": "lectures/revealjs_05_global.qmd.html#other-optimizations-interactions",
@@ -844,7 +844,7 @@
     "href": "lectures/revealjs_05_global.qmd.html#inline-the-function-combine-jmps-to-jmps",
     "title": "5 Global Analysis",
     "section": "inline the function, combine jmps to jmps",
-    "text": "inline the function, combine jmps to jmps\n\n\nloop: if (cond) goto past_loop\n    s1\n    b1\n    if () go to next\n    b2\n    next:\ngoto loop\n\n\ngraph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n    graph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n\n\nNow we have two back edges so two loops"
+    "text": "inline the function, combine jmps to jmps\n\n\nloop: if (cond) goto past_loop\n    s1\n    b1\n    if () go to next\n    b2\n    next:\ngoto loop\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n    graph TD;\n    loop--&gt; s1\n    loop---&gt; past_loop\n    s1--&gt; b1\n    b1 --&gt;inline_if\n    inline_if --&gt; b2\n    b2 --&gt; next_goto\n    inline_if --&gt; loop\n    next_goto --&gt; loop\n\n\n\n\n\n\nNow we have two back edges so two loops"
   },
   {
     "objectID": "lectures/01a_performance_measurement.html",
@@ -893,7 +893,7 @@
     "href": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
     "title": "Performance and Measurement",
     "section": "violin plots",
-    "text": "violin plots\ndata\nA dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle\n\n# library & dataset\nimport seaborn as sns\nimport pandas as pd\nimport numpy as np\n\n\ndf = pd.read_csv('images/chip_dataset.csv')\nprint(df.head())\n\nsns.set_palette(\"pastel\")\n\nsns.violinplot(x=df[\"Vendor\"], y=np.log(df[\"Freq (MHz)\"]), hue=df['Type'])\n\n   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \\\n0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   \n1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   \n2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   \n3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   \n4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   \n\n   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \\\n0     45.0             77.0                  122.0      2200.0  Unknown   \n1     35.0            192.0                 4800.0      3200.0  Unknown   \n2     28.0              NaN                    NaN      2600.0    Intel   \n3     80.0            160.0                 1400.0      1800.0    Intel   \n4    125.0            258.0                  758.0      3700.0  Unknown   \n\n  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  \n0    AMD          NaN          NaN          NaN  \n1    AMD          NaN          NaN          NaN  \n2  Intel          NaN          NaN          NaN  \n3  Intel          NaN          NaN          NaN  \n4    AMD          NaN          NaN          NaN  \n\n\n\n\n\n\n\n\n\napply np.log to the Freq (MHz) column. Because of wide range of values\nSet a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot\nHue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette\nData Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.\nI might want to take date into account in these plots"
+    "text": "violin plots\ndata\nA dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle\n\n\n   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \\\n0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   \n1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   \n2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   \n3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   \n4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   \n\n   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \\\n0     45.0             77.0                  122.0      2200.0  Unknown   \n1     35.0            192.0                 4800.0      3200.0  Unknown   \n2     28.0              NaN                    NaN      2600.0    Intel   \n3     80.0            160.0                 1400.0      1800.0    Intel   \n4    125.0            258.0                  758.0      3700.0  Unknown   \n\n  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  \n0    AMD          NaN          NaN          NaN  \n1    AMD          NaN          NaN          NaN  \n2  Intel          NaN          NaN          NaN  \n3  Intel          NaN          NaN          NaN  \n4    AMD          NaN          NaN          NaN  \n\n\n\n\n\n\n\n\n\napply np.log to the Freq (MHz) column. Because of wide range of values\nSet a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot\nHue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette\nData Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.\nI might want to take date into account in these plots"
   },
   {
     "objectID": "lectures/14_gpu_compilers.html",
@@ -1397,7 +1397,7 @@
     "href": "lectures/010_compiler_overview.html",
     "title": "1 Compiler Overview",
     "section": "",
-    "text": "A compiler writer builds bridges between people and machines, and this task is each day more challenging.\n\nSoftware engineers want abstractions\n\nHardware engineers want efficiency\n\n\n\nOriginally, a compiler was a person doing calculations.\nIn 1952, Grace Hopper an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”\n[]\n\n\n\nIn 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).\nTheir paper is located at https://dl.acm.org/doi/10.1145/1455567.1455599.\nThe name stands for formula translation. It’s in upper case because at that time, compilers did not support lower case.\nThe FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM’s next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan.\nThe goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.\nFORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.\n\n\n\nIn these early years, the development model was:\n\nbuild a new machine\ndesign a new language\nimplement the compiler\n\nVendors sometimes built compilers but often used small startup compiler companies.\n\nCompilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.\n\nFront end - parse the program into IR\nMiddle end - machine independent optimizations and analyses\nBack end - machine specific stuff where machine code is generated\n\n\n\n\n\n\ngraph LR;\nA[Front end]--IR--&gt; B[Middle end];\nB--IR--&gt; C[Back end];\nA--IR--&gt; C;\n\n\n\n\n\n\n\nThis course focuses on stage 2 (The middle end)\nA goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.\n There are many ways to compare the performance of programs:\n\nTime\nSpace\nEnergy\n\n\n\n\nIn 1987, GCC was released. It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR. Adding an optimization or reordering optimizations is quite hard.\nVendors could use one front end, one middle end and only need to write a new back end.\n\nThis ended almost all the compiler startups. Free front end, middle end.\nIn gcc the IR is somewhat C based, for instance there are pointers but there is no simple way to talk about garbage collection without hacks.\n\n\n\nin about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.\nThe core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.\n\n\n\n\n\ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;\n\n\n\n\n\n\n\nOptimizations form passes. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments.\n\n\n\n\nIn this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.\n\n\n\n\n\ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];\n\n\n\n\n\n\n\n\n\nCompilers are massive and expensive to build.\n\n\n\nCompiler\nYear Started\nDevelopers\nLines Of Code\nEst Cost $\n\n\n\n\nGCC 9.2.0\n1988\n617\n5,591,759\n425,747,279\n\n\nLLVM 8.0.1\n2001\n1,210\n6,877,489\n529,894,190\n\n\nOpenJDK 14+10\n2007\n883\n7,955,827\n616,517,789\n\n\nv8 7.8.112\n2008\n736\n3,043,793\n225,195,832\n\n\nRust 1.37.0\n2010\n2,737\n852,877\n59,109,425\n\n\nSwift\n2010\n857\n665,238\n45,535,689\n\n\nIntel Graphics 1.0.10\n2018\n149\n694,688\n46,934,626\n\n\n\nFrom CGO 2022 keynote\n\nSome observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.\n\n\n\n\nThe time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.\nUsers are ok with large programs taking minutes to compile\nCompilers run on machines that are memory-limited.\nCompilers run on single-threaded machines.\nMost targets are C-like.\n\n\nSome changes since early 2000’s:\n\nIntegrated development environments. When you type a.b what has to happen?\nDSL (Doman specific languages for AI)\nMore kinds of hardware\n\n\n\n\nAt the scale of data-centers, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.\nproebsting’s law\nCompiler Advances Double Computing Power Every 18 Years.\nwhile hardware computing horsepower doubles every 18 months. How would you prove this?\none attempt\n\n\n\nTalk given by KAI’s Arch Robison\nCompile-time program optimizations are similar to poetry: more are written than actually published in commercial compilers. Hard economic reality is that many interesting optimizations have too narrow an audience to justify their cost in a general-purpose compiler and custom compilers are too expensive to write.\n\n\n\nRemove performance penalty for:\n\nusing higher level constructs\nsafety checks (e.g., array bounds checks)\nwriting clean, simple code (no benefit to applying loop unrolling by hand)\nEncourage ADT’s that are as efficient as primitive types\n\n\nOver time hardware has become more of a challenge for compilers, for example caches are not predictable at compile time. So compilers have to guess\nAnd hardware can ignore features of the compiler can deal with them - for example interlock"
+    "text": "A compiler writer builds bridges between people and machines, and this task is each day more challenging.\n\nSoftware engineers want abstractions\n\nHardware engineers want efficiency\n\n\n\nOriginally, a compiler was a person doing calculations.\nIn 1952, Grace Hopper an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”\n[]\n\n\n\nIn 1957, John Backus created the first commercial compiler, FORTRAN (14 people worked on it for about 4 years).\nTheir paper is located at https://dl.acm.org/doi/10.1145/1455567.1455599.\nThe name stands for formula translation. It’s in upper case because at that time, compilers did not support lower case.\nThe FORTRAN project was begun in the summer of 1954. Its purpose was to reduce by a large factor the task of preparing scientific problems for IBM’s next large computer, the 704. If it were possible for the 704 to code problems for itself and produce as good programs as human coders (but without the errors), it was clear that large benefits could be achieved. For it was known that about two-thirds of the cost of solving most scientific and engineering problems on large computers was that of problem preparation. Furthermore, more than 90 per cent of the elapsed time for a problem was usually devoted to planning, writing, and debugging the program. In many cases the development of a general plan for solving a problem was a small job in comparison to the task of devising and coding machine procedures to carry out the plan.\nThe goal of the FORTRAN project was to enable the programmer to specify a numerical procedure using a concise language like that of mathematics and obtain automatically from this specification an efficient 704 program to carry out the procedure. It was expected that such a system would reduce the coding and debugging task to less than one-fifth of the job it had been.\nFORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.\n\n\n\nIn these early years, the development model was:\n\nbuild a new machine\ndesign a new language\nimplement the compiler\n\nVendors sometimes built compilers but often used small startup compiler companies.\n\nCompilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.\n\nFront end - parse the program into IR\nMiddle end - machine independent optimizations and analyses\nBack end - machine specific stuff where machine code is generated\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B[Middle end];\nB--IR--&gt; C[Back end];\nA--IR--&gt; C;\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B[Middle end];\nB--IR--&gt; C[Back end];\nA--IR--&gt; C;\n\n\n\n\n\n\n\nThis course focuses on stage 2 (The middle end)\nA goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.\n There are many ways to compare the performance of programs:\n\nTime\nSpace\nEnergy\n\n\n\n\nIn 1987, GCC was released. It formalized the IR, and was more or less open source. Within the stages, compiler writers could use any data structures but at the edges they had to use the single IR. Adding an optimization or reordering optimizations is quite hard.\nVendors could use one front end, one middle end and only need to write a new back end.\n\nThis ended almost all the compiler startups. Free front end, middle end.\nIn gcc the IR is somewhat C based, for instance there are pointers but there is no simple way to talk about garbage collection without hacks.\n\n\n\nin about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.\nThe core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;\n\n\n\n\n\n\n\nOptimizations form passes. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments.\n\n\n\n\nIn this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];\n\n\n\n\n\n\n\n\n\nCompilers are massive and expensive to build.\n\n\n\nCompiler\nYear Started\nDevelopers\nLines Of Code\nEst Cost $\n\n\n\n\nGCC 9.2.0\n1988\n617\n5,591,759\n425,747,279\n\n\nLLVM 8.0.1\n2001\n1,210\n6,877,489\n529,894,190\n\n\nOpenJDK 14+10\n2007\n883\n7,955,827\n616,517,789\n\n\nv8 7.8.112\n2008\n736\n3,043,793\n225,195,832\n\n\nRust 1.37.0\n2010\n2,737\n852,877\n59,109,425\n\n\nSwift\n2010\n857\n665,238\n45,535,689\n\n\nIntel Graphics 1.0.10\n2018\n149\n694,688\n46,934,626\n\n\n\nFrom CGO 2022 keynote\n\nSome observations: 1) Production compilers are expensive. 1) IR does not change easily. 1) Much of compiler technology is old. 1) There is a vast difference between production and student projects.\n\n\n\n\nThe time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.\nUsers are ok with large programs taking minutes to compile\nCompilers run on machines that are memory-limited.\nCompilers run on single-threaded machines.\nMost targets are C-like.\n\n\nSome changes since early 2000’s:\n\nIntegrated development environments. When you type a.b what has to happen?\nDSL (Doman specific languages for AI)\nMore kinds of hardware\n\n\n\n\nAt the scale of data-centers, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.\nproebsting’s law\nCompiler Advances Double Computing Power Every 18 Years.\nwhile hardware computing horsepower doubles every 18 months. How would you prove this?\none attempt\n\n\n\nTalk given by KAI’s Arch Robison\nCompile-time program optimizations are similar to poetry: more are written than actually published in commercial compilers. Hard economic reality is that many interesting optimizations have too narrow an audience to justify their cost in a general-purpose compiler and custom compilers are too expensive to write.\n\n\n\nRemove performance penalty for:\n\nusing higher level constructs\nsafety checks (e.g., array bounds checks)\nwriting clean, simple code (no benefit to applying loop unrolling by hand)\nEncourage ADT’s that are as efficient as primitive types\n\n\nOver time hardware has become more of a challenge for compilers, for example caches are not predictable at compile time. So compilers have to guess\nAnd hardware can ignore features of the compiler can deal with them - for example interlock"
   },
   {
     "objectID": "lectures/010_compiler_overview.html#early-compilers",
@@ -1418,7 +1418,7 @@
     "href": "lectures/010_compiler_overview.html#compiler-development-model",
     "title": "1 Compiler Overview",
     "section": "",
-    "text": "In these early years, the development model was:\n\nbuild a new machine\ndesign a new language\nimplement the compiler\n\nVendors sometimes built compilers but often used small startup compiler companies.\n\nCompilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.\n\nFront end - parse the program into IR\nMiddle end - machine independent optimizations and analyses\nBack end - machine specific stuff where machine code is generated\n\n\n\n\n\n\ngraph LR;\nA[Front end]--IR--&gt; B[Middle end];\nB--IR--&gt; C[Back end];\nA--IR--&gt; C;\n\n\n\n\n\n\n\nThis course focuses on stage 2 (The middle end)\nA goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.\n There are many ways to compare the performance of programs:\n\nTime\nSpace\nEnergy"
+    "text": "In these early years, the development model was:\n\nbuild a new machine\ndesign a new language\nimplement the compiler\n\nVendors sometimes built compilers but often used small startup compiler companies.\n\nCompilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.\n\nFront end - parse the program into IR\nMiddle end - machine independent optimizations and analyses\nBack end - machine specific stuff where machine code is generated\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B[Middle end];\nB--IR--&gt; C[Back end];\nA--IR--&gt; C;\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B[Middle end];\nB--IR--&gt; C[Back end];\nA--IR--&gt; C;\n\n\n\n\n\n\n\nThis course focuses on stage 2 (The middle end)\nA goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.\n There are many ways to compare the performance of programs:\n\nTime\nSpace\nEnergy"
   },
   {
     "objectID": "lectures/010_compiler_overview.html#gcc",
@@ -1432,14 +1432,14 @@
     "href": "lectures/010_compiler_overview.html#llvm",
     "title": "1 Compiler Overview",
     "section": "",
-    "text": "in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.\nThe core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.\n\n\n\n\n\ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;\n\n\n\n\n\n\n\nOptimizations form passes. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments."
+    "text": "in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.\nThe core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;\n\n\n\n\n\n\n\nOptimizations form passes. A user could mix and match – run some optimizations but not others to compile a specific program. It became easy for people to add a pass. Lots of academic research, lots of experiments."
   },
   {
     "objectID": "lectures/010_compiler_overview.html#bril",
     "href": "lectures/010_compiler_overview.html#bril",
     "title": "1 Compiler Overview",
     "section": "",
-    "text": "In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.\n\n\n\n\n\ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];"
+    "text": "In this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];"
   },
   {
     "objectID": "lectures/010_compiler_overview.html#cost-of-a-compiler.",
@@ -1509,14 +1509,14 @@
     "href": "lectures/revealjs_010_compiler_overview.qmd.html#llvm",
     "title": "1 Compiler Overview",
     "section": "LLVM",
-    "text": "LLVM\nin about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.\nThe core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.\n\n\n\n\n\ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;"
+    "text": "LLVM\nin about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.\nThe core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};\nA--IR--&gt; C;"
   },
   {
     "objectID": "lectures/revealjs_010_compiler_overview.qmd.html#bril",
     "href": "lectures/revealjs_010_compiler_overview.qmd.html#bril",
     "title": "1 Compiler Overview",
     "section": "bril",
-    "text": "bril\nIn this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.\n\n\n\n\n\ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];"
+    "text": "bril\nIn this course we are going to an IR call BRIL, which is a very simplified version of LLVM IR, and we are going to string passes together by using UNIX pipes.\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph TB;\nA[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1[\"new pass\"] --&gt; B2[BRIL interpreter];"
   },
   {
     "objectID": "lectures/revealjs_010_compiler_overview.qmd.html#cost-of-a-compiler.",
@@ -1698,7 +1698,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 732\n-rw-r--r-- 1 runner docker  8311 Jul 25 14:54 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3595 Jul 25 14:54 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 37927 Jul 25 14:55 02a_representation.html\n-rw-r--r-- 1 runner docker  7255 Jul 25 14:54 02a_representation.qmd\n-rw-r--r-- 1 runner docker 11782 Jul 25 14:54 02b_bril.qmd\n-rw-r--r-- 1 runner docker 20491 Jul 25 14:55 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  6951 Jul 25 14:54 03_local.qmd\n-rw-r--r-- 1 runner docker  7846 Jul 25 14:54 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 43341 Jul 25 14:55 04_data_flow.html\n-rw-r--r-- 1 runner docker 10399 Jul 25 14:54 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9250 Jul 25 14:54 05_global.qmd\n-rw-r--r-- 1 runner docker  4717 Jul 25 14:54 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3092 Jul 25 14:54 05c_pre.qmd\n-rw-r--r-- 1 runner docker 75909 Jul 25 14:55 06_ssa.html\n-rw-r--r-- 1 runner docker 16255 Jul 25 14:54 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Jul 25 14:54 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5635 Jul 25 14:54 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 13980 Jul 25 14:54 09_poly.qmd\n-rw-r--r-- 1 runner docker   246 Jul 25 14:54 100_mlir.qmd\n-rw-r--r-- 1 runner docker 20103 Jul 25 14:55 110_whole_program.html\n-rw-r--r-- 1 runner docker   264 Jul 25 14:54 110_whole_program.qmd\n-rw-r--r-- 1 runner docker   260 Jul 25 14:54 12_memory.qmd\n-rw-r--r-- 1 runner docker 16039 Jul 25 14:54 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10060 Jul 25 14:54 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4595 Jul 25 14:54 errors\ndrwxr-xr-x 2 runner docker  4096 Jul 25 14:54 images\ndrwxr-xr-x 2 runner docker  4096 Jul 25 14:54 papers\n-rw-r--r-- 1 runner docker 37445 Jul 25 14:55 ra-checking.html\n-rw-r--r-- 1 runner docker  8017 Jul 25 14:54 ra-checking.qmd\n-rw-r--r-- 1 runner docker 47525 Jul 25 14:55 revealjs_02a_representation.qmd.html\n-rw-r--r-- 1 runner docker 53509 Jul 25 14:55 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 76191 Jul 25 14:55 revealjs_06_ssa.qmd.html\n-rw-r--r-- 1 runner docker 33153 Jul 25 14:55 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 48954 Jul 25 14:55 revealjs_ra-checking.qmd.html"
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 708\n-rw-r--r-- 1 runner docker  8468 Jul 25 16:51 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3632 Jul 25 16:51 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 39165 Jul 25 16:52 02a_representation.html\n-rw-r--r-- 1 runner docker  7445 Jul 25 16:51 02a_representation.qmd\n-rw-r--r-- 1 runner docker 11870 Jul 25 16:51 02b_bril.qmd\n-rw-r--r-- 1 runner docker 20635 Jul 25 16:52 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  6970 Jul 25 16:51 03_local.qmd\n-rw-r--r-- 1 runner docker  7883 Jul 25 16:51 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 43947 Jul 25 16:52 04_data_flow.html\n-rw-r--r-- 1 runner docker 10538 Jul 25 16:51 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9950 Jul 25 16:51 05_global.qmd\n-rw-r--r-- 1 runner docker  4856 Jul 25 16:51 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3129 Jul 25 16:51 05c_pre.qmd\n-rw-r--r-- 1 runner docker 76433 Jul 25 16:52 06_ssa.html\n-rw-r--r-- 1 runner docker 16394 Jul 25 16:51 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Jul 25 16:51 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5672 Jul 25 16:51 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 14017 Jul 25 16:51 09_poly.qmd\n-rw-r--r-- 1 runner docker   283 Jul 25 16:51 100_mlir.qmd\n-rw-r--r-- 1 runner docker 20103 Jul 25 16:52 110_whole_program.html\n-rw-r--r-- 1 runner docker   301 Jul 25 16:51 110_whole_program.qmd\n-rw-r--r-- 1 runner docker   297 Jul 25 16:51 12_memory.qmd\n-rw-r--r-- 1 runner docker 16058 Jul 25 16:51 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10097 Jul 25 16:51 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4595 Jul 25 16:51 errors\ndrwxr-xr-x 2 runner docker  4096 Jul 25 16:51 images\ndrwxr-xr-x 2 runner docker  4096 Jul 25 16:51 papers\n-rw-r--r-- 1 runner docker 38227 Jul 25 16:52 ra-checking.html\n-rw-r--r-- 1 runner docker  8207 Jul 25 16:51 ra-checking.qmd\n-rw-r--r-- 1 runner docker 46253 Jul 25 16:52 revealjs_02a_representation.qmd.html\n-rw-r--r-- 1 runner docker 46472 Jul 25 16:52 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 56558 Jul 25 16:52 revealjs_06_ssa.qmd.html\n-rw-r--r-- 1 runner docker 33153 Jul 25 16:52 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 43792 Jul 25 16:52 revealjs_ra-checking.qmd.html"
   },
   {
     "objectID": "lectures/02b_bril.html#print-the-blocks",
@@ -1733,7 +1733,7 @@
     "href": "lectures/02b_bril.html#graph",
     "title": "Overview of Bril",
     "section": "graph",
-    "text": "graph\n\ngraph TD\ngen_bk_0--&gt; somewhere\ngen_bk_1 --&gt; somewhere\n\n\n\n\ngraph TD\ngen_bk_0--&gt; somewhere\ngen_bk_1 --&gt; somewhere"
+    "text": "graph\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\ngen_bk_0--&gt; somewhere\ngen_bk_1 --&gt; somewhere\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\ngen_bk_0--&gt; somewhere\ngen_bk_1 --&gt; somewhere"
   },
   {
     "objectID": "lectures/revealjs_02b_bril.qmd.html#how-to-use-bril-with-real-code",
@@ -1866,14 +1866,7 @@
     "href": "lectures/revealjs_02b_bril.qmd.html#as-a-test-lets-print-out-the-blocks",
     "title": "Overview of Bril",
     "section": "as a test, lets print out the blocks",
-    "text": "as a test, lets print out the blocks\n\ndef print_blocks(bril):\n    \"\"\"Given a Bril program, print out its basic blocks.\n    \"\"\"\n\n\n    func = bril['functions'][0]  # We only process one function.\n    for block in form_blocks(func['instrs']):\n        # Mark the block.\n        leader = block[0]\n        if 'label' in leader:\n            print( f\"block {leader['label']}\")\n            block = block[1:]  # Hide the label\n        else:\n            print('anonymous block:')\n\n        # Print the instructions.\n        for instr in block:\n            print(instr)\n\nprint_blocks(bril_program)\n\n\nthis test program has one block so pretty easy"
-  },
-  {
-    "objectID": "lectures/revealjs_02b_bril.qmd.html#as-a-test-lets-print-out-the-blocks-output",
-    "href": "lectures/revealjs_02b_bril.qmd.html#as-a-test-lets-print-out-the-blocks-output",
-    "title": "Overview of Bril",
-    "section": "as a test, lets print out the blocks",
-    "text": "as a test, lets print out the blocks\n\nanonymous block:\n{'op': 'const', 'type': 'int', 'dest': 'v0', 'value': 1}\n{'op': 'const', 'type': 'int', 'dest': 'v1', 'value': 2}\n{'op': 'add', 'type': 'int', 'dest': 'v2', 'args': ['v0', 'v1']}\n{'op': 'print', 'args': ['v2']}"
+    "text": "as a test, lets print out the blocks\n\n\nanonymous block:\n{'op': 'const', 'type': 'int', 'dest': 'v0', 'value': 1}\n{'op': 'const', 'type': 'int', 'dest': 'v1', 'value': 2}\n{'op': 'add', 'type': 'int', 'dest': 'v2', 'args': ['v0', 'v1']}\n{'op': 'print', 'args': ['v2']}\n\n\nthis test program has one block so pretty easy"
   },
   {
     "objectID": "lectures/revealjs_02b_bril.qmd.html#lets-try-a-second-example-with-a-jmp",
@@ -1894,21 +1887,14 @@
     "href": "lectures/revealjs_02b_bril.qmd.html#print-the-blocks",
     "title": "Overview of Bril",
     "section": "print the blocks",
-    "text": "print the blocks\n\nimport json \nimport os\nimport subprocess\n\nresult =  subprocess.check_output('bril2json &lt; images/jmp.bril', shell=True)\ntest2json = json.loads(result)\nprint_blocks(test2json)\n\n\n\nanonymous block:\n{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 4}\n{'labels': ['somewhere'], 'op': 'jmp'}\nanonymous block:\n{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 2}\nblock somewhere\n{'args': ['v'], 'op': 'print'}"
+    "text": "print the blocks\n\n\nanonymous block:\n{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 4}\n{'labels': ['somewhere'], 'op': 'jmp'}\nanonymous block:\n{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 2}\nblock somewhere\n{'args': ['v'], 'op': 'print'}"
   },
   {
     "objectID": "lectures/revealjs_02b_bril.qmd.html#the-map-label-names-to-blocks",
     "href": "lectures/revealjs_02b_bril.qmd.html#the-map-label-names-to-blocks",
     "title": "Overview of Bril",
     "section": "the map (label names to blocks)",
-    "text": "the map (label names to blocks)\n\nfrom collections import OrderedDict\n\n\ndef block_map(blocks):\n    \"\"\"Given a sequence of basic blocks, which are lists of instructions,\n    produce a `OrderedDict` mapping names to blocks.\n\n    The name of the block comes from the label it starts with, if any.\n    Anonymous blocks, which don't start with a label, get an\n    automatically generated name. Blocks in the mapping have their\n    labels removed.\n    \"\"\"\n    by_name = OrderedDict()\n\n    for block in blocks:\n        # Generate a name for the block.\n        if 'label' in block[0]:\n            # The block has a label. Remove the label but use it for the\n            # block's name.\n            name = block[0]['label']\n            block = block[1:]\n        else:\n            # Make up a new name for this anonymous block.\n            name = f'gen_bk_{len(by_name)}'\n\n        # Add the block to the mapping.\n        by_name[name] = block\n\n    return by_name\n\n\nblks = form_blocks(test2json['functions'][0]['instrs'])\nod = block_map(blks)\nfor (name, instrs) in od.items():\n    print (name, instrs)"
-  },
-  {
-    "objectID": "lectures/revealjs_02b_bril.qmd.html#the-map-label-names-to-blocks-output",
-    "href": "lectures/revealjs_02b_bril.qmd.html#the-map-label-names-to-blocks-output",
-    "title": "Overview of Bril",
-    "section": "the map (label names to blocks)",
-    "text": "the map (label names to blocks)\n\ngen_bk_0 [{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 4}, {'labels': ['somewhere'], 'op': 'jmp'}]\ngen_bk_1 [{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 2}]\nsomewhere [{'args': ['v'], 'op': 'print'}]"
+    "text": "the map (label names to blocks)\n\n\ngen_bk_0 [{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 4}, {'labels': ['somewhere'], 'op': 'jmp'}]\ngen_bk_1 [{'dest': 'v', 'op': 'const', 'type': 'int', 'value': 2}]\nsomewhere [{'args': ['v'], 'op': 'print'}]"
   },
   {
     "objectID": "lectures/revealjs_02b_bril.qmd.html#the-cfg-given-the-block-map-pseudo-code",
@@ -1922,28 +1908,14 @@
     "href": "lectures/revealjs_02b_bril.qmd.html#cfg",
     "title": "Overview of Bril",
     "section": "cfg",
-    "text": "cfg\n\ndef get_cfg(ordered_blocks):\n    cfg = {}\n\n    labels = list(ordered_blocks.keys())\n\n    for i, (block_name, block) in enumerate(ordered_blocks.items()):\n        last = block[-1]\n        op = last['op']\n\n        if op == 'jmp':\n            cfg[block_name] = last['labels']\n        elif op == 'br':\n            cfg[block_name] = last['labels']\n        else:\n            if i+1 &lt; len(labels):  # last block does not fall through\n                cfg[block_name] = [labels[i+1]]\n            else:\n                cfg[block_name] = []\n    return cfg\n\n\nblks = form_blocks(test2json['functions'][0]['instrs'])\nod = block_map(blks)\ncfg = get_cfg(od)\n\nprint(cfg)"
-  },
-  {
-    "objectID": "lectures/revealjs_02b_bril.qmd.html#cfg-output",
-    "href": "lectures/revealjs_02b_bril.qmd.html#cfg-output",
-    "title": "Overview of Bril",
-    "section": "cfg",
-    "text": "cfg\n\n{'gen_bk_0': ['somewhere'], 'gen_bk_1': ['somewhere'], 'somewhere': []}"
+    "text": "cfg\n\n\n{'gen_bk_0': ['somewhere'], 'gen_bk_1': ['somewhere'], 'somewhere': []}"
   },
   {
     "objectID": "lectures/revealjs_02b_bril.qmd.html#graph",
     "href": "lectures/revealjs_02b_bril.qmd.html#graph",
     "title": "Overview of Bril",
     "section": "graph",
-    "text": "graph\n\ngraph TD\ngen_bk_0--&gt; somewhere\ngen_bk_1 --&gt; somewhere"
-  },
-  {
-    "objectID": "lectures/revealjs_02b_bril.qmd.html#graph-output",
-    "href": "lectures/revealjs_02b_bril.qmd.html#graph-output",
-    "title": "Overview of Bril",
-    "section": "graph",
-    "text": "graph\n\n\n\n\ngraph TD\ngen_bk_0--&gt; somewhere\ngen_bk_1 --&gt; somewhere"
+    "text": "graph\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\ngen_bk_0--&gt; somewhere\ngen_bk_1 --&gt; somewhere"
   },
   {
     "objectID": "lectures/02a_representation.html",
@@ -2013,21 +1985,21 @@
     "href": "lectures/02a_representation.html#example-one",
     "title": "Representation of programs",
     "section": "Example one",
-    "text": "Example one\n@main {\n    v: int = const 5;\n    print v;\n}\n. . .\n\nflowchart LR\nA[const] --&gt; B[print]\n\n\n\n\nflowchart LR\nA[const] --&gt; B[print]"
+    "text": "Example one\n@main {\n    v: int = const 5;\n    print v;\n}\n. . .\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 10\n%%| fig-height: 9\n\nflowchart LR\nA[const] --&gt; B[print]\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 10\n%%| fig-height: 9\n\nflowchart LR\nA[const] --&gt; B[print]"
   },
   {
     "objectID": "lectures/02a_representation.html#second-example",
     "href": "lectures/02a_representation.html#second-example",
     "title": "Representation of programs",
     "section": "second example",
-    "text": "second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\n. . .\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\n. . .\nnotice label does not produce a node\nEasy to see a dead instruction."
+    "text": "second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\n. . .\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 6.5\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 6.5\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\n. . .\nnotice label does not produce a node\nEasy to see a dead instruction."
   },
   {
     "objectID": "lectures/02a_representation.html#third-example",
     "href": "lectures/02a_representation.html#third-example",
     "title": "Representation of programs",
     "section": "Third example:",
-    "text": "Third example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n. . .\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\n. . .\nwhich is the true edge and which is the false edge , could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside."
+    "text": "Third example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n. . .\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 6.5\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 6.5\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\n. . .\nwhich is the true edge and which is the false edge , could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside."
   },
   {
     "objectID": "lectures/02a_representation.html#cfg-cfg-form-2",
@@ -2118,21 +2090,21 @@
     "href": "lectures/revealjs_02a_representation.qmd.html#example-one",
     "title": "Representation of programs",
     "section": "Example one",
-    "text": "Example one\n@main {\n    v: int = const 5;\n    print v;\n}\n\n\nflowchart LR\nA[const] --&gt; B[print]\n\n\n\n\nflowchart LR\nA[const] --&gt; B[print]"
+    "text": "Example one\n@main {\n    v: int = const 5;\n    print v;\n}\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 10\n%%| fig-height: 9\n\nflowchart LR\nA[const] --&gt; B[print]"
   },
   {
     "objectID": "lectures/revealjs_02a_representation.qmd.html#second-example",
     "href": "lectures/revealjs_02a_representation.qmd.html#second-example",
     "title": "Representation of programs",
     "section": "second example",
-    "text": "second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\n\n\nnotice label does not produce a node\nEasy to see a dead instruction."
+    "text": "second example\n    @main {\n        v: int = const 4;\n        jmp  .somewhere;\n        v: int = const 2;\n        .somewhere;\n        print v;\n    }\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 6.5\nflowchart LR\n  A[const 4] --&gt; B[jmp]\n  B --&gt; C[print]\n  D[const 2] --&gt; C\n\n\n\n\n\n\n\n\nnotice label does not produce a node\nEasy to see a dead instruction."
   },
   {
     "objectID": "lectures/revealjs_02a_representation.qmd.html#third-example",
     "href": "lectures/revealjs_02a_representation.qmd.html#third-example",
     "title": "Representation of programs",
     "section": "Third example:",
-    "text": "Third example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\n\n\nwhich is the true edge and which is the false edge , could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside."
+    "text": "Third example:\n    @main {\n        v: int = const 4;\n        b: bool = const false;\n        br b .there .here;\n    .here:\n        v: int = const 2;\n    .there;\n        print v;\n    }\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| fig-width: 6.5\nflowchart LR\n  A[v: int const 4] --&gt; B[b: bool const false]\n  B --&gt; C[br b .there, .false]\n  C --&gt; D[v: const 2]\n  C --&gt; E[print v]\n  D --&gt; E\n\n\n\n\n\n\n\n\nwhich is the true edge and which is the false edge , could mark the edges or use a convention\nWhich is the entry, which is the exit?\nThere is a long chain of instructions entered at the top, exit at the bottom, no branches inside."
   },
   {
     "objectID": "lectures/revealjs_02a_representation.qmd.html#cfg-cfg-form-2",
@@ -2321,14 +2293,14 @@
     "href": "lectures/06_ssa.html#what-is-the-dominator-tree",
     "title": "Static Single Assignment",
     "section": "What is the dominator tree?",
-    "text": "What is the dominator tree?\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
+    "text": "What is the dominator tree?\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
   },
   {
     "objectID": "lectures/06_ssa.html#dominance-frontiers",
     "href": "lectures/06_ssa.html#dominance-frontiers",
     "title": "Static Single Assignment",
     "section": "dominance frontiers",
-    "text": "dominance frontiers\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3 \n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3 \n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
+    "text": "dominance frontiers\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3 \n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3 \n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
   },
   {
     "objectID": "lectures/06_ssa.html#add-phi-nodes",
@@ -2447,7 +2419,7 @@
     "href": "lectures/revealjs_06_ssa.qmd.html#an-example",
     "title": "Static Single Assignment",
     "section": "an example",
-    "text": "an example\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\"0: i = 0\n    1: s = 0\"]\nB1[\"2: x = m\n    3: s = s + x\n    4: i = i +4\n    5: if i &lt; n go to B0\"]\nB0 --&gt; B1\nB1 --&gt; B1\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\"0: i = 0\n    1: s = 0\"]\nB1[\"2: x = m\n    3: s = s + x\n    4: i = i +4\n    5: if i &lt; n go to B0\"]\nB0 --&gt; B1\nB1 --&gt; B1\n\n\n\n\n\n\nvariable i has two static assignments 0 and 4, so this program is not in SSA\nVariable s has two static assignments, x has one static assignment but x has lots of dynamic assignments (when the program executes)"
+    "text": "an example\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\"0: i = 0\n    1: s = 0\"]\nB1[\"2: x = m\n    3: s = s + x\n    4: i = i +4\n    5: if i &lt; n go to B0\"]\nB0 --&gt; B1\nB1 --&gt; B1\n\n\n\n\n\n\nvariable i has two static assignments 0 and 4, so this program is not in SSA\nVariable s has two static assignments, x has one static assignment but x has lots of dynamic assignments (when the program executes)"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#straight-line-code",
@@ -2468,7 +2440,7 @@
     "href": "lectures/revealjs_06_ssa.qmd.html#phi-nodes",
     "title": "Static Single Assignment",
     "section": "phi-Nodes",
-    "text": "phi-Nodes\nJust renaming assignments will quickly run into problems. Consider this program:\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\".b0\n    a: int = const 47;\n    br cond .left .right;\"]\nleft[\"a: int = add a a;\n    jmp .exit;\"]\nright[\"a: int = mul a a;\n        jmp .exit;\"]\nexit[\"print a;\"]\nB0 --&gt; left\nB0 --&gt; right\nleft --&gt; exit\nright --&gt; exit\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\".b0\n    a: int = const 47;\n    br cond .left .right;\"]\nleft[\"a: int = add a a;\n    jmp .exit;\"]\nright[\"a: int = mul a a;\n        jmp .exit;\"]\nexit[\"print a;\"]\nB0 --&gt; left\nB0 --&gt; right\nleft --&gt; exit\nright --&gt; exit\n\n\n\n\n\n\nWhich “version” of a should we use in the print statement?"
+    "text": "phi-Nodes\nJust renaming assignments will quickly run into problems. Consider this program:\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\".b0\n    a: int = const 47;\n    br cond .left .right;\"]\nleft[\"a: int = add a a;\n    jmp .exit;\"]\nright[\"a: int = mul a a;\n        jmp .exit;\"]\nexit[\"print a;\"]\nB0 --&gt; left\nB0 --&gt; right\nleft --&gt; exit\nright --&gt; exit\n\n\n\n\n\n\nWhich “version” of a should we use in the print statement?"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#phi-nodes-1",
@@ -2510,14 +2482,14 @@
     "href": "lectures/revealjs_06_ssa.qmd.html#an-example-1",
     "title": "Static Single Assignment",
     "section": "an example",
-    "text": "an example\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n\n\nwe cannot put instructions on edges, but we can add to prev block"
+    "text": "an example\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n\n\nwe cannot put instructions on edges, but we can add to prev block"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#critical-edges",
     "href": "lectures/revealjs_06_ssa.qmd.html#critical-edges",
     "title": "Static Single Assignment",
     "section": "critical edges",
-    "text": "critical edges\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n\n\nb2 = b0?\n\nThe placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop"
+    "text": "critical edges\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n\n\nb2 = b0?\n\nThe placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#critical-edge-splitting",
@@ -2531,7 +2503,7 @@
     "href": "lectures/revealjs_06_ssa.qmd.html#converting-to-ssa---very-simple-scheme",
     "title": "Static Single Assignment",
     "section": "Converting to SSA - Very simple scheme",
-    "text": "Converting to SSA - Very simple scheme\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n\nWhere do we need phi-functions?\nWhich variables\n\nAt the merge (join) node\nb"
+    "text": "Converting to SSA - Very simple scheme\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n\nWhere do we need phi-functions?\nWhich variables\n\nAt the merge (join) node\nb"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#scheme",
@@ -2573,21 +2545,21 @@
     "href": "lectures/revealjs_06_ssa.qmd.html#what-is-the-dominator-tree",
     "title": "Static Single Assignment",
     "section": "What is the dominator tree?",
-    "text": "What is the dominator tree?\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
+    "text": "What is the dominator tree?\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#dominance-frontiers",
     "href": "lectures/revealjs_06_ssa.qmd.html#dominance-frontiers",
     "title": "Static Single Assignment",
     "section": "dominance frontiers",
-    "text": "dominance frontiers\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3 \n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3 \n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7\n\n\n\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
+    "text": "dominance frontiers\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3 \n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 -.-&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB \nL0 --&gt; L3 \nL3--&gt; L4\nL3 --&gt; L10\nL4--&gt; L5 \nL4 --&gt; L9\nL4 --&gt; L7"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#add-phi-nodes",
     "href": "lectures/revealjs_06_ssa.qmd.html#add-phi-nodes",
     "title": "Static Single Assignment",
     "section": "add phi nodes",
-    "text": "add phi nodes\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"j = phi(j,j) \n    k = phi(k,k) \n   L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[\"j = phi(j,j)\n   k = phi(k,k)\n  L9: goto l3\"]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"j = phi(j,j) \n    k = phi(k,k) \n   L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[\"j = phi(j,j)\n   k = phi(k,k)\n  L9: goto l3\"]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3"
+    "text": "add phi nodes\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"j = phi(j,j) \n    k = phi(k,k) \n   L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[\"j = phi(j,j)\n   k = phi(k,k)\n  L9: goto l3\"]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\nL5 --&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#the-arity-of-phi-functions",
@@ -3509,7 +3481,7 @@
     "href": "lectures/revealjs_ra-checking.qmd.html#best-we-can-do-is-generate-lots-of-programs-check-each-one",
     "title": "Testing Register allocators",
     "section": "best we can do is generate lots of programs check each one",
-    "text": "best we can do is generate lots of programs check each one\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n\n\nWe could use the fuzzer to generate random programs or we could use a test set"
+    "text": "best we can do is generate lots of programs check each one\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n\n\nWe could use the fuzzer to generate random programs or we could use a test set"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#algorithm-linear-in-number-of-instructions",
@@ -3537,7 +3509,7 @@
     "href": "lectures/revealjs_ra-checking.qmd.html#control-flow",
     "title": "Testing Register allocators",
     "section": "control flow",
-    "text": "control flow\nWe can use data flow and a lattice\nhere is the lattice\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E\n\n\n\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E"
+    "text": "control flow\nWe can use data flow and a lattice\nhere is the lattice\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#now-for-the-data-flow",
@@ -3551,7 +3523,7 @@
     "href": "lectures/revealjs_ra-checking.qmd.html#how-about-an-example",
     "title": "Testing Register allocators",
     "section": "How about an example:",
-    "text": "How about an example:\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n\n\nat the top of C, we see that physical p0 is conflicted -\nbut that is not a error\nafter the reload we find it contains v2"
+    "text": "How about an example:\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n\n\nat the top of C, we see that physical p0 is conflicted -\nbut that is not a error\nafter the reload we find it contains v2"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#tracing-pointers--",
@@ -3621,7 +3593,7 @@
     "href": "lectures/ra-checking.html#best-we-can-do-is-generate-lots-of-programs-check-each-one",
     "title": "Testing Register allocators",
     "section": "best we can do is generate lots of programs check each one",
-    "text": "best we can do is generate lots of programs check each one\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n\n\nWe could use the fuzzer to generate random programs or we could use a test set"
+    "text": "best we can do is generate lots of programs check each one\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n\n\nWe could use the fuzzer to generate random programs or we could use a test set"
   },
   {
     "objectID": "lectures/ra-checking.html#algorithm-linear-in-number-of-instructions",
@@ -3649,7 +3621,7 @@
     "href": "lectures/ra-checking.html#control-flow",
     "title": "Testing Register allocators",
     "section": "control flow",
-    "text": "control flow\nWe can use data flow and a lattice\nhere is the lattice\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E\n\n\n\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E"
+    "text": "control flow\nWe can use data flow and a lattice\nhere is the lattice\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E"
   },
   {
     "objectID": "lectures/ra-checking.html#now-for-the-data-flow",
@@ -3663,7 +3635,7 @@
     "href": "lectures/ra-checking.html#how-about-an-example",
     "title": "Testing Register allocators",
     "section": "How about an example:",
-    "text": "How about an example:\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n\n\nat the top of C, we see that physical p0 is conflicted -\nbut that is not a error\nafter the reload we find it contains v2"
+    "text": "How about an example:\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n\n\nat the top of C, we see that physical p0 is conflicted -\nbut that is not a error\nafter the reload we find it contains v2"
   },
   {
     "objectID": "lectures/ra-checking.html#tracing-pointers--",
@@ -3684,7 +3656,7 @@
     "href": "lectures/revealjs_04_data_flow.qmd.html#example",
     "title": "Data Flow",
     "section": "example",
-    "text": "example\n\n\n     main(cond)\n     a int = const 47\n     b :int = const 42\n     br cond .left .right\n    .left\n     b: int = const 1\n     c:int = const 5 \n    jmp .end\n   .right\n     a :int = const 2\n     c: int = const 10\n   jmp .end\n   .end\n    d: int sub  a b\n    print d\n    ret\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D"
+    "text": "example\n\n\n     main(cond)\n     a int = const 47\n     b :int = const 42\n     br cond .left .right\n    .left\n     b: int = const 1\n     c:int = const 5 \n    jmp .end\n   .right\n     a :int = const 2\n     c: int = const 10\n   jmp .end\n   .end\n    d: int sub  a b\n    print d\n    ret\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D"
   },
   {
     "objectID": "lectures/revealjs_04_data_flow.qmd.html#first-we-are-going-to-look-at-a-specific-problem-reaching-definitions",
@@ -3817,7 +3789,7 @@
     "href": "lectures/04_data_flow.html#example",
     "title": "Data Flow",
     "section": "example",
-    "text": "example\n\n\n     main(cond)\n     a int = const 47\n     b :int = const 42\n     br cond .left .right\n    .left\n     b: int = const 1\n     c:int = const 5 \n    jmp .end\n   .right\n     a :int = const 2\n     c: int = const 10\n   jmp .end\n   .end\n    d: int sub  a b\n    print d\n    ret\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D"
+    "text": "example\n\n\n     main(cond)\n     a int = const 47\n     b :int = const 42\n     br cond .left .right\n    .left\n     b: int = const 1\n     c:int = const 5 \n    jmp .end\n   .right\n     a :int = const 2\n     c: int = const 10\n   jmp .end\n   .end\n    d: int sub  a b\n    print d\n    ret\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \n     A[\"1: main cond\\n2: a int = const 47\\n3: b :int = const 42\\n4:br cond left .right\"] \n   \n   B[\"5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A  -- true --&gt; B\n    A  --false --&gt; C\n    B --&gt; D\n    C --&gt; D"
   },
   {
     "objectID": "lectures/04_data_flow.html#first-we-are-going-to-look-at-a-specific-problem-reaching-definitions",
@@ -3845,7 +3817,7 @@
     "href": "lectures/04_data_flow.html#a-program-point-is-an-instruction",
     "title": "Data Flow",
     "section": "A program point is an instruction",
-    "text": "A program point is an instruction\nA definition of a variable v reaches just after a program point p if and only if:\n\nthe definition reaches the point just before p\nthe variable v is not redefined at p\n\nor\n\nthe variable v is defined at p.\n\n\nWhat about multiple predecessors? p is the first instruction of a block with multiple preds.\nIf a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.\nThis is a union operation.\nWe are moving information down from definition. This is called forward propagation\n\nDefine two sets IN and OUT that hold definitions\nIN is the set of definitions that reach a point immediately before p\nOUT is the set of definitions that reach a point immediately after p\n\nTo illustrate this, I”ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \nA_IN[\"A_IN={}\"]\nA_OUT[\"A_OUT={(cond,1),(a,2),(b,3)}\"]\n\nB_IN[\"B_IN={(cond,1),(a,2),(b,3)}\"]\nB_OUT[\"B_OUT={(cond,1),(a,2),(b,5),(c,6)}\"]\n\nC_IN[\"IN={(cond,1),(a,2),(b,3)}\"]\nC_OUT[\"OUT={(cond,1),(a,8),(b,3,(c,9)}\"]\n\nD_IN[\"IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}\"]\n \n  A[\"blk a\n    1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"blk b\n   5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"blk c\n     8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A_IN --&gt; A \n    A --&gt; A_OUT\n    A_OUT  -- true --&gt; B_IN\n    B_IN --&gt; B\n    B --&gt; B_OUT\n    A_OUT --false --&gt; C_IN\n    C_IN --&gt; C\n    C--&gt;   C_OUT\n    B_OUT--&gt; D_IN\n    C_OUT--&gt; D_IN\n    D_IN --&gt; D\n\n\n\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \nA_IN[\"A_IN={}\"]\nA_OUT[\"A_OUT={(cond,1),(a,2),(b,3)}\"]\n\nB_IN[\"B_IN={(cond,1),(a,2),(b,3)}\"]\nB_OUT[\"B_OUT={(cond,1),(a,2),(b,5),(c,6)}\"]\n\nC_IN[\"IN={(cond,1),(a,2),(b,3)}\"]\nC_OUT[\"OUT={(cond,1),(a,8),(b,3,(c,9)}\"]\n\nD_IN[\"IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}\"]\n \n  A[\"blk a\n    1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"blk b\n   5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"blk c\n     8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A_IN --&gt; A \n    A --&gt; A_OUT\n    A_OUT  -- true --&gt; B_IN\n    B_IN --&gt; B\n    B --&gt; B_OUT\n    A_OUT --false --&gt; C_IN\n    C_IN --&gt; C\n    C--&gt;   C_OUT\n    B_OUT--&gt; D_IN\n    C_OUT--&gt; D_IN\n    D_IN --&gt; D"
+    "text": "A program point is an instruction\nA definition of a variable v reaches just after a program point p if and only if:\n\nthe definition reaches the point just before p\nthe variable v is not redefined at p\n\nor\n\nthe variable v is defined at p.\n\n\nWhat about multiple predecessors? p is the first instruction of a block with multiple preds.\nIf a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.\nThis is a union operation.\nWe are moving information down from definition. This is called forward propagation\n\nDefine two sets IN and OUT that hold definitions\nIN is the set of definitions that reach a point immediately before p\nOUT is the set of definitions that reach a point immediately after p\n\nTo illustrate this, I”ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \nA_IN[\"A_IN={}\"]\nA_OUT[\"A_OUT={(cond,1),(a,2),(b,3)}\"]\n\nB_IN[\"B_IN={(cond,1),(a,2),(b,3)}\"]\nB_OUT[\"B_OUT={(cond,1),(a,2),(b,5),(c,6)}\"]\n\nC_IN[\"IN={(cond,1),(a,2),(b,3)}\"]\nC_OUT[\"OUT={(cond,1),(a,8),(b,3,(c,9)}\"]\n\nD_IN[\"IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}\"]\n \n  A[\"blk a\n    1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"blk b\n   5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"blk c\n     8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A_IN --&gt; A \n    A --&gt; A_OUT\n    A_OUT  -- true --&gt; B_IN\n    B_IN --&gt; B\n    B --&gt; B_OUT\n    A_OUT --false --&gt; C_IN\n    C_IN --&gt; C\n    C--&gt;   C_OUT\n    B_OUT--&gt; D_IN\n    C_OUT--&gt; D_IN\n    D_IN --&gt; D\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nstyle A text-align: left\nstyle B  text-align: left\n%% nodes \nA_IN[\"A_IN={}\"]\nA_OUT[\"A_OUT={(cond,1),(a,2),(b,3)}\"]\n\nB_IN[\"B_IN={(cond,1),(a,2),(b,3)}\"]\nB_OUT[\"B_OUT={(cond,1),(a,2),(b,5),(c,6)}\"]\n\nC_IN[\"IN={(cond,1),(a,2),(b,3)}\"]\nC_OUT[\"OUT={(cond,1),(a,8),(b,3,(c,9)}\"]\n\nD_IN[\"IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}\"]\n \n  A[\"blk a\n    1: main cond\n   2: a int = const 47\n   3: b :int = const 42\n   4:br cond .left .right\"] \n   \n   B[\"blk b\n   5: b: int = const 1\n   6 c:int = const 5 \n   7 jmp .end\"]\n  \n   C[\"blk c\n     8: a :int = const 2\n   9: c: int = const 10\n   10 jmp .end\"]\n    D[\"11: d: int sub  a b\n    12 print d\n    13 ret\"]\n%% edges\n    A_IN --&gt; A \n    A --&gt; A_OUT\n    A_OUT  -- true --&gt; B_IN\n    B_IN --&gt; B\n    B --&gt; B_OUT\n    A_OUT --false --&gt; C_IN\n    C_IN --&gt; C\n    C--&gt;   C_OUT\n    B_OUT--&gt; D_IN\n    C_OUT--&gt; D_IN\n    D_IN --&gt; D"
   },
   {
     "objectID": "lectures/04_data_flow.html#calculate-in-and-out",
@@ -4132,7 +4104,7 @@
     "href": "lectures/revealjs_05b_licm.qmd.html#step-2",
     "title": "loop invariant code motion",
     "section": "step 2",
-    "text": "step 2\nwhen is ok to move an instr? We call this safe to move.\n\n\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\ncan we move n = 2\n\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\n\nall uses of the variable dest in the loop, must come from this instr The basic block containing instr must execute every time around the loop\nmore formally\n\nthe def must dominate all the uses\nno other defs of the same variable\ndef dominates all the loop exits"
+    "text": "step 2\nwhen is ok to move an instr? We call this safe to move.\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\ncan we move n = 2\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\n\nall uses of the variable dest in the loop, must come from this instr The basic block containing instr must execute every time around the loop\nmore formally\n\nthe def must dominate all the uses\nno other defs of the same variable\ndef dominates all the loop exits"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#zero-trip-count-loops",
@@ -4146,7 +4118,7 @@
     "href": "lectures/revealjs_05b_licm.qmd.html#how-about-an-example",
     "title": "loop invariant code motion",
     "section": "How about an example:",
-    "text": "How about an example:\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n    graph  LR;\nB1[\"B1:\n     1: b = 2\n     2: i = 1\"]\n\nB2[\"b2:\n   i lessthen 100\"]\nB3[\"B3:\n   3: a = b+1\n   4: c = 2\n   i mod 2 == 0\"]\nB4[\"b4: \n    5: d = a + d \n    6: e = 1 +d\"]\nB5[\"B5:\n    7: d= -c\n    8: f = 1+a\"]\nB6[\"B6:\n  9: i = i + 1\n     a lessthen 2\"]\nEntry --&gt; B1\nB1--&gt; B2\nB2 -- y --&gt;exit;\nB2 --n --&gt; B3\nB3 --y --&gt; B4\nB3 --n --&gt; B5\nB4--&gt; B6\nB5 --&gt; B6\nB6 --y --&gt; exit\nB6 --n --&gt; B2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n    graph  LR;\nB1[\"B1:\n     1: b = 2\n     2: i = 1\"]\n\nB2[\"b2:\n   i lessthen 100\"]\nB3[\"B3:\n   3: a = b+1\n   4: c = 2\n   i mod 2 == 0\"]\nB4[\"b4: \n    5: d = a + d \n    6: e = 1 +d\"]\nB5[\"B5:\n    7: d= -c\n    8: f = 1+a\"]\nB6[\"B6:\n  9: i = i + 1\n     a lessthen 2\"]\nEntry --&gt; B1\nB1--&gt; B2\nB2 -- y --&gt;exit;\nB2 --n --&gt; B3\nB3 --y --&gt; B4\nB3 --n --&gt; B5\nB4--&gt; B6\nB5 --&gt; B6\nB6 --y --&gt; exit\nB6 --n --&gt; B2\n\n\n\n\n\n\nsteps\n\n\n\ncreate pre header\n\n\n\n\nb2.1 not loop invar (i &lt; 100) i reached by def outside of loop\n\n\n\n\nb3.3 loop inv ( a = b+1) b only def outside of the loop\n\n\n\n\nb3.4 loop inv (c =2) 2 is a constant\n\n\n\n\nb3.cond (i mod 2 ==0 ) not loop inv\n\n\n\n\nb4.5 (d = a +d ) not loop inv a is but not d\n\n\n\n\nb4.6 (e = 1 + d ) not loop inver\n\n\n\n\nb5.7 (d = -c ) not loop inv other def of d\n\n\n\n\nb5.8 (f = 1 +a) loop invar\n\n\n\n\nb6.9 not loop inv\n\n\n\n\nb6.cond loop inv\n\n\n\nchanged two instructions to loop invar\n\n\nrepeat"
+    "text": "How about an example:\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n    graph  LR;\nB1[\"B1:\n     1: b = 2\n     2: i = 1\"]\n\nB2[\"b2:\n   i lessthen 100\"]\nB3[\"B3:\n   3: a = b+1\n   4: c = 2\n   i mod 2 == 0\"]\nB4[\"b4: \n    5: d = a + d \n    6: e = 1 +d\"]\nB5[\"B5:\n    7: d= -c\n    8: f = 1+a\"]\nB6[\"B6:\n  9: i = i + 1\n     a lessthen 2\"]\nEntry --&gt; B1\nB1--&gt; B2\nB2 -- y --&gt;exit;\nB2 --n --&gt; B3\nB3 --y --&gt; B4\nB3 --n --&gt; B5\nB4--&gt; B6\nB5 --&gt; B6\nB6 --y --&gt; exit\nB6 --n --&gt; B2\n\n\n\n\n\n\nsteps\n\n\n\ncreate pre header\n\n\n\n\nb2.1 not loop invar (i &lt; 100) i reached by def outside of loop\n\n\n\n\nb3.3 loop inv ( a = b+1) b only def outside of the loop\n\n\n\n\nb3.4 loop inv (c =2) 2 is a constant\n\n\n\n\nb3.cond (i mod 2 ==0 ) not loop inv\n\n\n\n\nb4.5 (d = a +d ) not loop inv a is but not d\n\n\n\n\nb4.6 (e = 1 + d ) not loop inver\n\n\n\n\nb5.7 (d = -c ) not loop inv other def of d\n\n\n\n\nb5.8 (f = 1 +a) loop invar\n\n\n\n\nb6.9 not loop inv\n\n\n\n\nb6.cond loop inv\n\n\n\nchanged two instructions to loop invar\n\n\nrepeat"
   },
   {
     "objectID": "lectures/05b_licm.html",
@@ -4202,7 +4174,7 @@
     "href": "lectures/05b_licm.html#step-2",
     "title": "loop invariant code motion",
     "section": "step 2",
-    "text": "step 2\nwhen is ok to move an instr? We call this safe to move.\n\n\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\ncan we move n = 2\n\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\n\n\nall uses of the variable dest in the loop, must come from this instr The basic block containing instr must execute every time around the loop\nmore formally\n\nthe def must dominate all the uses\nno other defs of the same variable\ndef dominates all the loop exits"
+    "text": "step 2\nwhen is ok to move an instr? We call this safe to move.\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\ncan we move n = 2\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\n\n\nall uses of the variable dest in the loop, must come from this instr The basic block containing instr must execute every time around the loop\nmore formally\n\nthe def must dominate all the uses\nno other defs of the same variable\ndef dominates all the loop exits"
   },
   {
     "objectID": "lectures/05b_licm.html#zero-trip-count-loops",
@@ -4237,7 +4209,7 @@
     "href": "lectures/revealjs_05c_pre.qmd.html#partial-redundancy-elimination",
     "title": "_ partial_redundancy elimination",
     "section": "partial redundancy elimination",
-    "text": "partial redundancy elimination\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[a = b + c]\nb2[\" \"]\nb3[d = b + c]\nb1--&gt; b3\nb2--&gt; b3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[a = b + c]\nb2[\" \"]\nb3[d = b + c]\nb1--&gt; b3\nb2--&gt; b3\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[\"t = b + c\n    a = t\"]\nb2[t = b + c]\nb3[d =t]\nb1--&gt; b3\nb2--&gt; b3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[\"t = b + c\n    a = t\"]\nb2[t = b + c]\nb3[d =t]\nb1--&gt; b3\nb2--&gt; b3"
+    "text": "partial redundancy elimination\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[a = b + c]\nb2[\" \"]\nb3[d = b + c]\nb1--&gt; b3\nb2--&gt; b3\n\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[\"t = b + c\n    a = t\"]\nb2[t = b + c]\nb3[d =t]\nb1--&gt; b3\nb2--&gt; b3"
   },
   {
     "objectID": "lectures/revealjs_05c_pre.qmd.html#simplifications",
@@ -4251,7 +4223,7 @@
     "href": "lectures/revealjs_05c_pre.qmd.html#down-safe",
     "title": "_ partial_redundancy elimination",
     "section": "down safe",
-    "text": "down safe\nwe are moving computations earlier in the cfg\ndon’t move so far that it might not be used, or that an argument gets changed\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[\" \"]\nb2[\" \"]\nb3[b = d + e]\nb4[a = b + c]\nb5[\" \"]\nb6[d = b + c]\nb1 --&gt; b2\nb1 --&gt; b3\nb2 --&gt; b4\nb4 --&gt; b5\nb5 --&gt; b4\nb3 --&gt; b6\nb4 --&gt; exit\nb6 --&gt; exit\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[\" \"]\nb2[\" \"]\nb3[b = d + e]\nb4[a = b + c]\nb5[\" \"]\nb6[d = b + c]\nb1 --&gt; b2\nb1 --&gt; b3\nb2 --&gt; b4\nb4 --&gt; b5\nb5 --&gt; b4\nb3 --&gt; b6\nb4 --&gt; exit\nb6 --&gt; exit\n\n\n\n\n\n\n\n\ncannot move b +c to top, because b changes"
+    "text": "down safe\nwe are moving computations earlier in the cfg\ndon’t move so far that it might not be used, or that an argument gets changed\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[\" \"]\nb2[\" \"]\nb3[b = d + e]\nb4[a = b + c]\nb5[\" \"]\nb6[d = b + c]\nb1 --&gt; b2\nb1 --&gt; b3\nb2 --&gt; b4\nb4 --&gt; b5\nb5 --&gt; b4\nb3 --&gt; b6\nb4 --&gt; exit\nb6 --&gt; exit\n\n\n\n\n\n\n\n\ncannot move b +c to top, because b changes"
   },
   {
     "objectID": "lectures/revealjs_05c_pre.qmd.html#up-safe",
@@ -4265,7 +4237,7 @@
     "href": "lectures/revealjs_05c_pre.qmd.html#placement",
     "title": "_ partial_redundancy elimination",
     "section": "placement",
-    "text": "placement\nwant a down-safe node, that is not up-safe\n\npick the closest to the entry (min number of computations)\npick a later node to lower register pressure\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nA[a: Down-safe]\nB[b+c  :avail]\nC[c: Down-safe]\nD[:avail,Down-safe]\nE[e: Down-safe]\nF[b+c: Down-safe]\nA--&gt;C\nB--&gt;D\nC--&gt; E\nD--&gt; E\nE--&gt; F\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nA[a: Down-safe]\nB[b+c  :avail]\nC[c: Down-safe]\nD[:avail,Down-safe]\nE[e: Down-safe]\nF[b+c: Down-safe]\nA--&gt;C\nB--&gt;D\nC--&gt; E\nD--&gt; E\nE--&gt; F\n\n\n\n\n\n\nWe could move b+c in nodes a,c or e, but e does not help"
+    "text": "placement\nwant a down-safe node, that is not up-safe\n\npick the closest to the entry (min number of computations)\npick a later node to lower register pressure\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nA[a: Down-safe]\nB[b+c  :avail]\nC[c: Down-safe]\nD[:avail,Down-safe]\nE[e: Down-safe]\nF[b+c: Down-safe]\nA--&gt;C\nB--&gt;D\nC--&gt; E\nD--&gt; E\nE--&gt; F\n\n\n\n\n\n\nWe could move b+c in nodes a,c or e, but e does not help"
   },
   {
     "objectID": "lectures/05c_pre.html",

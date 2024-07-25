@@ -28,71 +28,6 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-    /* CSS for syntax highlighting */
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -500,23 +435,13 @@ return vn 5               return vn 5</code></pre>
 <section id="best-we-can-do-is-generate-lots-of-programs-check-each-one" class="slide level2">
 <h2>best we can do is generate lots of programs check each one</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a></a>graph LR</span>
-<span id="cb5-2"><a></a>A[Virtual code]</span>
-<span id="cb5-3"><a></a>B[Register allocator]</span>
-<span id="cb5-4"><a></a>C[Machine code]</span>
-<span id="cb5-5"><a></a>D[Checker]</span>
-<span id="cb5-6"><a></a>E[Fuzzing engine]</span>
-<span id="cb5-7"><a></a>A--&gt; B</span>
-<span id="cb5-8"><a></a>B--&gt; C</span>
-<span id="cb5-9"><a></a>C --&gt; D</span>
-<span id="cb5-10"><a></a>D --&gt; E</span>
-<span id="cb5-11"><a></a>E --&gt; A</span>
-<span id="cb5-12"><a></a>A --&gt; D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph LR
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph LR
 A[Virtual code]
 B[Register allocator]
 C[Machine code]
@@ -575,23 +500,13 @@ A --&gt; D
 <p>We can use data flow and a lattice</p>
 <p>here is the lattice</p>
 <div class="cell" data-reveal="true" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>graph TD</span>
-<span id="cb6-2"><a></a>A[Unknown]</span>
-<span id="cb6-3"><a></a>B[VR0]</span>
-<span id="cb6-4"><a></a>C[VR1]</span>
-<span id="cb6-5"><a></a>D[VR2]</span>
-<span id="cb6-6"><a></a>E[Conflicted]</span>
-<span id="cb6-7"><a></a>A--&gt;B</span>
-<span id="cb6-8"><a></a>A--&gt;C</span>
-<span id="cb6-9"><a></a>A--&gt;D</span>
-<span id="cb6-10"><a></a>B --&gt;E</span>
-<span id="cb6-11"><a></a>C--&gt; E</span>
-<span id="cb6-12"><a></a>D--&gt; E</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph TD
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
 A[Unknown]
 B[VR0]
 C[VR1]
@@ -620,18 +535,13 @@ D--&gt; E
 <section id="how-about-an-example" class="slide level2">
 <h2>How about an example:</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>graph TD</span>
-<span id="cb7-2"><a></a>A[p0-&gt;v1, [sp+4] -&gt; v2]</span>
-<span id="cb7-3"><a></a>B[p0-&gt;v9, [sp+4] -&gt; v2]</span>
-<span id="cb7-4"><a></a>C["top,</span>
-<span id="cb7-5"><a></a>   reload p0 from  [sp+4]]</span>
-<span id="cb7-6"><a></a>A--&gt; C</span>
-<span id="cb7-7"><a></a>B --&gt; C</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph TD
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
 A[p0-&gt;v1, [sp+4] -&gt; v2]
 B[p0-&gt;v9, [sp+4] -&gt; v2]
 C["top,
@@ -712,7 +622,7 @@ but that is not a error</p>
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: false,
+        slideNumber: 'c/t',
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',

@@ -384,7 +384,10 @@
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph LR;
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+%%| echo: false 
+graph LR;
 A[Front end]--IR--&gt; B[Middle end];
 B--IR--&gt; C[Back end];
 A--IR--&gt; C;
@@ -425,7 +428,10 @@ A--IR--&gt; C;
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph LR;
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+%%| echo: false 
+graph LR;
 A[Front end]--IR--&gt; B0[OP0] --IR--&gt; B1[OP1] --IR--&gt; B2[OPT2]--IR --&gt; BN[OPTn]--IR --&gt;C{Back end};
 A--IR--&gt; C;
 </pre>
@@ -447,7 +453,10 @@ A--IR--&gt; C;
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph TB;
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+%%| echo: false 
+graph TB;
 A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[BRIL interpreter];
 </pre>
 </div>
@@ -633,7 +642,7 @@ while hardware computing horsepower doubles every 18 months. How would you prove
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: false,
+        slideNumber: 'c/t',
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',

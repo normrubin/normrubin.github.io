@@ -548,14 +548,17 @@ print(result)</code></pre>
 <span id="cb5-3"><a></a>    print v;</span>
 <span id="cb5-4"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="10" data-fig-height="9" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>flowchart LR</span>
-<span id="cb6-2"><a></a>A[const] --&gt; B[print]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-reveal="true" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+%%| fig-width: 10
+%%| fig-height: 9
+
+flowchart LR
 A[const] --&gt; B[print]
 </pre>
 </div>
@@ -575,16 +578,15 @@ A[const] --&gt; B[print]
         print v;
     }</code></pre>
 <div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="6.5" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>flowchart LR</span>
-<span id="cb8-2"><a></a>  A[const 4] --&gt; B[jmp]</span>
-<span id="cb8-3"><a></a>  B --&gt; C[print]</span>
-<span id="cb8-4"><a></a>  D[const 2] --&gt; C</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-reveal="true" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+%%| fig-width: 6.5
+flowchart LR
   A[const 4] --&gt; B[jmp]
   B --&gt; C[print]
   D[const 2] --&gt; C
@@ -612,18 +614,15 @@ A[const] --&gt; B[print]
         print v;
     }</code></pre>
 <div class="fragment">
-<div class="cell" data-reveal="true" data-fig-width="6.5" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>flowchart LR</span>
-<span id="cb10-2"><a></a>  A[v: int const 4] --&gt; B[b: bool const false]</span>
-<span id="cb10-3"><a></a>  B --&gt; C[br b .there, .false]</span>
-<span id="cb10-4"><a></a>  C --&gt; D[v: const 2]</span>
-<span id="cb10-5"><a></a>  C --&gt; E[print v]</span>
-<span id="cb10-6"><a></a>  D --&gt; E</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-reveal="true" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart LR
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+%%| fig-width: 6.5
+flowchart LR
   A[v: int const 4] --&gt; B[b: bool const false]
   B --&gt; C[br b .there, .false]
   C --&gt; D[v: const 2]
@@ -765,7 +764,7 @@ for block in blocks:
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: false,
+        slideNumber: 'c/t',
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',
