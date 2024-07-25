@@ -6,8 +6,10 @@ format:
   revealjs:
     chalkboard: true
     code-line-numbers: true
+    echo: false
     output-file: revealjs_02a_representation.qmd
     scrollable: true
+    slideNumber: c/t
 sidebar: false
 title: Representation of programs
 
@@ -259,6 +261,8 @@ Representation is a directed graph.
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 %%| fig-width: 10
 %%| fig-height: 9
 
@@ -287,6 +291,8 @@ A[const] --> B[print]
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 %%| fig-width: 6.5
 flowchart LR
   A[const 4] --> B[jmp]
@@ -321,6 +327,8 @@ Easy to see a dead instruction.
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 %%| fig-width: 6.5
 flowchart LR
   A[v: int const 4] --> B[b: bool const false]

@@ -154,6 +154,6 @@ for file in files:
 
             new_contents = '\n'.join(pre) + '\n' + yaml.dump(yaml_template) + '\n' + '\n'.join(post)
 
-            break
+            #break
             with open(file, 'w') as f:
                 f.write(new_contents)

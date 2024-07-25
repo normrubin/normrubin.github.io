@@ -6,8 +6,10 @@ format:
   revealjs:
     chalkboard: true
     code-line-numbers: true
+    echo: false
     output-file: revealjs_05_global.qmd
     scrollable: true
+    slideNumber: c/t
 sidebar: false
 title: 5 Global Analysis
 
@@ -43,6 +45,8 @@ A ***strict dominator*** a sdom b if a dom b and a != b
 A control flow graph
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD;
 n0 --> n1;
 n1 --> n2;
@@ -56,6 +60,8 @@ n3 --> n4;
 The dominator tree
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD;
 n0 --> n1;
 n1 --> n2;n1 --> n3
@@ -72,6 +78,8 @@ n1 --> n4;
 A control flow graph
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD;
 n1 --> n2;
 n2 --> n3;
@@ -87,6 +95,8 @@ n5 --> n2
 Dominator tree
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD;
 n1--> n2
 n2 --> n3
@@ -162,6 +172,8 @@ suppose we have a node in the cfg with two parents, like n4,  if we takes paths 
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD;
 n0 --> n5;
 n0 --> n1;
@@ -179,6 +191,8 @@ n3 --> n8;
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD;
 n0--> n5
 n0 --> n1
@@ -313,6 +327,8 @@ Natural loops:
 ::: {.columns}
 ::: {.column}
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
     graph TD;
     entry --> H1
     H1 --> A
@@ -367,6 +383,8 @@ into one node,
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
     graph TD;
     a0[" "] --> n
 a1[" "] --> n
@@ -377,6 +395,8 @@ n --> b1[" "]
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
     graph TD;
     a0[" "] --> n1
 a1[" "] --> n1
@@ -389,6 +409,8 @@ n2 --> b1[" "]
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
     graph TD;
     a0[" "] --> n
 a1[" "] --> n
@@ -397,6 +419,8 @@ n --> b1[" "]
 ```
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
     graph TD;
     a0[" "] --> n1["n1_n2"]
 a1[" "] --> n1
@@ -425,6 +449,8 @@ n1 --> b1[" "]
 ## simplified control flow 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
     graph TD;
     entry --> switch;
     switch --> case0-7
@@ -475,6 +501,8 @@ goto loop
 :::
 ::: {.column}
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
     graph TD;
     loop--> s1
     loop---> past_loop

@@ -6,8 +6,10 @@ format:
   revealjs:
     chalkboard: true
     code-line-numbers: true
+    echo: false
     output-file: revealjs_05b_licm.qmd
     scrollable: true
+    slideNumber: c/t
 sidebar: false
 title: loop invariant code motion
 
@@ -83,6 +85,8 @@ when is ok to move an instr? We call this ***safe*** to move.
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD
    b1[" n= 0"]
    p["preheader"]
@@ -104,6 +108,8 @@ can we move n = 2
 
 ::: {.column}
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD
   b1[" n= 0"]
    p["preheader"]

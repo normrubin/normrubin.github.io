@@ -6,8 +6,10 @@ format:
   revealjs:
     chalkboard: true
     code-line-numbers: true
+    echo: false
     output-file: revealjs_ra-checking.qmd
     scrollable: true
+    slideNumber: c/t
 sidebar: false
 title: Testing Register allocators
 
@@ -139,6 +141,8 @@ not used in production
 ## best we can do is generate lots of programs check each one 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph LR
 A[Virtual code]
 B[Register allocator]
@@ -209,6 +213,8 @@ We can use data flow  and a lattice
 here is the lattice 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD
 A[Unknown]
 B[VR0]
@@ -238,6 +244,8 @@ like usual we might pick a good order to process basic blocks
 ## How about an example:
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD
 A[p0->v1, [sp+4] -> v2]
 B[p0->v9, [sp+4] -> v2]

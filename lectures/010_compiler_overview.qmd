@@ -6,10 +6,10 @@ format:
   revealjs:
     chalkboard: true
     code-line-numbers: true
+    echo: false
     output-file: revealjs_010_compiler_overview.qmd
     scrollable: true
-    execute: 
-      echo: false 
+    slideNumber: c/t
 sidebar: false
 title: 1 Compiler Overview
 
@@ -73,6 +73,8 @@ Compilers stabilized on a classic structure (using an ir intermediate language).
 1) Back end -  machine specific stuff where machine code is generated
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 %%| echo: false 
 graph LR;
 A[Front end]--IR--> B[Middle end];
@@ -114,6 +116,8 @@ The core of LLVM is the intermediate representation (IR), a low-level programmin
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 %%| echo: false 
 graph LR;
 A[Front end]--IR--> B0[OP0] --IR--> B1[OP1] --IR--> B2[OPT2]--IR --> BN[OPTn]--IR -->C{Back end};
@@ -134,6 +138,8 @@ In this course we are going to an IR call BRIL, which is a very simplified versi
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 %%| echo: false 
 graph TB;
 A[TEXT_Version of BRIL]--> B0[BRIL in JSON] --> B1["new pass"] --> B2[BRIL interpreter];

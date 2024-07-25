@@ -6,8 +6,10 @@ format:
   revealjs:
     chalkboard: true
     code-line-numbers: true
+    echo: false
     output-file: revealjs_06_ssa.qmd
     scrollable: true
+    slideNumber: c/t
 sidebar: false
 title: Static Single Assignment
 
@@ -538,6 +540,8 @@ L9 --> L3
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TB 
 L0 --> L3 
 L3--> L4
@@ -598,6 +602,8 @@ L9 --> L3
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TB 
 L0 --> L3 
 L3--> L4

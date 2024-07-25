@@ -6,8 +6,10 @@ format:
   revealjs:
     chalkboard: true
     code-line-numbers: true
+    echo: false
     output-file: revealjs_04_data_flow.qmd
     scrollable: true
+    slideNumber: c/t
 sidebar: false
 title: Data Flow
 
@@ -50,6 +52,8 @@ and some naming for each kind of problem
 ::: {.column}
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 
 graph TD
 style A text-align: left
@@ -143,6 +147,8 @@ To illustrate this, I"ll use pairs (variable, def) for each set, but the def alr
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD
 style A text-align: left
 style B  text-align: left
