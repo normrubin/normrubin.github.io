@@ -99,6 +99,7 @@ format:
         scrollable: true
         code-line-numbers: true
         echo: false 
+        slideNumber: "c/t"
 sidebar: false 
 execute:
     echo: true

@@ -53,6 +53,10 @@ A sample blog post about this paper
 
 [data](https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data)
 
+A dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle
+
+
+
 ```{python}
 
 # library & dataset
@@ -71,7 +75,16 @@ sns.violinplot(x=df["Vendor"], y=np.log(df["Freq (MHz)"]), hue=df['Type'])
 
 ```
 
-I might want to take date  into account in these plots
+apply np.log to the Freq (MHz) column.  Because of wide range of values
+
+Set a pastel palette with sns.set_palette("pastel"). These colors make it easier to see the parts of the violin plot
+
+Hue Parameter: I'm using the hue parameter to differentiate between types of chips. Hue sets a color within the palette
+
+Data Source and Preparation: Include a brief note on where the data comes from (you've provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.
+
+
+I might want to take date into account in these plots
 
 ----
 

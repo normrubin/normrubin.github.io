@@ -21,6 +21,9 @@ What we read in and read out when transforming a program.
 
 What kind of properties make a good representation?
 
+This lecture explores different representations and their implications.
+
+
 
 ::: {.content-hidden  when-format="revealjs"}
 
@@ -57,7 +60,9 @@ def graph(line):
 
 ## Concrete Syntax 
 
-One possible representation is called ***concrete syntax form*** 
+***Concrete syntax***, or surface syntax, represents programs as they are written
+
+
 Programs are text or surface syntax- just what you would type into an editor.
 
 ```
@@ -76,7 +81,8 @@ How do you understand the semantics.
 
 ##  Abstract syntax
 
-Tree structure
+Abstract syntax represents programs as tree structures, focusing on the nodes and their connections.
+
 
 1. Nodes are parts of the program, 
 2. Edges show how they are connected.
@@ -145,7 +151,7 @@ Programs are lists of instructions. Like an assembly instructions. Same sort of 
     {
         result = result * i
     }
-    console.log(result )
+    console.log(result)
 ```
 
 :::
@@ -404,16 +410,3 @@ for block in blocks:
    else  fall through 
       add edge to next block (if it exists)
 ```
-
-## How to look at a Bril program 
-
-::: {.content-visible}
-
-```{python}
-with open("images/add.json", 'r') as f:
-  bril_program = f.read()
-  print(bril_program)
-```
-:::
-
-
