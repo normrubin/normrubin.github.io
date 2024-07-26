@@ -410,6 +410,37 @@
 <p>What we read in and read out when transforming a program.</p>
 <p>What kind of properties make a good representation?</p>
 <p>This lecture explores different representations and their implications.</p>
+<div id="7dc7fe88" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
+<span id="cb1-2"><a></a><span class="im">import</span> ast</span>
+<span id="cb1-3"><a></a><span class="im">import</span> os </span>
+<span id="cb1-4"><a></a></span>
+<span id="cb1-5"><a></a><span class="kw">def</span> cmd(x):</span>
+<span id="cb1-6"><a></a>  os.system(x)</span>
+<span id="cb1-7"><a></a>  </span>
+<span id="cb1-8"><a></a><span class="kw">def</span> ast_syntax(line):</span>
+<span id="cb1-9"><a></a>  <span class="cf">return</span> ast.dump(ast.parse(line).body[<span class="dv">0</span>], indent<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb1-10"><a></a></span>
+<span id="cb1-11"><a></a>  </span>
+<span id="cb1-12"><a></a><span class="co"># Define a function to recursively add nodes to the Digraph</span></span>
+<span id="cb1-13"><a></a><span class="kw">def</span> add_node(dot, node, parent<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb1-14"><a></a>  node_name <span class="op">=</span> <span class="bu">str</span>(node.__class__.<span class="va">__name__</span>)</span>
+<span id="cb1-15"><a></a>  dot.node(<span class="bu">str</span>(<span class="bu">id</span>(node)), node_name)</span>
+<span id="cb1-16"><a></a>  <span class="cf">if</span> parent:</span>
+<span id="cb1-17"><a></a>    dot.edge(<span class="bu">str</span>(<span class="bu">id</span>(parent)), <span class="bu">str</span>(<span class="bu">id</span>(node)))</span>
+<span id="cb1-18"><a></a>  <span class="cf">for</span> child <span class="kw">in</span> ast.iter_child_nodes(node):</span>
+<span id="cb1-19"><a></a>    add_node(dot, child, node)</span>
+<span id="cb1-20"><a></a></span>
+<span id="cb1-21"><a></a><span class="co"># Add nodes to the Digraph</span></span>
+<span id="cb1-22"><a></a></span>
+<span id="cb1-23"><a></a><span class="kw">def</span> graph(line):</span>
+<span id="cb1-24"><a></a>  dot <span class="op">=</span> Digraph()</span>
+<span id="cb1-25"><a></a>  add_node(dot, ast.parse(line).body[<span class="dv">0</span>])</span>
+<span id="cb1-26"><a></a>  <span class="cf">return</span> dot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </section>
 <section id="concrete-syntax" class="slide level2">
 <h2>Concrete Syntax</h2>
@@ -543,12 +574,22 @@ print(result)</code></pre>
 </section>
 <section id="example-one" class="slide level2">
 <h2>Example one</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource {bril} number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a></a>@main {</span>
-<span id="cb5-2"><a></a>    v: int = const 5;</span>
-<span id="cb5-3"><a></a>    print v;</span>
-<span id="cb5-4"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource {bril} number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a></a>@main {</span>
+<span id="cb6-2"><a></a>    v: int = const 5;</span>
+<span id="cb6-3"><a></a>    print v;</span>
+<span id="cb6-4"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb7-2"><a></a></span>
+<span id="cb7-3"><a></a>%%| fig-width: 10</span>
+<span id="cb7-4"><a></a>%%| fig-height: 9</span>
+<span id="cb7-5"><a></a></span>
+<span id="cb7-6"><a></a>flowchart LR</span>
+<span id="cb7-7"><a></a>A[const] --&gt; B[print]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -579,6 +620,16 @@ A[const] --&gt; B[print]
     }</code></pre>
 <div class="fragment">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb9-2"><a></a></span>
+<span id="cb9-3"><a></a>%%| fig-width: 6.5</span>
+<span id="cb9-4"><a></a>flowchart LR</span>
+<span id="cb9-5"><a></a>  A[const 4] --&gt; B[jmp]</span>
+<span id="cb9-6"><a></a>  B --&gt; C[print]</span>
+<span id="cb9-7"><a></a>  D[const 2] --&gt; C</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -615,6 +666,18 @@ flowchart LR
     }</code></pre>
 <div class="fragment">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb11-2"><a></a></span>
+<span id="cb11-3"><a></a>%%| fig-width: 6.5</span>
+<span id="cb11-4"><a></a>flowchart LR</span>
+<span id="cb11-5"><a></a>  A[v: int const 4] --&gt; B[b: bool const false]</span>
+<span id="cb11-6"><a></a>  B --&gt; C[br b .there, .false]</span>
+<span id="cb11-7"><a></a>  C --&gt; D[v: const 2]</span>
+<span id="cb11-8"><a></a>  C --&gt; E[print v]</span>
+<span id="cb11-9"><a></a>  D --&gt; E</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>

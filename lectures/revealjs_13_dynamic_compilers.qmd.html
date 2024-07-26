@@ -28,6 +28,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -450,6 +515,16 @@
 <section id="flow" class="slide level2">
 <h2>flow</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb1-2"><a></a>graph LR</span>
+<span id="cb1-3"><a></a>interpreter -- hot? --&gt; profiling </span>
+<span id="cb1-4"><a></a>profiling -- stats --&gt; optimizing_compiler</span>
+<span id="cb1-5"><a></a>optimizing_compiler --&gt; compiled_code</span>
+<span id="cb1-6"><a></a>compiled_code -- deoptimze --&gt; interpreter</span>
+<span id="cb1-7"><a></a>interpreter -- already_compiled --&gt; compiled_code</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -598,6 +673,53 @@ interpreter -- already_compiled --&gt; compiled_code
 }</code></pre>
 </div><div class="column" style="width:40%;">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb8-2"><a></a>graph TD</span>
+<span id="cb8-3"><a></a>normal_entry["function entry</span>
+<span id="cb8-4"><a></a>              v = param[0]</span>
+<span id="cb8-5"><a></a>              q = param[1]</span>
+<span id="cb8-6"><a></a>              n = param[2]</span>
+<span id="cb8-7"><a></a>              if (n ==0) goto l1"]</span>
+<span id="cb8-8"><a></a></span>
+<span id="cb8-9"><a></a>l1["l1: throw error"]</span>
+<span id="cb8-10"><a></a>l2[" l2: i0 = 0</span>
+<span id="cb8-11"><a></a>     d = 0fffffff"]</span>
+<span id="cb8-12"><a></a>normal_entry --&gt; l1</span>
+<span id="cb8-13"><a></a>normal_entry--&gt; l2</span>
+<span id="cb8-14"><a></a>l3["l3: i1 = phi(i0, i2, i3)</span>
+<span id="cb8-15"><a></a>    d1 = phi(d0, d3, d4)</span>
+<span id="cb8-16"><a></a>    if (i1 &lt; n) go to l5"  ]</span>
+<span id="cb8-17"><a></a>l2--&gt; l3</span>
+<span id="cb8-18"><a></a>entry_on_stack_rep["start replace</span>
+<span id="cb8-19"><a></a>                   v = param[0]</span>
+<span id="cb8-20"><a></a>                  q = param[1]</span>
+<span id="cb8-21"><a></a>                  n = param[2]</span>
+<span id="cb8-22"><a></a>                  i3 = stack[0]</span>
+<span id="cb8-23"><a></a>                  d4 = stack[1]"]</span>
+<span id="cb8-24"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb8-25"><a></a>l5["l5: t0 = 4* i</span>
+<span id="cb8-26"><a></a>     t1 = v[t0]</span>
+<span id="cb8-27"><a></a>     notinbounds(t1, n) go to l8"]</span>
+<span id="cb8-28"><a></a></span>
+<span id="cb8-29"><a></a>l3 --&gt; l5 </span>
+<span id="cb8-30"><a></a>l3--&gt; l4</span>
+<span id="cb8-31"><a></a>l4["l4: return d1"]</span>
+<span id="cb8-32"><a></a>l5--&gt; l7</span>
+<span id="cb8-33"><a></a>l7[" l7: nd = abs(t1, q)</span>
+<span id="cb8-34"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb8-35"><a></a></span>
+<span id="cb8-36"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb8-37"><a></a>   i2 = i1 + 1</span>
+<span id="cb8-38"><a></a>   goto l3"]</span>
+<span id="cb8-39"><a></a>l7--&gt; l9</span>
+<span id="cb8-40"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb8-41"><a></a>l6--&gt; l9</span>
+<span id="cb8-42"><a></a>l8["l8: throw boundsError"]</span>
+<span id="cb8-43"><a></a>l5 --&gt; l8</span>
+<span id="cb8-44"><a></a>l9--&gt; l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -671,6 +793,53 @@ l9--&gt; l3
 <div class="columns">
 <div class="column" style="width:30%;">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb9-2"><a></a>graph TD</span>
+<span id="cb9-3"><a></a>normal_entry["function entry</span>
+<span id="cb9-4"><a></a>              v = param[0]</span>
+<span id="cb9-5"><a></a>              q = param[1]</span>
+<span id="cb9-6"><a></a>              n = param[2]</span>
+<span id="cb9-7"><a></a>              if (n ==0) goto l1"]</span>
+<span id="cb9-8"><a></a></span>
+<span id="cb9-9"><a></a>l1["l1: throw error"]</span>
+<span id="cb9-10"><a></a>l2[" l2: i0 = 0</span>
+<span id="cb9-11"><a></a>     d = 0fffffff"]</span>
+<span id="cb9-12"><a></a>normal_entry --&gt; l1</span>
+<span id="cb9-13"><a></a>normal_entry--&gt; l2</span>
+<span id="cb9-14"><a></a>l3["l3: i1 = phi(i0, i2, i3)</span>
+<span id="cb9-15"><a></a>    d1 = phi(d0, d3, d4)</span>
+<span id="cb9-16"><a></a>    if (i1 &lt; n) go to l5"  ]</span>
+<span id="cb9-17"><a></a>l2--&gt; l3</span>
+<span id="cb9-18"><a></a>entry_on_stack_rep["start replace</span>
+<span id="cb9-19"><a></a>                   v = param[0]</span>
+<span id="cb9-20"><a></a>                  q = param[1]</span>
+<span id="cb9-21"><a></a>                  n = param[2]</span>
+<span id="cb9-22"><a></a>                  i3 = stack[0]</span>
+<span id="cb9-23"><a></a>                  d4 = stack[1]"]</span>
+<span id="cb9-24"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb9-25"><a></a>l5["l5: t0 = 4* i</span>
+<span id="cb9-26"><a></a>     t1 = v[t0]</span>
+<span id="cb9-27"><a></a>     notinbounds(t1, n) go to l8"]</span>
+<span id="cb9-28"><a></a></span>
+<span id="cb9-29"><a></a>l3 --&gt; l5 </span>
+<span id="cb9-30"><a></a>l3--&gt; l4</span>
+<span id="cb9-31"><a></a>l4["l4: return d1"]</span>
+<span id="cb9-32"><a></a>l5--&gt; l7</span>
+<span id="cb9-33"><a></a>l7[" l7: nd = abs(t1, q)</span>
+<span id="cb9-34"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb9-35"><a></a></span>
+<span id="cb9-36"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb9-37"><a></a>   i2 = i1 + 1</span>
+<span id="cb9-38"><a></a>   goto l3"]</span>
+<span id="cb9-39"><a></a>l7--&gt; l9</span>
+<span id="cb9-40"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb9-41"><a></a>l6--&gt; l9</span>
+<span id="cb9-42"><a></a>l8["l8: throw boundsError"]</span>
+<span id="cb9-43"><a></a>l5 --&gt; l8</span>
+<span id="cb9-44"><a></a>l9--&gt; l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -727,6 +896,53 @@ l9--&gt; l3
 </div>
 </div><div class="column" style="width:40%;">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb10-2"><a></a>graph TD</span>
+<span id="cb10-3"><a></a>normal_entry["function entry</span>
+<span id="cb10-4"><a></a>              v = load[0]</span>
+<span id="cb10-5"><a></a>              q = q = 42 </span>
+<span id="cb10-6"><a></a>              n = 100</span>
+<span id="cb10-7"><a></a>              if (n ==0) goto l1"]</span>
+<span id="cb10-8"><a></a></span>
+<span id="cb10-9"><a></a>l1["l1: throw error"]</span>
+<span id="cb10-10"><a></a>l2[" l2: i0 = 0</span>
+<span id="cb10-11"><a></a>     d = 0fffffff"]</span>
+<span id="cb10-12"><a></a>normal_entry --&gt; l1</span>
+<span id="cb10-13"><a></a>normal_entry--&gt; l2</span>
+<span id="cb10-14"><a></a>l3["l3: i1 = phi(i2, i3)</span>
+<span id="cb10-15"><a></a>    d1 = phi(d3, d4)</span>
+<span id="cb10-16"><a></a>    if (i1 &lt; n) go to l5"  ]</span>
+<span id="cb10-17"><a></a>l2--&gt; l3</span>
+<span id="cb10-18"><a></a>entry_on_stack_rep["start replace</span>
+<span id="cb10-19"><a></a>                   v = load [0]</span>
+<span id="cb10-20"><a></a>                  q = 42</span>
+<span id="cb10-21"><a></a>                  n = 100</span>
+<span id="cb10-22"><a></a>                  i3 = 40</span>
+<span id="cb10-23"><a></a>                  d4 = offfffff"]</span>
+<span id="cb10-24"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb10-25"><a></a>l5["l5: t0 = 4* i</span>
+<span id="cb10-26"><a></a>     t1 = v[t0]</span>
+<span id="cb10-27"><a></a>     notinbounds(t1, n) go to l8"]</span>
+<span id="cb10-28"><a></a></span>
+<span id="cb10-29"><a></a>l3 --&gt; l5 </span>
+<span id="cb10-30"><a></a>l3--&gt; l4</span>
+<span id="cb10-31"><a></a>l4["l4: return d1"]</span>
+<span id="cb10-32"><a></a>l5--&gt; l7</span>
+<span id="cb10-33"><a></a>l7[" l7: nd = abs(t1, q)</span>
+<span id="cb10-34"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb10-35"><a></a></span>
+<span id="cb10-36"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb10-37"><a></a>   i2 = i1 + 1</span>
+<span id="cb10-38"><a></a>   goto l3"]</span>
+<span id="cb10-39"><a></a>l7--&gt; l9</span>
+<span id="cb10-40"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb10-41"><a></a>l6--&gt; l9</span>
+<span id="cb10-42"><a></a>l8["l8: throw boundsError"]</span>
+<span id="cb10-43"><a></a>l5 --&gt; l8</span>
+<span id="cb10-44"><a></a>l9--&gt; l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -789,6 +1005,53 @@ l9--&gt; l3
 <div class="columns">
 <div class="column" style="width:30%;">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb11-2"><a></a>graph TD</span>
+<span id="cb11-3"><a></a>normal_entry["function entry</span>
+<span id="cb11-4"><a></a>              v = load[0]</span>
+<span id="cb11-5"><a></a>              q = q = 42 </span>
+<span id="cb11-6"><a></a>              n = 100</span>
+<span id="cb11-7"><a></a>              if (n ==0) goto l1"]</span>
+<span id="cb11-8"><a></a></span>
+<span id="cb11-9"><a></a>l1["l1: throw error"]</span>
+<span id="cb11-10"><a></a>l2[" l2: i0 = 0</span>
+<span id="cb11-11"><a></a>     d = 0fffffff"]</span>
+<span id="cb11-12"><a></a>normal_entry --&gt; l1</span>
+<span id="cb11-13"><a></a>normal_entry--&gt; l2</span>
+<span id="cb11-14"><a></a>l3["l3: i1 = phi(i2, i3)</span>
+<span id="cb11-15"><a></a>    d1 = phi(d3, d4)</span>
+<span id="cb11-16"><a></a>    if (i1 &lt; n) go to l5"  ]</span>
+<span id="cb11-17"><a></a>l2--&gt; l3</span>
+<span id="cb11-18"><a></a>entry_on_stack_rep["start replace</span>
+<span id="cb11-19"><a></a>                   v = load [0]</span>
+<span id="cb11-20"><a></a>                  q = 42</span>
+<span id="cb11-21"><a></a>                  n = 100</span>
+<span id="cb11-22"><a></a>                  i3 = 40</span>
+<span id="cb11-23"><a></a>                  d4 = offfffff"]</span>
+<span id="cb11-24"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb11-25"><a></a>l5["l5: t0 = 4* i</span>
+<span id="cb11-26"><a></a>     t1 = v[t0]</span>
+<span id="cb11-27"><a></a>     notinbounds(t1, n) go to l8"]</span>
+<span id="cb11-28"><a></a></span>
+<span id="cb11-29"><a></a>l3 --&gt; l5 </span>
+<span id="cb11-30"><a></a>l3--&gt; l4</span>
+<span id="cb11-31"><a></a>l4["l4: return d1"]</span>
+<span id="cb11-32"><a></a>l5--&gt; l7</span>
+<span id="cb11-33"><a></a>l7[" l7: nd = abs(t1, q)</span>
+<span id="cb11-34"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb11-35"><a></a></span>
+<span id="cb11-36"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb11-37"><a></a>   i2 = i1 + 1</span>
+<span id="cb11-38"><a></a>   goto l3"]</span>
+<span id="cb11-39"><a></a>l7--&gt; l9</span>
+<span id="cb11-40"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb11-41"><a></a>l6--&gt; l9</span>
+<span id="cb11-42"><a></a>l8["l8: throw boundsError"]</span>
+<span id="cb11-43"><a></a>l5 --&gt; l8</span>
+<span id="cb11-44"><a></a>l9--&gt; l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -845,6 +1108,42 @@ l9--&gt; l3
 </div>
 </div><div class="column" style="width:45%;">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb12-2"><a></a>graph TD</span>
+<span id="cb12-3"><a></a></span>
+<span id="cb12-4"><a></a>l3["l3: i1 = phi(i2, i3)</span>
+<span id="cb12-5"><a></a>    d1 = phi(dd3, d4)</span>
+<span id="cb12-6"><a></a>    if (i1 &lt; n) go to l5"  ]</span>
+<span id="cb12-7"><a></a>entry_on_stack_rep["start replace</span>
+<span id="cb12-8"><a></a>                   v = load [0]</span>
+<span id="cb12-9"><a></a>                  q = 42</span>
+<span id="cb12-10"><a></a>                  n = 100</span>
+<span id="cb12-11"><a></a>                  i3 = 40</span>
+<span id="cb12-12"><a></a>                  d4 = offfffff"]</span>
+<span id="cb12-13"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb12-14"><a></a>l5["l5: t0 = 4* i</span>
+<span id="cb12-15"><a></a>     t1 = v[t0]</span>
+<span id="cb12-16"><a></a>     notinbounds(t1, n) go to l8"]</span>
+<span id="cb12-17"><a></a></span>
+<span id="cb12-18"><a></a>l3 --&gt; l5 </span>
+<span id="cb12-19"><a></a>l3--&gt; l4</span>
+<span id="cb12-20"><a></a>l4["l4: return d1"]</span>
+<span id="cb12-21"><a></a>l5--&gt; l7</span>
+<span id="cb12-22"><a></a>l7[" l7: nd = abs(t1, q)</span>
+<span id="cb12-23"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb12-24"><a></a></span>
+<span id="cb12-25"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb12-26"><a></a>   i2 = i1 + 1</span>
+<span id="cb12-27"><a></a>   goto l3"]</span>
+<span id="cb12-28"><a></a>l7--&gt; l9</span>
+<span id="cb12-29"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb12-30"><a></a>l6--&gt; l9</span>
+<span id="cb12-31"><a></a>l8["l8: throw boundsError"]</span>
+<span id="cb12-32"><a></a>l5 --&gt; l8</span>
+<span id="cb12-33"><a></a>l9--&gt; l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -899,6 +1198,42 @@ l9--&gt; l3
 <div class="columns">
 <div class="column" style="width:30%;">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb13-2"><a></a>graph TD</span>
+<span id="cb13-3"><a></a></span>
+<span id="cb13-4"><a></a>l3["l3: i1 = phi(i2, i3)</span>
+<span id="cb13-5"><a></a>    d1 = phi(dd3, d4)</span>
+<span id="cb13-6"><a></a>    if (i1 &lt; n) go to l5"  ]</span>
+<span id="cb13-7"><a></a>entry_on_stack_rep["start replace</span>
+<span id="cb13-8"><a></a>                   v = load [0]</span>
+<span id="cb13-9"><a></a>                  q = 42</span>
+<span id="cb13-10"><a></a>                  n = 100</span>
+<span id="cb13-11"><a></a>                  i3 = 40</span>
+<span id="cb13-12"><a></a>                  d4 = offfffff"]</span>
+<span id="cb13-13"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb13-14"><a></a>l5["l5: t0 = 4* i</span>
+<span id="cb13-15"><a></a>     t1 = v[t0]</span>
+<span id="cb13-16"><a></a>     notinbounds(t1, n) go to l8"]</span>
+<span id="cb13-17"><a></a></span>
+<span id="cb13-18"><a></a>l3 --&gt; l5 </span>
+<span id="cb13-19"><a></a>l3--&gt; l4</span>
+<span id="cb13-20"><a></a>l4["l4: return d1"]</span>
+<span id="cb13-21"><a></a>l5--&gt; l7</span>
+<span id="cb13-22"><a></a>l7[" l7: nd = abs(t1, q)</span>
+<span id="cb13-23"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb13-24"><a></a></span>
+<span id="cb13-25"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb13-26"><a></a>   i2 = i1 + 1</span>
+<span id="cb13-27"><a></a>   goto l3"]</span>
+<span id="cb13-28"><a></a>l7--&gt; l9</span>
+<span id="cb13-29"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb13-30"><a></a>l6--&gt; l9</span>
+<span id="cb13-31"><a></a>l8["l8: throw boundsError"]</span>
+<span id="cb13-32"><a></a>l5 --&gt; l8</span>
+<span id="cb13-33"><a></a>l9--&gt; l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -944,6 +1279,40 @@ l9--&gt; l3
 </div>
 </div><div class="column" style="width:45;">
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb14-2"><a></a>graph TD</span>
+<span id="cb14-3"><a></a></span>
+<span id="cb14-4"><a></a>l3["l3: i1 = phi(i0, i2, i3)</span>
+<span id="cb14-5"><a></a>    d1 = phi(d0, d3, d4)</span>
+<span id="cb14-6"><a></a>    if (i1 &lt; n) go to l5"  ]</span>
+<span id="cb14-7"><a></a>entry_on_stack_rep["start replace</span>
+<span id="cb14-8"><a></a>                   v = load [0]</span>
+<span id="cb14-9"><a></a>                  q = 42</span>
+<span id="cb14-10"><a></a>                  n = 100</span>
+<span id="cb14-11"><a></a>                  i3 = 40</span>
+<span id="cb14-12"><a></a>                  d4 = offfffff"]</span>
+<span id="cb14-13"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb14-14"><a></a>l5["l5: t0 = 4* i</span>
+<span id="cb14-15"><a></a>     t1 = v[t0]</span>
+<span id="cb14-16"><a></a>     "]</span>
+<span id="cb14-17"><a></a></span>
+<span id="cb14-18"><a></a>l3 --&gt; l5 </span>
+<span id="cb14-19"><a></a>l3--&gt; l4</span>
+<span id="cb14-20"><a></a>l4["l4: return d1"]</span>
+<span id="cb14-21"><a></a>l5--&gt; l7</span>
+<span id="cb14-22"><a></a>l7[" l7: nd = abs(t1, q)</span>
+<span id="cb14-23"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb14-24"><a></a></span>
+<span id="cb14-25"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb14-26"><a></a>   i2 = i1 + 1</span>
+<span id="cb14-27"><a></a>   goto l3"]</span>
+<span id="cb14-28"><a></a>l7--&gt; l9</span>
+<span id="cb14-29"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb14-30"><a></a>l6--&gt; l9</span>
+<span id="cb14-31"><a></a>l9--&gt; l3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -1004,6 +1373,36 @@ l9--&gt; l3
 <section id="after-loop-inversion" class="slide level2">
 <h2>after loop inversion</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb17-2"><a></a>graph TD</span>
+<span id="cb17-3"><a></a>l3["l3: i1 = phi(i2, i3)</span>
+<span id="cb17-4"><a></a>    d1 = phi(d3, d4)" ]</span>
+<span id="cb17-5"><a></a>entry_on_stack_rep["v = load [0]</span>
+<span id="cb17-6"><a></a>                  q = 42</span>
+<span id="cb17-7"><a></a>                  n = 100</span>
+<span id="cb17-8"><a></a>                  i3 = 40</span>
+<span id="cb17-9"><a></a>                  d4 = offfffff"]</span>
+<span id="cb17-10"><a></a>entry_on_stack_rep --&gt; l3</span>
+<span id="cb17-11"><a></a>l3 --&gt; l7</span>
+<span id="cb17-12"><a></a></span>
+<span id="cb17-13"><a></a></span>
+<span id="cb17-14"><a></a>l4["l4: return d1"]</span>
+<span id="cb17-15"><a></a>l7[" l7: l5: t0 = 4* i</span>
+<span id="cb17-16"><a></a>t1 = v[t0]</span>
+<span id="cb17-17"><a></a>nd = abs(t1, q)</span>
+<span id="cb17-18"><a></a>   if (nd &gt; d1) go to l9"]</span>
+<span id="cb17-19"><a></a></span>
+<span id="cb17-20"><a></a>l9["l9: d3 = phi(d1, d2)</span>
+<span id="cb17-21"><a></a>   i2 = i1 + 1</span>
+<span id="cb17-22"><a></a>   if (i2 &gt; n) goto l4"]</span>
+<span id="cb17-23"><a></a>l7--&gt; l9</span>
+<span id="cb17-24"><a></a>l7--&gt; l6["l6: d2 = nd"]</span>
+<span id="cb17-25"><a></a>l6--&gt; l9</span>
+<span id="cb17-26"><a></a>l9--&gt; l3</span>
+<span id="cb17-27"><a></a>l9--&gt; l4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
