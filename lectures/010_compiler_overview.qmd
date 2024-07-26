@@ -5,8 +5,9 @@ format:
   html: default
   revealjs:
     chalkboard: true
+    code-fold: true
     code-line-numbers: true
-    echo: false
+    echo: true
     output-file: revealjs_010_compiler_overview.qmd
     scrollable: true
     slideNumber: c/t
@@ -165,30 +166,31 @@ From CGO 2022 keynote
 ---
 
 Some observations:
-1) Production compilers are expensive.
-1) IR does not change easily.
-1) Much of compiler technology is old.
-1) There is a vast difference between production and student projects.
+
+1. Production compilers are expensive.
+1. IR does not change easily.
+1. Much of compiler technology is old.
+1. There is a vast difference between production and student projects.
 
 
 
 
 ## Compiler Assumptions (How many are still true)
 
-1) The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.
-1) Users are ok with large programs taking minutes to compile
-1) Compilers run on machines that are memory-limited.
-1) Compilers run on single-threaded machines.
-1) Most targets are C-like.
+1. The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.
+1. Users are ok with large programs taking minutes to compile
+1. Compilers run on machines that are memory-limited.
+1. Compilers run on single-threaded machines.
+1. Most targets are C-like.
  
  
  ---
 
 Some changes since early 2000's:
 
-1) Integrated development environments.  When you type a.b what has to happen?
-1) DSL (Doman specific languages for AI)
-1) More kinds of hardware 
+1. Integrated development environments.  When you type a.b what has to happen?
+1. DSL (Domain specific languages for AI)
+1. More kinds of hardware 
 
 
 ## How well do compilers do 

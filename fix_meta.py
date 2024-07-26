@@ -94,11 +94,12 @@ title: title
 format:
     html: default
     revealjs:
+        code-fold: true
+        echo: true 
         chalkboard: true
         output-file: xxxx
         scrollable: true
         code-line-numbers: true
-        echo: false 
         slideNumber: "c/t"
 sidebar: false 
 execute:
