@@ -131,7 +131,7 @@ for file in files:
         if yaml_contents:
             yaml_from_file = yaml.safe_load(yaml_contents)
             # preserve some entries 
-            keeps = ['title', 'tbl-colwidths', 'echo']
+            keeps = ['title', 'tbl-colwidths', 'echo', 'author']
             for keep in keeps:
                 if keep in yaml_from_file:
                     yaml_template[keep] = yaml_from_file[keep]

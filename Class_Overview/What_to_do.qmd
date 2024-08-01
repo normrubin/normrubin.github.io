@@ -20,20 +20,23 @@ To add a blog post (which you must do for discussion leading and project reports
 You'll want to create a text file in the blog directory with your new post. Use a filename like YYYY-MM-DD-title.qmd, where the date is the discussion day or the project deadline and the title is up to you. 
 
 
- Each quarto file starts with some meta data. For example this file has 
+ Each quarto file starts with some meta data. For example the sample  file has 
  
  ```
  ---
 format:
+---
+author: norm
+format:
   html: default
-title: How to do assignments
+title: sample blog
 ---
 
 ```
  
 The rest of the text file is the Markdown text of your blog post.
 
-If you want to use math in your blog post, you can use laytex dollar signs like `$\pi$` $\pi$ for inline math and `$$ e^{i\pi} + 1 = 0 $$`  $$ e^{i\pi} + 1 = 0 $$ for display math.
+If you want to use math in your blog post, you can use latex dollar signs like `$\pi$`  for $\pi$ for inline math and `$$ e^{i\pi} + 1 = 0 $$`  for $$ e^{i\pi} + 1 = 0 $$.
 
 To include images or other resources in your post, make your post into a directory. That is, make a new directory called YYYY-MM-DD-title inside blog. Then, put your text in a file called index.qmd inside that. Put your images in the same directory and refer to them with relative paths. See the QUARTO docs on for more details.
 
@@ -115,11 +118,12 @@ Publish the post to the course GitHub repository by opening a pull request.  Onc
 
 ## project Proposal
 
-The first deadline is the project proposal. Open a GitHub issue answering these three questions, which are a sort of abbreviated form of the Heilmeier catechism:
+The first deadline is the project proposal. Open a GitHub issue answering these three questions:
 
 What will you do?
 How will you do it?
 How will you empirically measure success?
+
 You should also list the GitHub usernames of everyone in the group. After you send the PR, submit its URL to the “Project Proposal” assignment on canvas.
 
 The instructor will have feedback on how to approach your project.

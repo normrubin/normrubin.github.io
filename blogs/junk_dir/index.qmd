@@ -1,0 +1,23 @@
+---
+author: norm
+format:
+  html: default
+title: sample blog with an image and a graph
+
+---
+
+![image of rabbits](image.jpg)
+
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+# example data
+x = np.arange(0.1, 4, 0.5)
+y = np.exp(-x)
+
+fig, ax = plt.subplots()
+ax.errorbar(x, y, xerr=0.2, yerr=0.4)
+
+
+```
