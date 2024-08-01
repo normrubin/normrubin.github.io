@@ -30,7 +30,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../weekly.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -67,38 +66,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <meta property="og:title" content="How to submit assignments – EECE7398 Fall 2024">
-<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
@@ -111,7 +80,9 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../Class_Overview/What_to_do.html">How to submit assignments</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      EECE7398 Fall 2024
+      </li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -153,7 +124,7 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link active">
+  <a href="../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How to submit assignments</span></a>
   </div>
 </li>
@@ -180,7 +151,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../Class_Overview/What_to_do.html">How to submit assignments</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">How to submit assignments</h1>
 </div>
@@ -199,98 +170,8 @@ window.Quarto = {
 </header>
 
 
-<section id="mechanics-of-writing-a-blog" class="level2">
-<h2 class="anchored" data-anchor-id="mechanics-of-writing-a-blog">Mechanics of writing a blog</h2>
-<p>Assignments get submitted as blog postings. In setting up the class web site I used <a href="https://quarto.org/">quarto</a> which lets you write a blog post in markdown (no messy html required). I recommend you use it as well. quarto converts markdown files to html and revealjs (for slides)</p>
-</section>
-<section id="submitting-via-pull-requests" class="level2">
-<h2 class="anchored" data-anchor-id="submitting-via-pull-requests">Submitting via pull requests</h2>
-<p>To add a blog post (which you must do for discussion leading and project reports), use a pull request.</p>
-<p>You’ll want to create a text file in the blog directory with your new post. Use a filename like YYYY-MM-DD-title.qmd, where the date is the discussion day or the project deadline and the title is up to you.</p>
-<p>Each quarto file starts with some meta data. For example this file has</p>
-<pre><code>---
-format:
- html: default
-title: How to do assignments
-
----
-</code></pre>
-<p>The rest of the text file is the Markdown text of your blog post.</p>
-<p>If you want to use math in your blog post, you can use laytex dollar signs like <code>$\pi$</code> <span class="math inline">\(\pi\)</span> for inline math and <code>$$ e^{i\pi} + 1 = 0 $$</code> <span class="math display">\[ e^{i\pi} + 1 = 0 \]</span> for display math.</p>
-<p>To include images or other resources in your post, make your post into a directory. That is, make a new directory called YYYY-MM-DD-title inside blog. Then, put your text in a file called index.qmd inside that. Put your images in the same directory and refer to them with relative paths. See the QUARTO docs on for more details.</p>
-<p>You can preview your writing with any Markdown renderer. To see what it will look like when published, install quarto and type quarto render to preview the entire site. Visual code has a really nice quarto extension that can preview pages.</p>
-</section>
-<section id="homeworks" class="level2">
-<h2 class="anchored" data-anchor-id="homeworks">Homeworks</h2>
-<p>To reinforce the specific compiler techniques we cover in class, you will implement them on your own. In lessons, we will discuss the high-level ideas and provide pseudo-code; your task is to translate these into working code and collect empirical evidence to demonstrate their effectiveness. Completing these implementations will reveal practical challenges that are not apparent from a high-level overview.</p>
-<p>Testing your implementation is crucial. Your goal is to provide convincing evidence that your implementation performs as intended. For instance, an optimization should generally make programs faster without causing any errors. While formal proofs of these properties are likely out of scope, you will need to find alternative ways to gather evidence. Avoid relying solely on existing test cases in the Bril repository, as they are typically insufficient. instead, consider using all the benchmarks available in the repo.</p>
-<p>You may work individually or in groups of 2–3 students. Upon completing an implementation, follow these steps:</p>
-<ol type="1">
-<li><p>Consider putting all your code online in an open-source repository, such as GitHub (optional but recommended). Create a fork of the class repository if desired.</p></li>
-<li><p>Submit the assignment on Canvas by providing a text file with a URL to your open-source implementation. If you prefer not to open-source your code, you can upload the code itself.</p></li>
-<li><p>Write a brief post in the lesson’s associated GitHub Discussions thread, covering the following topics (one paragraph each is sufficient):</p>
-<ol type="a">
-<li>Summarize what you did.</li>
-<li>Explain how you tested your implementation. What test inputs did you use? Do you have any quantitative results?</li>
-<li>Describe the hardest part of the task and how you addressed this challenge.</li>
-</ol></li>
-</ol>
-<p>Ensure all implementation tasks are your own work or done with your group. Although sample implementations for many tasks are available in the GitHub repository, you are not allowed to use this code. Similarly, you may not use implementations open-sourced by past students. I recommend not looking at these implementations while working on your tasks to ensure you genuinely learn the material. However, if you absolutely need to refer to them, you are responsible for managing your own learning process.</p>
-</section>
-<section id="paper-reading-discussion" class="level2">
-<h2 class="anchored" data-anchor-id="paper-reading-discussion">Paper Reading &amp; Discussion</h2>
-<p>Paper discussions are on GitHub Discussions.</p>
-<p>Another part of this course involves reading and discussing research papers. For each paper (see the schedule), everyone will participate in the discussion in two ways: asynchronously on GitHub Discussions threads before class, and synchronously in class. For every paper, there will be a Discussions topic; post at least one message with your thoughts on the paper before the class discussion. Your comment doesn’t need to be long—just a couple of sentences is fine. You can also respond to others’ thoughts on the thread.</p>
-<p>For some papers, you will be the discussion leader. Leaders have three extra responsibilities: monitoring and replying to the asynchronous discussion, moderating and guiding the in-class discussion, and synthesizing ideas into a blog post afterward.</p>
-<p><strong><em>Leader Responsibilities</em></strong></p>
-<p>At least a week before the discussion day:</p>
-<pre><code>1) Create a GitHub Discussions thread in the Reading category for your topic.</code></pre>
-<p>During the lead-up to the discussion day:</p>
-<pre><code>1) Monitor the GitHub Discussions thread for your topic. Answer questions and offer additional insights as needed.
-1) Collect a list of questions for the in-class discussion. You can create your own or select the best from the online discussion.</code></pre>
-<p>On the discussion day:</p>
-<p>Moderate the discussion. Provide enough background to get to the discussion questions and facilitate the conversation.</p>
-<p>Due one week after the discussion day:</p>
-<ol type="1">
-<li><p>Write a post about the paper for our course blog. The post should include:</p>
-<ol type="a">
-<li>Background information necessary to understand the paper.</li>
-<li>A detailed summary of the main contributions.</li>
-<li>Critical analysis of the merits and shortcomings of the work.</li>
-<li>Discussion of the paper’s role in history and its connections to the current computing landscape.</li>
-</ol>
-<ol type="A">
-<li>Incorporate the best ideas from the online and in-class discussions. You can present your own opinions, the class consensus, or both.</li>
-</ol></li>
-</ol>
-<p>Writing the Blog Post</p>
-<p>While summarizing the paper, avoid letting direct summary dominate your post. Keep the technical explanation to about a quarter of the length. Prioritize breadth over depth in your summary, and highlight specific contributions instead of covering the entire paper.</p>
-<p>Focus most of your writing on your own commentary: context, criticism, and discussion. Choose a title for your blog post that reflects the main point you want to make about the paper, rather than just the paper’s title.</p>
-<p>For inspiration, check out previous cs6120 blog posts. However, avoid reading posts about your paper, if they exist.</p>
-<p>Publishing</p>
-<p>Publish the post to the course GitHub repository by opening a pull request. Once your PR is open, announce it on the appropriate Discussions thread to let others know.</p>
-</section>
-<section id="project-proposal" class="level2">
-<h2 class="anchored" data-anchor-id="project-proposal">project Proposal</h2>
-<p>The first deadline is the project proposal. Open a GitHub issue answering these three questions, which are a sort of abbreviated form of the Heilmeier catechism:</p>
-<p>What will you do? How will you do it? How will you empirically measure success? You should also list the GitHub usernames of everyone in the group. After you send the PR, submit its URL to the “Project Proposal” assignment on canvas.</p>
-<p>The instructor will have feedback on how to approach your project.</p>
-<p>Implementation</p>
-<p>The main phase, of course, is implementing the thing you said you would implement. I recommend you keep a “lab notebook” to log your thoughts, attempts, and frustrations—this will come in handy for the report you’ll write about the project.</p>
-<p>I strongly recommend that you develop your code as an open-source project. Use a publicly-visible version control repository on a host like GitHub, and include an open source license. When you create your repository, comment on your proposal GitHub issue with a link. (If you have a specific objection to open-sourcing your code, that’s OK—include a description of how you’ll share your code privately with me.)</p>
-<p>Evaluation</p>
-<p>A major part of your project is an empirical evaluation. To design your evaluation strategy, you will need to consider at least these things:</p>
-<p>Where will you get the input code you’ll use in your evaluation? How will you check the correctness of your implementation? If you’ve implemented an optimization, for example, “correctness” means that the transformed programs behave the same way as the original programs. How will you measure the benefit (in performance, energy, complexity, etc.) of your implementation?</p>
-<p>How will you present the data you collect from your empirical evaluation? Other questions may be relevant depending on the project you choose. Consider the SIGPLAN empirical evaluation guidelines when you design your methodology.</p>
-</section>
-<section id="project-experience-report" class="level2">
-<h2 class="anchored" data-anchor-id="project-experience-report">project Experience Report</h2>
-<p>For the main project deadline, you will write up the project’s outcomes in the form of a post on the course blog. Your writeup should answer these questions in excruciating, exhaustive detail:</p>
-<p>What was the goal? What did you do? (Include both the design and the implementation.) What were the hardest parts to get right? Were you successful? (Report rigorously on your empirical evaluation.) As with paper discussions, you can optionally include a video to go along with your blog post.</p>
-<p>To submit your report, open a pull request in the course’s GitHub repository to add your post to the blog. In your PR description, please include “closes #N” where N is the issue number for your proposal</p>
 
 
-</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -713,15 +594,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../weekly.html" class="pagination-link" aria-label="Weekly Schedule">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Weekly Schedule</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
