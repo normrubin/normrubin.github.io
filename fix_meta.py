@@ -1,9 +1,6 @@
 ## fix up meta info for all files 
 import os 
 from pathlib import Path
-from turtle import pos
-from matplotlib.layout_engine import ConstrainedLayoutEngine
-from numpy import fix
 from requests import post
 import yaml
 
