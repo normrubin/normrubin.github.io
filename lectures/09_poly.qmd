@@ -30,6 +30,8 @@ The base idea -
 A statement in a loop might execute a lot of times
 Each time it executes there is one instance of the statement
 
+---
+
 We want an ir that:
 
 1) let  us reason about each instance 
@@ -49,13 +51,14 @@ C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loo
 over 95% of loops in deep learning are affine
 Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.
 
-
+---
 
 Over the course of this, I'll use 3 pieces of math
+
 1) ILP integer linear programming 
 	find a set of integers that satisfies a set of inequalities and maximize something 
 2) fourier-motzkin method
-3) The affine form of Farkas Lemma
+3) The affine form of Farkas Lemma (maybe)
 
 # 1 Changing the order of iterations 
 
@@ -66,6 +69,9 @@ for i = [1,2,3,4]
 s:   a[i] = a[i-1]
 
 ```
+
+---
+
 Does these loops do the same thing
 
 ```
@@ -73,6 +79,7 @@ for i = [1,2,3,4]      			for i = [4,3,2,1]
 s:   a[i] = a[i-1]      		 s:   a[i] = a[i-1] 
 
 ```
+---
 
 looks look at the instances by  considering a program trace 
 
@@ -98,12 +105,15 @@ s:   a[i] = a[i-1]      		  s:   a[i] = a[i-1]
    s(4)    a[3]   a[4]               s(1)
 ```
 
+---
+
 We need to preserve cases where an instance of s produces a value, some other instance of s consumes the value 
 
 each s(i) is an instance of a single statement
 
 data  dependence  as an equation:  $s(i) => s(i+1)$
 
+---
 
 observation 1-  same set of instances 
 
@@ -115,7 +125,7 @@ we need a more compressed ir format,  polyhedral methods use sets and math
 
 $$
 \begin{align*}
-domain &= \left\{ i \in \Z^1  \mid 1 <= i <= 4\right\} \\
+domain &= \left\{ i \in \mathbf{Z}^1  \mid 1 <= i <= 4\right\} \\
 instances\  of   \ s &= \left\{ s(i) \mid 1 <=i <= 4\right\}
 \end{align*}
 $$
@@ -127,6 +137,7 @@ We call the order that instances execute the **schedule**
 The  schedule is the ordering  of instances.
 this is a map of instance to time. Set of pairs that determine statement order.  Total ordering on instances 
 
+---
 
 observation 2- different schedules 
 
@@ -145,6 +156,8 @@ $$
 
 New schedule is legal, if it respects all data dependences,
 or **set of violated data dependences is empty**
+ 
+---
 
 what is a violated data dependence
 
@@ -173,7 +186,12 @@ $$
 \end{align*}
 $$
 
-We can pull in  magic math number 1 use a ilp solver to find a solution  one  solution is i = 1 
+---
+
+
+We can pull in  magic math number 1: use a ilp solver to find a solution  one  solution is i = 1 
+
+---
 
 #2 ilp solver  info
 
@@ -185,7 +203,7 @@ sadly answer is no (found in 1970)
 
 But we can do this if we limit the kinds of inequalities 
 
- ## affine limits 
+## affine limits 
 
 affine functions, no multiplying unknowns,  no quantifiers (for all, or exists)  and is ok,  or ok (if we change to two problems)
 just add/subtract/ multiply by a constant,
@@ -198,12 +216,13 @@ But lots of other kinds of programs do not.
 
 There is a lot of formal math background  here, decidability in logic. 
 
+---
 
 ilp is np-complete so it is slow, but often tractable for problems with up to several hundred variables.
 
 Some compiler writers feel that means can only do this for toy programs?  What do you think?
 
-
+---
 
 #2  multiple dimensions 
 
@@ -220,6 +239,7 @@ The arrows are the data flow,
 The schedule actually goes up each column (the j values) going over the columns left to right (the i column)
 
 notice that this does execute in parallel, but it could if we execute in diagonal order and we could tile it in the yellow boxes if we ran the tiles in diagonal order.
+
 
 ## formalizing the schedule, Lexicographic ordering
 
@@ -286,7 +306,8 @@ $$
 because of the lexicographic order ( or) we have two ilp problems
 one where $i'$ is greater then j, and one where $i'$ = j, and the other where $j'$ > j
 
-i ran it through 
+i ran it through:
+
 https://online-optimizer.appspot.com
 
 which gave me a solution 
@@ -347,12 +368,13 @@ j
 $$
 
 This also works if the loop bounds are symbolic
-~~~
+```
 for i in [L.. U]
   for j from  i to 7
      a(i,j) = 0
 
-~~~
+```
+
 $$
 \begin{equation*}
 B = 
@@ -407,11 +429,15 @@ for j  (must be constants)
 we can get the j bounds by projecting onto the j axis,  next we want to remove j from the inequalities 
 
 
-ir constrants
+ir constants
+
+
+
+
 
 $$
 \begin{align*}
-\begin{equation*}
+
 B =
 \begin{bmatrix} \begin{array}{rr}
  1 & 0 \\
@@ -428,9 +454,11 @@ B =
 6\\
 3
 \end{bmatrix}
-\end{equation*}
+
+
 \end{align*}
 $$
+
 
 written for i
 $$
