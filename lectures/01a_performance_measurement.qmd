@@ -103,3 +103,24 @@ The details
 1. the thick gray bar in the center represents the inter-quartile range
 1. the thin gray line represents the rest of the distribution, except for points that are determined to be “outliers” using a method that is a function of the inter-quartile range.
 1. On each side of the gray line is a kernel density estimation to show the distribution shape of the data. Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability.
+
+
+## error bars 
+
+```{python}
+
+print(df.head())
+
+import pandas as pd
+
+# Assuming df is your DataFrame and 'Release Date' is the column
+df['Release Date'] = pd.to_datetime(df['Release Date'], errors='coerce')
+df['Release Year'] = ((df['Release Date'].dt.year) // 5) * 5
+
+# Now df['Release Year'] contains the year extracted from 'Release Date'
+
+
+# plot a bar chart
+ax = sns.barplot(x=df['Release Year'], y=df["TDP (W)"], hue =df['Type'], estimator=np.mean, errorbar=("sd"))
+
+```
