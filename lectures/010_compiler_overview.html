@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>1 Compiler Overview – EECE7398 Fall 2024</title>
+<title>Compiler Overview – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -104,7 +104,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="1 Compiler Overview – EECE7398 Fall 2024">
+<meta property="og:title" content="Compiler Overview – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -124,7 +124,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">1 Compiler Overview</h1>
+<h1 class="title">Compiler Overview</h1>
 </div>
 
 
@@ -143,7 +143,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>A compiler writer builds bridges between people and machines, and this task is each day more challenging.</p>
+<p>A compiler writer builds bridges between people and machines, and every day this task becomes more challenging.</p>
 <ol type="a">
 <li>Software engineers want abstractions<br>
 </li>
@@ -151,9 +151,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <section id="early-compilers" class="level2">
 <h2 class="anchored" data-anchor-id="early-compilers">Early Compilers</h2>
-<p>Originally, a compiler was a person doing calculations. <a href="https://www.youtube.com/watch?v=aVda_e4qs2o&amp;list=PLL7607ZWeJ0CC4V0S8lMme61Oczi8bBEU&amp;index=40">hidden figures</a></p>
+<p>Originally, a compiler was a person doing calculations.</p>
+<p><a href="https://www.youtube.com/watch?v=aVda_e4qs2o&amp;list=PLL7607ZWeJ0CC4V0S8lMme61Oczi8bBEU&amp;index=40">hidden figures</a></p>
+<hr>
 <p>In 1952, Grace Hopper an operational link-loader, which she called a compiler. She later said, “Nobody believed that,” and that she “had a running compiler and nobody would touch it. They told me computers could only do arithmetic.”</p>
-<p>[<img src="images/Grace_Hopper_and_UNIVAC.jpg" class="img-fluid" alt="hopper">]</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Grace_Hopper_and_UNIVAC.jpg" class="img-fluid figure-img"></p>
+<figcaption>Grace Hopper</figcaption>
+</figure>
+</div>
 </section>
 <section id="fortran" class="level2">
 <h2 class="anchored" data-anchor-id="fortran">FORTRAN</h2>
@@ -166,7 +173,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="compiler-development-model" class="level2">
 <h2 class="anchored" data-anchor-id="compiler-development-model">Compiler Development Model</h2>
-<p>In these early years, the development model was:</p>
+<p>In these early years, the vendor development model was:</p>
 <ol type="1">
 <li>build a new machine</li>
 <li>design a new language</li>
@@ -180,6 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Middle end - machine independent optimizations and analyses</li>
 <li>Back end - machine specific stuff where machine code is generated</li>
 </ol>
+<hr>
 <div class="cell" data-layout-align="default">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -227,6 +235,7 @@ A--IR--&gt; C;
 <h2 class="anchored" data-anchor-id="llvm">LLVM</h2>
 <p>in about 2006 LLVM (originally low level virtual machine) appeared. This changed the model to look like a library.</p>
 <p>The core of LLVM is the intermediate representation (IR), a low-level programming language similar to assembly. IR is a strongly typed reduced instruction set computer (RISC) instruction set which abstracts away most details of the target.</p>
+<hr>
 <div class="cell" data-layout-align="default">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -261,7 +270,7 @@ A--IR--&gt; C;
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>%%| echo: false </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>graph TB;</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>graph LR;</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[BRIL interpreter];</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -270,7 +279,7 @@ A--IR--&gt; C;
 <pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
 
 %%| echo: false 
-graph TB;
+graph LR;
 A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[BRIL interpreter];
 </pre>
 </div>
@@ -278,6 +287,37 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 </div>
 </div>
 </div>
+</section>
+<section id="homeworks" class="level2">
+<h2 class="anchored" data-anchor-id="homeworks">Homeworks</h2>
+<p>Most homeworks are going to:</p>
+<ol type="1">
+<li>we talk about some algorithm using pseudo</li>
+<li>you implement that algorithm</li>
+<li>you write up a blog post explaining what happened</li>
+<li>If you like up to 3 people can submit a homework</li>
+</ol>
+<p>Since most programming languages have a json library, you can do homework in any language you like.</p>
+</section>
+<section id="readings" class="level2">
+<h2 class="anchored" data-anchor-id="readings">Readings</h2>
+<p>we are going to critically read current research papers</p>
+<ol type="1">
+<li>Each person leads a paper discussion</li>
+<li>Everyone reads the paper; the leader goes over the contents pros and cons</li>
+<li>The leader writes a blog post, (possibly including discussion insights )</li>
+<li>blog is due one week after the presentation.</li>
+<li>Discussions are 40 minutes each; two papers per class (subject to change).</li>
+</ol>
+</section>
+<section id="project" class="level2">
+<h2 class="anchored" data-anchor-id="project">Project</h2>
+<p>Everybody gets to do a project, which is compiler related</p>
+<ol type="1">
+<li>you will need to get a proposal approved half way through the term</li>
+<li>you submit a blog reporting on what happened</li>
+<li>If you like up to 3 people can submit a project</li>
+</ol>
 </section>
 <section id="cost-of-a-compiler." class="level2">
 <h2 class="anchored" data-anchor-id="cost-of-a-compiler.">Cost of a compiler.</h2>
@@ -355,7 +395,7 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 </ol>
 </section>
 <section id="compiler-assumptions-how-many-are-still-true" class="level2">
-<h2 class="anchored" data-anchor-id="compiler-assumptions-how-many-are-still-true">Compiler Assumptions (How many are still true)</h2>
+<h2 class="anchored" data-anchor-id="compiler-assumptions-how-many-are-still-true">Compiler Assumptions (How many are still true?)</h2>
 <ol type="1">
 <li>The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.</li>
 <li>Users are ok with large programs taking minutes to compile</li>
@@ -374,6 +414,9 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 <section id="how-well-do-compilers-do" class="level2">
 <h2 class="anchored" data-anchor-id="how-well-do-compilers-do">How well do compilers do</h2>
 <p>At the scale of data-centers, every single performance percent matters! Just take a look at Google’s (and other’s) publicly available numbers on expenditures on datacenters. We are talking about billions of dollars. A single percent improvement can mean millions of dollars from more program features or improved utilization.</p>
+</section>
+<section id="proebstings-law" class="level2">
+<h2 class="anchored" data-anchor-id="proebstings-law">proebsting’s law</h2>
 <p><a href="https://proebsting.cs.arizona.edu/law.html">proebsting’s law</a></p>
 <p>Compiler Advances Double Computing Power Every 18 Years.<br>
 while hardware computing horsepower doubles every 18 months. How would you prove this?</p>
