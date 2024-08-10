@@ -416,7 +416,7 @@
 <section id="lets-look-at-a-bril-program." class="slide level2">
 <h2>Lets look at a bril program.</h2>
 <p>Bril is written in JSON format. Almost all programming languages have a way to read json.</p>
-<div id="ea8f7f1a" class="cell" data-execution_count="1">
+<div id="08811549" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> json</span>
@@ -631,7 +631,7 @@ for each basic block
 </section>
 <section class="slide level2">
 
-<div id="0bf169e5" class="cell" data-execution_count="2">
+<div id="b6fc1c69" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a></a>    <span class="co">#Instructions that terminate a basic block.</span></span>
@@ -672,7 +672,7 @@ for each basic block
 
 </div></section><section id="as-a-test-lets-print-out-the-blocks" class="slide level2">
 <h2>as a test, lets print out the blocks</h2>
-<div id="0d6ad187" class="cell" data-execution_count="3">
+<div id="1bcf4006" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a><span class="kw">def</span> print_blocks(bril):</span>
@@ -724,7 +724,7 @@ for each basic block
 </section>
 <section class="slide level2">
 
-<div id="fbf31942" class="cell" data-execution_count="4">
+<div id="ec8e8083" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">import</span> subprocess</span>
@@ -740,65 +740,66 @@ for each basic block
 </div>
 <div class="cell fragment" data-execution_count="4">
 <div class="cell-output cell-output-stdout">
-<pre><code>total 1416
--rw-r--r-- 1 runner docker 37827 Aug  9 16:23 010_compiler_overview.html
--rw-r--r-- 1 runner docker  9626 Aug  9 16:22 010_compiler_overview.qmd
--rw-r--r-- 1 runner docker  4128 Aug  9 16:22 01a_performance_measurement.qmd
--rw-r--r-- 1 runner docker 39165 Aug  9 16:23 02a_representation.html
--rw-r--r-- 1 runner docker  7413 Aug  9 16:22 02a_representation.qmd
--rw-r--r-- 1 runner docker 62628 Aug  9 16:23 02b_bril.html
--rw-r--r-- 1 runner docker 11889 Aug  9 16:22 02b_bril.qmd
--rw-r--r-- 1 runner docker 20443 Aug  9 16:23 02b_bril.quarto_ipynb
-drwxr-xr-x 4 runner docker  4096 Aug  9 16:23 02b_bril_files
--rw-r--r-- 1 runner docker 33167 Aug  9 16:23 03_local.html
--rw-r--r-- 1 runner docker  6989 Aug  9 16:22 03_local.qmd
--rw-r--r-- 1 runner docker 30738 Aug  9 16:23 03b_local_value_numbering.html
--rw-r--r-- 1 runner docker  7902 Aug  9 16:22 03b_local_value_numbering.qmd
--rw-r--r-- 1 runner docker 10557 Aug  9 16:22 04_data_flow.qmd
--rw-r--r-- 1 runner docker 55633 Aug  9 16:23 05_global.html
--rw-r--r-- 1 runner docker  9974 Aug  9 16:22 05_global.qmd
--rw-r--r-- 1 runner docker  4875 Aug  9 16:22 05b_licm.qmd
--rw-r--r-- 1 runner docker  3148 Aug  9 16:22 05c_pre.qmd
--rw-r--r-- 1 runner docker 76433 Aug  9 16:23 06_ssa.html
--rw-r--r-- 1 runner docker 16413 Aug  9 16:22 06_ssa.qmd
--rw-r--r-- 1 runner docker 63470 Aug  9 16:23 07_llvm.html
--rwxr-xr-x 1 runner docker 29710 Aug  9 16:21 07_llvm.ipynb
--rw-r--r-- 1 runner docker 27225 Aug  9 16:23 08_classic_loop_ops.html
--rw-r--r-- 1 runner docker  5691 Aug  9 16:22 08_classic_loop_ops.qmd
--rwxr-xr-x 1 runner docker 14084 Aug  9 16:22 09_poly.qmd
--rw-r--r-- 1 runner docker 20067 Aug  9 16:23 100_mlir.html
--rw-r--r-- 1 runner docker   302 Aug  9 16:22 100_mlir.qmd
--rw-r--r-- 1 runner docker 20103 Aug  9 16:23 110_whole_program.html
--rw-r--r-- 1 runner docker   320 Aug  9 16:22 110_whole_program.qmd
--rw-r--r-- 1 runner docker 20118 Aug  9 16:23 12_memory.html
--rw-r--r-- 1 runner docker   316 Aug  9 16:22 12_memory.qmd
--rw-r--r-- 1 runner docker 16077 Aug  9 16:22 13_dynamic_compilers.qmd
--rw-r--r-- 1 runner docker 34244 Aug  9 16:23 14_gpu_compilers.html
--rw-r--r-- 1 runner docker 10116 Aug  9 16:22 14_gpu_compilers.qmd
--rw-r--r-- 1 runner docker  4595 Aug  9 16:21 errors
-drwxr-xr-x 2 runner docker  4096 Aug  9 16:21 images
-drwxr-xr-x 2 runner docker  4096 Aug  9 16:21 papers
--rw-r--r-- 1 runner docker 38227 Aug  9 16:23 ra-checking.html
--rw-r--r-- 1 runner docker  8226 Aug  9 16:22 ra-checking.qmd
--rw-r--r-- 1 runner docker 50456 Aug  9 16:23 revealjs_010_compiler_overview.qmd.html
--rw-r--r-- 1 runner docker 50968 Aug  9 16:23 revealjs_02a_representation.qmd.html
--rw-r--r-- 1 runner docker 46571 Aug  9 16:23 revealjs_03_local.qmd.html
--rw-r--r-- 1 runner docker 42647 Aug  9 16:23 revealjs_03b_local_value_numbering.qmd.html
--rw-r--r-- 1 runner docker 63656 Aug  9 16:23 revealjs_05_global.qmd.html
--rw-r--r-- 1 runner docker 77405 Aug  9 16:23 revealjs_06_ssa.qmd.html
--rw-r--r-- 1 runner docker 39234 Aug  9 16:23 revealjs_08_classic_loop_ops.qmd.html
--rw-r--r-- 1 runner docker 33126 Aug  9 16:23 revealjs_100_mlir.qmd.html
--rw-r--r-- 1 runner docker 33153 Aug  9 16:23 revealjs_110_whole_program.qmd.html
--rw-r--r-- 1 runner docker 33176 Aug  9 16:23 revealjs_12_memory.qmd.html
--rw-r--r-- 1 runner docker 46156 Aug  9 16:23 revealjs_14_gpu_compilers.qmd.html
--rw-r--r-- 1 runner docker 49639 Aug  9 16:23 revealjs_ra-checking.qmd.html
+<pre><code>total 1428
+-rw-r--r-- 1 runner docker 37827 Aug 10 14:41 010_compiler_overview.html
+-rw-r--r-- 1 runner docker  9626 Aug 10 14:40 010_compiler_overview.qmd
+-rw-r--r-- 1 runner docker  4134 Aug 10 14:40 01a_performance_measurement.qmd
+drwxr-xr-x 3 runner docker  4096 Aug 10 14:39 01a_performance_measurement_files
+-rw-r--r-- 1 runner docker 39165 Aug 10 14:41 02a_representation.html
+-rw-r--r-- 1 runner docker  7413 Aug 10 14:40 02a_representation.qmd
+-rw-r--r-- 1 runner docker 64227 Aug 10 14:41 02b_bril.html
+-rw-r--r-- 1 runner docker 13275 Aug 10 14:40 02b_bril.qmd
+-rw-r--r-- 1 runner docker 22684 Aug 10 14:41 02b_bril.quarto_ipynb
+drwxr-xr-x 4 runner docker  4096 Aug 10 14:41 02b_bril_files
+-rw-r--r-- 1 runner docker 33167 Aug 10 14:41 03_local.html
+-rw-r--r-- 1 runner docker  6989 Aug 10 14:40 03_local.qmd
+-rw-r--r-- 1 runner docker 30738 Aug 10 14:41 03b_local_value_numbering.html
+-rw-r--r-- 1 runner docker  7902 Aug 10 14:40 03b_local_value_numbering.qmd
+-rw-r--r-- 1 runner docker 10557 Aug 10 14:40 04_data_flow.qmd
+-rw-r--r-- 1 runner docker 55633 Aug 10 14:41 05_global.html
+-rw-r--r-- 1 runner docker  9974 Aug 10 14:40 05_global.qmd
+-rw-r--r-- 1 runner docker  4875 Aug 10 14:40 05b_licm.qmd
+-rw-r--r-- 1 runner docker  3148 Aug 10 14:40 05c_pre.qmd
+-rw-r--r-- 1 runner docker 76433 Aug 10 14:41 06_ssa.html
+-rw-r--r-- 1 runner docker 16413 Aug 10 14:40 06_ssa.qmd
+-rw-r--r-- 1 runner docker 63470 Aug 10 14:41 07_llvm.html
+-rwxr-xr-x 1 runner docker 29710 Aug 10 14:39 07_llvm.ipynb
+-rw-r--r-- 1 runner docker 27225 Aug 10 14:41 08_classic_loop_ops.html
+-rw-r--r-- 1 runner docker  5691 Aug 10 14:40 08_classic_loop_ops.qmd
+-rwxr-xr-x 1 runner docker 14084 Aug 10 14:40 09_poly.qmd
+-rw-r--r-- 1 runner docker 20067 Aug 10 14:41 100_mlir.html
+-rw-r--r-- 1 runner docker   302 Aug 10 14:40 100_mlir.qmd
+-rw-r--r-- 1 runner docker 20103 Aug 10 14:41 110_whole_program.html
+-rw-r--r-- 1 runner docker   320 Aug 10 14:40 110_whole_program.qmd
+-rw-r--r-- 1 runner docker 20118 Aug 10 14:41 12_memory.html
+-rw-r--r-- 1 runner docker   316 Aug 10 14:40 12_memory.qmd
+-rw-r--r-- 1 runner docker 16077 Aug 10 14:40 13_dynamic_compilers.qmd
+-rw-r--r-- 1 runner docker 34244 Aug 10 14:41 14_gpu_compilers.html
+-rw-r--r-- 1 runner docker 10116 Aug 10 14:40 14_gpu_compilers.qmd
+-rw-r--r-- 1 runner docker  4595 Aug 10 14:39 errors
+drwxr-xr-x 2 runner docker  4096 Aug 10 14:39 images
+drwxr-xr-x 2 runner docker  4096 Aug 10 14:39 papers
+-rw-r--r-- 1 runner docker 38227 Aug 10 14:41 ra-checking.html
+-rw-r--r-- 1 runner docker  8226 Aug 10 14:40 ra-checking.qmd
+-rw-r--r-- 1 runner docker 50456 Aug 10 14:41 revealjs_010_compiler_overview.qmd.html
+-rw-r--r-- 1 runner docker 50968 Aug 10 14:41 revealjs_02a_representation.qmd.html
+-rw-r--r-- 1 runner docker 46571 Aug 10 14:41 revealjs_03_local.qmd.html
+-rw-r--r-- 1 runner docker 42647 Aug 10 14:41 revealjs_03b_local_value_numbering.qmd.html
+-rw-r--r-- 1 runner docker 63656 Aug 10 14:41 revealjs_05_global.qmd.html
+-rw-r--r-- 1 runner docker 77405 Aug 10 14:41 revealjs_06_ssa.qmd.html
+-rw-r--r-- 1 runner docker 39234 Aug 10 14:41 revealjs_08_classic_loop_ops.qmd.html
+-rw-r--r-- 1 runner docker 33126 Aug 10 14:41 revealjs_100_mlir.qmd.html
+-rw-r--r-- 1 runner docker 33153 Aug 10 14:41 revealjs_110_whole_program.qmd.html
+-rw-r--r-- 1 runner docker 33176 Aug 10 14:41 revealjs_12_memory.qmd.html
+-rw-r--r-- 1 runner docker 46156 Aug 10 14:41 revealjs_14_gpu_compilers.qmd.html
+-rw-r--r-- 1 runner docker 49639 Aug 10 14:41 revealjs_ra-checking.qmd.html
 </code></pre>
 </div>
 </div>
 </section>
 <section id="print-the-blocks" class="slide level2">
 <h2>print the blocks</h2>
-<div id="0f7e082d" class="cell" data-execution_count="5">
+<div id="1cd0a002" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a></a><span class="im">import</span> json </span>
@@ -824,7 +825,7 @@ block somewhere
 </section>
 <section id="the-map-label-names-to-blocks" class="slide level2">
 <h2>the map (label names to blocks)</h2>
-<div id="a5750bf1" class="cell" data-execution_count="6">
+<div id="d028dd1b" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
@@ -889,7 +890,7 @@ somewhere [{'args': ['v'], 'op': 'print'}]</code></pre>
 </section>
 <section id="cfg" class="slide level2">
 <h2>cfg</h2>
-<div id="20707631" class="cell" data-execution_count="7">
+<div id="ec29e862" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a></a><span class="kw">def</span> get_cfg(ordered_blocks):</span>
@@ -939,14 +940,8 @@ somewhere [{'args': ['v'], 'op': 'print'}]</code></pre>
 </details>
 </div>
 
-
-<div class="quarto-auto-generated-content">
-<div class="footer footer-default">
-
-</div>
-</div>
 </section>
-    <section id="graph-output" class="slide level2 output-location-slide"><h2>graph</h2><div class="cell output-location-slide" data-reveal="true" data-layout-align="default">
+<section id="graph-output" class="slide level2 output-location-slide"><h2>graph</h2><div class="cell output-location-slide" data-reveal="true" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
@@ -962,7 +957,35 @@ gen_bk_1 --&gt; somewhere
 <p></p></figure><p></p>
 </div>
 </div>
-</div></section></div>
+</div></section><section id="homework" class="slide level2">
+<h2>homework</h2>
+<p>Due in 1 week</p>
+<p>Your goal is to get familiar with Bril.</p>
+</section>
+<section class="slide level2">
+
+<p>Part 1</p>
+<p>Write a new benchmark.</p>
+<p>You can write it by hand, use the TypeScript compiler, or generate it some other way. Try running it with brili.</p>
+<p>Use turnt –save yours.bril to create the test outputs for your new benchmark. (See the Turnt README for details.)</p>
+<p>Start your blog post, talking about your benchmark.</p>
+</section>
+<section class="slide level2">
+
+<p>part 2</p>
+<p>Write a program to analyze or transform Bril programs in some small way. Pick your favorite programming language—there is no “starter code,” so you can start from scratch.</p>
+<p>Load up a JSON file. You can start with the tiny ones in lectures/images! Read the docs.</p>
+<p>Do something unambitious with it: count the number of add instructions, or add a print instruction before every jump, or whatever. Pick something small and contrived! Use Turnt to test your new tool.</p>
+<p>Along the way, you will run into problems! Ask questions on github discussions, use open issues and pull requests to describe or fix problems. For example, even super simple benchmarks you might imagine probably can’t be written easily because Bril is too simple. Mention this in discussions, and consider pitching in to help add features.</p>
+<p>Think about how to write a good test, and add to your post describing your work, submit the post on github, and finally add a link to the post in canvas, homework 1</p>
+
+<div class="quarto-auto-generated-content">
+<div class="footer footer-default">
+
+</div>
+</div>
+</section>
+    </div>
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>

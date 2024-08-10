@@ -165,7 +165,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="violin-plots">violin plots</h2>
 <p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
 <p>A dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle</p>
-<div id="2b094be5" class="cell" data-execution_count="1">
+<div id="89d8803e" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library &amp; dataset</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -227,8 +227,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="error-bars" class="level2">
 <h2 class="anchored" data-anchor-id="error-bars">error bars</h2>
-<div id="5d119139" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
+<div id="10267b9d" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.describe())</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -242,26 +242,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># plot a bar chart</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.barplot(x<span class="op">=</span>df[<span class="st">'Release Year'</span>], y<span class="op">=</span>df[<span class="st">"TDP (W)"</span>], hue <span class="op">=</span>df[<span class="st">'Type'</span>], estimator<span class="op">=</span>np.mean, errorbar<span class="op">=</span>(<span class="st">"sd"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \
-0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   
-1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   
-2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   
-3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   
-4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   
+<pre><code>        Unnamed: 0  Process Size (nm)      TDP (W)  Die Size (mm^2)  \
+count  4854.000000        4845.000000  4228.000000      4139.000000   
+mean   2426.500000          55.109598    81.359981       188.440445   
+std    1401.373433          44.998676    76.807808       126.189383   
+min       0.000000           0.000000     1.000000         1.000000   
+25%    1213.250000          22.000000    33.000000       104.000000   
+50%    2426.500000          40.000000    65.000000       148.000000   
+75%    3639.750000          90.000000   100.000000       239.000000   
+max    4853.000000         250.000000   900.000000       826.000000   
 
-   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \
-0     45.0             77.0                  122.0      2200.0  Unknown   
-1     35.0            192.0                 4800.0      3200.0  Unknown   
-2     28.0              NaN                    NaN      2600.0    Intel   
-3     80.0            160.0                 1400.0      1800.0    Intel   
-4    125.0            258.0                  758.0      3700.0  Unknown   
+       Transistors (million)   Freq (MHz)    FP16 GFLOPS   FP32 GFLOPS  \
+count            4143.000000  4854.000000     536.000000   1948.000000   
+mean             1929.922279  1484.406057    8397.459851   2134.756653   
+std              4044.891098  1066.701523   13799.551131   3898.431487   
+min                 8.000000   100.000000      10.020000     12.800000   
+25%               154.000000   590.000000     768.800000    257.300000   
+50%               624.000000  1073.500000    2965.500000    696.000000   
+75%              1550.000000  2400.000000   10600.000000   2116.750000   
+max             54200.000000  4700.000000  184600.000000  40000.000000   
 
-  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  
-0    AMD          NaN          NaN          NaN  
-1    AMD          NaN          NaN          NaN  
-2  Intel          NaN          NaN          NaN  
-3  Intel          NaN          NaN          NaN  
-4    AMD          NaN          NaN          NaN  </code></pre>
+        FP64 GFLOPS  
+count   1306.000000  
+mean     363.670511  
+std     1145.931856  
+min        3.600000  
+25%       38.295000  
+50%       89.280000  
+75%      220.000000  
+max    11540.000000  </code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
