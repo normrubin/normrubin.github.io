@@ -109,7 +109,7 @@ The details
 
 ```{python}
 
-print(df.head())
+print(df.describe())
 
 import pandas as pd
 
@@ -124,3 +124,4 @@ df['Release Year'] = ((df['Release Date'].dt.year) // 5) * 5
 ax = sns.barplot(x=df['Release Year'], y=df["TDP (W)"], hue =df['Type'], estimator=np.mean, errorbar=("sd"))
 
 ```
+
