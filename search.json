@@ -3529,61 +3529,61 @@
   {
     "objectID": "homework/1.hw.html",
     "href": "homework/1.hw.html",
-    "title": "1 Homework",
+    "title": "Homework 1 trying out bril",
     "section": "",
-    "text": "Warning\n\n\n\n\nhow to add benchmark to repo pull request to where - add benchmark to docs?\nhow to ask questions on writing benchmark, discussion goes where (Canvas?)\nhow to write blog on what got done\nhow to submit blog url to canvas, what do they submit for grading\n\n\n\nYour goal is to get familiar with Bril.\nPart 1\nWrite a new benchmark.\nYou can write it by hand, use the TypeScript compiler, or generate it some other way. Try running it with brili.\nOpen a pull request to add your new benchmark. ??? Add your code to the the benchmarks directory.\nUse turnt –save yours.bril to create the test outputs for your new benchmark. (See the Turnt README for details.) Mention it in the docs.\npart 2 Write a program to analyze or transform Bril programs in some small way. Pick your favorite programming language—there is no “starter code,” so you can start from scratch.\nLoad up a JSON file. You can start with this tiny one! Read the docs.\nDo something unambitious with it: count the number of add instructions, or add a print instruction before every jump, or whatever. Pick something small and contrived! Use Turnt to test your new tool.\nAlong the way, you will run into problems! Ask questions on ???, and open issues and pull requests to describe or fix problems. For example, even super simple benchmarks you might imagine probably can’t be written easily because Bril is too simple. Mention this on ??? discussions, and consider pitching in to help add features.\nThink about how to write a good test, and finally write a post describing your work and submit it in Canvas\n\n\n\n Back to top",
+    "text": "you will write a blog post and put in in github using a pull request\nThen will put the name of the blog post into canvas\nYou can ask questions on github discussions\n\nYour goal is to get familiar with Bril.\nPart 1\nWrite a new benchmark.\nYou can write it by hand, use the TypeScript compiler, or generate it some other way. Try running it with brili.\nOpen a pull request to add your new benchmark. ??? Add your code to the the benchmarks directory.\nUse turnt –save yours.bril to create the test outputs for your new benchmark. (See the Turnt README for details.) Mention it in the docs.\npart 2\nWrite a program to analyze or transform Bril programs in some small way. Pick your favorite programming language—there is no “starter code,” so you can start from scratch.\nLoad up a JSON file. You can start with this tiny one! Read the docs.\nDo something unambitious with it: count the number of add instructions, or add a print instruction before every jump, or whatever. Pick something small and contrived! Use Turnt to test your new tool.\nAlong the way, you will run into problems! Ask questions on ???, and open issues and pull requests to describe or fix problems. For example, even super simple benchmarks you might imagine probably can’t be written easily because Bril is too simple. Mention this on ??? discussions, and consider pitching in to help add features.\nThink about how to write a good test, and finally write a post describing your work and submit it to github and submit the name to canvas\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Homework",
-      "1 Homework"
+      "Homework 1 trying out bril"
     ]
   },
   {
     "objectID": "homework/4_hw.html",
     "href": "homework/4_hw.html",
-    "title": "4_homework",
+    "title": "homework dominance",
     "section": "",
-    "text": "Task4: Implement some of the dominance utilities- 1) Find dominators for a function, 2) construct the dominance tree, 3) compute the dominance frontier. Devise a way to test your implementations. Can you find a way to confirm that block A dominates blockB. When you code this, remember that computing these sets should be cheap while checking their output could use slow naive algorithms.\n\n\n\n Back to top",
+    "text": "Implement some of the dominance utilities- 1) Find dominators for a function, 2) construct the dominance tree, 3) compute the dominance frontier. Devise a way to test your implementations. Can you find a way to confirm that block A dominates blockB. When you code this, remember that computing these sets should be cheap while checking their output could use slow naive algorithms.\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Homework",
-      "4_homework"
+      "homework dominance"
     ]
   },
   {
     "objectID": "homework/6_extra_credit.html",
     "href": "homework/6_extra_credit.html",
-    "title": "6 Homework extra credit",
+    "title": "Homework 6 loop optimization",
     "section": "",
-    "text": "Task6: Implement and evaluate a loop optimization, either start with Bril or LLVM, you can use the ssa form of Bril if you want. If you use Bril you will have to find the natural loops, if you use LLVM you can call LoopPass but other parts of the implementation will be tricker, Pick an optimization (I’d suggest loop invariant code motion) but any of the others mentioned in class would be fine. Evaluate its performance, in Bril you can use the Bril benchmarks, in LLVM select an existing benchmark such as Embench and feel free to violate the sigplan guidelines SIGPLAN empirical evaluation guidelines by cherry-picking a convenient subset.\n\n\n\n Back to top",
+    "text": "Implement and evaluate a loop optimization, either start with Bril or LLVM, you can use the ssa form of Bril if you want. If you use Bril you will have to find the natural loops, if you use LLVM you can call LoopPass but other parts of the implementation will be tricker, Pick an optimization (I’d suggest loop invariant code motion) but any of the others mentioned in class would be fine. Evaluate its performance, in Bril you can use the Bril benchmarks, in LLVM select an existing benchmark such as Embench and feel free to violate the sigplan guidelines SIGPLAN empirical evaluation guidelines by cherry-picking a convenient subset.\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Homework",
-      "6 Homework extra credit"
+      "Homework 6 loop optimization"
     ]
   },
   {
     "objectID": "homework/5_hw.html",
     "href": "homework/5_hw.html",
-    "title": "5_Homework",
+    "title": "Homework 5 SSA",
     "section": "",
-    "text": "Task5: Implement the into SSA and out of SSA transformations on Bril functions. Watch out for variables that are undefined on some paths. The script “is_ssa.py can check if a program is really in SSA and the Bril interpreter bili supports phi functions so you can execute code in the midpoint of your round trip. Measure the overhead (does the final program have more instructions (static or dynamic) the original, be sure to report the overhead in your writeup.\n\n\n\n Back to top",
+    "text": "Implement the into SSA and out of SSA transformations on Bril functions. Watch out for variables that are undefined on some paths. The script “is_ssa.py can check if a program is really in SSA and the Bril interpreter bili supports phi functions so you can execute code in the midpoint of your round trip. Measure the overhead (does the final program have more instructions (static or dynamic) the original, be sure to report the overhead in your writeup.\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Homework",
-      "5_Homework"
+      "Homework 5 SSA"
     ]
   },
   {
     "objectID": "homework/dynamic.html",
     "href": "homework/dynamic.html",
-    "title": "homework dynamic compile",
+    "title": "homework 7 dynamic compile",
     "section": "",
     "text": "This task is to implement a trace-based speculative optimizer for Bril. You’ll implement the same concept as in a tracing JIT, but in a profile-guided AOT setting: profiling, transformation, and execution will be distinct phases. The idea is to implement the “heavy lifting” for a trace-based JIT without needing all the scaffolding that a complete JIT requires, such as on-stack replacement.\nConcretely, there are three main phases:\n\nModify the reference interpreter to produce traces.\nBuild an optimizer that injects traces back into the original program using the speculation extension to provide a “fast path.”\nCheck that the whole process is correct and had some effect on performance (it needn’t actually be good!).\n\nStart by reading the documentation for the speculation extension (and watch the video!). That should give you an idea of what’s required to augment a program with a speculative execution of an extracted trace. Then make a plan for how you’ll hack the interpreter to produce one of those traces.\nHere’s a recipe:\n\nStart interpreting normally.\nAt some point during execution (at the very beginning of main, for example, or when reaching a backedge), start tracing.\nWhile tracing, record every instruction as it executes. Eliminate jumps; replace branches with guard instructions. Feel free to do the interprocedural version, and to bail out on any other instruction you don’t want to handle.\nStop tracing at some point (after a fixed number of instructions, for example, or at the next backedge) and save the trace to a file.\nFor bonus “points,” statically optimize the trace by eliminating instructions that depend on foregone conclusions enforced by guards.\nTransform the program to stitch the trace back into the program using speculate and commit instructions.\nFor these tasks, unlike some previous lessons, I recommend not attempting to support all the benchmarks. It’s more important that you understand a few programs well than you apply your transformation to a large body of code. (In other words, I recommend that you work depth-first instead of breadth-first.)\n\nIn particular, you do not need to support Bril’s memory extension, which makes things more complicated because it doesn’t get automatically rolled back on speculation aborts. If you are feeling very ambitious, you can try devising a scheme to manually roll back memory modifications on aborts (consider an “undo log” or “redo log,” which are concepts from databases).\nFinally, evaluate your work:\n\nCheck that you didn’t break programs. For at least one benchmark (and ideally a few), create multiple inputs to the program that result in different outputs. Use one input to generate the trace and optimize the program, and use other inputs to check correctness. This approach guards against cases where your tracing optimization “overfits” and you end up with code that only works on one input. Measure performance impact, i.e., the effect of your transformation on the dynamic instruction count.\nfor at least one benchmark, use at least two inputs to evaluate tracing’s impact on executions that are not identical to the traced execution. If you implemented optimizations on the traced code, consider comparing the optimized vs. un-optimized versions. (It’s OK if your tracing apparatus makes programs slower, especially on unseen inputs! We just want to measure the difference.)\n\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Homework",
-      "homework dynamic compile"
+      "homework 7 dynamic compile"
     ]
   },
   {
@@ -3601,25 +3601,25 @@
   {
     "objectID": "homework/3_hw.html",
     "href": "homework/3_hw.html",
-    "title": "3 Homework",
+    "title": "Homework 3 data flow",
     "section": "",
-    "text": "Task3: Implement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.\n\n\n\n Back to top",
+    "text": "Implement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Homework",
-      "3 Homework"
+      "Homework  3 data flow"
     ]
   },
   {
     "objectID": "homework/2_hw.html",
     "href": "homework/2_hw.html",
-    "title": "2 Homework",
+    "title": "Homework 2 local optimizations",
     "section": "",
-    "text": "Task2: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned. Then implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class.\n\n\n\n Back to top",
+    "text": "part 1: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned.\npart2: Implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class.\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Homework",
-      "2 Homework"
+      "Homework 2 local optimizations"
     ]
   },
   {
@@ -5426,7 +5426,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1376\n-rw-r--r-- 1 runner docker 39116 Aug 12 11:51 010_compiler_overview.html\n-rw-r--r-- 1 runner docker  9651 Aug 12 11:51 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  4134 Aug 12 11:51 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 40301 Aug 12 11:51 02a_representation.html\n-rw-r--r-- 1 runner docker  7413 Aug 12 11:51 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13286 Aug 12 11:51 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23212 Aug 12 11:51 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 34284 Aug 12 11:51 03_local.html\n-rw-r--r-- 1 runner docker  6989 Aug 12 11:51 03_local.qmd\n-rw-r--r-- 1 runner docker 31844 Aug 12 11:51 03b_local_value_numbering.html\n-rw-r--r-- 1 runner docker  7902 Aug 12 11:51 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 10557 Aug 12 11:51 04_data_flow.qmd\n-rw-r--r-- 1 runner docker 56705 Aug 12 11:51 05_global.html\n-rw-r--r-- 1 runner docker  9974 Aug 12 11:51 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Aug 12 11:51 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Aug 12 11:51 05c_pre.qmd\n-rw-r--r-- 1 runner docker 77503 Aug 12 11:51 06_ssa.html\n-rw-r--r-- 1 runner docker 16413 Aug 12 11:51 06_ssa.qmd\n-rw-r--r-- 1 runner docker 70102 Aug 12 11:51 07_llvm.html\n-rwxr-xr-x 1 runner docker 29710 Aug 12 11:50 07_llvm.ipynb\n-rw-r--r-- 1 runner docker 28290 Aug 12 11:51 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Aug 12 11:51 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 14084 Aug 12 11:51 09_poly.qmd\n-rw-r--r-- 1 runner docker 21140 Aug 12 11:51 100_mlir.html\n-rw-r--r-- 1 runner docker   302 Aug 12 11:51 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Aug 12 11:51 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Aug 12 11:51 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Aug 12 11:51 12_memory.html\n-rw-r--r-- 1 runner docker   316 Aug 12 11:51 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Aug 12 11:51 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 35359 Aug 12 11:51 14_gpu_compilers.html\n-rw-r--r-- 1 runner docker 10116 Aug 12 11:51 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4595 Aug 12 11:50 errors\ndrwxr-xr-x 2 runner docker  4096 Aug 12 11:50 images\ndrwxr-xr-x 2 runner docker  4096 Aug 12 11:50 papers\n-rw-r--r-- 1 runner docker 39048 Aug 12 11:51 ra-checking.html\n-rw-r--r-- 1 runner docker  8226 Aug 12 11:51 ra-checking.qmd\n-rw-r--r-- 1 runner docker 50551 Aug 12 11:51 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 50968 Aug 12 11:51 revealjs_02a_representation.qmd.html\n-rw-r--r-- 1 runner docker 46571 Aug 12 11:51 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 42647 Aug 12 11:51 revealjs_03b_local_value_numbering.qmd.html\n-rw-r--r-- 1 runner docker 63656 Aug 12 11:51 revealjs_05_global.qmd.html\n-rw-r--r-- 1 runner docker 77405 Aug 12 11:51 revealjs_06_ssa.qmd.html\n-rw-r--r-- 1 runner docker 39234 Aug 12 11:51 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33126 Aug 12 11:51 revealjs_100_mlir.qmd.html\n-rw-r--r-- 1 runner docker 33153 Aug 12 11:51 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Aug 12 11:51 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 46156 Aug 12 11:51 revealjs_14_gpu_compilers.qmd.html\n-rw-r--r-- 1 runner docker 49639 Aug 12 11:51 revealjs_ra-checking.qmd.html",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1376\n-rw-r--r-- 1 runner docker 39116 Aug 12 12:49 010_compiler_overview.html\n-rw-r--r-- 1 runner docker  9651 Aug 12 12:48 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  4134 Aug 12 12:48 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 40301 Aug 12 12:49 02a_representation.html\n-rw-r--r-- 1 runner docker  7413 Aug 12 12:48 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13286 Aug 12 12:48 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23212 Aug 12 12:49 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 34284 Aug 12 12:49 03_local.html\n-rw-r--r-- 1 runner docker  6989 Aug 12 12:48 03_local.qmd\n-rw-r--r-- 1 runner docker 31844 Aug 12 12:49 03b_local_value_numbering.html\n-rw-r--r-- 1 runner docker  7902 Aug 12 12:48 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 10557 Aug 12 12:48 04_data_flow.qmd\n-rw-r--r-- 1 runner docker 56705 Aug 12 12:49 05_global.html\n-rw-r--r-- 1 runner docker  9974 Aug 12 12:48 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Aug 12 12:48 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Aug 12 12:48 05c_pre.qmd\n-rw-r--r-- 1 runner docker 77503 Aug 12 12:49 06_ssa.html\n-rw-r--r-- 1 runner docker 16413 Aug 12 12:48 06_ssa.qmd\n-rw-r--r-- 1 runner docker 70167 Aug 12 12:49 07_llvm.html\n-rwxr-xr-x 1 runner docker 29710 Aug 12 12:48 07_llvm.ipynb\n-rw-r--r-- 1 runner docker 28290 Aug 12 12:49 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Aug 12 12:48 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 14084 Aug 12 12:48 09_poly.qmd\n-rw-r--r-- 1 runner docker 21140 Aug 12 12:49 100_mlir.html\n-rw-r--r-- 1 runner docker   302 Aug 12 12:48 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Aug 12 12:49 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Aug 12 12:48 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Aug 12 12:49 12_memory.html\n-rw-r--r-- 1 runner docker   316 Aug 12 12:48 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Aug 12 12:48 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 35359 Aug 12 12:49 14_gpu_compilers.html\n-rw-r--r-- 1 runner docker 10116 Aug 12 12:48 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4595 Aug 12 12:48 errors\ndrwxr-xr-x 2 runner docker  4096 Aug 12 12:48 images\ndrwxr-xr-x 2 runner docker  4096 Aug 12 12:48 papers\n-rw-r--r-- 1 runner docker 39048 Aug 12 12:49 ra-checking.html\n-rw-r--r-- 1 runner docker  8226 Aug 12 12:48 ra-checking.qmd\n-rw-r--r-- 1 runner docker 50551 Aug 12 12:49 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 50968 Aug 12 12:49 revealjs_02a_representation.qmd.html\n-rw-r--r-- 1 runner docker 46571 Aug 12 12:49 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 42647 Aug 12 12:49 revealjs_03b_local_value_numbering.qmd.html\n-rw-r--r-- 1 runner docker 63656 Aug 12 12:49 revealjs_05_global.qmd.html\n-rw-r--r-- 1 runner docker 77405 Aug 12 12:49 revealjs_06_ssa.qmd.html\n-rw-r--r-- 1 runner docker 39234 Aug 12 12:49 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33126 Aug 12 12:49 revealjs_100_mlir.qmd.html\n-rw-r--r-- 1 runner docker 33153 Aug 12 12:49 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Aug 12 12:49 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 46156 Aug 12 12:49 revealjs_14_gpu_compilers.qmd.html\n-rw-r--r-- 1 runner docker 49639 Aug 12 12:49 revealjs_ra-checking.qmd.html",
     "crumbs": [
       "EECS 7398",
       "Lectures",
