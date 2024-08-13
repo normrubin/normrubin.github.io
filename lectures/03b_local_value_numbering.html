@@ -307,7 +307,12 @@ a:  int b c;  </code></pre>
 </section>
 <section id="problem-canonical-variables-might-be-overwritten" class="level2">
 <h2 class="anchored" data-anchor-id="problem-canonical-variables-might-be-overwritten">problem: canonical variables might be overwritten</h2>
-<p><code>x = a+b       x =        = a+b</code></p>
+<ol type="1">
+<li>x = a+b<br>
+</li>
+<li>x =</li>
+<li>= a+b</li>
+</ol>
 <p>. . .</p>
 <p>one option is to save the value, if x will be overwritten add a temp</p>
 <pre><code>t = a+b
@@ -379,6 +384,11 @@ x =
 </ol>
 <p>Those three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!</p>
 <p>:::</p>
+</section>
+<section id="homework-2" class="level2">
+<h2 class="anchored" data-anchor-id="homework-2">homework 2</h2>
+<p>part 1: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned.</p>
+<p>part2: Implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class.</p>
 
 
 </section>
