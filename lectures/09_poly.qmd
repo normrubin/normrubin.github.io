@@ -12,38 +12,474 @@ format:
     scrollable: true
     slideNumber: c/t
 sidebar: false
-title: 9 polyhedral analysis
+title: Polyhedral Analysis
 
 ---
 
-# 1 intro to polyhedral analysis 
 
-We get a new flavor of IR -  more math like 
-
-two kinds of problems:
-
-1) polyhedral analysis -  given a loop transform, does the behavior change- Is it valid
-1) polyhedral scheduling  - find a transform that maximizes/minimizes some property
+## intro to polyhedral techniques 
 
 
-The base idea -
-A statement in a loop might execute a lot of times
-Each time it executes there is one instance of the statement
+There are two kinds of polyhedral problems:
+
+1. polyhedral analysis -  given a loop transform, does the behavior change- Is it valid?
+1. polyhedral scheduling  - find a transform that maximizes/minimizes some property
+
+## Base Idea 
+
+The base ideas -
+
+1. A statement in a loop might execute a lot of times.
+Each time it executes there is one instance of the statement. Polyhedral methods 
+keep track of instances.
+
+2. We can think of a program as having two parts: An algorithm, like $$ a[i] = 3, i \in \{1,2,3\}$$ and a schedule like: execute  the instances in reverse order.
+
+## poly steps 
+
+1. change the program into a polyhedral notations (a set like notation)
+1. Apply some kind of transformations to add a schedule
+1. Generate code that lets the result execute on a computer
 
 ---
 
-We want an ir that:
+## Polyhedral Methods
 
-1) let  us reason about each instance 
-1) is finite (even in the number of instances is not)
-1) lets  a compiler  reason about what is going on
+- Use equations as an intermediate representation (IR)
+- Allow reasoning about each instance
+- Ensure finiteness (even if the number of instances is not)
+- Reduce phase ordering issues by applying multiple transformations simultaneously
+- Ideal for tiling, parallelism, and cache management
 
 
-Negative - 
+## Negatives of Polyhedral Analysis
 
-Only applies to loop nests, where everything,
-array indexs, bounds, statements etc are affine
-so not not loops hidden in recursion
+- Only applies to loop nests
+- Requires affine array indexes, bounds, and statements
+- Not applicable to loops hidden by recursion
+
+
+
+## an example changing the order of iterations 
+
+can we reverse this loop: (change the schedule so that  i takes values 4,3,2,1). Does it get the same answer 
+
+```
+for i = [1,2,3,4]
+s:   a[i] = a[i-1]
+```
+
+----
+
+Do these loops do the same thing
+
+```
+for i = [1,2,3,4]      			for i = [4,3,2,1]
+s:   a[i] = a[i-1]      		 s:   a[i] = a[i-1] 
+```
+
+. . .
+
+
+program trace (instances)
+```
+   s(1)                               s(4)
+   s(2)                               s(3)
+   s(3)                               s(2)
+   s(4)                               s(1)
+```
+
+and the data that is accessed 
+
+```
+          reads  writes                       reads writes
+   s(1)    a[0]   a[1]               s(4)     a[3]   a[4]
+   s(2)    a[1]   a[2]               s(3)     a[2]   a[3]
+   s(3)    a[2]   a[3]               s(2)     a[1]   a[2]
+   s(4)    a[3]   a[4]               s(1)     a[0]   a[1]
+```
+
+---
+
+A transformation is valid (legal) if it preserves the dependence relations:
+producers have to execute before consumers 
+
+it is not valid if there is a pair s[i] and s[j], s[i] produces a value s[j] reads that value, s[j] is first in the new schedule
+
+---
+
+## a graphical view 
+
+(not legal if  there is a pair where the arrows go in opposite directions)
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+
+# Define the range of the loops
+n = 4  # Range for 'i' (1 to 4)
+
+# Create lists to hold the iteration points
+i_values = []
+j_values = []
+
+# Nested loops to generate iteration space
+for i in range(1, n + 1):
+  i_values.append(i)
+  j_values.append(1)
+
+# Plotting the iteration space
+plt.figure(figsize=(6, 3))
+plt.scatter(i_values, j_values, c='blue', marker='o')
+plt.xlabel('i  loop index)')
+plt.title('Iteration Space with Data Flow')
+plt.grid(True)
+plt.gca().invert_yaxis()
+
+plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+#plt.gca().yaxis.set_ticklabels([])
+
+# Annotate the iteration order and add arrows for data flow
+for i in range(2, n + 1):
+    plt.annotate('',
+      xy=(i,1), xytext=(i-1,1),
+        arrowprops=dict(facecolor='black', shrink=0.05))
+
+plt.annotate("time left schedule", xy=(n, 1.02), xytext=(1,1.02), arrowprops=dict(facecolor='green', shrink=0.05))
+
+plt.annotate("time right schedule", xy=(1, 1.04), xytext=(n-1,1.04), arrowprops=dict(facecolor='red', shrink=0.05))
+# Show the plot
+plt.show()
+
+```
+
+There are 3 pairs that make this invalid 
+
+## a second example 
+
+```
+for i in [1,2,3,4]
+  for j in [1,2,3,4]
+    a[i,j] = a[i,j-1]+ a[i-1,j]
+```
+
+can we execute this is parallel 
+
+---
+
+
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+
+# Define the range of the loops
+n = 4  # Range for 'i' (1 to 4)
+
+# Create lists to hold the iteration points
+i_values = []
+j_values = []
+
+# Nested loops to generate iteration space
+for i in range(1, n + 1):
+  for j in range(1, n + 1):
+    i_values.append(i)
+    j_values.append(j)
+
+# Plotting the iteration space
+plt.figure(figsize=(6, 4))
+plt.scatter(i_values, j_values, c='blue', marker='o')
+plt.xlabel('i  loop index)')
+plt.ylabel('j loop index')
+plt.title('Iteration Space with Data Flow')
+plt.grid(True)
+plt.gca().invert_yaxis()
+
+plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+plt.gca().yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+#plt.gca().yaxis.set_ticklabels([])
+
+# Annotate the iteration order and add arrows for data flow
+for i in range(2, n + 1):
+  for j in range(2, n +1):
+    plt.annotate('',
+       xy=(i,j), xytext=(i-1,j),
+        arrowprops=dict(facecolor='black', shrink=0.05))
+
+    plt.annotate('',
+       xy=(i,j), xytext=(i,j-1),
+        arrowprops=dict(facecolor='black', shrink=0.05))
+
+# plt.annotate("time left schedule", xy=(n, 1.02), xytext=(1,1.02), arrowprops=dict(facecolor='green', shrink=0.05))
+
+# plt.annotate("time right schedule", xy=(1, 1.04), xytext=(n-1,1.04), arrowprops=dict(facecolor='red', shrink=0.05))
+# Show the plot
+plt.show()
+```
+
+original code: time goes down each column
+
+. . .
+
+run diagonal order and could tile the loops 
+
+
+## definitions 
+
+an ***affine function***
+
+$$
+\text { affine function } f(\vec{v})=M_{f} \vec{v}+\vec{f}_{0}
+$$
+
+where $\vec{v}=\left(\begin{array}{c}v_{1} \\ \vdots \\ v_{d}\end{array}\right)$ and $M_{f} \in \mathbb{R}^{k \times d}$ is a matrix with $k$ rows and $d$ columns, $f_{0} \in \mathbb{R}^{k}$ is a $k$-dimensional vector. In all cases, we deal with affine functions with $M_{f} \in \mathbb{Z}^{k \times d}$ and $f_{0} \in \mathbb{Z}^{k}$. The domain is also a set of integers: $\vec{v} \in \mathbb{Z}^{d}$.
+
+
+***Perfect loop nest***, ***Imperfect loop nest***. A set of nested loops is called a perfect loop nest iff all statements appearing in the nest appear inside the body of the innermost loop. Otherwise, the loop nest is called an imperfect loop nest. 
+
+***Affine loop nest***. Affine loop nests are sequences of imperfectly nested loops with loop bounds and array accesses that are affine functions of outer loop variables and program parameters.
+
+Program parameters or structure parameters are symbolic constants that appear in loop bounds or access functions. They very often represent the problem size. $N$ and beta are the program parameters.
+
+```
+for (i=0 ; i<N ; i++)
+    for (j=0 ; j<N ; j++) 
+        S1: A[i,j]=A[i,j]+  u1[i] * v1[j]+u2[i] * v2[j] ;
+
+for $(k=0 ;k<N; k++ )
+    for (l}=0 ; l<N ; l++)
+        S2: x[k]=x[k]+beta*A[l,k] *y[l] ;
+```
+
+A portion of the GEMVER kernel
+
+***Affine spaces***. A set of vectors is an affine space iff it is closed under affine combination, i.e., if $\vec{x}, \vec{y}$ are in the space, all points lying on the line joining $\vec{x}$ and $\vec{y}$ belong to the space.
+
+
+***Affine hyperplane*** An affine hyperplane is an $n-1$ dimensional affine sub-space of an $n$ dimensional space.
+
+In our context, the set of all vectors $v \in \mathbb{Z}^{n}$ such that $\mathbf{h} . \vec{v}=k$, for $k \in \mathbb{Z}$, forms an affine hyperplane. The set of parallel hyperplane instances correspond to different values of $k$ with the row vector $\mathbf{h}$ normal to the hyperplane. Two vectors $\overrightarrow{v_{1}}$ and $\overrightarrow{v_{2}}$ lie in the same hyperplane if $\mathbf{h} \cdot \overrightarrow{v_{1}}=\mathbf{h} \cdot \overrightarrow{v_{2}}$. 
+
+![](https://cdn.mathpix.com/cropped/2024_08_15_37ce20a1c7fef7c8fca6g-04.jpg?height=589&width=512&top_left_y=528&top_left_x=429)
+
+An affine hyperplane
+
+
+***Polyhedron, Polytope***. A polyhedron is an intersection of a finite number of half-spaces. A polytope is a bounded polyhedron.
+
+Each of the half-spaces provides a face to the polyhedron. Hence, the set of affine inequalities, each representing a face, can be used to compactly represent the polyhedron. If there are $m$ inequalities, then the polyhedron is
+
+$$
+\left\{\vec{x} \in \mathbb{R}^{n} \mid A \vec{x}+\vec{b} \geq \overrightarrow{0}\right\}
+$$
+
+where $A \in \mathbb{R}^{m \times n}$ and $\vec{b} \in \mathbb{R}^{m}$.
+
+
+![](https://cdn.mathpix.com/cropped/2024_08_15_37ce20a1c7fef7c8fca6g-04.jpg?height=589&width=746&top_left_y=525&top_left_x=972)
+
+
+In our context, we are always interested in the integer points inside a polyhedron since loop iterators typically have integer data types and traverse an integer space. The matrix $A$ and $\vec{b}$ for problems we will deal with also comprise only integers. So, we always have:
+
+$$
+\begin{equation*}
+\left\{\vec{x} \in \mathbb{Z}^{n} \mid A \vec{x}+\vec{b} \geq \overrightarrow{0}\right\} 
+\end{equation*}
+$$
+
+where $A \in \mathbb{Z}^{m \times n}$ and $\vec{b} \in \mathbb{Z}^{m}$.
+
+
+***Iteration vector***. The iteration vector of a statement is the vector consisting of values of the indices of all loops surrounding the statement.
+
+Let $S$ be a statement of a program. The iteration vector is denoted by $\vec{i}_{S}$. An iteration vector represents a dynamic instance of a statement appearing in a loop nest that may be nested perfectly or imperfectly.
+
+***Domain, Index set***. The set of all iteration vectors for a given statement is the domain or the index set of the statement.
+
+A program comprises a sequence of statements, each statement surrounded by loops in a given order. We denote the domain of a statement $S$ by $\mathcal{D}^{S}$. When the loop bounds and data accesses are affine functions of outer loop indices and other program parameters, and all conditionals are statically predictable, the domain of every statement is a polyhedron as defined in (. Again, conditionals that are affine functions of outer loop indices and program parameters are statically predictable. 
+
+
+Each dynamic instance of a statement $S$, in a program, is identified by its iteration vector $\vec{i}_{S}$ which contains values for the indices of the loops surrounding $S$, from outermost to innermost. A statement $S$ is associated with a polytope $\mathcal{D}^{S}$ of dimensionality $m_{S}$. Each point in the polytope is an $m_{S}$-dimensional iteration vector.
+
+```
+for (i=0 ; i<N ; i++)
+    for (j=0 ; j<N ; j++) 
+        S1: A[i,j]=A[i,j]+  u1[i] * v1[j]+u2[i] * v2[j] ;
+
+for $(k=0 ;k<N; k++ )
+    for (l}=0 ; l<N ; l++)
+        S2: x[k]=x[k]+beta*A[l,k] *y[l] ;
+```
+
+
+$$
+\begin{aligned}
+i & \geq 0 \\
+j & \geq 0 \\
+-i+N-1 & \geq 0 \\
+-j+N-1 & \geq 0
+\end{aligned} \quad \quad \mathcal{D}^{S_{1}}:\left(\begin{array}{cccc}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+-1 & 0 & 1 & -1 \\
+0 & -1 & 1 & -1
+\end{array}\right)\left(\begin{array}{c}
+i \\
+j \\
+N \\
+1
+\end{array}\right) \geq 0
+$$
+
+## Iteration space as a set in matrix multiplication 
+
+```
+for (i =0 ;i < M ; i++)
+ for (j =0l j < N; j++)
+   for (k= 0; k < K, k++)
+     c[i,j] = c[i,j] + a[i,k]* B[k,j]
+```
+Iteration domain as a set: 
+
+$$ [M, N, K] -> \{ S[i, j, k] : 0 <= i < M \and  0 <= j < N \and 0 <= k < K; \}$$
+
+$$ writes ->  \{ S[i, j, k] -> C[i, j] \}$$
+
+$$ reads := \{S[i, j, k] -> B[k, j], S[i, j, k] -> A[i, k], S[i, j, k] -> C[i, j] \}$$
+
+
+
+## Dependence
+
+Two instances are dependent if they access the same location and one of them is a write.
+
+***true dependence*** producer is a write, consumer is a read. Also called read after write to RAW, also called a flow dependence
+
+***anti dependence*** write after read. WAR
+
+***output dependence** both writes WAW
+
+## dependence in example 
+
+```
+for (i=0 ; i<N ; i++)
+    for (j=0 ; j<N ; j++) 
+        S1: A[i,j]=A[i,j]+  u1[i] * v1[j]+u2[i] * v2[j] ;
+
+for (k=0 ;k<N; k++ )
+    for (l=0 ; l<N ; l++)
+        S2: x[k]=x[k]+beta*A[l,k] *y[l] ;
+```
+
+
+A[i,j] same location as A[l,k]
+
+```
+i between 0 and N
+j between 0 and N
+k between 0 and N
+l between 0 and N
+i - l == 0
+j - k == 0
+```
+
+Domain for statement S1 
+
+##
+
+
+![](https://cdn.mathpix.com/cropped/2024_08_15_37ce20a1c7fef7c8fca6g-10.jpg?height=426&width=1341&top_left_y=581&top_left_x=426)
+
+
+
+
+## loop interchange example
+
+```
+for (i = 0, i < 9; i++)
+  for (j = i; j < 7 && j < i+4; j++)
+     a[i,j] = 
+
+```
+
+There is no dependence so we can reorder the loops but what are the new bounds
+
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Initialize the coordinates for the domain
+domain_i = []
+domain_j = []
+
+# Loop through the values as described in the pseudocode
+for i in range(9):  # i = 0 to 8
+    for j in range(i, min(7, i + 4)):  # j starts from i, and is less than both 7 and i+4
+        domain_i.append(i)
+        domain_j.append(j)
+
+# Plot the domain points
+plt.scatter(domain_i, domain_j, color='blue', label='Domain Points')
+
+# Define the range for i and j for the hyperplanes
+i_values = np.arange(0, 9)
+j_values_i = i_values  # j = i
+j_values_7 = np.full_like(i_values, 7)  # j = 7
+j_values_i_plus_4 = i_values + 4  # j = i + 4
+
+# Plot the hyperplanes
+plt.plot(i_values, j_values_i, label='j = i', color='red')
+plt.plot(i_values, j_values_7, label='j = 7', color='green')
+plt.plot(i_values, j_values_i_plus_4, label='j = i + 4', color='orange')
+
+# Set plot properties
+plt.title('Domain of (i, j) with Hyperplanes')
+plt.xlabel('i')
+plt.ylabel('j')
+plt.grid(True)
+plt.xticks(range(9))
+plt.yticks(range(7))
+plt.gca().invert_yaxis()  # Invert y-axis to match matrix notation
+plt.legend()
+plt.show()
+
+
+```
+
+## reodered loops 
+```
+for (j = 0; j <=6; j++)
+ for (i = max(j-3,0); i <= j; i++)
+   a[i,j] = 0
+```
+
+
+outloop bounds cannot depend on i
+
+inner loop bounds can depend on j
+
+We  can read off j as a proection, for each value of j, i is a convex polygon (if the bounds were not convex this would be false)
+
+
+## fourier-motzkin method 
+
+input: 
+
+1. A convex polygon S on $x_1, x_2, ... x_n$ 
+2. A variable $X_m$ to be eliminated 
+
+output: $S^1$ a projection of S with out dimiension $m$
+
+## alogorithm
+
+$$ S = \{ vec(x) | B vec(x) + vec(f) \ge 0 \}$$
+$$C$$ = constraints in S that involve $S_m$ (coef is not zero)
+
+
+-=======================
+
+
+## How much of a limitation is affine only 
 
 99% of hpc loops are affine
 C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.
@@ -60,68 +496,75 @@ Over the course of this, I'll use 3 pieces of math
 2) fourier-motzkin method
 3) The affine form of Farkas Lemma (maybe)
 
-# 1 Changing the order of iterations 
-
-can we reverse this loop:
-
-```
-for i = [1,2,3,4]
-s:   a[i] = a[i-1]
 
 ```
 
----
+Here is a graph showing the data flow 
 
-Does these loops do the same thing
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
-```
-for i = [1,2,3,4]      			for i = [4,3,2,1]
-s:   a[i] = a[i-1]      		 s:   a[i] = a[i-1] 
+# Define the range of the loops
+n = 4  # Range for 'i' (1 to 4)
 
-```
----
+# Create lists to hold the iteration points
+i_values = []
+j_values = []
 
-looks look at the instances by  considering a program trace 
+# Nested loops to generate iteration space
+for i in range(1, n + 1):
+  i_values.append(i)
+  j_values.append(1)
 
-program trace (instances)
-```
-for i = [1,2,3,4]      			for i = [4,3,2,1]
-s:   a[i] = a[i-1]      		  s:   a[i] = a[i-1] 
-   s(1)                               s(4)
-   s(2)                               s(3)
-   s(3)                               s(2)
-   s(4)                               s(1)
-```
+# Plotting the iteration space
+plt.figure(figsize=(6, 3))
+plt.scatter(i_values, j_values, c='blue', marker='o')
+plt.xlabel('i  loop index)')
+plt.title('Iteration Space with Data Flow')
+plt.grid(True)
+plt.gca().invert_yaxis()
 
-and the data that is accessed 
+plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+plt.gca().yaxis.set_ticklabels([])
 
-```
-for i = [1,2,3,4]      			for i = [4,3,2,1]
-s:   a[i] = a[i-1]      		  s:   a[i] = a[i-1] 
-          reads  writes
-   s(1)    a[0]   a[1]               s(4)
-   s(2)    a[1]   a[2]               s(3)
-   s(3)    a[2]   a[3]               s(2)
-   s(4)    a[3]   a[4]               s(1)
+# Annotate the iteration order and add arrows for data flow
+for i in range(2, n + 1):
+    plt.annotate('',
+      xy=(i,1), xytext=(i-1,1),
+        arrowprops=dict(facecolor='black', shrink=0.05))
+
+# Show the plot
+plt.show()
+
 ```
 
 ---
 
-We need to preserve cases where an instance of s produces a value, some other instance of s consumes the value 
+
+
+We need to preserve order  where an instance  produces a value, some other instance consumes the value 
+
+more formally:
+
+The order that statements execute is called a ***schedule**
 
 each s(i) is an instance of a single statement
 
-data  dependence  as an equation:  $s(i) => s(i+1)$
+***data  dependence***  is a mapping:  $s(i) => s(i+1)$
+
+a valid schedule does not violate data dependence
 
 ---
 
 observation 1-  same set of instances 
 
-if we track  each instance,  we have more info b ut could run out of space 
+if we track  each instance,  we have more info but could run out of space 
 
 we need a more compressed ir format,  polyhedral methods use sets and math
 
 
+## some notation 
 
 $$
 \begin{align*}
@@ -135,11 +578,11 @@ left and right have the same domain
 
 We call the order that instances execute the **schedule**
 The  schedule is the ordering  of instances.
-this is a map of instance to time. Set of pairs that determine statement order.  Total ordering on instances 
+this is a map of instance to time. 
 
 ---
 
-observation 2- different schedules 
+observation 2- different schedules. instance -> time 
 
 $$
 \begin{align*}
@@ -159,41 +602,49 @@ or **set of violated data dependences is empty**
  
 ---
 
-what is a violated data dependence
+## what is a violated data dependence
 
 a pair (p, c) where p produces data that c consumes and c comes before p in the new schedule
 
+data dependence 
 $$
 \left \{(s(i), s(i+1)) \mid 1 \le i \le 3 \right \}
 $$
 
+set of violated data dependences 
 $$
-\left \{(s(i), s(j)) \mid \ newSch(i) \ge newSch(j) \right \}
+\left \{(s(i), s(j)) \mid \ newSch(j) \ge newSch(i) \right \}
 $$
 
-intersection is the set of s(i) produces data read by s(i+1) and  the consumer runs first
+---
+
+Dependence is $s[i] -> s[i+1]$
+
+set of violated data dependences 
+$$
+\left \{(s(i), s(j)) \mid \ newSch(j) \ge newSch(i) \right \}
+$$
 
 $$
-violated\ set = \left \{ (s(i), s(i+1)) \mid 1 \le i \le 3 \land 5-i \ge 5-i+1 \right \}
+ \left \{ (s(i), s(i+1)) \mid 1 \le i \le 3 \land 5-i+1 \ge 5-i  \right \}
 $$
-cannot reverse the loop if this set is empty
 
-we can simplify this to:
+
+constrants are :
 $$
 \begin{align*}
 1<= i <= 3 \\
- 5-i>= 5-i+1
+ 5-i +1  >= 5-i
 \end{align*}
 $$
 
 ---
 
-
-We can pull in  magic math number 1: use a ilp solver to find a solution  one  solution is i = 1 
+Use an ilp solver to find a solution  one  solution is i = 1 
 
 ---
 
-#2 ilp solver  info
+## ilp solver  info
 
 can an ilp solver always work?  
 
@@ -203,7 +654,7 @@ sadly answer is no (found in 1970)
 
 But we can do this if we limit the kinds of inequalities 
 
-## affine limits 
+## Affine limitations 
 
 affine functions, no multiplying unknowns,  no quantifiers (for all, or exists)  and is ok,  or ok (if we change to two problems)
 just add/subtract/ multiply by a constant,
@@ -224,22 +675,150 @@ Some compiler writers feel that means can only do this for toy programs?  What d
 
 ---
 
-#2  multiple dimensions 
+2  multiple dimensions 
 
-~~~
-for i in [1,2,3,4]
-  for j in [1,2,3, 4]
-    s: a(i,j) = a(i-1, j+1)
+```
+for (i=1; i<=n; i++)
+for (j=1; j<=n; j++)
+S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;
+```
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 
-~~~
-![alt text](plot2-1.png)
-The x axis is the outer loop, the y axis is the inner loop.
-The arrows are the data flow,
+# Define the range of the loops
+n = 4  # You can change n to any desired value
+
+# Create lists to hold the iteration points
+i_values = []
+j_values = []
+
+# Nested loops to generate iteration space
+for i in range(1, n + 1):
+    for j in range(1, n + 1):
+        i_values.append(i)
+        j_values.append(j)
+
+# Plotting the iteration space
+plt.figure(figsize=(5, 5))
+plt.scatter(i_values, j_values, c='blue', marker='o')
+plt.xlabel('i (outer loop index)')
+plt.ylabel('j (inner loop index)')
+plt.title('Data Dependence for A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5')
+plt.grid(True)
+plt.gca().invert_yaxis()
+
+# Annotate the iteration order and add arrows for data dependencies
+for i in range(1, n + 1):
+    for j in range(1, n + 1):
+        if i > 1:  # Dependency on A[i-1][j]
+            plt.annotate('',
+                         xy=(i, j), xytext=(i-1, j),
+                         arrowprops=dict(facecolor='black', shrink=0.05))
+        if j > 1:  # Dependency on A[i][j-1]
+            plt.annotate('',
+                         xy=(i, j), xytext=(i, j-1),
+                         arrowprops=dict(facecolor='black', shrink=0.05))
+
+# Force the x-axis to use integer labels and remove y-axis labels
+plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+plt.gca().yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+#plt.gca().yaxis.set_ticklabels([])  # Turn off y-axis labels
+
+# Show the plot
+plt.show()
+```
+
+---
 
 The schedule actually goes up each column (the j values) going over the columns left to right (the i column)
 
-notice that this does execute in parallel, but it could if we execute in diagonal order and we could tile it in the yellow boxes if we ran the tiles in diagonal order.
+notice that this does not execute in parallel, but it could if pick a different schedule
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import matplotlib.ticker as ticker
 
+plt.figure(figsize=(8, 8))
+tile_size = 1
+
+# # Define parameters
+# n = 12 # Size of the matrix
+# tile_size = 2  # Size of the tile
+
+# Create lists to hold the iteration points
+i_values = []
+j_values = []
+
+# Calculate iteration points for tiles
+for t in range(8):
+  for p in range(8):
+    i = p + t
+    j = p
+    if i >= 8:
+      continue
+    if (i >= 0 and  j >= 0) :
+      i_values.append(i)
+      j_values.append(j)
+      if i <= j:
+        continue
+      if ((t % 2) == 0) and (p % 2 ) == 0:
+          plt.gca().add_patch(   \
+          patches.Rectangle((t,p), tile_size, tile_size,  \
+                              linewidth=1, edgecolor='red', facecolor='none'))
+#         for i in range(ti, min(ti + tile_size, n + 1)):
+#             for j in range(tj, min(tj + tile_size, n + 1)):
+#                 if (i > 1 and  j > 1) :
+#                   i_values.append(i)
+#                   j_values.append(j)
+
+# # Plotting the iteration space
+
+plt.scatter(i_values, j_values, c='blue', marker='o', label='Iterations')
+plt.xlabel('i')
+plt.ylabel('j')
+plt.title('Iteration Space with Tiling and Dependencies')
+# plt.grid(True)
+#lt.gca().invert_yaxis()
+
+# # Draw a box around each tile
+# for ti in range(1, n + 1, tile_size):
+#     for tj in range(1, n + 1, tile_size):
+#         plt.gca().add_patch(
+#             patches.Rectangle((ti, tj), tile_size, tile_size,
+#                                linewidth=1, edgecolor='red', facecolor='none')
+#         )
+
+# # Draw dependencies
+# for i in range(1, n + 1):
+#     for j in range(1, n + 1):
+#         if i > 1:  # Dependency on A[i-1][j]
+#             plt.annotate('',
+#                          xy=(i, j), xytext=(i-1, j),
+#                          arrowprops=dict(facecolor='black', shrink=0.05))
+#         if j > 1:  # Dependency on A[i][j-1]
+#             plt.annotate('',
+#                          xy=(i, j), xytext=(i, j-1),
+#                          arrowprops=dict(facecolor='red', shrink=0.05))
+
+# # Force the x-axis and y-axis to use integer labels
+# plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+# plt.gca().yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+
+# # Show the plot
+# plt.legend()
+plt.show()
+```
+
+
+
+t   p     i   j
+0   0     0   0
+1   0     1   0
+1   1     0   1   t-p  p 
+2   1     1   1
+2   2     0   2
+```
 
 ## formalizing the schedule, Lexicographic ordering
 
@@ -663,7 +1242,50 @@ What does this mean and how does it help?
 
 
 
+```
 
+```{python}
+import matplotlib.pyplot as plt
+from matplotlib.patches import Arc
 
+fig, ax = plt.subplots(figsize=(5,5))
+
+# Define the range of the loops
+n = 4  # Range for 'i' (1 to 4)
+
+# Create lists to hold the iteration points
+i_values = []
+j_values = []
+
+# Nested loops to generate iteration space
+for i in range(1, n + 1):
+    i_values.append(i)
+    j_values.append(1)
+
+    arc = Arc(xy=(i+.5, 1), width=1, height=1, angle=0, theta1=0, theta2=180, color='red', lw=2)
+    ax.add_patch(arc)
+
+ax.set_ylim(0,2)
+
+# Plotting the iteration space
+
+plt.scatter(i_values, j_values, c='blue', marker='o')
+plt.xlabel('i (outer loop index)')
+plt.ylabel('j (inner loop index)')
+plt.title('Iteration Space with Data Flow')
+plt.grid(True)
+plt.gca().invert_yaxis()
+
+# # Annotate the iteration order and add arrows for data flow
+# for i in range(1, n + 1):
+#     for j in range(2, m + 1):  # Start from j=2 since j-1 needs to exist
+#         plt.annotate('',
+#                      xy=(i, j), xytext=(i, j-1),
+#                      arrowprops=dict(facecolor='black', shrink=0.05))
+
+# Show the plot
+plt.show()
+
+```
 
 
