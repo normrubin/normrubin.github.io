@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -337,7 +337,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">9 polyhedral analysis</span></a>
+ <span class="menu-text">Polyhedral Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -438,7 +438,7 @@ window.Quarto = {
 </section>
 <section id="submitting-via-pull-requests" class="level2">
 <h2 class="anchored" data-anchor-id="submitting-via-pull-requests">Submitting via pull requests</h2>
-<p>To add a blog post (which you must do for discussion leading and project reports), use a pull request.</p>
+<p>To add a blog post (which you must do for homework, discussion leading, and project reports), use a pull request.</p>
 <p>You’ll want to create a text file in the blog directory with your new post. Use a filename like YYYY-MM-DD-title.qmd, where the date is the discussion day or the project deadline and the title is up to you.</p>
 <p>Each quarto file starts with some meta data. For example the sample file has</p>
 <pre><code>---
@@ -463,8 +463,8 @@ title: sample blog
 <p>To include images or other resources in your post, make your post into a directory. That is, make a new directory called YYYY-MM-DD-title inside blog. Then, put your text in a file called index.qmd inside that. Put your images in the same directory and refer to them with relative paths. See the QUARTO docs on for more details.</p>
 <p>You can preview your writing with any Markdown renderer. To see what it will look like when published, install quarto and type quarto render to preview the entire site. Visual code has a really nice quarto extension that can preview pages.</p>
 </section>
-<section id="homeworks" class="level2">
-<h2 class="anchored" data-anchor-id="homeworks">Homeworks</h2>
+<section id="homework" class="level2">
+<h2 class="anchored" data-anchor-id="homework">Homework</h2>
 <p>To reinforce the specific compiler techniques we cover in class, you will implement them on your own. In lessons, we will discuss the high-level ideas and provide pseudo-code; your task is to translate these into working code and collect empirical evidence to demonstrate their effectiveness. Completing these implementations will reveal practical challenges that are not apparent from a high-level overview.</p>
 <p>Testing your implementation is crucial. Your goal is to provide convincing evidence that your implementation performs as intended. For instance, an optimization should generally make programs faster without causing any errors. While formal proofs of these properties are likely out of scope, you will need to find alternative ways to gather evidence. Avoid relying solely on existing test cases in the Bril repository, as they are typically insufficient. instead, consider using all the benchmarks available in the repo.</p>
 <p>You may work individually or in groups of 2–3 students. Upon completing an implementation, follow these steps:</p>
