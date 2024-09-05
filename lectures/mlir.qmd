@@ -1,0 +1,96 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_mlir.qmd
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: Polyhedral Compilation Opportunities in MLIR
+
+---
+
+#html: default
+
+## MLIR: Multi-Level Intermediate Representation
+
+MLIR (Multi-Level Intermediate Representation) was introduced by Google in April 2019 and is designed to serve as an IR from the outset. It provides various forms:
+
+## High-level form
+
+Ops (general purpose to domain speciﬁc) on tensor types / memref types
+
+```plaintext
+%patches = "tf.reshape"(%patches, %minus_one, %minor_dim_size)
+: (tensor<? x ? x ? x ? x f32>, index, index) −> tensor<? x ? x f32>
+%mat_out = "tf.matmul"(%patches_ﬂat, %patches_ﬂat){transpose_a : true}
+: (tensor<? x ? x f32>, tensor<? x ? x f32>) −> tensor<? x ?
+x f32>
+%vec_out = "tf.reduce_sum"(%patches_ﬂat) {axis: 0}
+: (tensor<? x ? x f32>) −> tensor<? x f32>
+```
+
+
+##  Loop-level / mid-level form
+
+```plaintext
+affine.for %i = 0 to 8 step 4 {
+  affine.for %j = 0 to 8 step 4 {
+    %5 = affine.load %arg0[%ii, %kk] : memref<8x8xvector<64xf32>>
+  }
+}
+```
+
+## Low-level form: closer to hardware
+
+```{plaintext}
+%v1 = load %a[%i2, %i3] : memref<256x64xvector<16xf32>>
+%v3 = addf %v1, %v2 : vector<16xf32>
+store %v3, %d[%i2, %i3] : memref<256x64xvector<16xf32>>
+
+```
+## Design principles
+
+1. Textual format 
+1. Ability to represent code at multiple levels
+1.	Uniﬁed representation for all the levels
+1.	First class abstractions for multi-dimensional arrays (tensors), loop nests, and more
+1.	Very ﬂexible, extensible
+
+## concepts 
+
+1. SSA, typed
+1. Module/Function/Block/Operation structure
+1. Operations can hold a “region” (a list of blocks)
+
+no phi nodes, basic blocks take arguments 
+
+~~~{plaintext}
+func @condbr_simple() -> (i32) {
+%cond = "foo"() : () -> i1
+%a = "bar"() : () -> i32
+%b = "bar"() : () -> i64
+
+
+^bb1(%x : i32):
+%w = "foo_bar"(%x) : (i32) -> i64
+br ^bb2(%w: i64)
+
+^bb2(%y : i64):
+%z = "abc"(%y) : (i64) -> i32 return %z : i32
+
+}
+~~~
+
+## operations 
+
+1. always have a name and source location
+1. arbitrary number of ssa operands and results 
+1. attributes - constant values 
+1. regions 
