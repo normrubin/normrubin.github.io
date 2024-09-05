@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>homework 0 – EECE7398 Fall 2024</title>
+<title>Polyhedral Compilation Opportunities in MLIR – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../homework/project.html" rel="next">
-<link href="../homework/dynamic.html" rel="prev">
+<link href="../lectures/ra-checking.html" rel="next">
+<link href="../lectures/14_gpu_compilers.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -69,323 +69,27 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="homework 0 – EECE7398 Fall 2024">
+<meta property="og:title" content="Polyhedral Compilation Opportunities in MLIR – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
-<body class="nav-sidebar docked fullcontent">
+<body>
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../homework/1.hw.html">Homework</a></li><li class="breadcrumb-item"><a href="../homework/hw0.html">homework 0</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
-    </div>
-  </nav>
-</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
-    <div class="pt-lg-2 mt-2 text-center sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="../">EECE7398 Fall 2024</a> 
-    </div>
-      </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true">
- <span class="menu-text">EECS 7398</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../weekly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Weekly Schedule</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How to submit assignments</span></a>
-  </div>
-</li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
- <span class="menu-text">Blogs</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">sample blog with an image and a graph</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../blogs/junk.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">sample blog</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Homework</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/1.hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 1 trying out bril</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/2_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 2 local optimizations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/3_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 3 data flow</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/4_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">homework dominance</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/5_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 5 SSA</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 6 loop optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/dynamic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">homework 7 dynamic compile</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/hw0.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">homework 0</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../homework/project.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">project</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Lectures</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Compiler Overview</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Performance and Measurement</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Representation of programs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Overview of Bril</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Local Analysis &amp; Optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">local value numbering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data Flow</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">5 Global Analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">loop invariant code motion</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">_ partial_redundancy elimination</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Static Single Assignment</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">7 LLVM</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">8 classic loop optimizations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Polyhedral Analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">10 MLIR</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">11 Whole program</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Dynamic Memory Management</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Dynamic Compilers</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">GPU Compilers</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/mlir.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Polyhedral Compilation Opportunities in MLIR</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Testing Register allocators</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-      </ul>
-  </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril Documentation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bril github</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="https://github.com/normrubin/normrubin.github.io" class="sidebar-item-text sidebar-link">
- <span class="menu-text">class github</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs_mlir.qmd.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../homework/1.hw.html">Homework</a></li><li class="breadcrumb-item"><a href="../homework/hw0.html">homework 0</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/mlir.html">Polyhedral Compilation Opportunities in MLIR</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">homework 0</h1>
+<h1 class="title">Polyhedral Compilation Opportunities in MLIR</h1>
 </div>
 
 
@@ -402,21 +106,71 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Write a paragraph to introduce yourself in a reply to the canvas introductions topic. Add a picture of you can. Mention a compilers topic you’d like to learn about someday, either in this class or beyond. Add your info to the canvas introductions discussion topic.</p>
-<p>Pick a paper from the <a href="../weekly.html">weekly schedule</a> whose discussion you will lead. Claim the paper by opening a pull request (at the class github) for the weekly.qmd file, fill in your name in the LEADER: line. (I encurage teams of two to sign up for the same paper)</p>
-<p>Once everyone has signed up, and I see which papers are covered, I’ll finalize the dates and times.</p>
-<p>Add a text file containing done to Canvas assignment 0 to indicate you have done the introduction and claimed a paper</p>
+<p>#html: default</p>
+<section id="mlir-multi-level-intermediate-representation" class="level2">
+<h2 class="anchored" data-anchor-id="mlir-multi-level-intermediate-representation">MLIR: Multi-Level Intermediate Representation</h2>
+<p>MLIR (Multi-Level Intermediate Representation) was introduced by Google in April 2019 and is designed to serve as an IR from the outset. It provides various forms:</p>
+</section>
+<section id="high-level-form" class="level2">
+<h2 class="anchored" data-anchor-id="high-level-form">High-level form</h2>
+<p>Ops (general purpose to domain speciﬁc) on tensor types / memref types</p>
+<pre class="plaintext"><code>%patches = "tf.reshape"(%patches, %minus_one, %minor_dim_size)
+: (tensor&lt;? x ? x ? x ? x f32&gt;, index, index) −&gt; tensor&lt;? x ? x f32&gt;
+%mat_out = "tf.matmul"(%patches_ﬂat, %patches_ﬂat){transpose_a : true}
+: (tensor&lt;? x ? x f32&gt;, tensor&lt;? x ? x f32&gt;) −&gt; tensor&lt;? x ?
+x f32&gt;
+%vec_out = "tf.reduce_sum"(%patches_ﬂat) {axis: 0}
+: (tensor&lt;? x ? x f32&gt;) −&gt; tensor&lt;? x f32&gt;</code></pre>
+</section>
+<section id="loop-level-mid-level-form" class="level2">
+<h2 class="anchored" data-anchor-id="loop-level-mid-level-form">Loop-level / mid-level form</h2>
+<pre class="plaintext"><code>affine.for %i = 0 to 8 step 4 {
+  affine.for %j = 0 to 8 step 4 {
+    %5 = affine.load %arg0[%ii, %kk] : memref&lt;8x8xvector&lt;64xf32&gt;&gt;
+  }
+}</code></pre>
+</section>
+<section id="low-level-form-closer-to-hardware" class="level2">
+<h2 class="anchored" data-anchor-id="low-level-form-closer-to-hardware">Low-level form: closer to hardware</h2>
+<pre class="{plaintext}"><code>%v1 = load %a[%i2, %i3] : memref&lt;256x64xvector&lt;16xf32&gt;&gt;
+%v3 = addf %v1, %v2 : vector&lt;16xf32&gt;
+store %v3, %d[%i2, %i3] : memref&lt;256x64xvector&lt;16xf32&gt;&gt;
+</code></pre>
+</section>
+<section id="design-principles" class="level2">
+<h2 class="anchored" data-anchor-id="design-principles">Design principles</h2>
 <ol type="1">
-<li><p>For this assignment you just need to submit a response to the canvas assignment to indicate that you are done after you write your introduction into canvas</p></li>
-<li><p>For other assignments you should:</p>
-<ol type="1">
-<li>Write a blog post describing your work, and submit it via a pull request to the github page</li>
-<li>Add a response to the the canvas assignment giving the name of your blog post</li>
-</ol></li>
+<li>Textual format</li>
+<li>Ability to represent code at multiple levels</li>
+<li>Uniﬁed representation for all the levels</li>
+<li>First class abstractions for multi-dimensional arrays (tensors), loop nests, and more</li>
+<li>Very ﬂexible, extensible</li>
 </ol>
-<p>My plan is that grades, personal details and the like stay in canvas and everything else becomes public and goes on the github website.</p>
+</section>
+<section id="concepts" class="level2">
+<h2 class="anchored" data-anchor-id="concepts">concepts</h2>
+<ol type="1">
+<li>SSA, typed</li>
+<li>Module/Function/Block/Operation structure</li>
+<li>Operations can hold a “region” (a list of blocks)</li>
+</ol>
+<p>no phi nodes, basic blocks take arguments</p>
+<p>~~~{plaintext} func <span class="citation" data-cites="condbr_simple">@condbr_simple</span>() -&gt; (i32) { %cond = “foo”() : () -&gt; i1 %a = “bar”() : () -&gt; i32 %b = “bar”() : () -&gt; i64</p>
+<p>^bb1(%x : i32): %w = “foo_bar”(%x) : (i32) -&gt; i64 br ^bb2(%w: i64)</p>
+<p>^bb2(%y : i64): %z = “abc”(%y) : (i64) -&gt; i32 return %z : i32</p>
+<p>} ~~~</p>
+</section>
+<section id="operations" class="level2">
+<h2 class="anchored" data-anchor-id="operations">operations</h2>
+<ol type="1">
+<li>always have a name and source location</li>
+<li>arbitrary number of ssa operands and results</li>
+<li>attributes - constant values</li>
+<li>regions</li>
+</ol>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -841,13 +595,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../homework/dynamic.html" class="pagination-link" aria-label="homework 7 dynamic compile">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">homework 7 dynamic compile</span>
+      <a href="../lectures/14_gpu_compilers.html" class="pagination-link" aria-label="GPU Compilers">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">GPU Compilers</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../homework/project.html" class="pagination-link" aria-label="project">
-        <span class="nav-page-text">project</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/ra-checking.html" class="pagination-link" aria-label="Testing Register allocators">
+        <span class="nav-page-text">Testing Register allocators</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
