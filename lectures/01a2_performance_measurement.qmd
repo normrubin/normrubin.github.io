@@ -1,0 +1,87 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_01a2_performance_measurement.qmd
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: Performance and Measurement part 2
+
+---
+
+# Measurement 
+
+last time we looked at 
+
+
+
+[ Producing Wrong Data Without Doing Anything Obviously Wrong!](papers/wrong_data.pdf) Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.
+
+445 references 
+
+
+---
+
+1. Measurement bias is significant
+1. Changing aspects of an experimental setup can introduce measurement bias. ​
+Measurement bias is unpredictable and there are no obvious ways to avoid it. ​
+Prior work in computer system evaluation does not adequately consider measurement bias. ​
+1. The paper discusses two techniques for dealing with measurement bias: experimental setup randomization and causal analysis. ​
+1. Measurement bias occurs for all benchmarks and architectures. ​
+1. Measurement bias due to link order can significantly fluctuate conclusions. ​
+1. Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​
+1. To avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​
+ ---
+
+---
+
+A sample blog post about this paper
+[blog](https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/)
+
+## another example
+
+[Strangely, Matrix Multiplications on GPUs Run Faster When Given "Predictable" Data!](https://www.thonking.ai/p/strangely-matrix-multiplications)
+
+[SIGPLAN Empirical Evaluation Guidelines](https://www.sigplan.org/Resources/EmpiricalEvaluation/)
+
+
+[checklist](https://blog.sigplan.org/2019/08/28/a-checklist-manifesto-for-empirical-evaluation-a-preemptive-strike-against-a-replication-crisis-in-computer-science/)
+
+Here are the criteria by Berger, Blackburn, Hauswirth, and Hicks (2018):
+
+1. Clearly stated claims
+    a. Explicit Claims
+    a. Appropriately-Scoped Claims
+    a. Acknowledges Limitations 
+1. Suitable Comparison
+    a. Appropriate Baseline for Comparison 
+    a. Fair Comparison
+1. Principled Benchmark Choice
+    a. Appropriate Suite
+    a. Non-Standard Suite(s) Justified
+    a. Applications, Not (Just) Kernels
+1. Adequate Data Analysis
+    a. Sufficient Number of Trials
+    a. Appropriate Summary Statistics
+    a. Report Data Distribution
+1. Relevant Metrics
+    a. Direct or Appropriate Proxy Metric
+    a. Measures All Important Effects
+1. Appropriate and Clear Experimental Design
+    a. Sufficient Information to Repeat
+    a. Reasonable Platform
+    a. Explores Key Design Parameters
+    a. Open Loop in Workload Generator
+    a. Cross-Validation Where Needed
+1. Presentation of Results
+    a. Comprehensive Summary Results
+    a. Axes Include Zero
+    a. Ratios Plotted Correctly
+    a. Appropriate Level of Precision

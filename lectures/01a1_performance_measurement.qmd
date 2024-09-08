@@ -1,0 +1,109 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_01a1_performance_measurement.qmd
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: Performance and Measurement part 1
+
+---
+
+# Measurement 
+
+
+## example 1
+
+
+[ Producing Wrong Data Without Doing Anything Obviously Wrong!](papers/wrong_data.pdf) Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.
+
+445 references 
+
+---
+
+A sample blog post about this paper
+[blog](https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/)
+
+
+
+
+## violin plots 
+
+[data](https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data)
+
+A dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle
+
+
+
+```{python}
+
+# library & dataset
+import seaborn as sns
+import pandas as pd
+import numpy as np
+
+
+df = pd.read_csv('images/chip_dataset.csv')
+print(df.head())
+
+sns.set_palette("pastel")
+
+sns.violinplot(x=df["Vendor"], y=np.log(df["Freq (MHz)"]), hue=df['Type'])
+
+
+```
+
+apply np.log to the Freq (MHz) column.  Because of wide range of values
+
+Set a pastel palette with sns.set_palette("pastel"). These colors make it easier to see the parts of the violin plot
+
+Hue Parameter: I'm using the hue parameter to differentiate between types of chips. Hue sets a color within the palette
+
+Data Source and Preparation: Include a brief note on where the data comes from (you've provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.
+
+
+I might want to take date into account in these plots
+
+----
+
+A violin plot shows density curves.  The width is the approximate frequency of data points at that value 
+
+Best for comparing distributions 
+
+consider ordering the groups 
+
+The details 
+
+1. the white dot represents the median
+1. the thick gray bar in the center represents the inter-quartile range
+1. the thin gray line represents the rest of the distribution, except for points that are determined to be “outliers” using a method that is a function of the inter-quartile range.
+1. On each side of the gray line is a kernel density estimation to show the distribution shape of the data. Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability.
+
+
+## error bars 
+
+```{python}
+
+print(df.describe())
+
+import pandas as pd
+
+# Assuming df is your DataFrame and 'Release Date' is the column
+df['Release Date'] = pd.to_datetime(df['Release Date'], errors='coerce')
+df['Release Year'] = ((df['Release Date'].dt.year) // 5) * 5
+
+# Now df['Release Year'] contains the year extracted from 'Release Date'
+
+
+# plot a bar chart
+ax = sns.barplot(x=df['Release Year'], y=df["TDP (W)"], hue =df['Type'], estimator=np.mean, errorbar=("sd"))
+
+```
+

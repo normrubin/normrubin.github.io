@@ -163,6 +163,26 @@ you can setup Bril on your local linux (can be wsl) machine
 Lets write a sample program - that generates  the cfg 
 
 How would you do that?
+
+
+```{plaintext}
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
+        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
+        { "op": "add", "type": "int", "dest": "v2",
+          "args": ["v0", "v1"] },
+        { "op": "print", "args": ["v2"] }
+      ],
+      "args": []
+    }
+  ]
+}
+
+```
  
 . . .
  
