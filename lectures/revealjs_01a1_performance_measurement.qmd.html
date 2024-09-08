@@ -10,7 +10,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.57">
 
-  <title>EECE7398 Fall 2024 – Performance and Measurement</title>
+  <title>EECE7398 Fall 2024 – Performance and Measurement part 1</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -387,7 +387,7 @@
       margin-right: 0; 
     }
   </style>
-<meta property="og:title" content="Performance and Measurement – EECE7398 Fall 2024">
+<meta property="og:title" content="Performance and Measurement part 1 – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -395,7 +395,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Performance and Measurement</h1>
+  <h1 class="title">Performance and Measurement part 1</h1>
 
 <div class="quarto-title-authors">
 </div>
@@ -411,32 +411,15 @@
 <p><a href="papers/wrong_data.pdf">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
 <p>445 references</p>
 </section>
-<section class="slide level2 scrollable">
-
-<ol type="1">
-<li>Measurement bias is significant</li>
-<li>Changing aspects of an experimental setup can introduce measurement bias. ​ Measurement bias is unpredictable and there are no obvious ways to avoid it. ​ Prior work in computer system evaluation does not adequately consider measurement bias. ​</li>
-<li>The paper discusses two techniques for dealing with measurement bias: experimental setup randomization and causal analysis. ​</li>
-<li>Measurement bias occurs for all benchmarks and architectures. ​</li>
-<li>Measurement bias due to link order can significantly fluctuate conclusions. ​</li>
-<li>Measurement bias due to UNIX environment size can lead to conflicting conclusions. ​</li>
-<li>To avoid measurement bias, it is important to use diverse evaluation workloads, randomize the experimental setup, conduct causal analysis, and collect more information from hardware manufacturers. ​ —</li>
-</ol>
-</section>
 <section class="slide level2">
 
 <p>A sample blog post about this paper <a href="https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/">blog</a></p>
-</section>
-<section id="another-example" class="slide level2">
-<h2>another example</h2>
-<p><a href="https://www.thonking.ai/p/strangely-matrix-multiplications">Strangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!</a></p>
-<p><a href="https://www.sigplan.org/Resources/EmpiricalEvaluation/">SIGPLAN Empirical Evaluation Guidelines</a></p>
 </section>
 <section id="violin-plots" class="slide level2">
 <h2>violin plots</h2>
 <p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
 <p>A dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle</p>
-<div id="a5425204" class="cell" data-execution_count="1">
+<div id="a038f3bd" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="co"># library &amp; dataset</span></span>
@@ -477,7 +460,7 @@
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="01a_performance_measurement_files/figure-revealjs/cell-2-output-2.png" width="799" height="429"></p>
+<p><img data-src="01a1_performance_measurement_files/figure-revealjs/cell-2-output-2.png" width="799" height="429"></p>
 </figure>
 </div>
 </div>
@@ -503,7 +486,7 @@
 </section>
 <section id="error-bars" class="slide level2">
 <h2>error bars</h2>
-<div id="769f1119" class="cell" data-execution_count="2">
+<div id="26da17ba" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="bu">print</span>(df.describe())</span>
@@ -554,7 +537,7 @@ max    11540.000000  </code></pre>
 <div class="cell-output cell-output-display">
 <div>
 <figure>
-<p><img data-src="01a_performance_measurement_files/figure-revealjs/cell-3-output-2.png" width="816" height="433"></p>
+<p><img data-src="01a1_performance_measurement_files/figure-revealjs/cell-3-output-2.png" width="816" height="433"></p>
 </figure>
 </div>
 </div>
