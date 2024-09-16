@@ -18,74 +18,19 @@ title: Data Flow
 
 ## Reasoning about data flow (global analysis)
 
-We will see a single algorithm that can do lots of different analysis. And it works no matter what kind of control flow.
+There	exists	a	general	algorithm	to	extract	information	from	programs.
 
-There is some theory to look at for this.  How do we know if the algorithm will converge for any possible cfg.
+Many	static	analyses	are	dataflow	analyses:
 
-and some naming for each kind of problem
+1. Liveness,	
+1. available	expressions,	
+1. very	busy	expressions,	
+1. reaching	definitions.	
 
+Dataflow	analyses	are	flow	sensitive.
 
-## example
+How do we know if the algorithm will converge for any possible cfg.
 
-::: {.columns}
-::: {.column}
-
-```
-     main(cond)
-     a int = const 47
-     b :int = const 42
-     br cond .left .right
-    .left
-     b: int = const 1
-     c:int = const 5 
-    jmp .end
-   .right
-     a :int = const 2
-     c: int = const 10
-   jmp .end
-   .end
-    d: int sub  a b
-    print d
-    ret
-```
-:::
-
-::: {.column}
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-
-
-graph TD
-style A text-align: left
-style B  text-align: left
-%% nodes 
-     A["1: main cond\n2: a int = const 47\n3: b :int = const 42\n4:br cond left .right"] 
-   
-   B["5: b: int = const 1
-   6 c:int = const 5 
-   7 jmp .end"]
-  
-   C["8: a :int = const 2
-   9: c: int = const 10
-   10 jmp .end"]
-    D["11: d: int sub  a b
-    12 print d
-    13 ret"]
-%% edges
-    A  -- true --> B
-    A  --false --> C
-    B --> D
-    C --> D
-```
-:::
-
-:::
-
-
-## first we are going to look at a  specific problem "reaching definitions"
-
-*Reaching definitions* are an example of a global property that require you to look at an entire CFG.
 
 ## definitions
 
@@ -99,18 +44,259 @@ A definition D reaches a point P (instruction) in the program if there is an exe
 
 if an instruction writes a variable it ***kills***  all prior definitions that write the same variable 
 
+ A ***program point*** is an instruction
+
+
+## example for avail expressions
+
+```{typescript}
+function main(x: number, y: number, z: number, a: number, b: number): void {
+    z = a + b;
+    y = a * b;
+
+    for (; y > a +b; ){
+        a = a + 1;
+        x = a + b;
+        // Update y to reflect the new value of a
+        y = a * b;
+    }
+}
+```
+
+```
+@main(x: float, y: float, z: float, a: float, b: float) {
+  z: float = fadd a b;
+  y: float = fmul a b;
+
+.for.cond.6:
+  v10: float = fadd a b;
+  v11: bool = fgt y v10;
+  br v11 .for.body.6 .for.end.6;
+
+.for.body.6:
+  a: float = fadd a 1;
+  x: float = fadd a b;
+  y: float = fmul a b;
+  jmp .for.cond.6;
+
+.for.end.6:
+}
+```
+How do we optimize this program?
+
+## control flow graph
+
+::: {.columns}
+
+::: {.column}
+
+```{typescript}
+function main(x: number, y: number, z: number, a: number, b: number): void {
+    z = a + b;
+    y = a * b;
+
+    for (; y > a +b; ){
+        a = a + 1;
+        x = a + b;
+        y = a * b;
+    }
+}
+```
+
+:::
+
+::: {.column}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+%%| echo: false
+graph TD
+A["z: float = fadd a b;\n
+  y: float = fmul a b;"]
+
+  B["v10: float = fadd a b;\n
+  v11: bool = fgt y v10;\n
+  br v11 .for.body.6 .for.end.6;"]
+
+  C["a: float = fadd a 1;\n
+  x: float = fadd a b;\n
+  y: float = fmul a b;\n
+  jmp .for.cond.6;"]
+
+  D["END"]
+
+  A-->B
+  B-->C
+  C--> B
+  B--> D
+
+
+```
+
+:::
+
+::: 
+
+## optimized 
+
+::: {.columns}
+
+::: {.column}
+
+```{typescript}
+function main(x: number, y: number, z: number, a: number, b: number): void {
+    z = a + b;
+    y = a * b;
+
+    for (; y > a +b; ){
+        a = a + 1;
+        x = a + b;
+        y = a * b;
+    }
+}
+```
+
+:::
+
+::: {.column}
+
+```{typescript}
+function main(x: number, y: number, z: number, a: number, b: number): void {
+    z = a + b;
+    y = a * b;
+     
+    w = z
+
+    for (; y > w; ){
+        a = a + 1;
+        x = a + b;
+        y = a * b;
+
+        w = x 
+    }
+}
+```
+
+:::
+
+:::
+
+
+is this an optimization?
+
+
+## available expressions 
+
+In	order	to	apply	the	previous	optimization,	we	had	to	know	which	expressions	were	available	at	the	places	where	we	replaced	expressions	by	variables.	
+
+An	expression	is	available	at	a	program	point	if	its	current value	has	already	been	computed	earlier	in	the	execution.	
+
+How does information originate 
+
+How does information propagate
+
+## Origin of information
+
+If	an	expression	is	used	at	a	point	p,	then	it	is	available	immediately	after	p,	as	long	as	p	does	not	redefine	any	of	the	variables	that	the	expression	uses.	
+
+What about expressions not used at p
+
+- - - 
+
+An	expression	E	is	available	immediately	after	a	program	point	p	if,	and	only	if:	
+
+1. It	is	available	immediately	before	p.	
+1. No	variable	of	E	is	redefined	at	p.	
+
+or	
+1. It	is	used	at	p.	
+1. No	variable	of	E	is	redefined	at	p.	
+
+information flows downward 
+
+## joining info
+
+at the top of a block an expression is available if it is available after the bottom of all predecessors 
+
+To solve this we can form two sets 
+
+IN expressions available immed before p
+
+OUT expressions available immed after p
+
+## equations 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+%%| echo: false
+graph TB
+p1 --> p
+p2 --> p
+p3 -->p
+```
+
+
+$$
+\begin{aligned} \operatorname{IN}(p) & =\bigcap \operatorname{OUT}\left(p_s\right), p_s \in \operatorname{pred}(p) \\ \operatorname{OUT}(p) & =(\operatorname{IN}(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\}\end{aligned}
+$$
+
+\
+
+## a  specific problem  called "reaching definitions"
+
+*Reaching definitions* is  an example of a global property that require you to look at an entire CFG.
+
+
 ## Reaching definitions problem: determine which definitions reach which uses.
 
+```
+x = input; 
+while (x > 1) {
+      y = x / 2;
+      if (y > 3)        
+         x = x - y;    
+      z = x - 4;   
+      if (y > 0)       
+          x = x / 2;    
+      z = z - 1; } 
+``` 
+      
+      Consider	this program 	How	could	we	optimize	it?	
+      
+      what 	information	does	this	optimization	need? 
 
-The above program has 8 definitions, Which we could represent by a bit vector of size 8.
+## reaching definitions 
 
+The assignment z = z -1 is dead - how do we find that 
+The assignment of z does not reach a use of z
+
+
+## reaching defs
+
+origin: if a program point p defines a variable v then v reaches the point after p
+
+propagation:
+A definition of a variable v reaches the program point immediately after p if, and only if: 
+
+1. the definition reaches the point immediately before p
+1. variable v is not redefined at p.
+
+or 
+
+Variable v is defined at p
+
+join:
+if a definition of a variable v reaches the point immediately after at least one predecessor of p, then it reaches the point immediately before p. 
+
+
+## matrix forms 
 
 We could build a 2d matrix - definitions by uses, where a 1 bit  indicates that this definition reaches this use.
 As a matrix this would be very sparse, later when we do ssa forms will see a very cool  compression technique. 
 Algorithms that use this kind of matrix are called bit-vector methods. 
 
 
-## A ***program point*** is an instruction
 
 A definition of a variable v reaches just after a program point p if and only if:
 
@@ -143,60 +329,6 @@ OUT is the set of definitions that reach a point immediately after p
 ---
 
 
-To illustrate this, I"ll use pairs (variable, def) for each set, but the def already includes the variable so real implementations can just use the def
-
-
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-
-graph TD
-style A text-align: left
-style B  text-align: left
-%% nodes 
-A_IN["A_IN={}"]
-A_OUT["A_OUT={(cond,1),(a,2),(b,3)}"]
-
-B_IN["B_IN={(cond,1),(a,2),(b,3)}"]
-B_OUT["B_OUT={(cond,1),(a,2),(b,5),(c,6)}"]
-
-C_IN["IN={(cond,1),(a,2),(b,3)}"]
-C_OUT["OUT={(cond,1),(a,8),(b,3,(c,9)}"]
-
-D_IN["IN={(cond,1),(a,2),(a,8) (b,5), (b,3), (c,6), (c,9)}"]
- 
-  A["blk a
-    1: main cond
-   2: a int = const 47
-   3: b :int = const 42
-   4:br cond .left .right"] 
-   
-   B["blk b
-   5: b: int = const 1
-   6 c:int = const 5 
-   7 jmp .end"]
-  
-   C["blk c
-     8: a :int = const 2
-   9: c: int = const 10
-   10 jmp .end"]
-    D["11: d: int sub  a b
-    12 print d
-    13 ret"]
-%% edges
-    A_IN --> A 
-    A --> A_OUT
-    A_OUT  -- true --> B_IN
-    B_IN --> B
-    B --> B_OUT
-    A_OUT --false --> C_IN
-    C_IN --> C
-    C-->   C_OUT
-    B_OUT--> D_IN
-    C_OUT--> D_IN
-    D_IN --> D
-```
-
 
 ## calculate in and out 
 
@@ -213,9 +345,55 @@ Reaching defs will need iteration. but these sets do not change
 1) $OUT(b) = (in(b) - kill(b) ) \cup gen(b)$
 2) $IN(b) = \cup \left( \operatorname{OUT}(p) \mid p \in predecessors(b) \right))$
 
+# common structure 
+liveness 
+$$
+\begin{aligned}
+\operatorname{IN}(p)= & (\operatorname{OUT}(p) \backslash\{v\}) \cup \operatorname{vars}(E) \\
+\operatorname{OUT}(p)= & \bigcup I N\left(p_s\right), p_s \in \operatorname{succ}(p) \\
+\end{aligned}
+$$ 
+reaching defs 
+$$
+\begin{aligned}
+IN(p)= & \bigcup \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
+\operatorname{OUT}(p)= & \left(I N(p) \backslash\left\{\operatorname{defs}_s(v)\right\}\right) \cup\{p\} \\
+\end{aligned}
+$$
 
-We call the function for 1 the ***transfer*** function for the block, and the function for 2 the ***merge*** function
+Available Expressions
+$$
+\begin{aligned}
+\operatorname{IN}(p)=\bigcap \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
+ \operatorname{OUT}(p)=(I N(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\} \\
+ \end{aligned}
+$$ 
 
+## framework
+
+A may analysis keeps tracks of facts that may happen during the execution of the program. 
+1. A definition may reach a certain point
+
+A must analysis tracks facts that will – for sure – happen during the execution of the program. 
+1. This expression will be used after certain program point.
+
+A backward analysis propagates information in the opposite direction in which the program flows.
+
+A forward analysis propagates information in the same direction in which the program flows. 
+
+
+## transfer functions 
+
+in a forward analysis  out = f(in) in a backward analysis in = f(out)
+
+
+we call f the ***transfer function***  
+
+The transfer functions provides us with a new "interpretation" of the program. We can implement a machine that traverses the program, always fetching a given instruction, and applying the transfer function onto that instruction. This process goes on until the results produced by these transfer functions stop changing. This is abstract interpretation
+
+## merge functions - 
+There are two merge functions meet and join specifying what happens 
+at all preds/successors
 
 ## pseudo code : We can solve for IN and OUT iteratively using a worklist 
 
@@ -272,17 +450,50 @@ visit a node after visiting its preds.  Reverse post order.
 
 ##  a second problem liveness- 
 
+If	we	assume	an	infinite	supply	of	registers,	then	a	variable	v	should	be	in	a	register	at	a	program	point	p,	whenever:	
+
+1. There	is	a	path	P	from	p	to	another	program	point	pu,	where	v	is	used.	
+2. The	path	P	does	not	go	across	any	definition	of	v.	
+
+Conditions	1	and	2	determine	when	a	variable	v	is	live at program	point	p.	
+
+Why is the second condition necessary?
+
+
 A variable is live at some point if it holds a value that may be needed in the future, or equivalently 
 if its value may be read before the next time the variable is written to.
 
 ```
-             live = {}
-b = 3        live = b
-c = 5        live = b c 
-a = f(b * c) live = a
-```
 
----
+
+## Origin of information
+
+if a variable is used at a program point p, it must be alive immediately before p
+
+if the variable is not used at p, when is it live immediately before p?
+
+## propagation of information
+
+A	variable	is	live	immediately	before	a	program	point	p	if,	and	only	if:	
+
+1. It	is	live	immediately	after	p.	
+2. It	is	not	redefined	at	p.	
+
+or	
+
+1. It	is	used	at	p.	
+
+information propagates upward 
+
+
+what if the program point p has multiple successors?
+
+#joining info 
+
+if a variable is live at the bottom of a block then it must be live at the top of at least one predecssor of the block.
+
+
+## IN and OUT sets 
 
 We had to consider flow starting at the bottom so this is a ***backwards*** analysis 
 
@@ -305,7 +516,7 @@ for a basic block (b):
 b1: a = 3; 
     b = 5;
     d = 4;
-    x = 100; //x is never being used later thus not in the out set {a,b,d}
+    x = 100; //x is never  used later thus not in the out set {a,b,d}
     t = a > b
     br t .t .f 
    // out: {a,b,d}    //union of all (in) successors of b1 => b2: {a,b}, and b3:{b,d}  
@@ -325,7 +536,19 @@ b3:  in: {b,d}; predecessor blocks: b1 and b2
 // out:{}
 ```
 
-This can be solved using the same code as before, flip pred, successors because its backward, reverse in and out, set elements are variable names 
+Each block gives us two equations.
+
+we can iterate these equations until IN and OUT stop changing 
+
+1. How do we intitialize these sets?
+1. Does this always converge?
+1. What is the complexity?
+
+## solving liveness 
+
+1. initialize each IN and OUT to empty
+1. Evaluate all the equations
+1. if anything changes repeat step 2 
 
 
 ## data flow framework
