@@ -15,387 +15,409 @@ sidebar: false
 title: Data Flow
 
 ---
-
-## Reasoning about data flow (global analysis)
-
-There	exists	a	general	algorithm	to	extract	information	from	programs.
-
-Many	static	analyses	are	dataflow	analyses:
-
-1. Liveness,	
-1. available	expressions,	
-1. very	busy	expressions,	
-1. reaching	definitions.	
-
-Dataflow	analyses	are	flow	sensitive.
-
-How do we know if the algorithm will converge for any possible cfg.
-
-
-## definitions
-
- A  ***Use:*** An instruction uses all of its arguments. (So any instruction with arguments is a "use."), a binary instruction is two uses.
-
-A ***definition*** is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest )
-
-A definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and  the variable in D is not overwritten on the path.
-
-***Available:*** Definitions that reach a given point in the program are available at that point.
-
-if an instruction writes a variable it ***kills***  all prior definitions that write the same variable 
-
- A ***program point*** is an instruction
-
-
-## example for avail expressions
-
-```{typescript}
-function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-
-    for (; y > a +b; ){
-        a = a + 1;
-        x = a + b;
-        // Update y to reflect the new value of a
-        y = a * b;
-    }
-}
-```
-
-```
-@main(x: float, y: float, z: float, a: float, b: float) {
-  z: float = fadd a b;
-  y: float = fmul a b;
-
-.for.cond.6:
-  v10: float = fadd a b;
-  v11: bool = fgt y v10;
-  br v11 .for.body.6 .for.end.6;
-
-.for.body.6:
-  a: float = fadd a 1;
-  x: float = fadd a b;
-  y: float = fmul a b;
-  jmp .for.cond.6;
-
-.for.end.6:
-}
-```
-How do we optimize this program?
-
-## control flow graph
-
-::: {.columns}
-
-::: {.column}
-
-```{typescript}
-function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-
-    for (; y > a +b; ){
-        a = a + 1;
-        x = a + b;
-        y = a * b;
-    }
-}
-```
-
-:::
-
-::: {.column}
-
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%| echo: false
-graph TD
-A["z: float = fadd a b;\n
-  y: float = fmul a b;"]
-
-  B["v10: float = fadd a b;\n
-  v11: bool = fgt y v10;\n
-  br v11 .for.body.6 .for.end.6;"]
-
-  C["a: float = fadd a 1;\n
-  x: float = fadd a b;\n
-  y: float = fmul a b;\n
-  jmp .for.cond.6;"]
-
-  D["END"]
-
-  A-->B
-  B-->C
-  C--> B
-  B--> D
-
-
-```
-
-:::
-
-::: 
-
-## optimized 
-
-::: {.columns}
-
-::: {.column}
-
-```{typescript}
-function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-
-    for (; y > a +b; ){
-        a = a + 1;
-        x = a + b;
-        y = a * b;
-    }
-}
-```
-
-:::
-
-::: {.column}
-
-```{typescript}
-function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-     
-    w = z
-
-    for (; y > w; ){
-        a = a + 1;
-        x = a + b;
-        y = a * b;
-
-        w = x 
-    }
-}
-```
-
-:::
-
-:::
-
-
-is this an optimization?
-
-
-## available expressions 
-
-In	order	to	apply	the	previous	optimization,	we	had	to	know	which	expressions	were	available	at	the	places	where	we	replaced	expressions	by	variables.	
-
-An	expression	is	available	at	a	program	point	if	its	current value	has	already	been	computed	earlier	in	the	execution.	
-
-How does information originate 
-
-How does information propagate
-
-## Origin of information
-
-If	an	expression	is	used	at	a	point	p,	then	it	is	available	immediately	after	p,	as	long	as	p	does	not	redefine	any	of	the	variables	that	the	expression	uses.	
-
-What about expressions not used at p
-
-- - - 
-
-An	expression	E	is	available	immediately	after	a	program	point	p	if,	and	only	if:	
-
-1. It	is	available	immediately	before	p.	
-1. No	variable	of	E	is	redefined	at	p.	
-
-or	
-1. It	is	used	at	p.	
-1. No	variable	of	E	is	redefined	at	p.	
-
-information flows downward 
-
-## joining info
-
-at the top of a block an expression is available if it is available after the bottom of all predecessors 
-
-To solve this we can form two sets 
-
-IN expressions available immed before p
-
-OUT expressions available immed after p
-
-## equations 
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%| echo: false
-graph TB
-p1 --> p
-p2 --> p
-p3 -->p
+The material in these slides have been taken from "Lecture Notes in Static Analysis" (Sec.6), by Michael I. Schwartzbach,
+https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/,  "Principles of Program Analysis", Chapter 6, by Niesen et al, and from Miachel Schwartzbach's "Lecture notes in Static Analysis", Chapter 6, First Section. 
+
+```{python}
+for i in range(131):
+    print(f"![](df/ra{i+1}.svg)\n##")
 ```
 
 
-$$
-\begin{aligned} \operatorname{IN}(p) & =\bigcap \operatorname{OUT}\left(p_s\right), p_s \in \operatorname{pred}(p) \\ \operatorname{OUT}(p) & =(\operatorname{IN}(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\}\end{aligned}
-$$
+##
+![](df/ra1.svg)
 
-\
+##
+![](df/ra2.svg)
 
-## a  specific problem  called "reaching definitions"
+##
+![](df/ra3.svg)
 
-*Reaching definitions* is  an example of a global property that require you to look at an entire CFG.
+##
+![](df/ra4.svg)
 
+##
+![](df/ra5.svg)
 
-## Reaching definitions problem: determine which definitions reach which uses.
+##
+![](df/ra6.svg)
 
-```
-x = input; 
-while (x > 1) {
-      y = x / 2;
-      if (y > 3)        
-         x = x - y;    
-      z = x - 4;   
-      if (y > 0)       
-          x = x / 2;    
-      z = z - 1; } 
-``` 
-      
-      Consider	this program 	How	could	we	optimize	it?	
-      
-      what 	information	does	this	optimization	need? 
+##
+![](df/ra7.svg)
 
-## reaching definitions 
+##
+![](df/ra8.svg)
 
-The assignment z = z -1 is dead - how do we find that 
-The assignment of z does not reach a use of z
+##
+![](df/ra9.svg)
 
+##
+![](df/ra10.svg)
 
-## reaching defs
+##
+![](df/ra11.svg)
 
-origin: if a program point p defines a variable v then v reaches the point after p
+##
+![](df/ra12.svg)
 
-propagation:
-A definition of a variable v reaches the program point immediately after p if, and only if: 
+##
+![](df/ra13.svg)
 
-1. the definition reaches the point immediately before p
-1. variable v is not redefined at p.
+##
+![](df/ra14.svg)
 
-or 
+##
+![](df/ra15.svg)
 
-Variable v is defined at p
+##
+![](df/ra16.svg)
 
-join:
-if a definition of a variable v reaches the point immediately after at least one predecessor of p, then it reaches the point immediately before p. 
+##
+![](df/ra17.svg)
 
+##
+![](df/ra18.svg)
 
-## matrix forms 
+##
+![](df/ra19.svg)
 
-We could build a 2d matrix - definitions by uses, where a 1 bit  indicates that this definition reaches this use.
-As a matrix this would be very sparse, later when we do ssa forms will see a very cool  compression technique. 
-Algorithms that use this kind of matrix are called bit-vector methods. 
+##
+![](df/ra20.svg)
 
+##
+![](df/ra21.svg)
 
+##
+![](df/ra22.svg)
 
-A definition of a variable v reaches just after a program point p if and only if:
+##
+![](df/ra23.svg)
 
-1) the definition reaches the point just before p 
-1) the variable v is not redefined at p
+##
+![](df/ra24.svg)
 
-or 
+##
+![](df/ra25.svg)
 
-1) the variable v is defined at p.
+##
+![](df/ra26.svg)
 
---- 
+##
+![](df/ra27.svg)
 
-What about multiple predecessors?  p is the first instruction of a block with multiple preds.
+##
+![](df/ra28.svg)
 
-If a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.
+##
+![](df/ra29.svg)
 
-This is a ***union*** operation.
+##
+![](df/ra30.svg)
 
-We are moving information down from definition. This is called ***forward*** propagation 
+##
+![](df/ra31.svg)
 
----
+##
+![](df/ra32.svg)
 
+##
+![](df/ra33.svg)
 
-Define two sets IN and OUT that hold definitions 
+##
+![](df/ra34.svg)
 
-IN is the set of definitions that reach a point immediately before p
+##
+![](df/ra35.svg)
 
-OUT is the set of definitions that reach a point immediately after p 
+##
+![](df/ra36.svg)
 
----
+## 
+![](df/ra37.svg)
 
+##
+![](df/ra38.svg)
 
+##
+![](df/ra39.svg)
 
-## calculate in and out 
+##
+![](df/ra40.svg)
 
-For a given block b,  we can compute two sets (of definitions):
+##
+![](df/ra41.svg)
 
-1) kill(b) = all defs in the program that assign to y, and there is a def of y in b  
-2) gen(b) = definitions in b that reach the bottom of b
+##
+![](df/ra42.svg)
 
-Reaching defs will need iteration. but these sets do not change 
+##
+![](df/ra43.svg)
 
+##
+![](df/ra44.svg)
 
-## And now globally:
+##
+![](df/ra45.svg)
 
-1) $OUT(b) = (in(b) - kill(b) ) \cup gen(b)$
-2) $IN(b) = \cup \left( \operatorname{OUT}(p) \mid p \in predecessors(b) \right))$
+##
+![](df/ra46.svg)
 
-# common structure 
-liveness 
-$$
-\begin{aligned}
-\operatorname{IN}(p)= & (\operatorname{OUT}(p) \backslash\{v\}) \cup \operatorname{vars}(E) \\
-\operatorname{OUT}(p)= & \bigcup I N\left(p_s\right), p_s \in \operatorname{succ}(p) \\
-\end{aligned}
-$$ 
-reaching defs 
-$$
-\begin{aligned}
-IN(p)= & \bigcup \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
-\operatorname{OUT}(p)= & \left(I N(p) \backslash\left\{\operatorname{defs}_s(v)\right\}\right) \cup\{p\} \\
-\end{aligned}
-$$
+##
+![](df/ra47.svg)
 
-Available Expressions
-$$
-\begin{aligned}
-\operatorname{IN}(p)=\bigcap \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
- \operatorname{OUT}(p)=(I N(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\} \\
- \end{aligned}
-$$ 
+##
+![](df/ra48.svg)
 
-## framework
+##
+![](df/ra49.svg)
 
-A may analysis keeps tracks of facts that may happen during the execution of the program. 
-1. A definition may reach a certain point
+##
+![](df/ra50.svg)
 
-A must analysis tracks facts that will – for sure – happen during the execution of the program. 
-1. This expression will be used after certain program point.
+##
+![](df/ra51.svg)
 
-A backward analysis propagates information in the opposite direction in which the program flows.
+##
+![](df/ra52.svg)
 
-A forward analysis propagates information in the same direction in which the program flows. 
+## 
+![](df/ra53.svg)
 
+##
+![](df/ra54.svg)
 
-## transfer functions 
+##
+![](df/ra55.svg)
 
-in a forward analysis  out = f(in) in a backward analysis in = f(out)
+##
+![](df/ra56.svg)
 
+##
+![](df/ra57.svg)
 
-we call f the ***transfer function***  
+##
+![](df/ra58.svg)
 
-The transfer functions provides us with a new "interpretation" of the program. We can implement a machine that traverses the program, always fetching a given instruction, and applying the transfer function onto that instruction. This process goes on until the results produced by these transfer functions stop changing. This is abstract interpretation
+##
+![](df/ra59.svg)
 
-## merge functions - 
-There are two merge functions meet and join specifying what happens 
-at all preds/successors
+##
+![](df/ra60.svg)
 
-## pseudo code : We can solve for IN and OUT iteratively using a worklist 
+##
+![](df/ra61.svg)
+
+##
+![](df/ra62.svg)
+
+##
+![](df/ra63.svg)
+
+##
+![](df/ra64.svg)
+
+##
+![](df/ra65.svg)
+
+##
+![](df/ra66.svg)
+
+##
+![](df/ra67.svg)
+
+##
+![](df/ra68.svg)
+
+##
+![](df/ra69.svg)
+
+##
+![](df/ra70.svg)
+
+##
+![](df/ra71.svg)
+
+##
+![](df/ra72.svg)
+
+##
+![](df/ra73.svg)
+
+##
+![](df/ra74.svg)
+
+##
+![](df/ra75.svg)
+
+##
+![](df/ra76.svg)
+
+##
+![](df/ra77.svg)
+
+##
+![](df/ra78.svg)
+
+## 
+![](df/ra79.svg)
+
+##
+![](df/ra80.svg)
+
+##
+![](df/ra81.svg)
+
+##
+![](df/ra82.svg)
+
+##
+![](df/ra83.svg)
+
+## 84
+![](df/ra84.svg)
+
+##
+![](df/ra85.svg)
+
+##
+![](df/ra86.svg)
+
+##
+![](df/ra87.svg)
+
+##
+![](df/ra88.svg)
+
+##
+![](df/ra89.svg)
+
+## 
+![](df/ra90.svg)
+
+##
+![](df/ra91.svg)
+
+##
+![](df/ra92.svg)
+
+##
+![](df/ra93.svg)
+
+##
+![](df/ra94.svg)
+
+##
+![](df/ra95.svg)
+
+##
+![](df/ra96.svg)
+
+##
+![](df/ra97.svg)
+
+##
+![](df/ra98.svg)
+
+##
+![](df/ra99.svg)
+
+##
+![](df/ra100.svg)
+
+##
+![](df/ra101.svg)
+
+##
+![](df/ra102.svg)
+
+##
+![](df/ra103.svg)
+
+##
+![](df/ra104.svg)
+
+##
+![](df/ra105.svg)
+
+##
+![](df/ra106.svg)
+
+##
+![](df/ra107.svg)
+
+##
+![](df/ra108.svg)
+
+##
+![](df/ra109.svg)
+
+##
+![](df/ra110.svg)
+
+##
+![](df/ra111.svg)
+
+##
+![](df/ra112.svg)
+
+##
+![](df/ra113.svg)
+
+##
+![](df/ra114.svg)
+
+##
+![](df/ra115.svg)
+
+##
+![](df/ra116.svg)
+
+##
+![](df/ra117.svg)
+
+##
+![](df/ra118.svg)
+
+##
+![](df/ra119.svg)
+
+##
+![](df/ra120.svg)
+
+##
+![](df/ra121.svg)
+
+##
+![](df/ra122.svg)
+
+##
+![](df/ra123.svg)
+
+##
+![](df/ra124.svg)
+
+##
+![](df/ra125.svg)
+
+##
+![](df/ra126.svg)
+
+##
+![](df/ra127.svg)
+
+##
+![](df/ra128.svg)
+
+##
+![](df/ra129.svg)
+
+##
+![](df/ra130.svg)
+
+##
+![](df/ra131.svg)
+
+## pseudo code 
 
 ```
 // Initialize
@@ -435,141 +457,12 @@ while (Changed != emptyset)
 }
 ```
 
-## questions 
-
-Does this always converge?
-
-what order do we want to select nodes (basic blocks)? 
-
-. . . 
-
-allways since the sets change in one direction 
-
-visit a node after visiting its preds.  Reverse post order.
-
-
-##  a second problem liveness- 
-
-If	we	assume	an	infinite	supply	of	registers,	then	a	variable	v	should	be	in	a	register	at	a	program	point	p,	whenever:	
-
-1. There	is	a	path	P	from	p	to	another	program	point	pu,	where	v	is	used.	
-2. The	path	P	does	not	go	across	any	definition	of	v.	
-
-Conditions	1	and	2	determine	when	a	variable	v	is	live at program	point	p.	
-
-Why is the second condition necessary?
-
-
-A variable is live at some point if it holds a value that may be needed in the future, or equivalently 
-if its value may be read before the next time the variable is written to.
-
-```
-
-
-## Origin of information
-
-if a variable is used at a program point p, it must be alive immediately before p
-
-if the variable is not used at p, when is it live immediately before p?
-
-## propagation of information
-
-A	variable	is	live	immediately	before	a	program	point	p	if,	and	only	if:	
-
-1. It	is	live	immediately	after	p.	
-2. It	is	not	redefined	at	p.	
-
-or	
-
-1. It	is	used	at	p.	
-
-information propagates upward 
-
-
-what if the program point p has multiple successors?
-
-#joining info 
-
-if a variable is live at the bottom of a block then it must be live at the top of at least one predecssor of the block.
-
-
-## IN and OUT sets 
-
-We had to consider flow starting at the bottom so this is a ***backwards*** analysis 
-
-for a basic block (b):
-
-1) GEN(s) the set of variables used in s before any assignment to s in the same block
-2) kill(s) the set of variables assigned in s 
-
-## global liveness  
-
-1) OUT(exit) = {}
-2) IN(b) = gen(b) union ( OUT(b) - KILL(b))
-3) OUT(b) = union IN(b) 
-
-
-## An example 
-
-```
-// in: {}; predecessor blocks: none
-b1: a = 3; 
-    b = 5;
-    d = 4;
-    x = 100; //x is never  used later thus not in the out set {a,b,d}
-    t = a > b
-    br t .t .f 
-   // out: {a,b,d}    //union of all (in) successors of b1 => b2: {a,b}, and b3:{b,d}  
-
-
-
-.t   // in: {a,b}; predecessor blocks: b1
-b2: c = a + b;
-    d = 2;
-// out: {b,d}
-
-
-.f 
-b3:  in: {b,d}; predecessor blocks: b1 and b2
-    c = 4;
-    return b * d + c;
-// out:{}
-```
-
-Each block gives us two equations.
-
-we can iterate these equations until IN and OUT stop changing 
-
-1. How do we intitialize these sets?
-1. Does this always converge?
-1. What is the complexity?
-
-## solving liveness 
-
-1. initialize each IN and OUT to empty
-1. Evaluate all the equations
-1. if anything changes repeat step 2 
-
-
-## data flow framework
-
-The data flow framework. Here's how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:
-
-1) Figure out the thing you want to know at the entry and exit of each block.
-2)  Write an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a *local analysis* for the block.), calculate GEN and KILL
-3)  Generate equalities according to the edges in the CFG.
-4)  Solve the system of equations! (Using a general solver algorithm that you don't need to adapt to every problem.)
-
----
-
-step 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL
 
 
 ## loops 
 
 This algorithm has no problems with loops!
 
-Theory -- the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?
 
 ## partial orders 
 
@@ -577,28 +470,9 @@ The domain of values you're trying compute needs to form a *partial order* with 
 
 In terms of a partial order ⊑, the merge function is the *meet* (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so `x ⊑ y` implies `f(x) ⊑ f(y)`.
 
----
-
-The usual definition of a "correct" solution to a data-flow problem is the *meet-over-all-paths* solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block
-
-## other data flow problems 
-
-More examples of things you can do with the data flow framework.
-
-1) Reaching definitions.
-1) Live variables: which variables are both defined and going to be used at some point in the future?
-1) Constant propagation: which variables have statically knowable constant values?
-1) Available expressions: which *expressions* have already been computed in the past? (Useful in CSE.)
-1) Initialized variables: like in Java, which variables have had *something* written to them?
-1) Interval analysis: what is the numerical range of values that a given variable might hold?
+## homework 3  
 
 
-## ud chains
+Implement one data flow analysis - For Bonus points make it generic so that the
+same code supports multiple analysis. As always, think about how to test it.
 
-In data flow we talked about a matrix ***definitions by uses*** which is very sparse and very slow to process.
-
-use-def chains, for each use build a list of all defs that might reach that use. 
-
-def-use chains for each def calculate the set of all uses that the def might reach.    
-
-Both of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs 
