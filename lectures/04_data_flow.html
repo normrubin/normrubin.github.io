@@ -101,39 +101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <meta property="og:title" content="Data Flow – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
@@ -172,340 +140,801 @@ window.Quarto = {
 </header>
 
 
-<section id="reasoning-about-data-flow-global-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="reasoning-about-data-flow-global-analysis">Reasoning about data flow (global analysis)</h2>
-<p>There exists a general algorithm to extract information from programs.</p>
-<p>Many static analyses are dataflow analyses:</p>
-<ol type="1">
-<li>Liveness,<br>
-</li>
-<li>available expressions,<br>
-</li>
-<li>very busy expressions,<br>
-</li>
-<li>reaching definitions.</li>
-</ol>
-<p>Dataflow analyses are flow sensitive.</p>
-<p>How do we know if the algorithm will converge for any possible cfg.</p>
-</section>
-<section id="definitions" class="level2">
-<h2 class="anchored" data-anchor-id="definitions">definitions</h2>
-<p>A <strong><em>Use:</em></strong> An instruction uses all of its arguments. (So any instruction with arguments is a “use.”), a binary instruction is two uses.</p>
-<p>A <strong><em>definition</em></strong> is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest )</p>
-<p>A definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and the variable in D is not overwritten on the path.</p>
-<p><strong><em>Available:</em></strong> Definitions that reach a given point in the program are available at that point.</p>
-<p>if an instruction writes a variable it <strong><em>kills</em></strong> all prior definitions that write the same variable</p>
-<p>A <strong><em>program point</em></strong> is an instruction</p>
-</section>
-<section id="example-for-avail-expressions" class="level2">
-<h2 class="anchored" data-anchor-id="example-for-avail-expressions">example for avail expressions</h2>
-<pre class="{typescript}"><code>function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-
-    for (; y &gt; a +b; ){
-        a = a + 1;
-        x = a + b;
-        // Update y to reflect the new value of a
-        y = a * b;
-    }
-}</code></pre>
-<pre><code>@main(x: float, y: float, z: float, a: float, b: float) {
-  z: float = fadd a b;
-  y: float = fmul a b;
-
-.for.cond.6:
-  v10: float = fadd a b;
-  v11: bool = fgt y v10;
-  br v11 .for.body.6 .for.end.6;
-
-.for.body.6:
-  a: float = fadd a 1;
-  x: float = fadd a b;
-  y: float = fmul a b;
-  jmp .for.cond.6;
-
-.for.end.6:
-}</code></pre>
-<p>How do we optimize this program?</p>
-</section>
-<section id="control-flow-graph" class="level2">
-<h2 class="anchored" data-anchor-id="control-flow-graph">control flow graph</h2>
-<div class="columns">
-<div class="column">
-<pre class="{typescript}"><code>function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-
-    for (; y &gt; a +b; ){
-        a = a + 1;
-        x = a + b;
-        y = a * b;
-    }
-}</code></pre>
-</div><div class="column">
-<div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>%%| echo: false</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>A["z: float = fadd a b;\n</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  y: float = fmul a b;"]</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  B["v10: float = fadd a b;\n</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  v11: bool = fgt y v10;\n</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  br v11 .for.body.6 .for.end.6;"]</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  C["a: float = fadd a 1;\n</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  x: float = fadd a b;\n</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  y: float = fmul a b;\n</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  jmp .for.cond.6;"]</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  D["END"]</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  A--&gt;B</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  B--&gt;C</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  C--&gt; B</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  B--&gt; D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%| echo: false
-graph TD
-A["z: float = fadd a b;\n
-  y: float = fmul a b;"]
-
-  B["v10: float = fadd a b;\n
-  v11: bool = fgt y v10;\n
-  br v11 .for.body.6 .for.end.6;"]
-
-  C["a: float = fadd a 1;\n
-  x: float = fadd a b;\n
-  y: float = fmul a b;\n
-  jmp .for.cond.6;"]
-
-  D["END"]
-
-  A--&gt;B
-  B--&gt;C
-  C--&gt; B
-  B--&gt; D
-
-
-</pre>
+<p>The material in these slides have been taken from “Lecture Notes in Static Analysis” (Sec.6), by Michael I. Schwartzbach, https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/, “Principles of Program Analysis”, Chapter 6, by Niesen et al, and from Miachel Schwartzbach’s “Lecture notes in Static Analysis”, Chapter 6, First Section.</p>
+<div id="e2596057" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">131</span>):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"![](df/ra</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">.svg)</span><span class="ch">\n</span><span class="ss">##"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>![](df/ra1.svg)
+##
+![](df/ra2.svg)
+##
+![](df/ra3.svg)
+##
+![](df/ra4.svg)
+##
+![](df/ra5.svg)
+##
+![](df/ra6.svg)
+##
+![](df/ra7.svg)
+##
+![](df/ra8.svg)
+##
+![](df/ra9.svg)
+##
+![](df/ra10.svg)
+##
+![](df/ra11.svg)
+##
+![](df/ra12.svg)
+##
+![](df/ra13.svg)
+##
+![](df/ra14.svg)
+##
+![](df/ra15.svg)
+##
+![](df/ra16.svg)
+##
+![](df/ra17.svg)
+##
+![](df/ra18.svg)
+##
+![](df/ra19.svg)
+##
+![](df/ra20.svg)
+##
+![](df/ra21.svg)
+##
+![](df/ra22.svg)
+##
+![](df/ra23.svg)
+##
+![](df/ra24.svg)
+##
+![](df/ra25.svg)
+##
+![](df/ra26.svg)
+##
+![](df/ra27.svg)
+##
+![](df/ra28.svg)
+##
+![](df/ra29.svg)
+##
+![](df/ra30.svg)
+##
+![](df/ra31.svg)
+##
+![](df/ra32.svg)
+##
+![](df/ra33.svg)
+##
+![](df/ra34.svg)
+##
+![](df/ra35.svg)
+##
+![](df/ra36.svg)
+##
+![](df/ra37.svg)
+##
+![](df/ra38.svg)
+##
+![](df/ra39.svg)
+##
+![](df/ra40.svg)
+##
+![](df/ra41.svg)
+##
+![](df/ra42.svg)
+##
+![](df/ra43.svg)
+##
+![](df/ra44.svg)
+##
+![](df/ra45.svg)
+##
+![](df/ra46.svg)
+##
+![](df/ra47.svg)
+##
+![](df/ra48.svg)
+##
+![](df/ra49.svg)
+##
+![](df/ra50.svg)
+##
+![](df/ra51.svg)
+##
+![](df/ra52.svg)
+##
+![](df/ra53.svg)
+##
+![](df/ra54.svg)
+##
+![](df/ra55.svg)
+##
+![](df/ra56.svg)
+##
+![](df/ra57.svg)
+##
+![](df/ra58.svg)
+##
+![](df/ra59.svg)
+##
+![](df/ra60.svg)
+##
+![](df/ra61.svg)
+##
+![](df/ra62.svg)
+##
+![](df/ra63.svg)
+##
+![](df/ra64.svg)
+##
+![](df/ra65.svg)
+##
+![](df/ra66.svg)
+##
+![](df/ra67.svg)
+##
+![](df/ra68.svg)
+##
+![](df/ra69.svg)
+##
+![](df/ra70.svg)
+##
+![](df/ra71.svg)
+##
+![](df/ra72.svg)
+##
+![](df/ra73.svg)
+##
+![](df/ra74.svg)
+##
+![](df/ra75.svg)
+##
+![](df/ra76.svg)
+##
+![](df/ra77.svg)
+##
+![](df/ra78.svg)
+##
+![](df/ra79.svg)
+##
+![](df/ra80.svg)
+##
+![](df/ra81.svg)
+##
+![](df/ra82.svg)
+##
+![](df/ra83.svg)
+##
+![](df/ra84.svg)
+##
+![](df/ra85.svg)
+##
+![](df/ra86.svg)
+##
+![](df/ra87.svg)
+##
+![](df/ra88.svg)
+##
+![](df/ra89.svg)
+##
+![](df/ra90.svg)
+##
+![](df/ra91.svg)
+##
+![](df/ra92.svg)
+##
+![](df/ra93.svg)
+##
+![](df/ra94.svg)
+##
+![](df/ra95.svg)
+##
+![](df/ra96.svg)
+##
+![](df/ra97.svg)
+##
+![](df/ra98.svg)
+##
+![](df/ra99.svg)
+##
+![](df/ra100.svg)
+##
+![](df/ra101.svg)
+##
+![](df/ra102.svg)
+##
+![](df/ra103.svg)
+##
+![](df/ra104.svg)
+##
+![](df/ra105.svg)
+##
+![](df/ra106.svg)
+##
+![](df/ra107.svg)
+##
+![](df/ra108.svg)
+##
+![](df/ra109.svg)
+##
+![](df/ra110.svg)
+##
+![](df/ra111.svg)
+##
+![](df/ra112.svg)
+##
+![](df/ra113.svg)
+##
+![](df/ra114.svg)
+##
+![](df/ra115.svg)
+##
+![](df/ra116.svg)
+##
+![](df/ra117.svg)
+##
+![](df/ra118.svg)
+##
+![](df/ra119.svg)
+##
+![](df/ra120.svg)
+##
+![](df/ra121.svg)
+##
+![](df/ra122.svg)
+##
+![](df/ra123.svg)
+##
+![](df/ra124.svg)
+##
+![](df/ra125.svg)
+##
+![](df/ra126.svg)
+##
+![](df/ra127.svg)
+##
+![](df/ra128.svg)
+##
+![](df/ra129.svg)
+##
+![](df/ra130.svg)
+##
+![](df/ra131.svg)
+##</code></pre>
 </div>
-<p></p></figure><p></p>
 </div>
-</div>
-</div>
-</div>
-</div>
+<section id="section" class="level2">
+<h2 class="anchored" data-anchor-id="section"></h2>
+<p><img src="df/ra1.svg" class="img-fluid"></p>
 </section>
-<section id="optimized" class="level2">
-<h2 class="anchored" data-anchor-id="optimized">optimized</h2>
-<div class="columns">
-<div class="column">
-<pre class="{typescript}"><code>function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-
-    for (; y &gt; a +b; ){
-        a = a + 1;
-        x = a + b;
-        y = a * b;
-    }
-}</code></pre>
-</div><div class="column">
-<pre class="{typescript}"><code>function main(x: number, y: number, z: number, a: number, b: number): void {
-    z = a + b;
-    y = a * b;
-     
-    w = z
-
-    for (; y &gt; w; ){
-        a = a + 1;
-        x = a + b;
-        y = a * b;
-
-        w = x 
-    }
-}</code></pre>
-</div>
-</div>
-<p>is this an optimization?</p>
+<section id="section-1" class="level2">
+<h2 class="anchored" data-anchor-id="section-1"></h2>
+<p><img src="df/ra2.svg" class="img-fluid"></p>
 </section>
-<section id="available-expressions" class="level2">
-<h2 class="anchored" data-anchor-id="available-expressions">available expressions</h2>
-<p>In order to apply the previous optimization, we had to know which expressions were available at the places where we replaced expressions by variables.</p>
-<p>An expression is available at a program point if its current value has already been computed earlier in the execution.</p>
-<p>How does information originate</p>
-<p>How does information propagate</p>
+<section id="section-2" class="level2">
+<h2 class="anchored" data-anchor-id="section-2"></h2>
+<p><img src="df/ra3.svg" class="img-fluid"></p>
 </section>
-<section id="origin-of-information" class="level2">
-<h2 class="anchored" data-anchor-id="origin-of-information">Origin of information</h2>
-<p>If an expression is used at a point p, then it is available immediately after p, as long as p does not redefine any of the variables that the expression uses.</p>
-<p>What about expressions not used at p</p>
-<hr>
-<p>An expression E is available immediately after a program point p if, and only if:</p>
-<p>1. It is available immediately before p.<br>
-1. No variable of E is redefined at p.&nbsp;</p>
-<p>or<br>
-1. It is used at p.<br>
-1. No variable of E is redefined at p.&nbsp;</p>
-<p>information flows downward</p>
+<section id="section-3" class="level2">
+<h2 class="anchored" data-anchor-id="section-3"></h2>
+<p><img src="df/ra4.svg" class="img-fluid"></p>
 </section>
-<section id="joining-info" class="level2">
-<h2 class="anchored" data-anchor-id="joining-info">joining info</h2>
-<p>at the top of a block an expression is available if it is available after the bottom of all predecessors</p>
-<p>To solve this we can form two sets</p>
-<p>IN expressions available immed before p</p>
-<p>OUT expressions available immed after p</p>
+<section id="section-4" class="level2">
+<h2 class="anchored" data-anchor-id="section-4"></h2>
+<p><img src="df/ra5.svg" class="img-fluid"></p>
 </section>
-<section id="equations" class="level2">
-<h2 class="anchored" data-anchor-id="equations">equations</h2>
-<div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>%%| echo: false</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>p1 --&gt; p</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>p2 --&gt; p</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>p3 --&gt;p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%| echo: false
-graph TB
-p1 --&gt; p
-p2 --&gt; p
-p3 --&gt;p
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<p><span class="math display">\[
-\begin{aligned} \operatorname{IN}(p) &amp; =\bigcap \operatorname{OUT}\left(p_s\right), p_s \in \operatorname{pred}(p) \\ \operatorname{OUT}(p) &amp; =(\operatorname{IN}(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\}\end{aligned}
-\]</span></p>
-<p><br>
-</p>
+<section id="section-5" class="level2">
+<h2 class="anchored" data-anchor-id="section-5"></h2>
+<p><img src="df/ra6.svg" class="img-fluid"></p>
 </section>
-<section id="a-specific-problem-called-reaching-definitions" class="level2">
-<h2 class="anchored" data-anchor-id="a-specific-problem-called-reaching-definitions">a specific problem called “reaching definitions”</h2>
-<p><em>Reaching definitions</em> is an example of a global property that require you to look at an entire CFG.</p>
+<section id="section-6" class="level2">
+<h2 class="anchored" data-anchor-id="section-6"></h2>
+<p><img src="df/ra7.svg" class="img-fluid"></p>
 </section>
-<section id="reaching-definitions-problem-determine-which-definitions-reach-which-uses." class="level2">
-<h2 class="anchored" data-anchor-id="reaching-definitions-problem-determine-which-definitions-reach-which-uses.">Reaching definitions problem: determine which definitions reach which uses.</h2>
-<pre><code>x = input; 
-while (x &gt; 1) {
-      y = x / 2;
-      if (y &gt; 3)        
-         x = x - y;    
-      z = x - 4;   
-      if (y &gt; 0)       
-          x = x / 2;    
-      z = z - 1; } </code></pre>
-<pre><code>  Consider  this program    How could   we  optimize    it? 
-  
-  what  information does    this    optimization    need? </code></pre>
+<section id="section-7" class="level2">
+<h2 class="anchored" data-anchor-id="section-7"></h2>
+<p><img src="df/ra8.svg" class="img-fluid"></p>
 </section>
-<section id="reaching-definitions" class="level2">
-<h2 class="anchored" data-anchor-id="reaching-definitions">reaching definitions</h2>
-<p>The assignment z = z -1 is dead - how do we find that The assignment of z does not reach a use of z</p>
+<section id="section-8" class="level2">
+<h2 class="anchored" data-anchor-id="section-8"></h2>
+<p><img src="df/ra9.svg" class="img-fluid"></p>
 </section>
-<section id="reaching-defs" class="level2">
-<h2 class="anchored" data-anchor-id="reaching-defs">reaching defs</h2>
-<p>origin: if a program point p defines a variable v then v reaches the point after p</p>
-<p>propagation: A definition of a variable v reaches the program point immediately after p if, and only if:</p>
-<ol type="1">
-<li>the definition reaches the point immediately before p</li>
-<li>variable v is not redefined at p.</li>
-</ol>
-<p>or</p>
-<p>Variable v is defined at p</p>
-<p>join: if a definition of a variable v reaches the point immediately after at least one predecessor of p, then it reaches the point immediately before p.&nbsp;</p>
+<section id="section-9" class="level2">
+<h2 class="anchored" data-anchor-id="section-9"></h2>
+<p><img src="df/ra10.svg" class="img-fluid"></p>
 </section>
-<section id="matrix-forms" class="level2">
-<h2 class="anchored" data-anchor-id="matrix-forms">matrix forms</h2>
-<p>We could build a 2d matrix - definitions by uses, where a 1 bit indicates that this definition reaches this use. As a matrix this would be very sparse, later when we do ssa forms will see a very cool compression technique. Algorithms that use this kind of matrix are called bit-vector methods.</p>
-<p>A definition of a variable v reaches just after a program point p if and only if:</p>
-<ol type="1">
-<li>the definition reaches the point just before p</li>
-<li>the variable v is not redefined at p</li>
-</ol>
-<p>or</p>
-<ol type="1">
-<li>the variable v is defined at p.</li>
-</ol>
-<hr>
-<p>What about multiple predecessors? p is the first instruction of a block with multiple preds.</p>
-<p>If a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.</p>
-<p>This is a <strong><em>union</em></strong> operation.</p>
-<p>We are moving information down from definition. This is called <strong><em>forward</em></strong> propagation</p>
-<hr>
-<p>Define two sets IN and OUT that hold definitions</p>
-<p>IN is the set of definitions that reach a point immediately before p</p>
-<p>OUT is the set of definitions that reach a point immediately after p</p>
-<hr>
+<section id="section-10" class="level2">
+<h2 class="anchored" data-anchor-id="section-10"></h2>
+<p><img src="df/ra11.svg" class="img-fluid"></p>
 </section>
-<section id="calculate-in-and-out" class="level2">
-<h2 class="anchored" data-anchor-id="calculate-in-and-out">calculate in and out</h2>
-<p>For a given block b, we can compute two sets (of definitions):</p>
-<ol type="1">
-<li>kill(b) = all defs in the program that assign to y, and there is a def of y in b<br>
-</li>
-<li>gen(b) = definitions in b that reach the bottom of b</li>
-</ol>
-<p>Reaching defs will need iteration. but these sets do not change</p>
+<section id="section-11" class="level2">
+<h2 class="anchored" data-anchor-id="section-11"></h2>
+<p><img src="df/ra12.svg" class="img-fluid"></p>
 </section>
-<section id="and-now-globally" class="level2">
-<h2 class="anchored" data-anchor-id="and-now-globally">And now globally:</h2>
-<ol type="1">
-<li><span class="math inline">\(OUT(b) = (in(b) - kill(b) ) \cup gen(b)\)</span></li>
-<li><span class="math inline">\(IN(b) = \cup \left( \operatorname{OUT}(p) \mid p \in predecessors(b) \right))\)</span></li>
-</ol>
+<section id="section-12" class="level2">
+<h2 class="anchored" data-anchor-id="section-12"></h2>
+<p><img src="df/ra13.svg" class="img-fluid"></p>
 </section>
-<section id="common-structure" class="level1">
-<h1>common structure</h1>
-<p>liveness <span class="math display">\[
-\begin{aligned}
-\operatorname{IN}(p)= &amp; (\operatorname{OUT}(p) \backslash\{v\}) \cup \operatorname{vars}(E) \\
-\operatorname{OUT}(p)= &amp; \bigcup I N\left(p_s\right), p_s \in \operatorname{succ}(p) \\
-\end{aligned}
-\]</span> reaching defs <span class="math display">\[
-\begin{aligned}
-IN(p)= &amp; \bigcup \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
-\operatorname{OUT}(p)= &amp; \left(I N(p) \backslash\left\{\operatorname{defs}_s(v)\right\}\right) \cup\{p\} \\
-\end{aligned}
-\]</span></p>
-<p>Available Expressions <span class="math display">\[
-\begin{aligned}
-\operatorname{IN}(p)=\bigcap \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
-\operatorname{OUT}(p)=(I N(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\} \\
-\end{aligned}
-\]</span></p>
-<section id="framework" class="level2">
-<h2 class="anchored" data-anchor-id="framework">framework</h2>
-<p>A may analysis keeps tracks of facts that may happen during the execution of the program. 1. A definition may reach a certain point</p>
-<p>A must analysis tracks facts that will – for sure – happen during the execution of the program. 1. This expression will be used after certain program point.</p>
-<p>A backward analysis propagates information in the opposite direction in which the program flows.</p>
-<p>A forward analysis propagates information in the same direction in which the program flows.</p>
+<section id="section-13" class="level2">
+<h2 class="anchored" data-anchor-id="section-13"></h2>
+<p><img src="df/ra14.svg" class="img-fluid"></p>
 </section>
-<section id="transfer-functions" class="level2">
-<h2 class="anchored" data-anchor-id="transfer-functions">transfer functions</h2>
-<p>in a forward analysis out = f(in) in a backward analysis in = f(out)</p>
-<p>we call f the <strong><em>transfer function</em></strong></p>
-<p>The transfer functions provides us with a new “interpretation” of the program. We can implement a machine that traverses the program, always fetching a given instruction, and applying the transfer function onto that instruction. This process goes on until the results produced by these transfer functions stop changing. This is abstract interpretation</p>
+<section id="section-14" class="level2">
+<h2 class="anchored" data-anchor-id="section-14"></h2>
+<p><img src="df/ra15.svg" class="img-fluid"></p>
 </section>
-<section id="merge-functions--" class="level2">
-<h2 class="anchored" data-anchor-id="merge-functions--">merge functions -</h2>
-<p>There are two merge functions meet and join specifying what happens at all preds/successors</p>
+<section id="section-15" class="level2">
+<h2 class="anchored" data-anchor-id="section-15"></h2>
+<p><img src="df/ra16.svg" class="img-fluid"></p>
 </section>
-<section id="pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist" class="level2">
-<h2 class="anchored" data-anchor-id="pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist">pseudo code : We can solve for IN and OUT iteratively using a worklist</h2>
+<section id="section-16" class="level2">
+<h2 class="anchored" data-anchor-id="section-16"></h2>
+<p><img src="df/ra17.svg" class="img-fluid"></p>
+</section>
+<section id="section-17" class="level2">
+<h2 class="anchored" data-anchor-id="section-17"></h2>
+<p><img src="df/ra18.svg" class="img-fluid"></p>
+</section>
+<section id="section-18" class="level2">
+<h2 class="anchored" data-anchor-id="section-18"></h2>
+<p><img src="df/ra19.svg" class="img-fluid"></p>
+</section>
+<section id="section-19" class="level2">
+<h2 class="anchored" data-anchor-id="section-19"></h2>
+<p><img src="df/ra20.svg" class="img-fluid"></p>
+</section>
+<section id="section-20" class="level2">
+<h2 class="anchored" data-anchor-id="section-20"></h2>
+<p><img src="df/ra21.svg" class="img-fluid"></p>
+</section>
+<section id="section-21" class="level2">
+<h2 class="anchored" data-anchor-id="section-21"></h2>
+<p><img src="df/ra22.svg" class="img-fluid"></p>
+</section>
+<section id="section-22" class="level2">
+<h2 class="anchored" data-anchor-id="section-22"></h2>
+<p><img src="df/ra23.svg" class="img-fluid"></p>
+</section>
+<section id="section-23" class="level2">
+<h2 class="anchored" data-anchor-id="section-23"></h2>
+<p><img src="df/ra24.svg" class="img-fluid"></p>
+</section>
+<section id="section-24" class="level2">
+<h2 class="anchored" data-anchor-id="section-24"></h2>
+<p><img src="df/ra25.svg" class="img-fluid"></p>
+</section>
+<section id="section-25" class="level2">
+<h2 class="anchored" data-anchor-id="section-25"></h2>
+<p><img src="df/ra26.svg" class="img-fluid"></p>
+</section>
+<section id="section-26" class="level2">
+<h2 class="anchored" data-anchor-id="section-26"></h2>
+<p><img src="df/ra27.svg" class="img-fluid"></p>
+</section>
+<section id="section-27" class="level2">
+<h2 class="anchored" data-anchor-id="section-27"></h2>
+<p><img src="df/ra28.svg" class="img-fluid"></p>
+</section>
+<section id="section-28" class="level2">
+<h2 class="anchored" data-anchor-id="section-28"></h2>
+<p><img src="df/ra29.svg" class="img-fluid"></p>
+</section>
+<section id="section-29" class="level2">
+<h2 class="anchored" data-anchor-id="section-29"></h2>
+<p><img src="df/ra30.svg" class="img-fluid"></p>
+</section>
+<section id="section-30" class="level2">
+<h2 class="anchored" data-anchor-id="section-30"></h2>
+<p><img src="df/ra31.svg" class="img-fluid"></p>
+</section>
+<section id="section-31" class="level2">
+<h2 class="anchored" data-anchor-id="section-31"></h2>
+<p><img src="df/ra32.svg" class="img-fluid"></p>
+</section>
+<section id="section-32" class="level2">
+<h2 class="anchored" data-anchor-id="section-32"></h2>
+<p><img src="df/ra33.svg" class="img-fluid"></p>
+</section>
+<section id="section-33" class="level2">
+<h2 class="anchored" data-anchor-id="section-33"></h2>
+<p><img src="df/ra34.svg" class="img-fluid"></p>
+</section>
+<section id="section-34" class="level2">
+<h2 class="anchored" data-anchor-id="section-34"></h2>
+<p><img src="df/ra35.svg" class="img-fluid"></p>
+</section>
+<section id="section-35" class="level2">
+<h2 class="anchored" data-anchor-id="section-35"></h2>
+<p><img src="df/ra36.svg" class="img-fluid"></p>
+</section>
+<section id="section-36" class="level2">
+<h2 class="anchored" data-anchor-id="section-36"></h2>
+<p><img src="df/ra37.svg" class="img-fluid"></p>
+</section>
+<section id="section-37" class="level2">
+<h2 class="anchored" data-anchor-id="section-37"></h2>
+<p><img src="df/ra38.svg" class="img-fluid"></p>
+</section>
+<section id="section-38" class="level2">
+<h2 class="anchored" data-anchor-id="section-38"></h2>
+<p><img src="df/ra39.svg" class="img-fluid"></p>
+</section>
+<section id="section-39" class="level2">
+<h2 class="anchored" data-anchor-id="section-39"></h2>
+<p><img src="df/ra40.svg" class="img-fluid"></p>
+</section>
+<section id="section-40" class="level2">
+<h2 class="anchored" data-anchor-id="section-40"></h2>
+<p><img src="df/ra41.svg" class="img-fluid"></p>
+</section>
+<section id="section-41" class="level2">
+<h2 class="anchored" data-anchor-id="section-41"></h2>
+<p><img src="df/ra42.svg" class="img-fluid"></p>
+</section>
+<section id="section-42" class="level2">
+<h2 class="anchored" data-anchor-id="section-42"></h2>
+<p><img src="df/ra43.svg" class="img-fluid"></p>
+</section>
+<section id="section-43" class="level2">
+<h2 class="anchored" data-anchor-id="section-43"></h2>
+<p><img src="df/ra44.svg" class="img-fluid"></p>
+</section>
+<section id="section-44" class="level2">
+<h2 class="anchored" data-anchor-id="section-44"></h2>
+<p><img src="df/ra45.svg" class="img-fluid"></p>
+</section>
+<section id="section-45" class="level2">
+<h2 class="anchored" data-anchor-id="section-45"></h2>
+<p><img src="df/ra46.svg" class="img-fluid"></p>
+</section>
+<section id="section-46" class="level2">
+<h2 class="anchored" data-anchor-id="section-46"></h2>
+<p><img src="df/ra47.svg" class="img-fluid"></p>
+</section>
+<section id="section-47" class="level2">
+<h2 class="anchored" data-anchor-id="section-47"></h2>
+<p><img src="df/ra48.svg" class="img-fluid"></p>
+</section>
+<section id="section-48" class="level2">
+<h2 class="anchored" data-anchor-id="section-48"></h2>
+<p><img src="df/ra49.svg" class="img-fluid"></p>
+</section>
+<section id="section-49" class="level2">
+<h2 class="anchored" data-anchor-id="section-49"></h2>
+<p><img src="df/ra50.svg" class="img-fluid"></p>
+</section>
+<section id="section-50" class="level2">
+<h2 class="anchored" data-anchor-id="section-50"></h2>
+<p><img src="df/ra51.svg" class="img-fluid"></p>
+</section>
+<section id="section-51" class="level2">
+<h2 class="anchored" data-anchor-id="section-51"></h2>
+<p><img src="df/ra52.svg" class="img-fluid"></p>
+</section>
+<section id="section-52" class="level2">
+<h2 class="anchored" data-anchor-id="section-52"></h2>
+<p><img src="df/ra53.svg" class="img-fluid"></p>
+</section>
+<section id="section-53" class="level2">
+<h2 class="anchored" data-anchor-id="section-53"></h2>
+<p><img src="df/ra54.svg" class="img-fluid"></p>
+</section>
+<section id="section-54" class="level2">
+<h2 class="anchored" data-anchor-id="section-54"></h2>
+<p><img src="df/ra55.svg" class="img-fluid"></p>
+</section>
+<section id="section-55" class="level2">
+<h2 class="anchored" data-anchor-id="section-55"></h2>
+<p><img src="df/ra56.svg" class="img-fluid"></p>
+</section>
+<section id="section-56" class="level2">
+<h2 class="anchored" data-anchor-id="section-56"></h2>
+<p><img src="df/ra57.svg" class="img-fluid"></p>
+</section>
+<section id="section-57" class="level2">
+<h2 class="anchored" data-anchor-id="section-57"></h2>
+<p><img src="df/ra58.svg" class="img-fluid"></p>
+</section>
+<section id="section-58" class="level2">
+<h2 class="anchored" data-anchor-id="section-58"></h2>
+<p><img src="df/ra59.svg" class="img-fluid"></p>
+</section>
+<section id="section-59" class="level2">
+<h2 class="anchored" data-anchor-id="section-59"></h2>
+<p><img src="df/ra60.svg" class="img-fluid"></p>
+</section>
+<section id="section-60" class="level2">
+<h2 class="anchored" data-anchor-id="section-60"></h2>
+<p><img src="df/ra61.svg" class="img-fluid"></p>
+</section>
+<section id="section-61" class="level2">
+<h2 class="anchored" data-anchor-id="section-61"></h2>
+<p><img src="df/ra62.svg" class="img-fluid"></p>
+</section>
+<section id="section-62" class="level2">
+<h2 class="anchored" data-anchor-id="section-62"></h2>
+<p><img src="df/ra63.svg" class="img-fluid"></p>
+</section>
+<section id="section-63" class="level2">
+<h2 class="anchored" data-anchor-id="section-63"></h2>
+<p><img src="df/ra64.svg" class="img-fluid"></p>
+</section>
+<section id="section-64" class="level2">
+<h2 class="anchored" data-anchor-id="section-64"></h2>
+<p><img src="df/ra65.svg" class="img-fluid"></p>
+</section>
+<section id="section-65" class="level2">
+<h2 class="anchored" data-anchor-id="section-65"></h2>
+<p><img src="df/ra66.svg" class="img-fluid"></p>
+</section>
+<section id="section-66" class="level2">
+<h2 class="anchored" data-anchor-id="section-66"></h2>
+<p><img src="df/ra67.svg" class="img-fluid"></p>
+</section>
+<section id="section-67" class="level2">
+<h2 class="anchored" data-anchor-id="section-67"></h2>
+<p><img src="df/ra68.svg" class="img-fluid"></p>
+</section>
+<section id="section-68" class="level2">
+<h2 class="anchored" data-anchor-id="section-68"></h2>
+<p><img src="df/ra69.svg" class="img-fluid"></p>
+</section>
+<section id="section-69" class="level2">
+<h2 class="anchored" data-anchor-id="section-69"></h2>
+<p><img src="df/ra70.svg" class="img-fluid"></p>
+</section>
+<section id="section-70" class="level2">
+<h2 class="anchored" data-anchor-id="section-70"></h2>
+<p><img src="df/ra71.svg" class="img-fluid"></p>
+</section>
+<section id="section-71" class="level2">
+<h2 class="anchored" data-anchor-id="section-71"></h2>
+<p><img src="df/ra72.svg" class="img-fluid"></p>
+</section>
+<section id="section-72" class="level2">
+<h2 class="anchored" data-anchor-id="section-72"></h2>
+<p><img src="df/ra73.svg" class="img-fluid"></p>
+</section>
+<section id="section-73" class="level2">
+<h2 class="anchored" data-anchor-id="section-73"></h2>
+<p><img src="df/ra74.svg" class="img-fluid"></p>
+</section>
+<section id="section-74" class="level2">
+<h2 class="anchored" data-anchor-id="section-74"></h2>
+<p><img src="df/ra75.svg" class="img-fluid"></p>
+</section>
+<section id="section-75" class="level2">
+<h2 class="anchored" data-anchor-id="section-75"></h2>
+<p><img src="df/ra76.svg" class="img-fluid"></p>
+</section>
+<section id="section-76" class="level2">
+<h2 class="anchored" data-anchor-id="section-76"></h2>
+<p><img src="df/ra77.svg" class="img-fluid"></p>
+</section>
+<section id="section-77" class="level2">
+<h2 class="anchored" data-anchor-id="section-77"></h2>
+<p><img src="df/ra78.svg" class="img-fluid"></p>
+</section>
+<section id="section-78" class="level2">
+<h2 class="anchored" data-anchor-id="section-78"></h2>
+<p><img src="df/ra79.svg" class="img-fluid"></p>
+</section>
+<section id="section-79" class="level2">
+<h2 class="anchored" data-anchor-id="section-79"></h2>
+<p><img src="df/ra80.svg" class="img-fluid"></p>
+</section>
+<section id="section-80" class="level2">
+<h2 class="anchored" data-anchor-id="section-80"></h2>
+<p><img src="df/ra81.svg" class="img-fluid"></p>
+</section>
+<section id="section-81" class="level2">
+<h2 class="anchored" data-anchor-id="section-81"></h2>
+<p><img src="df/ra82.svg" class="img-fluid"></p>
+</section>
+<section id="section-82" class="level2">
+<h2 class="anchored" data-anchor-id="section-82"></h2>
+<p><img src="df/ra83.svg" class="img-fluid"></p>
+</section>
+<section id="section-83" class="level2">
+<h2 class="anchored" data-anchor-id="section-83">84</h2>
+<p><img src="df/ra84.svg" class="img-fluid"></p>
+</section>
+<section id="section-84" class="level2">
+<h2 class="anchored" data-anchor-id="section-84"></h2>
+<p><img src="df/ra85.svg" class="img-fluid"></p>
+</section>
+<section id="section-85" class="level2">
+<h2 class="anchored" data-anchor-id="section-85"></h2>
+<p><img src="df/ra86.svg" class="img-fluid"></p>
+</section>
+<section id="section-86" class="level2">
+<h2 class="anchored" data-anchor-id="section-86"></h2>
+<p><img src="df/ra87.svg" class="img-fluid"></p>
+</section>
+<section id="section-87" class="level2">
+<h2 class="anchored" data-anchor-id="section-87"></h2>
+<p><img src="df/ra88.svg" class="img-fluid"></p>
+</section>
+<section id="section-88" class="level2">
+<h2 class="anchored" data-anchor-id="section-88"></h2>
+<p><img src="df/ra89.svg" class="img-fluid"></p>
+</section>
+<section id="section-89" class="level2">
+<h2 class="anchored" data-anchor-id="section-89"></h2>
+<p><img src="df/ra90.svg" class="img-fluid"></p>
+</section>
+<section id="section-90" class="level2">
+<h2 class="anchored" data-anchor-id="section-90"></h2>
+<p><img src="df/ra91.svg" class="img-fluid"></p>
+</section>
+<section id="section-91" class="level2">
+<h2 class="anchored" data-anchor-id="section-91"></h2>
+<p><img src="df/ra92.svg" class="img-fluid"></p>
+</section>
+<section id="section-92" class="level2">
+<h2 class="anchored" data-anchor-id="section-92"></h2>
+<p><img src="df/ra93.svg" class="img-fluid"></p>
+</section>
+<section id="section-93" class="level2">
+<h2 class="anchored" data-anchor-id="section-93"></h2>
+<p><img src="df/ra94.svg" class="img-fluid"></p>
+</section>
+<section id="section-94" class="level2">
+<h2 class="anchored" data-anchor-id="section-94"></h2>
+<p><img src="df/ra95.svg" class="img-fluid"></p>
+</section>
+<section id="section-95" class="level2">
+<h2 class="anchored" data-anchor-id="section-95"></h2>
+<p><img src="df/ra96.svg" class="img-fluid"></p>
+</section>
+<section id="section-96" class="level2">
+<h2 class="anchored" data-anchor-id="section-96"></h2>
+<p><img src="df/ra97.svg" class="img-fluid"></p>
+</section>
+<section id="section-97" class="level2">
+<h2 class="anchored" data-anchor-id="section-97"></h2>
+<p><img src="df/ra98.svg" class="img-fluid"></p>
+</section>
+<section id="section-98" class="level2">
+<h2 class="anchored" data-anchor-id="section-98"></h2>
+<p><img src="df/ra99.svg" class="img-fluid"></p>
+</section>
+<section id="section-99" class="level2">
+<h2 class="anchored" data-anchor-id="section-99"></h2>
+<p><img src="df/ra100.svg" class="img-fluid"></p>
+</section>
+<section id="section-100" class="level2">
+<h2 class="anchored" data-anchor-id="section-100"></h2>
+<p><img src="df/ra101.svg" class="img-fluid"></p>
+</section>
+<section id="section-101" class="level2">
+<h2 class="anchored" data-anchor-id="section-101"></h2>
+<p><img src="df/ra102.svg" class="img-fluid"></p>
+</section>
+<section id="section-102" class="level2">
+<h2 class="anchored" data-anchor-id="section-102"></h2>
+<p><img src="df/ra103.svg" class="img-fluid"></p>
+</section>
+<section id="section-103" class="level2">
+<h2 class="anchored" data-anchor-id="section-103"></h2>
+<p><img src="df/ra104.svg" class="img-fluid"></p>
+</section>
+<section id="section-104" class="level2">
+<h2 class="anchored" data-anchor-id="section-104"></h2>
+<p><img src="df/ra105.svg" class="img-fluid"></p>
+</section>
+<section id="section-105" class="level2">
+<h2 class="anchored" data-anchor-id="section-105"></h2>
+<p><img src="df/ra106.svg" class="img-fluid"></p>
+</section>
+<section id="section-106" class="level2">
+<h2 class="anchored" data-anchor-id="section-106"></h2>
+<p><img src="df/ra107.svg" class="img-fluid"></p>
+</section>
+<section id="section-107" class="level2">
+<h2 class="anchored" data-anchor-id="section-107"></h2>
+<p><img src="df/ra108.svg" class="img-fluid"></p>
+</section>
+<section id="section-108" class="level2">
+<h2 class="anchored" data-anchor-id="section-108"></h2>
+<p><img src="df/ra109.svg" class="img-fluid"></p>
+</section>
+<section id="section-109" class="level2">
+<h2 class="anchored" data-anchor-id="section-109"></h2>
+<p><img src="df/ra110.svg" class="img-fluid"></p>
+</section>
+<section id="section-110" class="level2">
+<h2 class="anchored" data-anchor-id="section-110"></h2>
+<p><img src="df/ra111.svg" class="img-fluid"></p>
+</section>
+<section id="section-111" class="level2">
+<h2 class="anchored" data-anchor-id="section-111"></h2>
+<p><img src="df/ra112.svg" class="img-fluid"></p>
+</section>
+<section id="section-112" class="level2">
+<h2 class="anchored" data-anchor-id="section-112"></h2>
+<p><img src="df/ra113.svg" class="img-fluid"></p>
+</section>
+<section id="section-113" class="level2">
+<h2 class="anchored" data-anchor-id="section-113"></h2>
+<p><img src="df/ra114.svg" class="img-fluid"></p>
+</section>
+<section id="section-114" class="level2">
+<h2 class="anchored" data-anchor-id="section-114"></h2>
+<p><img src="df/ra115.svg" class="img-fluid"></p>
+</section>
+<section id="section-115" class="level2">
+<h2 class="anchored" data-anchor-id="section-115"></h2>
+<p><img src="df/ra116.svg" class="img-fluid"></p>
+</section>
+<section id="section-116" class="level2">
+<h2 class="anchored" data-anchor-id="section-116"></h2>
+<p><img src="df/ra117.svg" class="img-fluid"></p>
+</section>
+<section id="section-117" class="level2">
+<h2 class="anchored" data-anchor-id="section-117"></h2>
+<p><img src="df/ra118.svg" class="img-fluid"></p>
+</section>
+<section id="section-118" class="level2">
+<h2 class="anchored" data-anchor-id="section-118"></h2>
+<p><img src="df/ra119.svg" class="img-fluid"></p>
+</section>
+<section id="section-119" class="level2">
+<h2 class="anchored" data-anchor-id="section-119"></h2>
+<p><img src="df/ra120.svg" class="img-fluid"></p>
+</section>
+<section id="section-120" class="level2">
+<h2 class="anchored" data-anchor-id="section-120"></h2>
+<p><img src="df/ra121.svg" class="img-fluid"></p>
+</section>
+<section id="section-121" class="level2">
+<h2 class="anchored" data-anchor-id="section-121"></h2>
+<p><img src="df/ra122.svg" class="img-fluid"></p>
+</section>
+<section id="section-122" class="level2">
+<h2 class="anchored" data-anchor-id="section-122"></h2>
+<p><img src="df/ra123.svg" class="img-fluid"></p>
+</section>
+<section id="section-123" class="level2">
+<h2 class="anchored" data-anchor-id="section-123"></h2>
+<p><img src="df/ra124.svg" class="img-fluid"></p>
+</section>
+<section id="section-124" class="level2">
+<h2 class="anchored" data-anchor-id="section-124"></h2>
+<p><img src="df/ra125.svg" class="img-fluid"></p>
+</section>
+<section id="section-125" class="level2">
+<h2 class="anchored" data-anchor-id="section-125"></h2>
+<p><img src="df/ra126.svg" class="img-fluid"></p>
+</section>
+<section id="section-126" class="level2">
+<h2 class="anchored" data-anchor-id="section-126"></h2>
+<p><img src="df/ra127.svg" class="img-fluid"></p>
+</section>
+<section id="section-127" class="level2">
+<h2 class="anchored" data-anchor-id="section-127"></h2>
+<p><img src="df/ra128.svg" class="img-fluid"></p>
+</section>
+<section id="section-128" class="level2">
+<h2 class="anchored" data-anchor-id="section-128"></h2>
+<p><img src="df/ra129.svg" class="img-fluid"></p>
+</section>
+<section id="section-129" class="level2">
+<h2 class="anchored" data-anchor-id="section-129"></h2>
+<p><img src="df/ra130.svg" class="img-fluid"></p>
+</section>
+<section id="section-130" class="level2">
+<h2 class="anchored" data-anchor-id="section-130"></h2>
+<p><img src="df/ra131.svg" class="img-fluid"></p>
+</section>
+<section id="pseudo-code" class="level2">
+<h2 class="anchored" data-anchor-id="pseudo-code">pseudo code</h2>
 <pre><code>// Initialize
 for all CFG nodes n in N,
     OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];
@@ -542,133 +971,20 @@ while (Changed != emptyset)
     }
 }</code></pre>
 </section>
-<section id="questions" class="level2">
-<h2 class="anchored" data-anchor-id="questions">questions</h2>
-<p>Does this always converge?</p>
-<p>what order do we want to select nodes (basic blocks)?</p>
-<p>. . .</p>
-<p>allways since the sets change in one direction</p>
-<p>visit a node after visiting its preds. Reverse post order.</p>
-</section>
-<section id="a-second-problem-liveness-" class="level2">
-<h2 class="anchored" data-anchor-id="a-second-problem-liveness-">a second problem liveness-</h2>
-<p>If we assume an infinite supply of registers, then a variable v should be in a register at a program point p, whenever:</p>
-<p>1. There is a path P from p to another program point pu, where v is used.<br>
-2. The path P does not go across any definition of v.</p>
-<p>Conditions 1 and 2 determine when a variable v is live at program point p.&nbsp;</p>
-<p>Why is the second condition necessary?</p>
-<p>A variable is live at some point if it holds a value that may be needed in the future, or equivalently if its value may be read before the next time the variable is written to.</p>
-<pre><code>
-
-## Origin of information
-
-if a variable is used at a program point p, it must be alive immediately before p
-
-if the variable is not used at p, when is it live immediately before p?
-
-## propagation of information
-
-A   variable    is  live    immediately before  a   program point   p   if, and only    if: 
-
-1. It   is  live    immediately after   p.  
-2. It   is  not redefined   at  p.  
-
-or  
-
-1. It   is  used    at  p.  
-
-information propagates upward 
-
-
-what if the program point p has multiple successors?
-
-#joining info 
-
-if a variable is live at the bottom of a block then it must be live at the top of at least one predecssor of the block.
-
-
-## IN and OUT sets 
-
-We had to consider flow starting at the bottom so this is a ***backwards*** analysis 
-
-for a basic block (b):
-
-1) GEN(s) the set of variables used in s before any assignment to s in the same block
-2) kill(s) the set of variables assigned in s 
-
-## global liveness  
-
-1) OUT(exit) = {}
-2) IN(b) = gen(b) union ( OUT(b) - KILL(b))
-3) OUT(b) = union IN(b) 
-
-
-## An example 
-</code></pre>
-<p>// in: {}; predecessor blocks: none b1: a = 3; b = 5; d = 4; x = 100; //x is never used later thus not in the out set {a,b,d} t = a &gt; b br t .t .f // out: {a,b,d} //union of all (in) successors of b1 =&gt; b2: {a,b}, and b3:{b,d}</p>
-<p>.t // in: {a,b}; predecessor blocks: b1 b2: c = a + b; d = 2; // out: {b,d}</p>
-<p>.f b3: in: {b,d}; predecessor blocks: b1 and b2 c = 4; return b * d + c; // out:{} ```</p>
-<p>Each block gives us two equations.</p>
-<p>we can iterate these equations until IN and OUT stop changing</p>
-<ol type="1">
-<li>How do we intitialize these sets?</li>
-<li>Does this always converge?</li>
-<li>What is the complexity?</li>
-</ol>
-</section>
-<section id="solving-liveness" class="level2">
-<h2 class="anchored" data-anchor-id="solving-liveness">solving liveness</h2>
-<ol type="1">
-<li>initialize each IN and OUT to empty</li>
-<li>Evaluate all the equations</li>
-<li>if anything changes repeat step 2</li>
-</ol>
-</section>
-<section id="data-flow-framework" class="level2">
-<h2 class="anchored" data-anchor-id="data-flow-framework">data flow framework</h2>
-<p>The data flow framework. Here’s how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:</p>
-<ol type="1">
-<li>Figure out the thing you want to know at the entry and exit of each block.</li>
-<li>Write an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a <em>local analysis</em> for the block.), calculate GEN and KILL</li>
-<li>Generate equalities according to the edges in the CFG.</li>
-<li>Solve the system of equations! (Using a general solver algorithm that you don’t need to adapt to every problem.)</li>
-</ol>
-<hr>
-<p>step 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL</p>
-</section>
 <section id="loops" class="level2">
 <h2 class="anchored" data-anchor-id="loops">loops</h2>
 <p>This algorithm has no problems with loops!</p>
-<p>Theory – the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?</p>
 </section>
 <section id="partial-orders" class="level2">
 <h2 class="anchored" data-anchor-id="partial-orders">partial orders</h2>
 <p>The domain of values you’re trying compute needs to form a <em>partial order</em> with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.</p>
 <p>In terms of a partial order ⊑, the merge function is the <em>meet</em> (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so <code>x ⊑ y</code> implies <code>f(x) ⊑ f(y)</code>.</p>
-<hr>
-<p>The usual definition of a “correct” solution to a data-flow problem is the <em>meet-over-all-paths</em> solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block</p>
 </section>
-<section id="other-data-flow-problems" class="level2">
-<h2 class="anchored" data-anchor-id="other-data-flow-problems">other data flow problems</h2>
-<p>More examples of things you can do with the data flow framework.</p>
-<ol type="1">
-<li>Reaching definitions.</li>
-<li>Live variables: which variables are both defined and going to be used at some point in the future?</li>
-<li>Constant propagation: which variables have statically knowable constant values?</li>
-<li>Available expressions: which <em>expressions</em> have already been computed in the past? (Useful in CSE.)</li>
-<li>Initialized variables: like in Java, which variables have had <em>something</em> written to them?</li>
-<li>Interval analysis: what is the numerical range of values that a given variable might hold?</li>
-</ol>
-</section>
-<section id="ud-chains" class="level2">
-<h2 class="anchored" data-anchor-id="ud-chains">ud chains</h2>
-<p>In data flow we talked about a matrix <strong><em>definitions by uses</em></strong> which is very sparse and very slow to process.</p>
-<p>use-def chains, for each use build a list of all defs that might reach that use.</p>
-<p>def-use chains for each def calculate the set of all uses that the def might reach.</p>
-<p>Both of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs</p>
+<section id="homework-3" class="level2">
+<h2 class="anchored" data-anchor-id="homework-3">homework 3</h2>
+<p>Implement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.</p>
 
 
-</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->

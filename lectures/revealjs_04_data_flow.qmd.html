@@ -387,9 +387,6 @@
       margin-right: 0; 
     }
   </style>
-  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <meta property="og:title" content="Data Flow – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -404,351 +401,807 @@
 </div>
 
 </section>
-<section id="reasoning-about-data-flow-global-analysis" class="slide level2 scrollable">
-<h2>Reasoning about data flow (global analysis)</h2>
-<p>There exists a general algorithm to extract information from programs.</p>
-<p>Many static analyses are dataflow analyses:</p>
-<ol type="1">
-<li>Liveness,<br>
-</li>
-<li>available expressions,<br>
-</li>
-<li>very busy expressions,<br>
-</li>
-<li>reaching definitions.</li>
-</ol>
-<p>Dataflow analyses are flow sensitive.</p>
-<p>How do we know if the algorithm will converge for any possible cfg.</p>
-</section>
-<section id="definitions" class="slide level2">
-<h2>definitions</h2>
-<p>A <strong><em>Use:</em></strong> An instruction uses all of its arguments. (So any instruction with arguments is a “use.”), a binary instruction is two uses.</p>
-<p>A <strong><em>definition</em></strong> is place in the program that assigns a value to an instruction. For Bril, a definition is a value instruction (has a dest )</p>
-<p>A definition D reaches a point P (instruction) in the program if there is an execution path from D to P, and the variable in D is not overwritten on the path.</p>
-<p><strong><em>Available:</em></strong> Definitions that reach a given point in the program are available at that point.</p>
-<p>if an instruction writes a variable it <strong><em>kills</em></strong> all prior definitions that write the same variable</p>
-<p>A <strong><em>program point</em></strong> is an instruction</p>
-</section>
-<section id="example-for-avail-expressions" class="slide level2">
-<h2>example for avail expressions</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource {typescript} number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a></a>function main(x: number, y: number, z: number, a: number, b: number): void {</span>
-<span id="cb1-2"><a></a>    z = a + b;</span>
-<span id="cb1-3"><a></a>    y = a * b;</span>
-<span id="cb1-4"><a></a></span>
-<span id="cb1-5"><a></a>    for (; y &gt; a +b; ){</span>
-<span id="cb1-6"><a></a>        a = a + 1;</span>
-<span id="cb1-7"><a></a>        x = a + b;</span>
-<span id="cb1-8"><a></a>        // Update y to reflect the new value of a</span>
-<span id="cb1-9"><a></a>        y = a * b;</span>
-<span id="cb1-10"><a></a>    }</span>
-<span id="cb1-11"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<pre><code>@main(x: float, y: float, z: float, a: float, b: float) {
-  z: float = fadd a b;
-  y: float = fmul a b;
+<section class="slide level2">
 
-.for.cond.6:
-  v10: float = fadd a b;
-  v11: bool = fgt y v10;
-  br v11 .for.body.6 .for.end.6;
-
-.for.body.6:
-  a: float = fadd a 1;
-  x: float = fadd a b;
-  y: float = fmul a b;
-  jmp .for.cond.6;
-
-.for.end.6:
-}</code></pre>
-<p>How do we optimize this program?</p>
-</section>
-<section id="control-flow-graph" class="slide level2">
-<h2>control flow graph</h2>
-<div class="columns">
-<div class="column">
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource {typescript} number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a></a>function main(x: number, y: number, z: number, a: number, b: number): void {</span>
-<span id="cb3-2"><a></a>    z = a + b;</span>
-<span id="cb3-3"><a></a>    y = a * b;</span>
-<span id="cb3-4"><a></a></span>
-<span id="cb3-5"><a></a>    for (; y &gt; a +b; ){</span>
-<span id="cb3-6"><a></a>        a = a + 1;</span>
-<span id="cb3-7"><a></a>        x = a + b;</span>
-<span id="cb3-8"><a></a>        y = a * b;</span>
-<span id="cb3-9"><a></a>    }</span>
-<span id="cb3-10"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div><div class="column">
-<div class="cell" data-reveal="true" data-layout-align="default">
+<p>The material in these slides have been taken from “Lecture Notes in Static Analysis” (Sec.6), by Michael I. Schwartzbach, https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/, “Principles of Program Analysis”, Chapter 6, by Niesen et al, and from Miachel Schwartzbach’s “Lecture notes in Static Analysis”, Chapter 6, First Section.</p>
+<div id="f1e069d9" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb4-2"><a></a>%%| echo: false</span>
-<span id="cb4-3"><a></a>graph TD</span>
-<span id="cb4-4"><a></a>A["z: float = fadd a b;\n</span>
-<span id="cb4-5"><a></a>  y: float = fmul a b;"]</span>
-<span id="cb4-6"><a></a></span>
-<span id="cb4-7"><a></a>  B["v10: float = fadd a b;\n</span>
-<span id="cb4-8"><a></a>  v11: bool = fgt y v10;\n</span>
-<span id="cb4-9"><a></a>  br v11 .for.body.6 .for.end.6;"]</span>
-<span id="cb4-10"><a></a></span>
-<span id="cb4-11"><a></a>  C["a: float = fadd a 1;\n</span>
-<span id="cb4-12"><a></a>  x: float = fadd a b;\n</span>
-<span id="cb4-13"><a></a>  y: float = fmul a b;\n</span>
-<span id="cb4-14"><a></a>  jmp .for.cond.6;"]</span>
-<span id="cb4-15"><a></a></span>
-<span id="cb4-16"><a></a>  D["END"]</span>
-<span id="cb4-17"><a></a></span>
-<span id="cb4-18"><a></a>  A--&gt;B</span>
-<span id="cb4-19"><a></a>  B--&gt;C</span>
-<span id="cb4-20"><a></a>  C--&gt; B</span>
-<span id="cb4-21"><a></a>  B--&gt; D</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">131</span>):</span>
+<span id="cb1-2"><a></a>    <span class="bu">print</span>(<span class="ss">f"![](df/ra</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">.svg)</span><span class="ch">\n</span><span class="ss">##"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%| echo: false
-graph TD
-A["z: float = fadd a b;\n
-  y: float = fmul a b;"]
-
-  B["v10: float = fadd a b;\n
-  v11: bool = fgt y v10;\n
-  br v11 .for.body.6 .for.end.6;"]
-
-  C["a: float = fadd a 1;\n
-  x: float = fadd a b;\n
-  y: float = fmul a b;\n
-  jmp .for.cond.6;"]
-
-  D["END"]
-
-  A--&gt;B
-  B--&gt;C
-  C--&gt; B
-  B--&gt; D
-
-
-</pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>![](df/ra1.svg)
+##
+![](df/ra2.svg)
+##
+![](df/ra3.svg)
+##
+![](df/ra4.svg)
+##
+![](df/ra5.svg)
+##
+![](df/ra6.svg)
+##
+![](df/ra7.svg)
+##
+![](df/ra8.svg)
+##
+![](df/ra9.svg)
+##
+![](df/ra10.svg)
+##
+![](df/ra11.svg)
+##
+![](df/ra12.svg)
+##
+![](df/ra13.svg)
+##
+![](df/ra14.svg)
+##
+![](df/ra15.svg)
+##
+![](df/ra16.svg)
+##
+![](df/ra17.svg)
+##
+![](df/ra18.svg)
+##
+![](df/ra19.svg)
+##
+![](df/ra20.svg)
+##
+![](df/ra21.svg)
+##
+![](df/ra22.svg)
+##
+![](df/ra23.svg)
+##
+![](df/ra24.svg)
+##
+![](df/ra25.svg)
+##
+![](df/ra26.svg)
+##
+![](df/ra27.svg)
+##
+![](df/ra28.svg)
+##
+![](df/ra29.svg)
+##
+![](df/ra30.svg)
+##
+![](df/ra31.svg)
+##
+![](df/ra32.svg)
+##
+![](df/ra33.svg)
+##
+![](df/ra34.svg)
+##
+![](df/ra35.svg)
+##
+![](df/ra36.svg)
+##
+![](df/ra37.svg)
+##
+![](df/ra38.svg)
+##
+![](df/ra39.svg)
+##
+![](df/ra40.svg)
+##
+![](df/ra41.svg)
+##
+![](df/ra42.svg)
+##
+![](df/ra43.svg)
+##
+![](df/ra44.svg)
+##
+![](df/ra45.svg)
+##
+![](df/ra46.svg)
+##
+![](df/ra47.svg)
+##
+![](df/ra48.svg)
+##
+![](df/ra49.svg)
+##
+![](df/ra50.svg)
+##
+![](df/ra51.svg)
+##
+![](df/ra52.svg)
+##
+![](df/ra53.svg)
+##
+![](df/ra54.svg)
+##
+![](df/ra55.svg)
+##
+![](df/ra56.svg)
+##
+![](df/ra57.svg)
+##
+![](df/ra58.svg)
+##
+![](df/ra59.svg)
+##
+![](df/ra60.svg)
+##
+![](df/ra61.svg)
+##
+![](df/ra62.svg)
+##
+![](df/ra63.svg)
+##
+![](df/ra64.svg)
+##
+![](df/ra65.svg)
+##
+![](df/ra66.svg)
+##
+![](df/ra67.svg)
+##
+![](df/ra68.svg)
+##
+![](df/ra69.svg)
+##
+![](df/ra70.svg)
+##
+![](df/ra71.svg)
+##
+![](df/ra72.svg)
+##
+![](df/ra73.svg)
+##
+![](df/ra74.svg)
+##
+![](df/ra75.svg)
+##
+![](df/ra76.svg)
+##
+![](df/ra77.svg)
+##
+![](df/ra78.svg)
+##
+![](df/ra79.svg)
+##
+![](df/ra80.svg)
+##
+![](df/ra81.svg)
+##
+![](df/ra82.svg)
+##
+![](df/ra83.svg)
+##
+![](df/ra84.svg)
+##
+![](df/ra85.svg)
+##
+![](df/ra86.svg)
+##
+![](df/ra87.svg)
+##
+![](df/ra88.svg)
+##
+![](df/ra89.svg)
+##
+![](df/ra90.svg)
+##
+![](df/ra91.svg)
+##
+![](df/ra92.svg)
+##
+![](df/ra93.svg)
+##
+![](df/ra94.svg)
+##
+![](df/ra95.svg)
+##
+![](df/ra96.svg)
+##
+![](df/ra97.svg)
+##
+![](df/ra98.svg)
+##
+![](df/ra99.svg)
+##
+![](df/ra100.svg)
+##
+![](df/ra101.svg)
+##
+![](df/ra102.svg)
+##
+![](df/ra103.svg)
+##
+![](df/ra104.svg)
+##
+![](df/ra105.svg)
+##
+![](df/ra106.svg)
+##
+![](df/ra107.svg)
+##
+![](df/ra108.svg)
+##
+![](df/ra109.svg)
+##
+![](df/ra110.svg)
+##
+![](df/ra111.svg)
+##
+![](df/ra112.svg)
+##
+![](df/ra113.svg)
+##
+![](df/ra114.svg)
+##
+![](df/ra115.svg)
+##
+![](df/ra116.svg)
+##
+![](df/ra117.svg)
+##
+![](df/ra118.svg)
+##
+![](df/ra119.svg)
+##
+![](df/ra120.svg)
+##
+![](df/ra121.svg)
+##
+![](df/ra122.svg)
+##
+![](df/ra123.svg)
+##
+![](df/ra124.svg)
+##
+![](df/ra125.svg)
+##
+![](df/ra126.svg)
+##
+![](df/ra127.svg)
+##
+![](df/ra128.svg)
+##
+![](df/ra129.svg)
+##
+![](df/ra130.svg)
+##
+![](df/ra131.svg)
+##</code></pre>
 </div>
-<p></p></figure><p></p>
 </div>
-</div>
-</div>
-</div></div>
 </section>
-<section id="optimized" class="slide level2">
-<h2>optimized</h2>
-<div class="columns">
-<div class="column">
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource {typescript} number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a></a>function main(x: number, y: number, z: number, a: number, b: number): void {</span>
-<span id="cb5-2"><a></a>    z = a + b;</span>
-<span id="cb5-3"><a></a>    y = a * b;</span>
-<span id="cb5-4"><a></a></span>
-<span id="cb5-5"><a></a>    for (; y &gt; a +b; ){</span>
-<span id="cb5-6"><a></a>        a = a + 1;</span>
-<span id="cb5-7"><a></a>        x = a + b;</span>
-<span id="cb5-8"><a></a>        y = a * b;</span>
-<span id="cb5-9"><a></a>    }</span>
-<span id="cb5-10"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div><div class="column">
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource {typescript} number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a></a>function main(x: number, y: number, z: number, a: number, b: number): void {</span>
-<span id="cb6-2"><a></a>    z = a + b;</span>
-<span id="cb6-3"><a></a>    y = a * b;</span>
-<span id="cb6-4"><a></a>     </span>
-<span id="cb6-5"><a></a>    w = z</span>
-<span id="cb6-6"><a></a></span>
-<span id="cb6-7"><a></a>    for (; y &gt; w; ){</span>
-<span id="cb6-8"><a></a>        a = a + 1;</span>
-<span id="cb6-9"><a></a>        x = a + b;</span>
-<span id="cb6-10"><a></a>        y = a * b;</span>
-<span id="cb6-11"><a></a></span>
-<span id="cb6-12"><a></a>        w = x </span>
-<span id="cb6-13"><a></a>    }</span>
-<span id="cb6-14"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div></div>
-<p>is this an optimization?</p>
-</section>
-<section id="available-expressions" class="slide level2">
-<h2>available expressions</h2>
-<p>In order to apply the previous optimization, we had to know which expressions were available at the places where we replaced expressions by variables.</p>
-<p>An expression is available at a program point if its current value has already been computed earlier in the execution.</p>
-<p>How does information originate</p>
-<p>How does information propagate</p>
-</section>
-<section id="origin-of-information" class="slide level2">
-<h2>Origin of information</h2>
-<p>If an expression is used at a point p, then it is available immediately after p, as long as p does not redefine any of the variables that the expression uses.</p>
-<p>What about expressions not used at p</p>
-</section>
-<section class="slide level2">
+<section id="section" class="slide level2">
+<h2></h2>
 
-<p>An expression E is available immediately after a program point p if, and only if:</p>
-<p>1. It is available immediately before p.<br>
-1. No variable of E is redefined at p.&nbsp;</p>
-<p>or<br>
-1. It is used at p.<br>
-1. No variable of E is redefined at p.&nbsp;</p>
-<p>information flows downward</p>
-</section>
-<section id="joining-info" class="slide level2">
-<h2>joining info</h2>
-<p>at the top of a block an expression is available if it is available after the bottom of all predecessors</p>
-<p>To solve this we can form two sets</p>
-<p>IN expressions available immed before p</p>
-<p>OUT expressions available immed after p</p>
-</section>
-<section id="equations" class="slide level2">
-<h2>equations</h2>
-<div class="cell" data-reveal="true" data-layout-align="default">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb7-2"><a></a>%%| echo: false</span>
-<span id="cb7-3"><a></a>graph TB</span>
-<span id="cb7-4"><a></a>p1 --&gt; p</span>
-<span id="cb7-5"><a></a>p2 --&gt; p</span>
-<span id="cb7-6"><a></a>p3 --&gt;p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%| echo: false
-graph TB
-p1 --&gt; p
-p2 --&gt; p
-p3 --&gt;p
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<p><span class="math display">\[
-\begin{aligned} \operatorname{IN}(p) &amp; =\bigcap \operatorname{OUT}\left(p_s\right), p_s \in \operatorname{pred}(p) \\ \operatorname{OUT}(p) &amp; =(\operatorname{IN}(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\}\end{aligned}
-\]</span></p>
-<p><br>
-</p>
-</section>
-<section id="a-specific-problem-called-reaching-definitions" class="slide level2">
-<h2>a specific problem called “reaching definitions”</h2>
-<p><em>Reaching definitions</em> is an example of a global property that require you to look at an entire CFG.</p>
-</section>
-<section id="reaching-definitions-problem-determine-which-definitions-reach-which-uses." class="slide level2">
-<h2>Reaching definitions problem: determine which definitions reach which uses.</h2>
-<pre><code>x = input; 
-while (x &gt; 1) {
-      y = x / 2;
-      if (y &gt; 3)        
-         x = x - y;    
-      z = x - 4;   
-      if (y &gt; 0)       
-          x = x / 2;    
-      z = z - 1; } </code></pre>
-<pre><code>  Consider  this program    How could   we  optimize    it? 
-  
-  what  information does    this    optimization    need? </code></pre>
-</section>
-<section id="reaching-definitions" class="slide level2">
-<h2>reaching definitions</h2>
-<p>The assignment z = z -1 is dead - how do we find that The assignment of z does not reach a use of z</p>
-</section>
-<section id="reaching-defs" class="slide level2 scrollable">
-<h2>reaching defs</h2>
-<p>origin: if a program point p defines a variable v then v reaches the point after p</p>
-<p>propagation: A definition of a variable v reaches the program point immediately after p if, and only if:</p>
-<ol type="1">
-<li>the definition reaches the point immediately before p</li>
-<li>variable v is not redefined at p.</li>
-</ol>
-<p>or</p>
-<p>Variable v is defined at p</p>
-<p>join: if a definition of a variable v reaches the point immediately after at least one predecessor of p, then it reaches the point immediately before p.&nbsp;</p>
-</section>
-<section id="matrix-forms" class="slide level2 scrollable">
-<h2>matrix forms</h2>
-<p>We could build a 2d matrix - definitions by uses, where a 1 bit indicates that this definition reaches this use. As a matrix this would be very sparse, later when we do ssa forms will see a very cool compression technique. Algorithms that use this kind of matrix are called bit-vector methods.</p>
-<p>A definition of a variable v reaches just after a program point p if and only if:</p>
-<ol type="1">
-<li>the definition reaches the point just before p</li>
-<li>the variable v is not redefined at p</li>
-</ol>
-<p>or</p>
-<ol type="1">
-<li>the variable v is defined at p.</li>
-</ol>
-</section>
-<section class="slide level2">
+<img data-src="df/ra1.svg" class="r-stretch"></section>
+<section id="section-1" class="slide level2">
+<h2></h2>
 
-<p>What about multiple predecessors? p is the first instruction of a block with multiple preds.</p>
-<p>If a definition reaches a point immediately after at least one pred of p then it reaches the point immediately before p.</p>
-<p>This is a <strong><em>union</em></strong> operation.</p>
-<p>We are moving information down from definition. This is called <strong><em>forward</em></strong> propagation</p>
-</section>
-<section class="slide level2">
+<img data-src="df/ra2.svg" class="r-stretch"></section>
+<section id="section-2" class="slide level2">
+<h2></h2>
 
-<p>Define two sets IN and OUT that hold definitions</p>
-<p>IN is the set of definitions that reach a point immediately before p</p>
-<p>OUT is the set of definitions that reach a point immediately after p</p>
-</section>
-<section id="calculate-in-and-out" class="slide level2 scrollable">
-<h2>calculate in and out</h2>
-<p>For a given block b, we can compute two sets (of definitions):</p>
-<ol type="1">
-<li>kill(b) = all defs in the program that assign to y, and there is a def of y in b<br>
-</li>
-<li>gen(b) = definitions in b that reach the bottom of b</li>
-</ol>
-<p>Reaching defs will need iteration. but these sets do not change</p>
-</section>
-<section id="and-now-globally" class="slide level2 scrollable">
-<h2>And now globally:</h2>
-<ol type="1">
-<li><span class="math inline">\(OUT(b) = (in(b) - kill(b) ) \cup gen(b)\)</span></li>
-<li><span class="math inline">\(IN(b) = \cup \left( \operatorname{OUT}(p) \mid p \in predecessors(b) \right))\)</span></li>
-</ol>
-</section>
-<section>
-<section id="common-structure" class="title-slide slide level1 center">
-<h1>common structure</h1>
-<p>liveness <span class="math display">\[
-\begin{aligned}
-\operatorname{IN}(p)= &amp; (\operatorname{OUT}(p) \backslash\{v\}) \cup \operatorname{vars}(E) \\
-\operatorname{OUT}(p)= &amp; \bigcup I N\left(p_s\right), p_s \in \operatorname{succ}(p) \\
-\end{aligned}
-\]</span> reaching defs <span class="math display">\[
-\begin{aligned}
-IN(p)= &amp; \bigcup \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
-\operatorname{OUT}(p)= &amp; \left(I N(p) \backslash\left\{\operatorname{defs}_s(v)\right\}\right) \cup\{p\} \\
-\end{aligned}
-\]</span></p>
-<p>Available Expressions <span class="math display">\[
-\begin{aligned}
-\operatorname{IN}(p)=\bigcap \text { OUT }\left(p_s\right), p_s \in \operatorname{pred}(p) \\
-\operatorname{OUT}(p)=(I N(p) \cup\{E\}) \backslash\{\operatorname{Expr}(v)\} \\
-\end{aligned}
-\]</span></p>
-</section>
-<section id="framework" class="slide level2">
-<h2>framework</h2>
-<p>A may analysis keeps tracks of facts that may happen during the execution of the program. 1. A definition may reach a certain point</p>
-<p>A must analysis tracks facts that will – for sure – happen during the execution of the program. 1. This expression will be used after certain program point.</p>
-<p>A backward analysis propagates information in the opposite direction in which the program flows.</p>
-<p>A forward analysis propagates information in the same direction in which the program flows.</p>
-</section>
-<section id="transfer-functions" class="slide level2">
-<h2>transfer functions</h2>
-<p>in a forward analysis out = f(in) in a backward analysis in = f(out)</p>
-<p>we call f the <strong><em>transfer function</em></strong></p>
-<p>The transfer functions provides us with a new “interpretation” of the program. We can implement a machine that traverses the program, always fetching a given instruction, and applying the transfer function onto that instruction. This process goes on until the results produced by these transfer functions stop changing. This is abstract interpretation</p>
-</section>
-<section id="merge-functions--" class="slide level2">
-<h2>merge functions -</h2>
-<p>There are two merge functions meet and join specifying what happens at all preds/successors</p>
-</section>
-<section id="pseudo-code-we-can-solve-for-in-and-out-iteratively-using-a-worklist" class="slide level2">
-<h2>pseudo code : We can solve for IN and OUT iteratively using a worklist</h2>
+<img data-src="df/ra3.svg" class="r-stretch"></section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra4.svg" class="r-stretch"></section>
+<section id="section-4" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra5.svg" class="r-stretch"></section>
+<section id="section-5" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra6.svg" class="r-stretch"></section>
+<section id="section-6" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra7.svg" class="r-stretch"></section>
+<section id="section-7" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra8.svg" class="r-stretch"></section>
+<section id="section-8" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra9.svg" class="r-stretch"></section>
+<section id="section-9" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra10.svg" class="r-stretch"></section>
+<section id="section-10" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra11.svg" class="r-stretch"></section>
+<section id="section-11" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra12.svg" class="r-stretch"></section>
+<section id="section-12" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra13.svg" class="r-stretch"></section>
+<section id="section-13" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra14.svg" class="r-stretch"></section>
+<section id="section-14" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra15.svg" class="r-stretch"></section>
+<section id="section-15" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra16.svg" class="r-stretch"></section>
+<section id="section-16" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra17.svg" class="r-stretch"></section>
+<section id="section-17" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra18.svg" class="r-stretch"></section>
+<section id="section-18" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra19.svg" class="r-stretch"></section>
+<section id="section-19" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra20.svg" class="r-stretch"></section>
+<section id="section-20" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra21.svg" class="r-stretch"></section>
+<section id="section-21" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra22.svg" class="r-stretch"></section>
+<section id="section-22" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra23.svg" class="r-stretch"></section>
+<section id="section-23" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra24.svg" class="r-stretch"></section>
+<section id="section-24" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra25.svg" class="r-stretch"></section>
+<section id="section-25" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra26.svg" class="r-stretch"></section>
+<section id="section-26" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra27.svg" class="r-stretch"></section>
+<section id="section-27" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra28.svg" class="r-stretch"></section>
+<section id="section-28" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra29.svg" class="r-stretch"></section>
+<section id="section-29" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra30.svg" class="r-stretch"></section>
+<section id="section-30" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra31.svg" class="r-stretch"></section>
+<section id="section-31" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra32.svg" class="r-stretch"></section>
+<section id="section-32" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra33.svg" class="r-stretch"></section>
+<section id="section-33" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra34.svg" class="r-stretch"></section>
+<section id="section-34" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra35.svg" class="r-stretch"></section>
+<section id="section-35" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra36.svg" class="r-stretch"></section>
+<section id="section-36" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra37.svg" class="r-stretch"></section>
+<section id="section-37" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra38.svg" class="r-stretch"></section>
+<section id="section-38" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra39.svg" class="r-stretch"></section>
+<section id="section-39" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra40.svg" class="r-stretch"></section>
+<section id="section-40" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra41.svg" class="r-stretch"></section>
+<section id="section-41" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra42.svg" class="r-stretch"></section>
+<section id="section-42" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra43.svg" class="r-stretch"></section>
+<section id="section-43" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra44.svg" class="r-stretch"></section>
+<section id="section-44" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra45.svg" class="r-stretch"></section>
+<section id="section-45" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra46.svg" class="r-stretch"></section>
+<section id="section-46" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra47.svg" class="r-stretch"></section>
+<section id="section-47" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra48.svg" class="r-stretch"></section>
+<section id="section-48" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra49.svg" class="r-stretch"></section>
+<section id="section-49" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra50.svg" class="r-stretch"></section>
+<section id="section-50" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra51.svg" class="r-stretch"></section>
+<section id="section-51" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra52.svg" class="r-stretch"></section>
+<section id="section-52" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra53.svg" class="r-stretch"></section>
+<section id="section-53" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra54.svg" class="r-stretch"></section>
+<section id="section-54" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra55.svg" class="r-stretch"></section>
+<section id="section-55" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra56.svg" class="r-stretch"></section>
+<section id="section-56" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra57.svg" class="r-stretch"></section>
+<section id="section-57" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra58.svg" class="r-stretch"></section>
+<section id="section-58" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra59.svg" class="r-stretch"></section>
+<section id="section-59" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra60.svg" class="r-stretch"></section>
+<section id="section-60" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra61.svg" class="r-stretch"></section>
+<section id="section-61" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra62.svg" class="r-stretch"></section>
+<section id="section-62" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra63.svg" class="r-stretch"></section>
+<section id="section-63" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra64.svg" class="r-stretch"></section>
+<section id="section-64" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra65.svg" class="r-stretch"></section>
+<section id="section-65" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra66.svg" class="r-stretch"></section>
+<section id="section-66" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra67.svg" class="r-stretch"></section>
+<section id="section-67" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra68.svg" class="r-stretch"></section>
+<section id="section-68" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra69.svg" class="r-stretch"></section>
+<section id="section-69" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra70.svg" class="r-stretch"></section>
+<section id="section-70" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra71.svg" class="r-stretch"></section>
+<section id="section-71" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra72.svg" class="r-stretch"></section>
+<section id="section-72" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra73.svg" class="r-stretch"></section>
+<section id="section-73" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra74.svg" class="r-stretch"></section>
+<section id="section-74" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra75.svg" class="r-stretch"></section>
+<section id="section-75" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra76.svg" class="r-stretch"></section>
+<section id="section-76" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra77.svg" class="r-stretch"></section>
+<section id="section-77" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra78.svg" class="r-stretch"></section>
+<section id="section-78" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra79.svg" class="r-stretch"></section>
+<section id="section-79" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra80.svg" class="r-stretch"></section>
+<section id="section-80" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra81.svg" class="r-stretch"></section>
+<section id="section-81" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra82.svg" class="r-stretch"></section>
+<section id="section-82" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra83.svg" class="r-stretch"></section>
+<section id="section-83" class="slide level2">
+<h2>84</h2>
+
+<img data-src="df/ra84.svg" class="r-stretch"></section>
+<section id="section-84" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra85.svg" class="r-stretch"></section>
+<section id="section-85" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra86.svg" class="r-stretch"></section>
+<section id="section-86" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra87.svg" class="r-stretch"></section>
+<section id="section-87" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra88.svg" class="r-stretch"></section>
+<section id="section-88" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra89.svg" class="r-stretch"></section>
+<section id="section-89" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra90.svg" class="r-stretch"></section>
+<section id="section-90" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra91.svg" class="r-stretch"></section>
+<section id="section-91" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra92.svg" class="r-stretch"></section>
+<section id="section-92" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra93.svg" class="r-stretch"></section>
+<section id="section-93" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra94.svg" class="r-stretch"></section>
+<section id="section-94" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra95.svg" class="r-stretch"></section>
+<section id="section-95" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra96.svg" class="r-stretch"></section>
+<section id="section-96" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra97.svg" class="r-stretch"></section>
+<section id="section-97" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra98.svg" class="r-stretch"></section>
+<section id="section-98" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra99.svg" class="r-stretch"></section>
+<section id="section-99" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra100.svg" class="r-stretch"></section>
+<section id="section-100" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra101.svg" class="r-stretch"></section>
+<section id="section-101" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra102.svg" class="r-stretch"></section>
+<section id="section-102" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra103.svg" class="r-stretch"></section>
+<section id="section-103" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra104.svg" class="r-stretch"></section>
+<section id="section-104" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra105.svg" class="r-stretch"></section>
+<section id="section-105" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra106.svg" class="r-stretch"></section>
+<section id="section-106" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra107.svg" class="r-stretch"></section>
+<section id="section-107" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra108.svg" class="r-stretch"></section>
+<section id="section-108" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra109.svg" class="r-stretch"></section>
+<section id="section-109" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra110.svg" class="r-stretch"></section>
+<section id="section-110" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra111.svg" class="r-stretch"></section>
+<section id="section-111" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra112.svg" class="r-stretch"></section>
+<section id="section-112" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra113.svg" class="r-stretch"></section>
+<section id="section-113" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra114.svg" class="r-stretch"></section>
+<section id="section-114" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra115.svg" class="r-stretch"></section>
+<section id="section-115" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra116.svg" class="r-stretch"></section>
+<section id="section-116" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra117.svg" class="r-stretch"></section>
+<section id="section-117" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra118.svg" class="r-stretch"></section>
+<section id="section-118" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra119.svg" class="r-stretch"></section>
+<section id="section-119" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra120.svg" class="r-stretch"></section>
+<section id="section-120" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra121.svg" class="r-stretch"></section>
+<section id="section-121" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra122.svg" class="r-stretch"></section>
+<section id="section-122" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra123.svg" class="r-stretch"></section>
+<section id="section-123" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra124.svg" class="r-stretch"></section>
+<section id="section-124" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra125.svg" class="r-stretch"></section>
+<section id="section-125" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra126.svg" class="r-stretch"></section>
+<section id="section-126" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra127.svg" class="r-stretch"></section>
+<section id="section-127" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra128.svg" class="r-stretch"></section>
+<section id="section-128" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra129.svg" class="r-stretch"></section>
+<section id="section-129" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra130.svg" class="r-stretch"></section>
+<section id="section-130" class="slide level2">
+<h2></h2>
+
+<img data-src="df/ra131.svg" class="r-stretch"></section>
+<section id="pseudo-code" class="slide level2">
+<h2>pseudo code</h2>
 <pre><code>// Initialize
 for all CFG nodes n in N,
     OUT[n] = emptyset; // can optimize by OUT[n] = GEN[n];
@@ -785,142 +1238,25 @@ while (Changed != emptyset)
     }
 }</code></pre>
 </section>
-<section id="questions" class="slide level2">
-<h2>questions</h2>
-<p>Does this always converge?</p>
-<p>what order do we want to select nodes (basic blocks)?</p>
-<div class="fragment">
-<p>allways since the sets change in one direction</p>
-<p>visit a node after visiting its preds. Reverse post order.</p>
-</div>
-</section>
-<section id="a-second-problem-liveness-" class="slide level2 scrollable">
-<h2>a second problem liveness-</h2>
-<p>If we assume an infinite supply of registers, then a variable v should be in a register at a program point p, whenever:</p>
-<p>1. There is a path P from p to another program point pu, where v is used.<br>
-2. The path P does not go across any definition of v.</p>
-<p>Conditions 1 and 2 determine when a variable v is live at program point p.&nbsp;</p>
-<p>Why is the second condition necessary?</p>
-<p>A variable is live at some point if it holds a value that may be needed in the future, or equivalently if its value may be read before the next time the variable is written to.</p>
-<pre><code>
-
-## Origin of information
-
-if a variable is used at a program point p, it must be alive immediately before p
-
-if the variable is not used at p, when is it live immediately before p?
-
-## propagation of information
-
-A   variable    is  live    immediately before  a   program point   p   if, and only    if: 
-
-1. It   is  live    immediately after   p.  
-2. It   is  not redefined   at  p.  
-
-or  
-
-1. It   is  used    at  p.  
-
-information propagates upward 
-
-
-what if the program point p has multiple successors?
-
-#joining info 
-
-if a variable is live at the bottom of a block then it must be live at the top of at least one predecssor of the block.
-
-
-## IN and OUT sets 
-
-We had to consider flow starting at the bottom so this is a ***backwards*** analysis 
-
-for a basic block (b):
-
-1) GEN(s) the set of variables used in s before any assignment to s in the same block
-2) kill(s) the set of variables assigned in s 
-
-## global liveness  
-
-1) OUT(exit) = {}
-2) IN(b) = gen(b) union ( OUT(b) - KILL(b))
-3) OUT(b) = union IN(b) 
-
-
-## An example 
-</code></pre>
-<p>// in: {}; predecessor blocks: none b1: a = 3; b = 5; d = 4; x = 100; //x is never used later thus not in the out set {a,b,d} t = a &gt; b br t .t .f // out: {a,b,d} //union of all (in) successors of b1 =&gt; b2: {a,b}, and b3:{b,d}</p>
-<p>.t // in: {a,b}; predecessor blocks: b1 b2: c = a + b; d = 2; // out: {b,d}</p>
-<p>.f b3: in: {b,d}; predecessor blocks: b1 and b2 c = 4; return b * d + c; // out:{} ```</p>
-<p>Each block gives us two equations.</p>
-<p>we can iterate these equations until IN and OUT stop changing</p>
-<ol type="1">
-<li>How do we intitialize these sets?</li>
-<li>Does this always converge?</li>
-<li>What is the complexity?</li>
-</ol>
-</section>
-<section id="solving-liveness" class="slide level2 scrollable">
-<h2>solving liveness</h2>
-<ol type="1">
-<li>initialize each IN and OUT to empty</li>
-<li>Evaluate all the equations</li>
-<li>if anything changes repeat step 2</li>
-</ol>
-</section>
-<section id="data-flow-framework" class="slide level2 scrollable">
-<h2>data flow framework</h2>
-<p>The data flow framework. Here’s how you solve a global analysis problem by imbuing a local analysis with a dose of data-flow magic:</p>
-<ol type="1">
-<li>Figure out the thing you want to know at the entry and exit of each block.</li>
-<li>Write an equation for every block relating that thing at the entry to that thing at the exit. (In general, this is a <em>local analysis</em> for the block.), calculate GEN and KILL</li>
-<li>Generate equalities according to the edges in the CFG.</li>
-<li>Solve the system of equations! (Using a general solver algorithm that you don’t need to adapt to every problem.)</li>
-</ol>
-</section>
-<section class="slide level2">
-
-<p>step 2 only looks at a single block, the iteration does not need to refigure out GEN and KILL</p>
-</section>
 <section id="loops" class="slide level2">
 <h2>loops</h2>
 <p>This algorithm has no problems with loops!</p>
-<p>Theory – the requirements for a general data flow analysis. How do you know the worklist algorithm terminates and gives you the right answer?</p>
 </section>
 <section id="partial-orders" class="slide level2">
 <h2>partial orders</h2>
 <p>The domain of values you’re trying compute needs to form a <em>partial order</em> with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.</p>
 <p>In terms of a partial order ⊑, the merge function is the <em>meet</em> (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so <code>x ⊑ y</code> implies <code>f(x) ⊑ f(y)</code>.</p>
 </section>
-<section class="slide level2">
-
-<p>The usual definition of a “correct” solution to a data-flow problem is the <em>meet-over-all-paths</em> solution: the meet of chained applications of the transfer functions for every path in the CFG from the entry block to any given block</p>
-</section>
-<section id="other-data-flow-problems" class="slide level2 scrollable">
-<h2>other data flow problems</h2>
-<p>More examples of things you can do with the data flow framework.</p>
-<ol type="1">
-<li>Reaching definitions.</li>
-<li>Live variables: which variables are both defined and going to be used at some point in the future?</li>
-<li>Constant propagation: which variables have statically knowable constant values?</li>
-<li>Available expressions: which <em>expressions</em> have already been computed in the past? (Useful in CSE.)</li>
-<li>Initialized variables: like in Java, which variables have had <em>something</em> written to them?</li>
-<li>Interval analysis: what is the numerical range of values that a given variable might hold?</li>
-</ol>
-</section>
-<section id="ud-chains" class="slide level2">
-<h2>ud chains</h2>
-<p>In data flow we talked about a matrix <strong><em>definitions by uses</em></strong> which is very sparse and very slow to process.</p>
-<p>use-def chains, for each use build a list of all defs that might reach that use.</p>
-<p>def-use chains for each def calculate the set of all uses that the def might reach.</p>
-<p>Both of these are good, but we are going use a much better data structure that is both smaller and faster to process. We also want ways to talk about loops in programs, since optimizations that move instructions inside loops to a place outside loops often speed up programs</p>
+<section id="homework-3" class="slide level2">
+<h2>homework 3</h2>
+<p>Implement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section></section>
+</section>
     </div>
   </div>
 
