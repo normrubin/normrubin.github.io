@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -67,6 +101,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -137,11 +174,11 @@ window.Quarto = {
 
 <section id="local-value-numbering" class="level3">
 <h3 class="anchored" data-anchor-id="local-value-numbering">Local Value Numbering</h3>
-<p><a href="http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/">slides from Phil Gibbons at CMU</a> lectures/L3-Local-Opts.pdf) for more details and context on LVN</p>
-<p>Value numbering is a very powerful technique that removes <strong><em>redunancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
+<p><a href="http://www.cs.cmu.edu/afs/cs/academic/class/15745-s19/www/">slides from Phil Gibbons at CMU</a> for more details and context on LVN</p>
+<p>Value numbering is a very powerful technique that removes <strong><em>redundancies</em></strong>, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.</p>
 <hr>
 <p>The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)</p>
-<p>Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives tha a new value number.</p>
+<p>Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives it a new value number.</p>
 <p>Two instructions are redundant if they have same op code and operands, which means the same value number</p>
 <hr>
 <p><span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> have the same value number if and only if <span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> are provably equal for all possible operands of the expressions.</p>
@@ -192,6 +229,48 @@ a:  int b c;  </code></pre>
 ]</code></pre>
 <p>less storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.</p>
 <hr>
+</section>
+<section id="value-numbering-continued" class="level2">
+<h2 class="anchored" data-anchor-id="value-numbering-continued">value numbering continued</h2>
+</section>
+<section id="use-of-turnt" class="level2">
+<h2 class="anchored" data-anchor-id="use-of-turnt">use of turnt&nbsp;</h2>
+<p><a href="https://www.cs.cornell.edu/~asampson/blog/turnt.html">turnt</a></p>
+<p>there is a directory&nbsp; &nbsp;bril/examples/test/tdce&nbsp; &nbsp;which has some test programs&nbsp;</p>
+<p>and a file turnt.toml&nbsp; that contains&nbsp; one line&nbsp;</p>
+<p>command = “bril2json &lt; {filename} | python3 ../../tdce.py {args} | bril2txt”</p>
+<p>to execute&nbsp;</p>
+<p>(.venv) (base) norm@norm-ubuntu:~/bril/examples/test/tdce$ turnt *.bril 1..8 ok 1 - combo.bril ok 2 - diamond.bril ok 3 - double.bril ok 4 - double-pass.bril ok 5 - reassign.bril ok 6 - reassign-dkp.bril ok 7 - simple.bril ok 8 - skipped.bril</p>
+<p>walk each block, assign a distinct value number to each value the block computes.</p>
+<p><span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> have the same value number if and only if <span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> are provably equal for all possible operands of the expressions.</p>
+</section>
+<section id="pseudo-code-vn-version-1" class="level2">
+<h2 class="anchored" data-anchor-id="pseudo-code-vn-version-1">pseudo code vn version 1</h2>
+<p>we have two tables - hash_table: expression to vn, variable holding the value variable to vn</p>
+<pre><code>for each instr in the block
+  v= [ value_number(a) for a in the args of the instr]
+  build temp inst hash = instr.op + v
+  if hash in hash_table:
+     get from table vn, cann_variable 
+     replace instr with instr.dest = cann_variable
+     instr.dest = vn
+  else: 
+    generate a new value number, add new entry to hash_table, new vn, instr.dest </code></pre>
+<p>An example</p>
+<pre><code>a add b, c 
+b sub a, d 
+c add b, c
+d sub a, d  // d id b</code></pre>
+<pre><code>item   vn       hash 
+b      0/4
+c      1/5
+                add12  2    a 
+a      2 
+d      3
+
+                sub23 4     b
+                add41 5     c
+                </code></pre>
 <p>Pseudo code (similar to an interpreter)</p>
 <ol type="1">
 <li><p>hash table constants and expressions of value numbers to value numbers and to a variable holding the value</p></li>
@@ -273,37 +352,38 @@ a:  int b c;  </code></pre>
 </table>
 </div>
 </div>
-</section>
-<section id="steps" class="level1">
-<h1>steps</h1>
-<pre><code>for each instruction 
-   build a temp instruction  
-   for each arg,  
-       see if the argument has a value number, if it does 
-      update the temp instruction to use the canonical name
-      if the argument has no vn give it one 
-  see if  the temp instruction is in the table, if is,
-      delete it 
-      give the dest the value number that was found </code></pre>
-<hr>
 <p>extensions:</p>
 <ol type="1">
 <li>a: int id b</li>
 </ol>
 <p>a gets the value number of b. No copy required</p>
-<ol start="2" type="1">
-<li>add a b; for add sort value numbers so add a b; and add b a; get the same value number</li>
-</ol>
+<p>Commutative operations Commutative operations that differ only in the order of their operands, such as a × b and b × a, should receive the same value numbers. As lvn constructs a hash key for the right-hand side of the current operation, it can sort the operands using some convenient scheme, such as ordering them by value number. This simple action will ensure that commutative variants receive the same value number.</p>
 <hr>
-<section id="extension-3" class="level2">
-<h2 class="anchored" data-anchor-id="extension-3">extension 3</h2>
+</section>
+<section id="extension" class="level2">
+<h2 class="anchored" data-anchor-id="extension">extension</h2>
 <pre><code>constant folding 
    a: int const 1;
    b: int const 2;
    c: add a b;</code></pre>
-<ol start="3" type="1">
-<li>if both value numbers are pointing to constants- actually do the add</li>
-</ol>
+<p>Constant folding If all the operands of an operation have known constant values, lvn can perform the operation and fold the answer directly into the code. lvn can store information about constants in the hash table, including their value. Before hash-key formation, it can test the operands and, if possible, evaluate them. If lvn discovers a constant expression, it can replace the operation with an immediate load of the result. Subsequent copy folding will clean up the code.</p>
+<p>Algebraic identities: lvn can apply algebraic identities to simplify the code. For example, x + 0 and x should receive the same value number. Unfortunately, lvn needs special-case code for each identity. A series of tests, one per identity, can easily become long enough to produce an unacceptable slowdown in the algorithm. To ameliorate this problem, lvn should organize the tests into operator-specific decision trees.</p>
+<p>a +0, a-0, a<em>1 a</em>0, a-a</p>
+</section>
+<section id="vn-version-2" class="level2">
+<h2 class="anchored" data-anchor-id="vn-version-2">vn version 2</h2>
+<p>add a bit indicating that a variable is a constant</p>
+<pre><code>for each instr in the block
+  v= [ value_number(a) for a in the args of the instr]
+  if all v's are constants, fold the operation 
+  check for all the identities 
+  build temp inst hash = instr.op + v
+  if hash in hash_table:
+     get from table vn, cann_variable 
+     replace instr with instr.dest = cann_variable
+     instr.dest = vn
+  else: 
+    generate a new value number, add new entry to hash_table, new vn, instr.dest </code></pre>
 </section>
 <section id="problem-canonical-variables-might-be-overwritten" class="level2">
 <h2 class="anchored" data-anchor-id="problem-canonical-variables-might-be-overwritten">problem: canonical variables might be overwritten</h2>
@@ -320,40 +400,23 @@ x = t
 x = 
   = t </code></pre>
 </section>
-<section id="pseudo-code" class="level2">
-<h2 class="anchored" data-anchor-id="pseudo-code">pseudo code</h2>
-<pre><code>   table = mapping from value tuples to canonical variables,
-     with each row numbered
-   
-   var2num = mapping from variable names to their current
-     value numbers (i.e., rows in table)
+<section id="indirect-assignments" class="level2">
+<h2 class="anchored" data-anchor-id="indirect-assignments">indirect assignments</h2>
+<p>assignments via a pointer, or to an array element</p>
+<pre><code>a = b[i]
+...       no change to i 
+c = b[i]
 
-   for instr in block:
-       value = (instr.op, var2num[instr.args[0]], ...)
 
-       if value in table:
-           # The value has been computed before; reuse it.
-           num, var = table[value]
-           delete the instruction 
+a = b[i]
+i=
+c = b[i]
 
-       else:
-           # A newly computed value.
-           num = fresh value number
 
-           dest = instr.dest
-           if instr.dest  will be overwritten later:
-                dest = fresh variable name
-                instr.dest = dest
-           else:
-                dest = instr.dest
-
-           table[value] = num, dest
-
-           for a in instr.args:
-               replace a with table[var2num[a]].var
-
-       var2num[instr.dest] = num</code></pre>
-<hr>
+a = b[i]
+b[k] =
+   =b[i]
+   =b[k]</code></pre>
 </section>
 <section id="local-value-numbering." class="level2">
 <h2 class="anchored" data-anchor-id="local-value-numbering.">Local value numbering.</h2>
@@ -369,9 +432,8 @@ x =
 </ol>
 <hr>
 <p>As with every task in this class, part of the work is checking that you have done what you set out to do — in this case, that your optimizations do those two things.</p>
-</section>
-<section id="think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria." class="level2">
-<h2 class="anchored" data-anchor-id="think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria.">Think carefully about how to make a convincing case for each of those criteria.</h2>
+<p>Think carefully about how to make a convincing case for each of those criteria.</p>
+<hr>
 <p>One tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).</p>
 <hr>
 <p>While there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available <a href="https://capra.cs.cornell.edu/bril/tools/bench.html">Bril benchmark</a>, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.</p>
@@ -383,15 +445,57 @@ x =
 <li><p>It can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)</p></li>
 </ol>
 <p>Those three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!</p>
-<p>:::</p>
 </section>
 <section id="homework-2" class="level2">
 <h2 class="anchored" data-anchor-id="homework-2">homework 2</h2>
 <p>part 1: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned.</p>
 <p>part2: Implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class.</p>
-
-
 </section>
+<section id="extended-basic-blocks" class="level2">
+<h2 class="anchored" data-anchor-id="extended-basic-blocks">extended basic blocks</h2>
+<div class="cell" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>A--&gt;b</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>A--&gt;c</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>c--&gt;d</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>c--&gt;e</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A--&gt;b
+A--&gt;c
+c--&gt;d
+c--&gt;e
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>how do we extend the hash tables over the boundary</p>
+<p>we need to do value numbering over each path</p>
+<pre><code>worklist = {entry block}
+stack = {}
+while worklist is not empty 
+   remove a block b from the worklist 
+   evn(b)
+
+evn(b, stack)
+   t = new table for b  
+   link t to scope 
+   lvn(b,t) 
+   for each s successor of b,
+     if s has one pred then evn(s, t)
+     else add s to worklist 
+   dealocate t</code></pre>
+
+
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->

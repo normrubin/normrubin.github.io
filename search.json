@@ -1873,7 +1873,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1188\n-rw-r--r-- 1 runner docker 11163 Sep 17 15:50 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 17 15:50 01a1_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 24384 Sep 17 15:50 01a2_performance_measurement.html\n-rw-r--r-- 1 runner docker  3000 Sep 17 15:50 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Sep 17 15:50 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Sep 17 15:50 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Sep 17 15:50 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 17 15:50 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13675 Sep 17 15:50 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23925 Sep 17 15:50 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Sep 17 15:50 03_local.html\n-rw-r--r-- 1 runner docker 12742 Sep 17 15:50 03_local.qmd\n-rw-r--r-- 1 runner docker  8402 Sep 17 15:50 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 48816 Sep 17 15:50 04_data_flow.html\n-rw-r--r-- 1 runner docker  5154 Sep 17 15:50 04_data_flow.qmd\n-rw-r--r-- 1 runner docker 56705 Sep 17 15:50 05_global.html\n-rw-r--r-- 1 runner docker  9974 Sep 17 15:50 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 17 15:50 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Sep 17 15:50 05c_pre.qmd\n-rw-r--r-- 1 runner docker 77503 Sep 17 15:50 06_ssa.html\n-rw-r--r-- 1 runner docker 16413 Sep 17 15:50 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 17 15:49 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 17 15:50 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 17 15:50 09_poly.qmd\n-rw-r--r-- 1 runner docker   302 Sep 17 15:50 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 17 15:50 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 17 15:50 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 17 15:50 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 17 15:50 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 35379 Sep 17 15:50 14_gpu_compilers.html\n-rw-r--r-- 1 runner docker 10116 Sep 17 15:50 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 17 15:49 a.json\n-rw-r--r-- 1 runner docker   248 Sep 17 15:49 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 17 15:49 df\n-rw-r--r-- 1 runner docker  4595 Sep 17 15:49 errors\n-rw-r--r-- 1 runner docker  3623 Sep 17 15:49 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 17 15:49 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 17 15:49 images\n-rw-r--r-- 1 runner docker  2260 Sep 17 15:50 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 17 15:49 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 17 15:49 ra\n-rw-r--r-- 1 runner docker  8226 Sep 17 15:50 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 17 15:50 register_allocation.qmd\n-rw-r--r-- 1 runner docker 36215 Sep 17 15:50 revealjs_01a2_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 46478 Sep 17 15:50 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Sep 17 15:50 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 57025 Sep 17 15:50 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 63656 Sep 17 15:50 revealjs_05_global.qmd.html\n-rw-r--r-- 1 runner docker 77405 Sep 17 15:50 revealjs_06_ssa.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 17 15:50 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 46156 Sep 17 15:50 revealjs_14_gpu_compilers.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 17 15:49 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1188\n-rw-r--r-- 1 runner docker 11163 Sep 18 13:55 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 18 13:55 01a1_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 24384 Sep 18 13:55 01a2_performance_measurement.html\n-rw-r--r-- 1 runner docker  3000 Sep 18 13:55 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Sep 18 13:55 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Sep 18 13:55 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Sep 18 13:55 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 18 13:55 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13675 Sep 18 13:55 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23925 Sep 18 13:55 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Sep 18 13:55 03_local.html\n-rw-r--r-- 1 runner docker 12742 Sep 18 13:55 03_local.qmd\n-rw-r--r-- 1 runner docker 10790 Sep 18 13:55 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 48816 Sep 18 13:55 04_data_flow.html\n-rw-r--r-- 1 runner docker  5154 Sep 18 13:55 04_data_flow.qmd\n-rw-r--r-- 1 runner docker 56705 Sep 18 13:55 05_global.html\n-rw-r--r-- 1 runner docker  9974 Sep 18 13:55 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 18 13:55 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Sep 18 13:55 05c_pre.qmd\n-rw-r--r-- 1 runner docker 77503 Sep 18 13:55 06_ssa.html\n-rw-r--r-- 1 runner docker 16413 Sep 18 13:55 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 18 13:54 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 18 13:55 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 18 13:55 09_poly.qmd\n-rw-r--r-- 1 runner docker   302 Sep 18 13:55 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 18 13:55 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 18 13:55 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 18 13:55 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 18 13:55 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 35379 Sep 18 13:55 14_gpu_compilers.html\n-rw-r--r-- 1 runner docker 10116 Sep 18 13:55 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 18 13:54 a.json\n-rw-r--r-- 1 runner docker   248 Sep 18 13:54 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 18 13:54 df\n-rw-r--r-- 1 runner docker  4595 Sep 18 13:54 errors\n-rw-r--r-- 1 runner docker  3623 Sep 18 13:54 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 18 13:54 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 18 13:54 images\n-rw-r--r-- 1 runner docker  2260 Sep 18 13:55 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 18 13:54 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 18 13:54 ra\n-rw-r--r-- 1 runner docker  8226 Sep 18 13:55 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 18 13:55 register_allocation.qmd\n-rw-r--r-- 1 runner docker 36215 Sep 18 13:55 revealjs_01a2_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 46478 Sep 18 13:55 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Sep 18 13:55 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 57025 Sep 18 13:55 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 63656 Sep 18 13:55 revealjs_05_global.qmd.html\n-rw-r--r-- 1 runner docker 77405 Sep 18 13:55 revealjs_06_ssa.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 18 13:55 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 46156 Sep 18 13:55 revealjs_14_gpu_compilers.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 18 13:54 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5123,7 +5123,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#2199c0d8 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#15d8f429 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5687,11 +5687,39 @@
     "text": "variables vis values\nWe want to stop thinking about variables and think about values. Two instructions are redundant if they compute the same value."
   },
   {
-    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#extension-3",
-    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#extension-3",
+    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#value-numbering-continued",
+    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#value-numbering-continued",
     "title": "local value numbering",
-    "section": "extension 3",
-    "text": "extension 3\nconstant folding \n   a: int const 1;\n   b: int const 2;\n   c: add a b;\n\nif both value numbers are pointing to constants- actually do the add"
+    "section": "value numbering continued",
+    "text": "value numbering continued"
+  },
+  {
+    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#use-of-turnt",
+    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#use-of-turnt",
+    "title": "local value numbering",
+    "section": "use of turnt ",
+    "text": "use of turnt \nturnt\nthere is a directory   bril/examples/test/tdce   which has some test programs \nand a file turnt.toml  that contains  one line \ncommand = “bril2json &lt; {filename} | python3 ../../tdce.py {args} | bril2txt”\nto execute \n(.venv) (base) norm@norm-ubuntu:~/bril/examples/test/tdce$ turnt *.bril 1..8 ok 1 - combo.bril ok 2 - diamond.bril ok 3 - double.bril ok 4 - double-pass.bril ok 5 - reassign.bril ok 6 - reassign-dkp.bril ok 7 - simple.bril ok 8 - skipped.bril\nwalk each block, assign a distinct value number to each value the block computes.\n\\(e_i\\) and \\(e_j\\) have the same value number if and only if \\(e_i\\) and \\(e_j\\) are provably equal for all possible operands of the expressions."
+  },
+  {
+    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#pseudo-code-vn-version-1",
+    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#pseudo-code-vn-version-1",
+    "title": "local value numbering",
+    "section": "pseudo code vn version 1",
+    "text": "pseudo code vn version 1\nwe have two tables - hash_table: expression to vn, variable holding the value variable to vn\nfor each instr in the block\n  v= [ value_number(a) for a in the args of the instr]\n  build temp inst hash = instr.op + v\n  if hash in hash_table:\n     get from table vn, cann_variable \n     replace instr with instr.dest = cann_variable\n     instr.dest = vn\n  else: \n    generate a new value number, add new entry to hash_table, new vn, instr.dest \nAn example\na add b, c \nb sub a, d \nc add b, c\nd sub a, d  // d id b\nitem   vn       hash \nb      0/4\nc      1/5\n                add12  2    a \na      2 \nd      3\n\n                sub23 4     b\n                add41 5     c\n                \nPseudo code (similar to an interpreter)\n\nhash table constants and expressions of value numbers to value numbers and to a variable holding the value\nreverse map from variables to value numbers"
+  },
+  {
+    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#extension",
+    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#extension",
+    "title": "local value numbering",
+    "section": "extension",
+    "text": "extension\nconstant folding \n   a: int const 1;\n   b: int const 2;\n   c: add a b;\nConstant folding If all the operands of an operation have known constant values, lvn can perform the operation and fold the answer directly into the code. lvn can store information about constants in the hash table, including their value. Before hash-key formation, it can test the operands and, if possible, evaluate them. If lvn discovers a constant expression, it can replace the operation with an immediate load of the result. Subsequent copy folding will clean up the code.\nAlgebraic identities: lvn can apply algebraic identities to simplify the code. For example, x + 0 and x should receive the same value number. Unfortunately, lvn needs special-case code for each identity. A series of tests, one per identity, can easily become long enough to produce an unacceptable slowdown in the algorithm. To ameliorate this problem, lvn should organize the tests into operator-specific decision trees.\na +0, a-0, a1 a0, a-a"
+  },
+  {
+    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#vn-version-2",
+    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#vn-version-2",
+    "title": "local value numbering",
+    "section": "vn version 2",
+    "text": "vn version 2\nadd a bit indicating that a variable is a constant\nfor each instr in the block\n  v= [ value_number(a) for a in the args of the instr]\n  if all v's are constants, fold the operation \n  check for all the identities \n  build temp inst hash = instr.op + v\n  if hash in hash_table:\n     get from table vn, cann_variable \n     replace instr with instr.dest = cann_variable\n     instr.dest = vn\n  else: \n    generate a new value number, add new entry to hash_table, new vn, instr.dest"
   },
   {
     "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#problem-canonical-variables-might-be-overwritten",
@@ -5701,11 +5729,11 @@
     "text": "problem: canonical variables might be overwritten\n\nx = a+b\n\nx =\n= a+b\n\n\none option is to save the value, if x will be overwritten add a temp\nt = a+b\nx = t \nx = \n  = t"
   },
   {
-    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#pseudo-code",
-    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#pseudo-code",
+    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#indirect-assignments",
+    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#indirect-assignments",
     "title": "local value numbering",
-    "section": "pseudo code",
-    "text": "pseudo code\n   table = mapping from value tuples to canonical variables,\n     with each row numbered\n   \n   var2num = mapping from variable names to their current\n     value numbers (i.e., rows in table)\n\n   for instr in block:\n       value = (instr.op, var2num[instr.args[0]], ...)\n\n       if value in table:\n           # The value has been computed before; reuse it.\n           num, var = table[value]\n           delete the instruction \n\n       else:\n           # A newly computed value.\n           num = fresh value number\n\n           dest = instr.dest\n           if instr.dest  will be overwritten later:\n                dest = fresh variable name\n                instr.dest = dest\n           else:\n                dest = instr.dest\n\n           table[value] = num, dest\n\n           for a in instr.args:\n               replace a with table[var2num[a]].var\n\n       var2num[instr.dest] = num"
+    "section": "indirect assignments",
+    "text": "indirect assignments\nassignments via a pointer, or to an array element\na = b[i]\n...       no change to i \nc = b[i]\n\n\na = b[i]\ni=\nc = b[i]\n\n\na = b[i]\nb[k] =\n   =b[i]\n   =b[k]"
   },
   {
     "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#local-value-numbering.",
@@ -5722,13 +5750,6 @@
     "text": "Testing Your Optimizations\nAs part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:\n\nNot break programs.\nMake programs faster, most of the time."
   },
   {
-    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria.",
-    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria.",
-    "title": "local value numbering",
-    "section": "Think carefully about how to make a convincing case for each of those criteria.",
-    "text": "Think carefully about how to make a convincing case for each of those criteria.\nOne tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why)."
-  },
-  {
     "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#homework-2",
     "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#homework-2",
     "title": "local value numbering",
@@ -5736,11 +5757,18 @@
     "text": "homework 2\npart 1: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned.\npart2: Implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class."
   },
   {
+    "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#extended-basic-blocks",
+    "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#extended-basic-blocks",
+    "title": "local value numbering",
+    "section": "extended basic blocks",
+    "text": "extended basic blocks\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n\nhow do we extend the hash tables over the boundary\nwe need to do value numbering over each path\nworklist = {entry block}\nstack = {}\nwhile worklist is not empty \n   remove a block b from the worklist \n   evn(b)\n\nevn(b, stack)\n   t = new table for b  \n   link t to scope \n   lvn(b,t) \n   for each s successor of b,\n     if s has one pred then evn(s, t)\n     else add s to worklist \n   dealocate t"
+  },
+  {
     "objectID": "lectures/03b_local_value_numbering.html",
     "href": "lectures/03b_local_value_numbering.html",
     "title": "local value numbering",
     "section": "",
-    "text": "slides from Phil Gibbons at CMU lectures/L3-Local-Opts.pdf) for more details and context on LVN\nValue numbering is a very powerful technique that removes redunancies, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.\n\nThe idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)\nEach time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives tha a new value number.\nTwo instructions are redundant if they have same op code and operands, which means the same value number\n\n\\(e_i\\) and \\(e_j\\) have the same value number if and only if \\(e_i\\) and \\(e_j\\) are provably equal for all possible operands of the expressions.",
+    "text": "slides from Phil Gibbons at CMU for more details and context on LVN\nValue numbering is a very powerful technique that removes redundancies, An instruction x + y is redundant inside a block if it has already been computed in the block, and no intervening operation redefines x or y. If the compiler finds a redundant expression, it can save that value at the first computation and replace any subsequent evaluations with references to the saved value.\n\nThe idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)\nEach time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives it a new value number.\nTwo instructions are redundant if they have same op code and operands, which means the same value number\n\n\\(e_i\\) and \\(e_j\\) have the same value number if and only if \\(e_i\\) and \\(e_j\\) are provably equal for all possible operands of the expressions.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5764,7 +5792,7 @@
     "href": "lectures/03b_local_value_numbering.html#variables-vis-values",
     "title": "local value numbering",
     "section": "variables vis values",
-    "text": "variables vis values\nWe want to stop thinking about variables and think about values. Two instructions are redundant if they compute the same value.\n\nfor example in a JIT compiler we want computation to be fast so we can get rid of all the variables\nb: int const 1;\nc: int cont 2;\na:  int b c;  \nbecomes:\n[  int const 1\n   int const 2 \n   int 0 1\n]\nless storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.\n\nPseudo code (similar to an interpreter)\n\nhash table constants and expressions of value numbers to value numbers and to a variable holding the value\nreverse map from variables to value numbers\n\n\n\n\n  main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2: int = add a b;\n    prod: int = mult sum1 sum2;\n    print prod\n\n  }\n\n\n\n\nkey\nvalue\ncanonical name\n\n\n\n\nconst 4\n1\na\n\n\nconst 2\n2\nb\n\n\nadd 1 2\n3\nsum1\n\n\nmul 3 3\n4\nprod\n\n\n\n\n\n\nname\nvalue\n\n\n\n\na\n1\n\n\nb\n2\n\n\nsum1\n3\n\n\nsum2\n3\n\n\nprod\n4",
+    "text": "variables vis values\nWe want to stop thinking about variables and think about values. Two instructions are redundant if they compute the same value.\n\nfor example in a JIT compiler we want computation to be fast so we can get rid of all the variables\nb: int const 1;\nc: int cont 2;\na:  int b c;  \nbecomes:\n[  int const 1\n   int const 2 \n   int 0 1\n]\nless storage, args are just pointers, instructions are smaller. faster because any use points to the corresponding def without any searching.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5772,11 +5800,59 @@
     ]
   },
   {
-    "objectID": "lectures/03b_local_value_numbering.html#extension-3",
-    "href": "lectures/03b_local_value_numbering.html#extension-3",
+    "objectID": "lectures/03b_local_value_numbering.html#value-numbering-continued",
+    "href": "lectures/03b_local_value_numbering.html#value-numbering-continued",
     "title": "local value numbering",
-    "section": "extension 3",
-    "text": "extension 3\nconstant folding \n   a: int const 1;\n   b: int const 2;\n   c: add a b;\n\nif both value numbers are pointing to constants- actually do the add",
+    "section": "value numbering continued",
+    "text": "value numbering continued",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "local value numbering"
+    ]
+  },
+  {
+    "objectID": "lectures/03b_local_value_numbering.html#use-of-turnt",
+    "href": "lectures/03b_local_value_numbering.html#use-of-turnt",
+    "title": "local value numbering",
+    "section": "use of turnt ",
+    "text": "use of turnt \nturnt\nthere is a directory   bril/examples/test/tdce   which has some test programs \nand a file turnt.toml  that contains  one line \ncommand = “bril2json &lt; {filename} | python3 ../../tdce.py {args} | bril2txt”\nto execute \n(.venv) (base) norm@norm-ubuntu:~/bril/examples/test/tdce$ turnt *.bril 1..8 ok 1 - combo.bril ok 2 - diamond.bril ok 3 - double.bril ok 4 - double-pass.bril ok 5 - reassign.bril ok 6 - reassign-dkp.bril ok 7 - simple.bril ok 8 - skipped.bril\nwalk each block, assign a distinct value number to each value the block computes.\n\\(e_i\\) and \\(e_j\\) have the same value number if and only if \\(e_i\\) and \\(e_j\\) are provably equal for all possible operands of the expressions.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "local value numbering"
+    ]
+  },
+  {
+    "objectID": "lectures/03b_local_value_numbering.html#pseudo-code-vn-version-1",
+    "href": "lectures/03b_local_value_numbering.html#pseudo-code-vn-version-1",
+    "title": "local value numbering",
+    "section": "pseudo code vn version 1",
+    "text": "pseudo code vn version 1\nwe have two tables - hash_table: expression to vn, variable holding the value variable to vn\nfor each instr in the block\n  v= [ value_number(a) for a in the args of the instr]\n  build temp inst hash = instr.op + v\n  if hash in hash_table:\n     get from table vn, cann_variable \n     replace instr with instr.dest = cann_variable\n     instr.dest = vn\n  else: \n    generate a new value number, add new entry to hash_table, new vn, instr.dest \nAn example\na add b, c \nb sub a, d \nc add b, c\nd sub a, d  // d id b\nitem   vn       hash \nb      0/4\nc      1/5\n                add12  2    a \na      2 \nd      3\n\n                sub23 4     b\n                add41 5     c\n                \nPseudo code (similar to an interpreter)\n\nhash table constants and expressions of value numbers to value numbers and to a variable holding the value\nreverse map from variables to value numbers\n\n\n\n\n  main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2: int = add a b;\n    prod: int = mult sum1 sum2;\n    print prod\n\n  }\n\n\n\n\nkey\nvalue\ncanonical name\n\n\n\n\nconst 4\n1\na\n\n\nconst 2\n2\nb\n\n\nadd 1 2\n3\nsum1\n\n\nmul 3 3\n4\nprod\n\n\n\n\n\n\nname\nvalue\n\n\n\n\na\n1\n\n\nb\n2\n\n\nsum1\n3\n\n\nsum2\n3\n\n\nprod\n4\n\n\n\n\n\nextensions:\n\na: int id b\n\na gets the value number of b. No copy required\nCommutative operations Commutative operations that differ only in the order of their operands, such as a × b and b × a, should receive the same value numbers. As lvn constructs a hash key for the right-hand side of the current operation, it can sort the operands using some convenient scheme, such as ordering them by value number. This simple action will ensure that commutative variants receive the same value number.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "local value numbering"
+    ]
+  },
+  {
+    "objectID": "lectures/03b_local_value_numbering.html#extension",
+    "href": "lectures/03b_local_value_numbering.html#extension",
+    "title": "local value numbering",
+    "section": "extension",
+    "text": "extension\nconstant folding \n   a: int const 1;\n   b: int const 2;\n   c: add a b;\nConstant folding If all the operands of an operation have known constant values, lvn can perform the operation and fold the answer directly into the code. lvn can store information about constants in the hash table, including their value. Before hash-key formation, it can test the operands and, if possible, evaluate them. If lvn discovers a constant expression, it can replace the operation with an immediate load of the result. Subsequent copy folding will clean up the code.\nAlgebraic identities: lvn can apply algebraic identities to simplify the code. For example, x + 0 and x should receive the same value number. Unfortunately, lvn needs special-case code for each identity. A series of tests, one per identity, can easily become long enough to produce an unacceptable slowdown in the algorithm. To ameliorate this problem, lvn should organize the tests into operator-specific decision trees.\na +0, a-0, a1 a0, a-a",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "local value numbering"
+    ]
+  },
+  {
+    "objectID": "lectures/03b_local_value_numbering.html#vn-version-2",
+    "href": "lectures/03b_local_value_numbering.html#vn-version-2",
+    "title": "local value numbering",
+    "section": "vn version 2",
+    "text": "vn version 2\nadd a bit indicating that a variable is a constant\nfor each instr in the block\n  v= [ value_number(a) for a in the args of the instr]\n  if all v's are constants, fold the operation \n  check for all the identities \n  build temp inst hash = instr.op + v\n  if hash in hash_table:\n     get from table vn, cann_variable \n     replace instr with instr.dest = cann_variable\n     instr.dest = vn\n  else: \n    generate a new value number, add new entry to hash_table, new vn, instr.dest",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5796,11 +5872,11 @@
     ]
   },
   {
-    "objectID": "lectures/03b_local_value_numbering.html#pseudo-code",
-    "href": "lectures/03b_local_value_numbering.html#pseudo-code",
+    "objectID": "lectures/03b_local_value_numbering.html#indirect-assignments",
+    "href": "lectures/03b_local_value_numbering.html#indirect-assignments",
     "title": "local value numbering",
-    "section": "pseudo code",
-    "text": "pseudo code\n   table = mapping from value tuples to canonical variables,\n     with each row numbered\n   \n   var2num = mapping from variable names to their current\n     value numbers (i.e., rows in table)\n\n   for instr in block:\n       value = (instr.op, var2num[instr.args[0]], ...)\n\n       if value in table:\n           # The value has been computed before; reuse it.\n           num, var = table[value]\n           delete the instruction \n\n       else:\n           # A newly computed value.\n           num = fresh value number\n\n           dest = instr.dest\n           if instr.dest  will be overwritten later:\n                dest = fresh variable name\n                instr.dest = dest\n           else:\n                dest = instr.dest\n\n           table[value] = num, dest\n\n           for a in instr.args:\n               replace a with table[var2num[a]].var\n\n       var2num[instr.dest] = num",
+    "section": "indirect assignments",
+    "text": "indirect assignments\nassignments via a pointer, or to an array element\na = b[i]\n...       no change to i \nc = b[i]\n\n\na = b[i]\ni=\nc = b[i]\n\n\na = b[i]\nb[k] =\n   =b[i]\n   =b[k]",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5824,19 +5900,7 @@
     "href": "lectures/03b_local_value_numbering.html#testing-your-optimizations",
     "title": "local value numbering",
     "section": "Testing Your Optimizations",
-    "text": "Testing Your Optimizations\nAs part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:\n\nNot break programs.\nMake programs faster, most of the time.\n\n\nAs with every task in this class, part of the work is checking that you have done what you set out to do — in this case, that your optimizations do those two things.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "local value numbering"
-    ]
-  },
-  {
-    "objectID": "lectures/03b_local_value_numbering.html#think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria.",
-    "href": "lectures/03b_local_value_numbering.html#think-carefully-about-how-to-make-a-convincing-case-for-each-of-those-criteria.",
-    "title": "local value numbering",
-    "section": "Think carefully about how to make a convincing case for each of those criteria.",
-    "text": "Think carefully about how to make a convincing case for each of those criteria.\nOne tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).\n\nWhile there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available Bril benchmark, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.\n\nIf this is the route you choose, you can do it however you like, There is a simple tool that you can consider using, called Brench. Brench is not very fancy; it does three things:\n\nIt makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)\nIt checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)\nIt can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)\n\nThose three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!\n:::",
+    "text": "Testing Your Optimizations\nAs part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:\n\nNot break programs.\nMake programs faster, most of the time.\n\n\nAs with every task in this class, part of the work is checking that you have done what you set out to do — in this case, that your optimizations do those two things.\nThink carefully about how to make a convincing case for each of those criteria.\n\nOne tempting methodology might be to hand write a few small test-case Bril programs (or, worse, borrow the woefully inadequate ones sitting around in the Bril git repository), run them through your optimizations, and look at them to check whether they look right. This does not amount to convincing evidence (maybe you can think of a few specific reasons why).\n\nWhile there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available Bril benchmark, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.\n\nIf this is the route you choose, you can do it however you like, There is a simple tool that you can consider using, called Brench. Brench is not very fancy; it does three things:\n\nIt makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an “interpret” command and an “optimize-and-then-interpret” command.)\nIt checks that all the commands agree on their output. (So, in our use case, it checks that optimizing the benchmark doesn’t change its output when interpreted.)\nIt can collect a statistic from each command for comparison. (Like the number of dynamic instructions the interpreter executed, which is a pretty good metric for standard optimizations.)\n\nThose three things are probably what you want to do to make a convincing case for an optimization’s correctness and effectiveness, whether or not you use Brench. It’s there if you want it, but feel free to go your own way!",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5849,6 +5913,18 @@
     "title": "local value numbering",
     "section": "homework 2",
     "text": "homework 2\npart 1: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned.\npart2: Implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "local value numbering"
+    ]
+  },
+  {
+    "objectID": "lectures/03b_local_value_numbering.html#extended-basic-blocks",
+    "href": "lectures/03b_local_value_numbering.html#extended-basic-blocks",
+    "title": "local value numbering",
+    "section": "extended basic blocks",
+    "text": "extended basic blocks\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n\nhow do we extend the hash tables over the boundary\nwe need to do value numbering over each path\nworklist = {entry block}\nstack = {}\nwhile worklist is not empty \n   remove a block b from the worklist \n   evn(b)\n\nevn(b, stack)\n   t = new table for b  \n   link t to scope \n   lvn(b,t) \n   for each s successor of b,\n     if s has one pred then evn(s, t)\n     else add s to worklist \n   dealocate t",
     "crumbs": [
       "EECS 7398",
       "Lectures",
