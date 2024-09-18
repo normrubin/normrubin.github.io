@@ -24,7 +24,7 @@ title: local value numbering
 
 :::
 
-Value numbering is a very powerful technique that removes ***redunancies***,  An instruction  x + y is redundant inside a block if it has already been computed
+Value numbering is a very powerful technique that removes ***redundancies***,  An instruction  x + y is redundant inside a block if it has already been computed
 in the block, and no intervening operation redefines x or y. If the compiler
 finds a redundant expression, it can save that value at the first computation
 and replace any subsequent evaluations with references to the saved value.
@@ -33,7 +33,7 @@ and replace any subsequent evaluations with references to the saved value.
 
 The idea is simple - The algorithm executes the block, Each time it sees a new variable it gives it a value (represented as a number)
 
-Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives tha a new value number.
+Each time it sees an instruction it forms a hash of the op code and the value numbers of its operands and gives it a new value number.
 
 Two instructions are redundant if they have same op code and operands, which means the same value number
 
@@ -103,6 +103,80 @@ faster because any use points to the corresponding def without any searching.
 
  ---
 
+
+## value numbering continued
+
+## use of turnt 
+
+[turnt](https://www.cs.cornell.edu/~asampson/blog/turnt.html)
+
+
+there is a directory   bril/examples/test/tdce   which has some test programs 
+
+and a file turnt.toml  that contains  one line 
+
+command = "bril2json < {filename} | python3 ../../tdce.py {args} | bril2txt"
+
+
+to execute 
+
+(.venv) (base) norm@norm-ubuntu:~/bril/examples/test/tdce$ turnt *.bril
+1..8
+ok 1 - combo.bril
+ok 2 - diamond.bril
+ok 3 - double.bril
+ok 4 - double-pass.bril
+ok 5 - reassign.bril
+ok 6 - reassign-dkp.bril
+ok 7 - simple.bril
+ok 8 - skipped.bril
+
+
+walk each block, assign a distinct value number to each value the block computes. 
+
+$e_i$ and $e_j$ have the
+same value number if and only if $e_i$ and $e_j$  are provably equal for all possible
+operands of the expressions.
+
+##  pseudo code vn version 1
+
+we have two tables - hash_table:  expression to vn, variable holding the value
+variable to vn  
+
+```
+for each instr in the block
+  v= [ value_number(a) for a in the args of the instr]
+  build temp inst hash = instr.op + v
+  if hash in hash_table:
+     get from table vn, cann_variable 
+     replace instr with instr.dest = cann_variable
+     instr.dest = vn
+  else: 
+    generate a new value number, add new entry to hash_table, new vn, instr.dest 
+```
+
+An example
+
+```
+a add b, c 
+b sub a, d 
+c add b, c
+d sub a, d  // d id b
+```
+
+```
+item   vn       hash 
+b      0/4
+c      1/5
+                add12  2    a 
+a      2 
+d      3
+
+                sub23 4     b
+                add41 5     c
+                
+```
+
 Pseudo code (similar to an interpreter)
 
 1. hash table 
@@ -152,21 +226,7 @@ constants and expressions of value numbers to value numbers and to a  variable h
 ::: 
 
 
-# steps 
 
-```
-for each instruction 
-   build a temp instruction  
-   for each arg,  
-       see if the argument has a value number, if it does 
-      update the temp instruction to use the canonical name
-      if the argument has no vn give it one 
-  see if  the temp instruction is in the table, if is,
-      delete it 
-      give the dest the value number that was found 
-```
-
----
 
 extensions:
 
@@ -174,11 +234,12 @@ extensions:
 
 a gets the value number of b. No copy required
 
-2) add a b; for add sort value numbers so add a b; and add b a; get the same value number 
+Commutative operations Commutative operations that differ only in the order of their operands, such as a × b and b × a, should receive the same value numbers. As lvn constructs a hash key for the right-hand side of the current operation, it can sort the operands using some convenient scheme, such as ordering them by value number. This simple action will ensure that commutative variants receive the same value number.
+
 
 ---
 
-## extension 3
+## extension 
 
 ```
 constant folding 
@@ -186,15 +247,38 @@ constant folding
    b: int const 2;
    c: add a b;
 ```
-3. if both value numbers are pointing to constants- actually do the add
 
+Constant folding If all the operands of an operation have known constant values, lvn can perform the operation and fold the answer directly into the code. lvn can store information about constants in the hash table, including their value. Before hash-key formation, it can test the operands and, if possible, evaluate them. If lvn discovers a constant expression, it can replace the operation with an immediate load of the result. Subsequent copy folding will clean up the code.
+
+Algebraic identities: lvn can apply algebraic identities to simplify the code. For example, x + 0 and x should receive the same value number. Unfortunately, lvn needs special-case code for each identity. A series of tests, one per identity, can easily become long enough to produce an unacceptable slowdown in the algorithm. To ameliorate this problem, lvn should organize the tests into operator-specific decision trees. 
+
+a +0, a-0, a*1 a*0, a-a 
+
+
+## vn version 2
+
+add a bit indicating that a variable is a constant 
+
+```
+for each instr in the block
+  v= [ value_number(a) for a in the args of the instr]
+  if all v's are constants, fold the operation 
+  check for all the identities 
+  build temp inst hash = instr.op + v
+  if hash in hash_table:
+     get from table vn, cann_variable 
+     replace instr with instr.dest = cann_variable
+     instr.dest = vn
+  else: 
+    generate a new value number, add new entry to hash_table, new vn, instr.dest 
+```
 
 
 ## problem:   canonical variables might be  overwritten
 
 1. x = a+b  
 1. x = 
-1. = a+b 
+1.   = a+b 
 
 . . .
 
@@ -208,42 +292,25 @@ x =
   = t 
 ```
 
-## pseudo code
+## indirect assignments 
 
- ```
-    table = mapping from value tuples to canonical variables,
-      with each row numbered
-    
-    var2num = mapping from variable names to their current
-      value numbers (i.e., rows in table)
-
-    for instr in block:
-        value = (instr.op, var2num[instr.args[0]], ...)
-
-        if value in table:
-            # The value has been computed before; reuse it.
-            num, var = table[value]
-            delete the instruction 
-
-        else:
-            # A newly computed value.
-            num = fresh value number
-
-            dest = instr.dest
-            if instr.dest  will be overwritten later:
-                 dest = fresh variable name
-                 instr.dest = dest
-            else:
-                 dest = instr.dest
-
-            table[value] = num, dest
-
-            for a in instr.args:
-                replace a with table[var2num[a]].var
-
-        var2num[instr.dest] = num
+assignments via a pointer, or to an array element 
 ```
----
+a = b[i]
+...       no change to i 
+c = b[i]
+
+
+a = b[i]
+i=
+c = b[i]
+
+
+a = b[i]
+b[k] =
+   =b[i]
+   =b[k]
+```
 
 
 
@@ -285,9 +352,7 @@ This is a nice way to check for unexpected behavior in programs that you didn't 
 If this is the route you choose, you can do it however you like, There is  a simple tool that you can consider using, called Brench.
 Brench is not very fancy; it does three things:
 
-::: {.content-hidden  when-format="revealjs"}
 
-:::
 
 1. It makes it easy to run a long list of inputs through several different commands. (For example, you can run a long list of Bril benchmarks through an "interpret" command and an "optimize-and-then-interpret" command.)
 
@@ -297,14 +362,6 @@ Brench is not very fancy; it does three things:
 
 Those three things are probably what you want to do to make a convincing case for an optimization's correctness and effectiveness, whether or not you use Brench. It's there if you want it, but feel free to go your own way!
 
-:::
-
-::: {.content-visible when-format="revealjs"}
-
-1. run multiple commands over a list of tests
-1. check the each command got the same output for each text 
-1. collect a statistic for each command 
-:::
 
 
 
@@ -319,3 +376,38 @@ pairing it with your dead code elimination code, in the write up be sure to incl
 evidence that your implementation is correct and actually optimizes programs, you
 might want to use the Brench program, for extra points, extend your implementation to
 handle some of the tricker examples talked about in class.
+
+
+## extended basic blocks  
+
+```{mermaid}
+graph TB
+A-->b
+A-->c
+c-->d
+c-->e
+```
+
+how do we extend the hash tables over the boundary 
+
+we need to do value numbering over each path 
+
+```
+worklist = {entry block}
+stack = {}
+while worklist is not empty 
+   remove a block b from the worklist 
+   evn(b)
+
+evn(b, stack)
+   t = new table for b  
+   link t to scope 
+   lvn(b,t) 
+   for each s successor of b,
+     if s has one pred then evn(s, t)
+     else add s to worklist 
+   dealocate t
+```
+
+
+ 
