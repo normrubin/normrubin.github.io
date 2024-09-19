@@ -132,6 +132,27 @@ ok 7 - simple.bril
 ok 8 - skipped.bril
 
 
+## redundancy elimination
+
+an expression x+y is redundant if and only if 
+
+1. along every path from the entry it has been evaluated and 
+1. its subexpressions x and y  have not been redefined
+
+if the compiler can prove an expression is redundant it can
+
+1. preserve the earlier evaluation
+1. replace the redundant expression with a use of the preserved value 
+
+## key idea 
+
+assign a number (value number) to each expression 
+
+1. two expressions have the same value number if they always have the same value
+1. use hashing to make this efficient
+
+## pseudo code 
+
 walk each block, assign a distinct value number to each value the block computes. 
 
 $e_i$ and $e_j$ have the
@@ -274,14 +295,19 @@ for each instr in the block
 ```
 
 
-## problem:   canonical variables might be  overwritten
+## problem:   
 
-1. x = a+b  
-1. x = 
-1.   = a+b 
 
-. . .
 
+```
+a = x +y 
+b = x + y
+a = 17
+c = x +y 
+```
+
+
+keep track of all variables that contain the value and select one
 
 one option is to save the value, if x will be overwritten add a temp
 
@@ -291,6 +317,36 @@ x = t
 x = 
   = t 
 ```
+
+## another option is renaming 
+
+::: {.columns}
+
+
+::: {.column}
+
+```
+a = x + y
+b = x + y
+a = 17
+c = x +Y
+```
+
+:::
+
+::: {.column}
+
+```
+a0 = x0 + y0
+b0 = x0+ y0
+a1 = 17
+c0 = x0 +y0
+```
+
+:::
+
+::: 
+
 
 ## indirect assignments 
 
@@ -377,10 +433,14 @@ evidence that your implementation is correct and actually optimizes programs, yo
 might want to use the Brench program, for extra points, extend your implementation to
 handle some of the tricker examples talked about in class.
 
+remember that the result is a blog post 
+
 
 ## extended basic blocks  
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TB
 A-->b
 A-->c
@@ -409,5 +469,21 @@ evn(b, stack)
    dealocate t
 ```
 
+## safety 
 
- 
+if the result of evaluating E1 cannot be distinguished from evaluating E the compiler is free to replace E with E1
+
+Some compilers assume it is ok if E1 produces less errors than E
+
+some compilers assume that safety is only required for "standard conforming" code and undefined behavior for other code.
+
+While is value numbering safe?
+
+1. if an expression is in the table, it must have occurred at least one in the block
+1. Algorithm modified the code but does not invalidate the table 
+
+## when is value numbering profitable
+
+if reuse is cheaper then re-compute 
+1. does not cause a spill
+1. if does not need a copy (does the copy take as long as the compute)
