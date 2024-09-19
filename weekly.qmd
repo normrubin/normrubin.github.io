@@ -29,22 +29,23 @@ Either 1 or 2 people can sign up for a paper.  Once everyone has done so, I'll s
 | | | [Performance Measurement-1](lectures/01a1_performance_measurement.qmd)  | | 
 2|Sept 10   | [Performance Measurement-2](lectures/01a2_performance_measurement.qmd)  | | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/71)
 3|Sept 13    |[Representing programs](lectures/02a_representation.qmd)| hw0 | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/72)
-| | | [Bril](lectures/02b_bril.qmd)| |[discussion](https://github.com/normrubin/normrubin.github.io/discussions/73)
-4| Sept 20   | [Local analysis and optimization](lectures/03_local.qmd)  | | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/74)
-|||[Local Value Numbering](lectures/03b_local_value_numbering.qmd)
-5| Sept 27   | Data flow    | | 
-6| Oct 1 |Global analysis |
-7| Oct 4     | Loop invariant code motion  | |
-8|Oct 8 |Static single assignment |
-9|Oct 11  | Norm unavailable - maybe guest lecture 
-10| Oct 15  | [GPU Compilers](lectures/14_gpu_compilers.qmd)  | | 
-11| Oct 22   |Global value number |
-12| Oct 25   |LLVM  | |
-13| Oct 29   | readings  | |
-14 | Nov 1| readings  |
-15| Nov 5   |[Dynamic compilers 1 ](lectures/13_dynamic_compilers.qmd) |
-16| Nov 8   | [Dynamic compilers 2 ](lectures/13_dynamic_compilers.qmd)  | | 
-19| Nov 12 |Classical loop optimizations |
+3|   | [Bril](lectures/02b_bril.qmd)| |[discussion](https://github.com/normrubin/normrubin.github.io/discussions/73)
+4| Sept 17   | [Local analysis and optimization](lectures/03_local.qmd)  | | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/74)
+5|sept 20|[Local Value Numbering](lectures/03b_local_value_numbering.qmd) |[hw1](homework/1.hw.qmd)|
+6| Sept 24   | [data flow](lectures/04_data_flow.qmd)  |  | 
+7| Sept 27   | Data flow  continued   | 
+8| Oct 1 | graphs |
+9| Oct 4     | Static single assignment  | |
+10|Oct 8 |Loop invariant code motion |
+11|Oct 11  | Norm unavailable - maybe guest lecture 
+12| Oct 15  | [GPU Compilers](lectures/14_gpu_compilers.qmd)  | | 
+13| Oct 22   |Global value number |
+14| Oct 25   |LLVM  | |
+15| Oct 29   | readings  | |
+16| Nov 1| readings  |
+17| Nov 5   |[Dynamic compilers 1 ](lectures/13_dynamic_compilers.qmd) |
+18| Nov 8   | [Dynamic compilers 2 ](lectures/13_dynamic_compilers.qmd)  | | 
+19| Nov 12 |register allocation |
 20| Nov 15    |  readings  | | 
 21| Nov 19    | readings  | | | 
 22| Nov 22    | readings   | | 
@@ -56,32 +57,43 @@ Either 1 or 2 people can sign up for a paper.  Once everyone has done so, I'll s
 
 Suggested Papers 
 
-leader: [Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers](https://arxiv.org/html/2406.12146v1)
+Sana Taghipour Anvari [Large Language Models for Compiler Optimization](https://ar5iv.labs.arxiv.org/html/2309.07062)
+
+Oscar Kellner(https://github.com/Eightscer) [Retargeting and Respecializing GPU Workloads for Performance Portability](https://ieeexplore.ieee.org/document/10444828)
+
+Aymane El Jerari [MLIR: A Compiler Infrastructure for the End of Moore’s Law](https://arxiv.org/abs/2002.11054)
+
+Yashaswini Makaram [ProGraML: Graph-based Deep Learning for Program Optimization and Analysis](https://arxiv.org/abs/2003.10536)
+
+Yankai Jiang [TVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen)
+
+Qucheng Jiang(https://github.com/jiangqucheng) [An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration](https://dl.acm.org/doi/abs/10.1145/3508352.3549424)
+
+Zhaoyang Han [Autotuning OpenCL workgroup size for stencil patterns](https://arxiv.org/pdf/1511.02490)
+
+
+Rohit Gurusamy Anandakumar [Sharmila Sivalingam] [Generating GPU Compiler Heuristics using Reinforcement Learning](https://arxiv.org/abs/2111.12055)
+
+Michael Maurer(https://github.com/maurermi/) [Energy-Aware Tile Size Selection for Affine Programs on GPUs](https://malithjayaweera.com/wp-content/uploads/2024/01/CGO24_eatss_PREPRINT.pdf)
+
+
+Matin Raayai: [Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers](https://arxiv.org/html/2406.12146v1)
 
 leader: [SLaDe: A Portable Small Language Model Decompiler for Optimized Assembly](https://arxiv.org/abs/2305.12520)
 
 
-leader: Sana Taghipour Anvari [Large Language Models for Compiler Optimization](https://ar5iv.labs.arxiv.org/html/2309.07062)
-
 Leader:[ACPO: AI-Enabled Compiler-Driven Program Optimization](https://ar5iv.labs.arxiv.org/html/2312.09982)
-
-leader: [Retargeting and Respecializing GPU Workloads for Performance Portability](https://ieeexplore.ieee.org/document/10444828)
 
 
 leader: [Adaptive Online Context-Sensitive Inlining](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1191550)
 
-leader: Aymane El Jerari [MLIR: A Compiler Infrastructure for the End of Moore’s Law](https://arxiv.org/abs/2002.11054)
 
 leader: [Threaded Code Variations and Optimizations](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=e1e1a8622dc562e7f42d98b59f67de6949e2539e)
 
-leader: [ProGraML: Graph-based Deep Learning for Program Optimization and Analysis](https://arxiv.org/abs/2003.10536)
-
-leader: [TVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen)
 
 
 leader:[Learning Compiler Pass Orders using Coreset and Normalized Value Prediction](https://ar5iv.labs.arxiv.org/html/2301.05104v1)
 
-leader: [Qucheng Jiang](https://github.com/jiangqucheng) [An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration](https://dl.acm.org/doi/abs/10.1145/3508352.3549424)
 
 leader: [Learning to Optimize Tensor Programs](https://arxiv.org/abs/1805.08166)
 
@@ -89,8 +101,5 @@ leader: [End-to-end Deep Learning of Optimization Heuristics](https://chriscummi
 
 leader: [Compiler Fuzzing through Deep Learning](https://chriscummins.cc/pub/2018-issta.pdf)
 
-leader:[Autotuning OpenCL workgroup size for stencil patterns](https://arxiv.org/pdf/1511.02490)
 
-leader: [Generating GPU Compiler Heuristics using Reinforcement Learning](https://arxiv.org/abs/2111.12055)
 
-leader: [Michael Maurer](https://github.com/maurermi/) [Energy-Aware Tile Size Selection for Affine Programs on GPUs](https://malithjayaweera.com/wp-content/uploads/2024/01/CGO24_eatss_PREPRINT.pdf)
