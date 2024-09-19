@@ -478,6 +478,30 @@ a:  int b c;  </code></pre>
 <p>command = “bril2json &lt; {filename} | python3 ../../tdce.py {args} | bril2txt”</p>
 <p>to execute&nbsp;</p>
 <p>(.venv) (base) norm@norm-ubuntu:~/bril/examples/test/tdce$ turnt *.bril 1..8 ok 1 - combo.bril ok 2 - diamond.bril ok 3 - double.bril ok 4 - double-pass.bril ok 5 - reassign.bril ok 6 - reassign-dkp.bril ok 7 - simple.bril ok 8 - skipped.bril</p>
+</section>
+<section id="redundancy-elimination" class="slide level2 scrollable">
+<h2>redundancy elimination</h2>
+<p>an expression x+y is redundant if and only if</p>
+<ol type="1">
+<li>along every path from the entry it has been evaluated and</li>
+<li>its subexpressions x and y have not been redefined</li>
+</ol>
+<p>if the compiler can prove an expression is redundant it can</p>
+<ol type="1">
+<li>preserve the earlier evaluation</li>
+<li>replace the redundant expression with a use of the preserved value</li>
+</ol>
+</section>
+<section id="key-idea" class="slide level2 scrollable">
+<h2>key idea</h2>
+<p>assign a number (value number) to each expression</p>
+<ol type="1">
+<li>two expressions have the same value number if they always have the same value</li>
+<li>use hashing to make this efficient</li>
+</ol>
+</section>
+<section id="pseudo-code" class="slide level2">
+<h2>pseudo code</h2>
 <p>walk each block, assign a distinct value number to each value the block computes.</p>
 <p><span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> have the same value number if and only if <span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> are provably equal for all possible operands of the expressions.</p>
 </section>
@@ -622,21 +646,33 @@ d      3
   else: 
     generate a new value number, add new entry to hash_table, new vn, instr.dest </code></pre>
 </section>
-<section id="problem-canonical-variables-might-be-overwritten" class="slide level2 scrollable">
-<h2>problem: canonical variables might be overwritten</h2>
-<ol type="1">
-<li>x = a+b<br>
-</li>
-<li>x =</li>
-<li>= a+b</li>
-</ol>
-<div class="fragment">
+<section id="problem" class="slide level2">
+<h2>problem:</h2>
+<pre><code>a = x +y 
+b = x + y
+a = 17
+c = x +y </code></pre>
+<p>keep track of all variables that contain the value and select one</p>
 <p>one option is to save the value, if x will be overwritten add a temp</p>
 <pre><code>t = a+b
 x = t 
 x = 
   = t </code></pre>
-</div>
+</section>
+<section id="another-option-is-renaming" class="slide level2">
+<h2>another option is renaming</h2>
+<div class="columns">
+<div class="column">
+<pre><code>a = x + y
+b = x + y
+a = 17
+c = x +Y</code></pre>
+</div><div class="column">
+<pre><code>a0 = x0 + y0
+b0 = x0+ y0
+a1 = 17
+c0 = x0 +y0</code></pre>
+</div></div>
 </section>
 <section id="indirect-assignments" class="slide level2">
 <h2>indirect assignments</h2>
@@ -696,19 +732,20 @@ b[k] =
 <h2>homework 2</h2>
 <p>part 1: Implement “trivial” dead code elimination in which you delete instructions that are never used before they are reassigned.</p>
 <p>part2: Implement local value numbering. Try pairing it with your dead code elimination code, in the write up be sure to include evidence that your implementation is correct and actually optimizes programs, you might want to use the Brench program, for extra points, extend your implementation to handle some of the tricker examples talked about in class.</p>
+<p>remember that the result is a blog post</p>
 </section>
 <section id="extended-basic-blocks" class="slide level2">
 <h2>extended basic blocks</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb12-2"><a></a></span>
-<span id="cb12-3"><a></a>graph TB</span>
-<span id="cb12-4"><a></a>A--&gt;b</span>
-<span id="cb12-5"><a></a>A--&gt;c</span>
-<span id="cb12-6"><a></a>c--&gt;d</span>
-<span id="cb12-7"><a></a>c--&gt;e</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb15-2"><a></a></span>
+<span id="cb15-3"><a></a>graph TB</span>
+<span id="cb15-4"><a></a>A--&gt;b</span>
+<span id="cb15-5"><a></a>A--&gt;c</span>
+<span id="cb15-6"><a></a>c--&gt;d</span>
+<span id="cb15-7"><a></a>c--&gt;e</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -743,6 +780,21 @@ evn(b, stack)
      if s has one pred then evn(s, t)
      else add s to worklist 
    dealocate t</code></pre>
+</section>
+<section id="safety" class="slide level2 scrollable">
+<h2>safety</h2>
+<p>if the result of evaluating E1 cannot be distinguished from evaluating E the compiler is free to replace E with E1</p>
+<p>Some compilers assume it is ok if E1 produces less errors than E</p>
+<p>some compilers assume that safety is only required for “standard conforming” code and undefined behavior for other code.</p>
+<p>While is value numbering safe?</p>
+<ol type="1">
+<li>if an expression is in the table, it must have occurred at least one in the block</li>
+<li>Algorithm modified the code but does not invalidate the table</li>
+</ol>
+</section>
+<section id="when-is-value-numbering-profitable" class="slide level2">
+<h2>when is value numbering profitable</h2>
+<p>if reuse is cheaper then re-compute 1. does not cause a spill 1. if does not need a copy (does the copy take as long as the compute)</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
