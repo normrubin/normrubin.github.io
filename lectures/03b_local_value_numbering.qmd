@@ -435,6 +435,39 @@ handle some of the tricker examples talked about in class.
 
 remember that the result is a blog post 
 
+## crossing blocks 
+
+```{mermaid}le
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A["m = a + b<br/><span style='color:red'>n = a + b</span>"]
+B["p = c + d<br><span style='color:red'>r = c + d</span>"]
+
+C["<span style='color:blue'> q = a + b<br> </span> r = c + d"]
+D["e=b + 18<br> <span style='color:blue'> s = a + b </span> <br> u = e + f "]
+E["e=a + 17<br> <span style='color:blue'> t = c + d </span> <br> u = e + f "]
+F["<span style='color:blue'> v = a + b <br> w = c + d <br> x = e + f</span>"]
+G["<span style='color:blue'> y = a + b <br> z = c + d</span>"]
+
+style A fill:#ffffff,stroke:#000000,stroke-width:1px
+style B fill:#ffffff,stroke:#000000,stroke-width:1px
+style C fill:#ffffff,stroke:#000000,stroke-width:1px
+style D fill:#ffffff,stroke:#000000,stroke-width:1px
+style E fill:#ffffff,stroke:#000000,stroke-width:1px
+style F fill:#ffffff,stroke:#000000,stroke-width:1px
+style G fill:#ffffff,stroke:#000000,stroke-width:1px
+A--> B
+A--> C
+C --> D
+C --> E
+D--> F
+E --> F
+F--> G
+B--> G
+
+```
+
 
 ## extended basic blocks  
 
