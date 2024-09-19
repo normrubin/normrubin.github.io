@@ -1,0 +1,151 @@
+---
+author: Oscar Kellner
+format:
+  html: default
+title: HW1 - Trying Out Bril
+
+---
+
+## Overview
+
+Bril is a very simple and educational instruction-based intermediate represnetation (IR) that is represented in JSON. It features a simple syntax that can be converted as JSON, and a suite of tools to execute the program.
+
+In this assignment, we implement a basic benchmarking program with Bril, then write a simple analysis program that analyzes a Bril (JSON) program, as well as create tests for both of these using Turnt (a snapshot testing tool).
+
+## Part 1: Bril Benchmark Program
+
+After reviewing the list of existing benchmark programs within the Bril repository (under the benchmarks directory), we notice that most benchmarks tend to consist of basic sample programs that runs a handwritten algorithm that returns some output value.
+
+In keeping with this pattern, I had originally wanted to write a program that performs a single forward convolutional pass through a large matrix of data, however after noticing the tedious process of packing individual data values into large arrays, I felt that an implementation of this would be too messy. I had also wanted to test recusion in Bril, so naturally an implementation of Merge Sort would fit this purpose well. I chose an in-place version of the algorithm to reduce the complexity a little.
+
+As mentioned earlier, creating arrays appear to require painstakingly pack all the individual values one at a time into memory. I had borrowed the `@pack` function from the `bubblesort.bril` benchmark to help create this array from the passed arguments for my program, 8 integer values to be stored into an unsorted array. These arguments are passed in when the program is called, as opposed to many other benchmark programs that hardcode the input values into the program.
+
+Taking an existing implementation of in-place merge sort written in C and converting it to a functional bril program was a relatively simple task, given the procedural and imperative nature of both languages. The difficulty mostly came down to writing proper control flow (inverting condition statements to support >= and <=), the verbosity of accessing individual elements in an array, and keeping track of what variables to modify. Keeping temporary notes in listing what variables are currently used within a certain scope helps keep track of how state may change in a program if a particular variable is used elsewhere.
+
+## Part 2: Analysis Tool
+
+For the second part of the assignment, we are tasked to write a small program that analyzes or modifies a Bril program in some way. I had originally tried to write my program in Zig for some extra practice, but time constraints locked me back to Python for convenience (JSON handling is a lot easier in Python).
+
+The program I had written performs a couple of basic scans through the functions of the specified Bril program, and prints out the following for each function (if applicable):
+
+* The arguments of the function and their types
+* The list of all function calls made and their arguments
+* If recursion is present
+* The number of potential loops found within the function
+
+A potential loop is found by simply scanning for all unique labels that have a `jmp` or `br` instruction located somewhere after the label that jumps to said label.
+
+Gathering these statistics for all functions could potentially help internally organize programs into a convenient structure and identify what the most dominating section of code is. I find that it provides a nice synopsis on what a high-level breakdown of a Bril program looks like.
+
+Originally, I had also planned to add functionality that will analyze whether variables are unused, but it got needlessly complicated and felt more appropriate for dead code elimination in a later assignment.
+
+## Testing
+
+An in-place merge sort implementation in Bril and a simple program to analyze Bril programs were developed. Both of these programs have associated Turnt tests to ensure that the outputs for these programs are matching the expected result when I had written them. For the analysis tool (`flow_detect.py`), I have included other existing benchmark Bril programs in testing for a variety of outputs. 
+
+Here are some outputs for our Merge Sort program:
+
+```
+$ bril2json < mergesort-inplace.bril | brili -p 8 1 2 7 3 6 5 4
+1
+2
+3
+4
+5
+6
+7
+8
+total_dyn_inst: 677
+```
+
+```
+$ bril2json < mergesort-inplace.bril | brili -p 8 7 6 5 4 3 2 1
+1
+2
+3
+4
+5
+6
+7
+8
+total_dyn_inst: 803
+```
+
+```
+$ bril2json < mergesort-inplace.bril | brili -p 2 2 2 2 2 2 2 1
+1
+2
+2
+2
+2
+2
+2
+2
+total_dyn_inst: 486
+```
+
+For our analysis tool, I had selected a handful of benchmarks that have a variety of control flow. Here is the output for `eight-queens`:
+
+```
+main:
+	args:
+		int: input
+	function calls: 1
+		queen(zero, n, icount, site)
+
+queen:
+	args:
+		int: n, queens, icount
+		int ptr: site
+	num potential loops: 1
+	function calls: 2
+		valid(n, site)
+		queen(n_1, queens, icount, site)
+	recursion present
+
+valid:
+	args:
+		int: n
+		int ptr: site
+	num potential loops: 1
+```
+
+As shown, for each function a list of arguments, function calls, and indication of loops and/or recursion is demonstrated, if applicable. I have tested the program on my own Merge Sort file as well:
+
+```
+main:
+	args:
+		int: n1, n2, n3, n4, n5, n6, n7, n8
+	function calls: 3
+		pack(size, n1, n2, n3, n4, n5, n6, n7, n8)
+		merge_sort(array, zero, upper_bound)
+		print_array(array, size)
+
+pack:
+	args:
+		int: size, n1, n2, n3, n4, n5, n6, n7, n8
+
+merge:
+	args:
+		int ptr: arr
+		int: start, mid, end
+	num potential loops: 2
+
+merge_sort:
+	args:
+		int ptr: arr
+		int: l, r
+	function calls: 3
+		merge_sort(arr, l, m)
+		merge_sort(arr, mp1, r)
+		merge(arr, l, m, r)
+	recursion present
+
+print_array:
+	args:
+		int ptr: array
+		int: size
+	num potential loops: 1
+```
+
+Here, the program correctly identifies the use of recursion in our `@merge_sort` function, as well as finding the two nested loops within `@merge` as well.
