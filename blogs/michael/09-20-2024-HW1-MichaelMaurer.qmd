@@ -1,0 +1,150 @@
+---
+author: Michael Maurer
+format:
+  html: default
+title: EECE7309 Homework 1 -- Trying Out Bril
+
+---
+
+## Introduction
+
+This assignment is designed to allow us to get comfortable with Bril, an intermediate representation designed for learning.
+In this assignment, we add a benchmark program to the suite, and write a tool for analyzing JSON formatted Bril.
+
+## Part 1: Bril Benchmark Program
+
+A good benchmark for this assignment is one which is new to the repository, but is fairly simple. 
+As such, a benchmark which fits into the `benchmark/core` suite is likely a good choice. 
+
+My first idea was to implement a benchmark which computes the Hamming distance between two integers. 
+In a high level language with a shift operator, this is a fairly easy program to write. 
+However, Bril does not have a built-in shift operator. 
+I spent some time writing a function to compute the Hamming distance without shifting, but it quickly became cumbersome and I searched for other ideas to not overcomplicate this work.
+
+My next idea was to write a benchmark which computes the $nth$ value in the Fibonacci sequence recursively.
+This is a sensible benchmark, as it may test a system's ability to handle recursive programs, and further tests 
+whether a compiler preserves this relationship. 
+
+To create this, only about 11 lines of TypeScript were required (when paired with the TypeScript compiler).
+
+At the end, I created a program to compute the $nth$ value in the Fibonacci sequence recursively, which can be found at 
+`benchmarks/core/fibonacci.bril`, and can be tested with `turnt`.
+
+## Problems Faced
+One challenge as I learned was that the TS compiler does not recognize many types, and further regards many types as `Any` 
+when they cannot be easily predicted. This was not much of a challenge to handle, however I am not much of a TS programmer
+so learning enough of the language was a step in the process.
+
+## Testing
+To verify functionality, I first by hand compared the results of execution with different input values of $n$, and additionally developed a turnt test.
+Results of testing can be observed below:
+
+```
+$ bril2json < benchmarks/core/fibonacci.bril | brili 1
+1
+$ bril2json < benchmarks/core/fibonacci.bril | brili 5
+5
+$ bril2json < benchmarks/core/fibonacci.bril | brili 10
+55
+$ bril2json < benchmarks/core/fibonacci.bril | brili 30
+832040
+
+# Including timing results as evidence that recursion is happening 
+$ time bril2json < benchmarks/core/fibonacci.bril | brili 30
+832040
+
+real	0m1.836s
+user	0m1.817s
+sys	0m0.052s
+[15:02:36] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril$ time bril2json < benchmarks/core/fibonacci.bril | brili 10
+55
+
+real	0m0.102s
+user	0m0.096s
+sys	0m0.031s
+```
+
+## Part 2: Bril Tooling
+
+For the second part of this assignment, we were asked to design a tool which either analyzed or modified Bril code stored in JSON format.
+I chose to make a simple program, which for a given file, computes how many of each "type" of instruction the program contains.
+The three types of instructions are "Constants", "Value Operations", and "Effect Operations" as outlined in the [docs](https://github.com/sampsyo/bril/blob/main/docs/lang/syntax.md).
+
+To do this, I wrote a Python script which consumed the input JSON, parsed it to get the available instructions, and iterated through the map. 
+Each instruction type has a unique construction, which I used to determine how many of each type of isntruction was contained.
+This tool only requires one pass through the program JSON to determine the count of each instruction type. 
+
+This tool could readily be extended to gather information about the types of instructions in a program.
+
+The code for this tool is shared below:
+```{python}
+#!/usr/bin/env python3
+
+import json
+import sys
+
+# Read the input as json
+# Proc Exit: If valid input rec'd
+def read_json_file(input):
+    try:
+        data = json.load(input)
+        return data
+    except json.JSONDecodeError:
+        print(f"Error: The input does not contain valid JSON.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        sys.exit(1)
+
+# Count the instruction types as specified by Bril syntax
+def count_instr_types(data: dict):
+    db = {'constant': 0, 'value': 0, 'effect': 0}
+    for func in data['functions']:
+        for instr in func['instrs']:
+            # If instr op is const, it must be a constant instruction
+            if 'op' in instr and instr['op'] == 'const':
+                db['constant'] += 1
+            # If instr has a dest and is not a const, it must be a value instruction
+            elif 'dest' in instr:
+                db['value'] += 1
+            # Continue if this is a label
+            elif 'label' in instr:
+                continue
+            # Otherwise this must be an effect instruction
+            else:
+                db['effect'] += 1
+            # Note: this assumes the json is well-formed Bril.
+    return db
+
+# Main
+def main():
+    data = read_json_file(sys.stdin)
+    print(count_instr_types(data))
+
+if __name__ == "__main__":
+    main()
+```
+
+## Testing
+
+I tested this program on a handful of the provided benchmarks, and verified the results by hand. Some results are shared below:
+
+```
+$ bril2json < ../benchmarks/core/hanoi.bril | python tool.py 
+{'constant': 5, 'value': 2, 'effect': 6}
+[15:10:42] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril/mytools$ bril2json < ../benchmarks/core/birthday.bril | python tool.py 
+{'constant': 9, 'value': 26, 'effect': 4}
+[15:11:04] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril/mytools$ bril2json < ../benchmarks/core/collatz.bril | python tool.py 
+{'constant': 3, 'value': 7, 'effect': 7}
+```
+
+## Challenges faced
+Originally, I had planned to construct a program which identified all control flow instructions, and further identified how many
+basic blocks the program contained. I moved away from this because I was not sure how exactly to handle call and ret instructions at this time, 
+and it seems likely this work is coming in a future assignment.
+
+Another challenge was that I had at first not realized that labels are contained within the instructions in the json files.
+This was causing my program to crash, and required some (brief) debugging.
+
+## Code
+The code for this assignment is contained in the latest commit [in my fork of Bril](https://github.com/maurermi/bril/tree/assignment-1).
