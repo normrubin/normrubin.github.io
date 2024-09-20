@@ -981,7 +981,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#83e69af2 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#1731640c .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -3438,7 +3438,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 596\n-rw-r--r-- 1 runner docker 40847 Sep 20 12:27 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 20 12:26 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 20 12:26 01a1_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 20 12:26 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 20 12:26 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  7413 Sep 20 12:26 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13675 Sep 20 12:26 02b_bril.qmd\n-rw-r--r-- 1 runner docker 24233 Sep 20 12:27 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 20 12:26 03_local.qmd\n-rw-r--r-- 1 runner docker 13488 Sep 20 12:26 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  5154 Sep 20 12:26 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 20 12:26 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 20 12:26 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 20 12:27 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 20 12:26 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 20 12:26 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 20 12:26 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 20 12:26 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 20 12:26 09_poly.qmd\n-rw-r--r-- 1 runner docker   302 Sep 20 12:26 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 20 12:26 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 20 12:27 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 20 12:26 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 20 12:26 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 20 12:26 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 20 12:26 a.json\n-rw-r--r-- 1 runner docker   248 Sep 20 12:26 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 20 12:26 df\n-rw-r--r-- 1 runner docker  4595 Sep 20 12:26 errors\n-rw-r--r-- 1 runner docker  3623 Sep 20 12:26 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 20 12:26 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 20 12:26 images\n-rw-r--r-- 1 runner docker  2260 Sep 20 12:26 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 20 12:26 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 20 12:26 ra\n-rw-r--r-- 1 runner docker  8226 Sep 20 12:26 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 20 12:26 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 20 12:27 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 20 12:27 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 20 12:27 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 20 12:26 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 596\n-rw-r--r-- 1 runner docker 40847 Sep 20 15:42 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 20 15:42 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 20 15:42 01a1_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 20 15:42 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 20 15:42 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  7413 Sep 20 15:42 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13675 Sep 20 15:42 02b_bril.qmd\n-rw-r--r-- 1 runner docker 24233 Sep 20 15:42 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 20 15:42 03_local.qmd\n-rw-r--r-- 1 runner docker 13488 Sep 20 15:42 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  5154 Sep 20 15:42 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 20 15:42 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 20 15:42 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 20 15:42 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 20 15:42 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 20 15:42 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 20 15:41 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 20 15:42 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 20 15:42 09_poly.qmd\n-rw-r--r-- 1 runner docker   302 Sep 20 15:42 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 20 15:42 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 20 15:42 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 20 15:42 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 20 15:42 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 20 15:42 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 20 15:41 a.json\n-rw-r--r-- 1 runner docker   248 Sep 20 15:41 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 20 15:41 df\n-rw-r--r-- 1 runner docker  4595 Sep 20 15:41 errors\n-rw-r--r-- 1 runner docker  3623 Sep 20 15:41 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 20 15:41 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 20 15:41 images\n-rw-r--r-- 1 runner docker  2260 Sep 20 15:42 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 20 15:41 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 20 15:41 ra\n-rw-r--r-- 1 runner docker  8226 Sep 20 15:42 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 20 15:42 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 20 15:42 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 20 15:42 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 20 15:42 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 20 15:41 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -3756,6 +3756,71 @@
       "EECS 7398",
       "Blogs",
       "sample blog with an image and a graph"
+    ]
+  },
+  {
+    "objectID": "blogs/oscar/2024-09-20-HW1.html",
+    "href": "blogs/oscar/2024-09-20-HW1.html",
+    "title": "HW1 - Trying Out Bril",
+    "section": "",
+    "text": "Bril is a very simple and educational instruction-based intermediate represnetation (IR) that is represented in JSON. It features a simple syntax that can be converted as JSON, and a suite of tools to execute the program.\nIn this assignment, we implement a basic benchmarking program with Bril, then write a simple analysis program that analyzes a Bril (JSON) program, as well as create tests for both of these using Turnt (a snapshot testing tool).",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Oscar",
+      "HW1 - Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#overview",
+    "href": "blogs/oscar/2024-09-20-HW1.html#overview",
+    "title": "HW1 - Trying Out Bril",
+    "section": "",
+    "text": "Bril is a very simple and educational instruction-based intermediate represnetation (IR) that is represented in JSON. It features a simple syntax that can be converted as JSON, and a suite of tools to execute the program.\nIn this assignment, we implement a basic benchmarking program with Bril, then write a simple analysis program that analyzes a Bril (JSON) program, as well as create tests for both of these using Turnt (a snapshot testing tool).",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Oscar",
+      "HW1 - Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#part-1-bril-benchmark-program",
+    "href": "blogs/oscar/2024-09-20-HW1.html#part-1-bril-benchmark-program",
+    "title": "HW1 - Trying Out Bril",
+    "section": "Part 1: Bril Benchmark Program",
+    "text": "Part 1: Bril Benchmark Program\nAfter reviewing the list of existing benchmark programs within the Bril repository (under the benchmarks directory), we notice that most benchmarks tend to consist of basic sample programs that runs a handwritten algorithm that returns some output value.\nIn keeping with this pattern, I had originally wanted to write a program that performs a single forward convolutional pass through a large matrix of data, however after noticing the tedious process of packing individual data values into large arrays, I felt that an implementation of this would be too messy. I had also wanted to test recusion in Bril, so naturally an implementation of Merge Sort would fit this purpose well. I chose an in-place version of the algorithm to reduce the complexity a little.\nAs mentioned earlier, creating arrays appear to require painstakingly pack all the individual values one at a time into memory. I had borrowed the @pack function from the bubblesort.bril benchmark to help create this array from the passed arguments for my program, 8 integer values to be stored into an unsorted array. These arguments are passed in when the program is called, as opposed to many other benchmark programs that hardcode the input values into the program.\nTaking an existing implementation of in-place merge sort written in C and converting it to a functional bril program was a relatively simple task, given the procedural and imperative nature of both languages. The difficulty mostly came down to writing proper control flow (inverting condition statements to support &gt;= and &lt;=), the verbosity of accessing individual elements in an array, and keeping track of what variables to modify. Keeping temporary notes in listing what variables are currently used within a certain scope helps keep track of how state may change in a program if a particular variable is used elsewhere.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Oscar",
+      "HW1 - Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#part-2-analysis-tool",
+    "href": "blogs/oscar/2024-09-20-HW1.html#part-2-analysis-tool",
+    "title": "HW1 - Trying Out Bril",
+    "section": "Part 2: Analysis Tool",
+    "text": "Part 2: Analysis Tool\nFor the second part of the assignment, we are tasked to write a small program that analyzes or modifies a Bril program in some way. I had originally tried to write my program in Zig for some extra practice, but time constraints locked me back to Python for convenience (JSON handling is a lot easier in Python).\nThe program I had written performs a couple of basic scans through the functions of the specified Bril program, and prints out the following for each function (if applicable):\n\nThe arguments of the function and their types\nThe list of all function calls made and their arguments\nIf recursion is present\nThe number of potential loops found within the function\n\nA potential loop is found by simply scanning for all unique labels that have a jmp or br instruction located somewhere after the label that jumps to said label.\nGathering these statistics for all functions could potentially help internally organize programs into a convenient structure and identify what the most dominating section of code is. I find that it provides a nice synopsis on what a high-level breakdown of a Bril program looks like.\nOriginally, I had also planned to add functionality that will analyze whether variables are unused, but it got needlessly complicated and felt more appropriate for dead code elimination in a later assignment.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Oscar",
+      "HW1 - Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#testing",
+    "href": "blogs/oscar/2024-09-20-HW1.html#testing",
+    "title": "HW1 - Trying Out Bril",
+    "section": "Testing",
+    "text": "Testing\nAn in-place merge sort implementation in Bril and a simple program to analyze Bril programs were developed. Both of these programs have associated Turnt tests to ensure that the outputs for these programs are matching the expected result when I had written them. For the analysis tool (flow_detect.py), I have included other existing benchmark Bril programs in testing for a variety of outputs.\nHere are some outputs for our Merge Sort program:\n$ bril2json &lt; mergesort-inplace.bril | brili -p 8 1 2 7 3 6 5 4\n1\n2\n3\n4\n5\n6\n7\n8\ntotal_dyn_inst: 677\n$ bril2json &lt; mergesort-inplace.bril | brili -p 8 7 6 5 4 3 2 1\n1\n2\n3\n4\n5\n6\n7\n8\ntotal_dyn_inst: 803\n$ bril2json &lt; mergesort-inplace.bril | brili -p 2 2 2 2 2 2 2 1\n1\n2\n2\n2\n2\n2\n2\n2\ntotal_dyn_inst: 486\nFor our analysis tool, I had selected a handful of benchmarks that have a variety of control flow. Here is the output for eight-queens:\nmain:\n    args:\n        int: input\n    function calls: 1\n        queen(zero, n, icount, site)\n\nqueen:\n    args:\n        int: n, queens, icount\n        int ptr: site\n    num potential loops: 1\n    function calls: 2\n        valid(n, site)\n        queen(n_1, queens, icount, site)\n    recursion present\n\nvalid:\n    args:\n        int: n\n        int ptr: site\n    num potential loops: 1\nAs shown, for each function a list of arguments, function calls, and indication of loops and/or recursion is demonstrated, if applicable. I have tested the program on my own Merge Sort file as well:\nmain:\n    args:\n        int: n1, n2, n3, n4, n5, n6, n7, n8\n    function calls: 3\n        pack(size, n1, n2, n3, n4, n5, n6, n7, n8)\n        merge_sort(array, zero, upper_bound)\n        print_array(array, size)\n\npack:\n    args:\n        int: size, n1, n2, n3, n4, n5, n6, n7, n8\n\nmerge:\n    args:\n        int ptr: arr\n        int: start, mid, end\n    num potential loops: 2\n\nmerge_sort:\n    args:\n        int ptr: arr\n        int: l, r\n    function calls: 3\n        merge_sort(arr, l, m)\n        merge_sort(arr, mp1, r)\n        merge(arr, l, m, r)\n    recursion present\n\nprint_array:\n    args:\n        int ptr: array\n        int: size\n    num potential loops: 1\nHere, the program correctly identifies the use of recursion in our @merge_sort function, as well as finding the two nested loops within @merge as well.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Oscar",
+      "HW1 - Trying Out Bril"
     ]
   },
   {
@@ -4489,6 +4554,90 @@
       "EECS 7398",
       "Blogs",
       "sample blog"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html",
+    "title": "Homework1 - Sana",
+    "section": "",
+    "text": "I created a Brill benchmark that calculates and prints the sum of prime numbers and composite numbers up to a given input (in this case, 100). The algorithm used here is very similar to the algorithm used in sieve.bril code in the Brill benchmark folder which is designed to find and print all prime numbers up to a specified limit. It emphasizes the identification of primes through boolean flags and modular functions. Our implementation extends the algorithm to calculate the sum of primes and the sum of composites up to a specified limit. It uses an integer array to flag primes and composites and focuses on aggregating values rather than listing them.\n\n\n\nTo give a little explanation about what each part of the code does:\n\n\n@sumOfPrimes: This function calculates the sum of all prime numbers up to n. First, an array nums of size n is allocated, where each index represents whether a number is prime or composite (1 for prime, 0 for composite). Initially, all numbers are marked as prime. Starting from current = 2, the function marks the multiples of each number as composite (0), skipping prime numbers. The outer loop increments current, and the inner loop marks all multiples of current as composite. After marking non-primes, the function iterates over the array from 2 to n and sums the numbers where the value is 1 (they are prime).\n@sumOfComposites: This function calculates the sum of all composite numbers up to n. It works similarly to the sumOfPrimes function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from 4 (since 1 is neither prime nor composite, and 2 and 3 are primes) and adds all numbers marked as 0 (composite).\n\n\n\n\nTo test the implementation, I used the following approach:\n\na) I ran the benchmark with different input values, starting with small numbers like 10, 20, and then larger numbers like 100.\nb) I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.\nc) I used the Brill interpreter (brili) to run the benchmark and checked both the output and the number of dynamic instructions executed.\n\nQuantitative results for input 100:\n1060\n3889\n\n\n\nThe most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (br) and jumps (jmp). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code",
+    "title": "Homework1 - Sana",
+    "section": "",
+    "text": "To give a little explanation about what each part of the code does:\n\n\n@sumOfPrimes: This function calculates the sum of all prime numbers up to n. First, an array nums of size n is allocated, where each index represents whether a number is prime or composite (1 for prime, 0 for composite). Initially, all numbers are marked as prime. Starting from current = 2, the function marks the multiples of each number as composite (0), skipping prime numbers. The outer loop increments current, and the inner loop marks all multiples of current as composite. After marking non-primes, the function iterates over the array from 2 to n and sums the numbers where the value is 1 (they are prime).\n@sumOfComposites: This function calculates the sum of all composite numbers up to n. It works similarly to the sumOfPrimes function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from 4 (since 1 is neither prime nor composite, and 2 and 3 are primes) and adds all numbers marked as 0 (composite).",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested",
+    "title": "Homework1 - Sana",
+    "section": "",
+    "text": "To test the implementation, I used the following approach:\n\na) I ran the benchmark with different input values, starting with small numbers like 10, 20, and then larger numbers like 100.\nb) I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.\nc) I used the Brill interpreter (brili) to run the benchmark and checked both the output and the number of dynamic instructions executed.\n\nQuantitative results for input 100:\n1060\n3889",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced",
+    "title": "Homework1 - Sana",
+    "section": "",
+    "text": "The most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (br) and jumps (jmp). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code-1",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code-1",
+    "title": "Homework1 - Sana",
+    "section": "Explanation of the Code",
+    "text": "Explanation of the Code\nThe code first iterates through each function in the program using the outer loop. Inside the function, the inner loop goes through each instruction. For each instruction, it increments the instruction count and checks if the instruction is a jump (br or jmp). If it is, a print instruction is added before the jump.\n\nimport json\nimport copy\n\nbril_json = \"\"\"\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\", \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"br\", \"args\": [\"v2\"], \"labels\": [\"then\", \"else\"] },\n        { \"label\": \"then\" },\n        { \"op\": \"print\", \"args\": [\"v2\"] },\n        { \"op\": \"jmp\", \"labels\": [\"end\"] },\n        { \"label\": \"else\" },\n        { \"op\": \"print\", \"args\": [\"v1\"] },\n        { \"label\": \"end\" },\n        { \"op\": \"ret\" }\n      ]\n    }\n  ]\n}\n\"\"\"\n\nbril_program = json.loads(bril_json)\n\ndef process_bril_program(bril_program):\n    total_instructions = 0\n    for function in bril_program['functions']:\n        new_instrs = []\n        for instruction in function['instrs']:\n            total_instructions += 1\n            \n            # add a print instruction before a jump!\n            if instruction.get('op') in ['br', 'jmp']:\n                print_instr = {\n                    \"op\": \"print\",\n                    \"args\": [\"Jumping\"]\n                }\n                new_instrs.append(print_instr)\n            \n            new_instrs.append(instruction)\n        \n        function['instrs'] = new_instrs\n\n    return bril_program, total_instructions\n\nmodified_program, instruction_count = process_bril_program(bril_program)\n\nprint(\"Total number of instructions:\", instruction_count)\nprint(\"Modified Bril program:\")\nprint(json.dumps(modified_program, indent=2))\n\nTotal number of instructions: 11\nModified Bril program:\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        {\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"dest\": \"v0\",\n          \"value\": 1\n        },\n        {\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"dest\": \"v1\",\n          \"value\": 2\n        },\n        {\n          \"op\": \"add\",\n          \"type\": \"int\",\n          \"dest\": \"v2\",\n          \"args\": [\n            \"v0\",\n            \"v1\"\n          ]\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"Jumping\"\n          ]\n        },\n        {\n          \"op\": \"br\",\n          \"args\": [\n            \"v2\"\n          ],\n          \"labels\": [\n            \"then\",\n            \"else\"\n          ]\n        },\n        {\n          \"label\": \"then\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"v2\"\n          ]\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"Jumping\"\n          ]\n        },\n        {\n          \"op\": \"jmp\",\n          \"labels\": [\n            \"end\"\n          ]\n        },\n        {\n          \"label\": \"else\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"v1\"\n          ]\n        },\n        {\n          \"label\": \"end\"\n        },\n        {\n          \"op\": \"ret\"\n        }\n      ]\n    }\n  ]\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested-1",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested-1",
+    "title": "Homework1 - Sana",
+    "section": "How the Implementation is Tested",
+    "text": "How the Implementation is Tested\nTo test the implementation, I created a small Bril program called test.json that contains various types of instructions, including constants, an add operation, a branch instruction (br), a jump instruction (jmp), and print statements. I used this file to verify that the transformation was applied correctly and that the total number of instructions was counted.\nTest Input (test.json):\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\", \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"br\", \"args\": [\"v2\"], \"labels\": [\"then\", \"else\"] },\n        { \"label\": \"then\" },\n        { \"op\": \"print\", \"args\": [\"v2\"] },\n        { \"op\": \"jmp\", \"labels\": [\"end\"] },\n        { \"label\": \"else\" },\n        { \"op\": \"print\", \"args\": [\"v1\"] },\n        { \"label\": \"end\" },\n        { \"op\": \"ret\" }\n      ]\n    }\n  ]\n}\n\nOutput of The program is shown in previous section.\nQuantitative Results: The total number of instructions before the transformation was 11. After transformation, 2 print instructions were added (one before the br and another before the jmp), making the total number of instructions 13. (We can conclude this by counting the instructions in the modified Bril program)",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced-1",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced-1",
+    "title": "Homework1 - Sana",
+    "section": "Challenges Faced",
+    "text": "Challenges Faced\nThe most challenging part of the task was ensuring that the additional instructions were inserted in the correct place without modifying the logic of the Bril program. The Bril program must still execute in the intended order, and placing the print instructions incorrectly could have changed the control flow. To address this challenge, I carefully looped through the instruction list, checked for br and jmp operations, and inserted the print instructions before each of these jump-related instructions by also maintaining the program’s original flow and semantics.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
     ]
   },
   {

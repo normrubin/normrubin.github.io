@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Sana Taghipour Anvari">
 
-<title>Homework 3 data flow – EECE7398 Fall 2024</title>
+<title>hw1-sanataghipouranvari – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +65,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../homework/4_hw.html" rel="next">
-<link href="../homework/2_hw.html" rel="prev">
+<link href="../blogs/junk_dir/index.html" rel="next">
+<link href="../Class_Overview/What_to_do.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -69,7 +104,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 3 data flow – EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -83,7 +118,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../homework/1.hw.html">Homework</a></li><li class="breadcrumb-item"><a href="../homework/3_hw.html">Homework 3 data flow</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Homework1 - Sana</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -131,16 +166,16 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Blogs</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Homework1 - Sana</span></a>
   </div>
 </li>
@@ -177,13 +212,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
  <span class="menu-text">Homework</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../homework/1.hw.html" class="sidebar-item-text sidebar-link">
@@ -198,7 +233,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/3_hw.html" class="sidebar-item-text sidebar-link active">
+  <a href="../homework/3_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 3 data flow</span></a>
   </div>
 </li>
@@ -424,15 +459,21 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../homework/1.hw.html">Homework</a></li><li class="breadcrumb-item"><a href="../homework/3_hw.html">Homework 3 data flow</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Homework1 - Sana</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 3 data flow</h1>
+<h1 class="title">Homework1 - Sana</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Sana Taghipour Anvari </p>
+          </div>
+  </div>
     
   
     
@@ -443,9 +484,225 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Implement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.</p>
+<section id="part-1" class="level1">
+<h1>Part 1</h1>
+<p>I created a Brill benchmark that calculates and prints the sum of prime numbers and composite numbers up to a given input (in this case, 100). The algorithm used here is very similar to the algorithm used in <code>sieve.bril</code> code in the Brill benchmark folder which is designed to find and print all prime numbers up to a specified limit. It emphasizes the identification of primes through boolean flags and modular functions. Our implementation extends the algorithm to calculate the sum of primes and the sum of composites up to a specified limit. It uses an integer array to flag primes and composites and focuses on aggregating values rather than listing them.</p>
+<section id="explanation-of-the-code" class="level2">
+<h2 class="anchored" data-anchor-id="explanation-of-the-code">Explanation of the Code</h2>
+<ol type="1">
+<li>To give a little explanation about what each part of the code does:</li>
+</ol>
+<ul>
+<li><p><strong><span class="citation" data-cites="sumOfPrimes">@sumOfPrimes</span></strong>: This function calculates the sum of all prime numbers up to <code>n</code>. First, an array <code>nums</code> of size <code>n</code> is allocated, where each index represents whether a number is prime or composite (<code>1</code> for prime, <code>0</code> for composite). Initially, all numbers are marked as prime. Starting from <code>current = 2</code>, the function marks the multiples of each number as composite (<code>0</code>), skipping prime numbers. The outer loop increments <code>current</code>, and the inner loop marks all multiples of <code>current</code> as composite. After marking non-primes, the function iterates over the array from <code>2</code> to <code>n</code> and sums the numbers where the value is <code>1</code> (they are prime).</p></li>
+<li><p><strong><span class="citation" data-cites="sumOfComposites">@sumOfComposites</span></strong>: This function calculates the sum of all composite numbers up to <code>n</code>. It works similarly to the <code>sumOfPrimes</code> function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from <code>4</code> (since <code>1</code> is neither prime nor composite, and <code>2</code> and <code>3</code> are primes) and adds all numbers marked as <code>0</code> (composite).</p></li>
+</ul>
+</section>
+<section id="how-the-implementation-is-tested" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-implementation-is-tested">How the Implementation is Tested</h2>
+<p>To test the implementation, I used the following approach:</p>
+<ul>
+<li><p><strong>a)</strong> I ran the benchmark with different input values, starting with small numbers like <code>10</code>, <code>20</code>, and then larger numbers like <code>100</code>.</p></li>
+<li><p><strong>b)</strong> I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.</p></li>
+<li><p><strong>c)</strong> I used the Brill interpreter (<code>brili</code>) to run the benchmark and checked both the output and the number of dynamic instructions executed.</p></li>
+</ul>
+<p>Quantitative results for input <code>100</code>:</p>
+<pre><code>1060
+3889</code></pre>
+</section>
+<section id="challenges-faced" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced">Challenges Faced</h2>
+<p>The most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (<code>br</code>) and jumps (<code>jmp</code>). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.</p>
+</section>
+</section>
+<section id="part-2" class="level1">
+<h1>Part 2</h1>
+<p>I developed a Python script that analyzes and modifies Bril programs. The script performs two main tasks:</p>
+<ul>
+<li><p><strong>a)</strong> Counts the total number of instructions in the Bril program.</p></li>
+<li><p><strong>b)</strong> Adds a print instruction before every jump instruction (both <code>br</code> and <code>jmp</code>).</p></li>
+</ul>
+<p>The implementation involves parsing a JSON file containing the Bril program, iterating through its instructions, counting them, and inserting new print instructions where necessary. The modified program is then output along with the total instruction count.</p>
+<section id="explanation-of-the-code-1" class="level2">
+<h2 class="anchored" data-anchor-id="explanation-of-the-code-1">Explanation of the Code</h2>
+<p>The code first iterates through each function in the program using the outer loop. Inside the function, the inner loop goes through each instruction. For each instruction, it increments the instruction count and checks if the instruction is a jump (<code>br</code> or <code>jmp</code>). If it is, a <code>print</code> instruction is added before the jump.</p>
+<div id="b9568446" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>bril_json <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">  "functions": [</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">      "name": "main",</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="st">      "instrs": [</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "v0", "value": 1 },</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "v1", "value": 2 },</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "add", "type": "int", "dest": "v2", "args": ["v0", "v1"] },</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "br", "args": ["v2"], "labels": ["then", "else"] },</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="st">        { "label": "then" },</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "print", "args": ["v2"] },</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "jmp", "labels": ["end"] },</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="st">        { "label": "else" },</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "print", "args": ["v1"] },</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="st">        { "label": "end" },</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "ret" }</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="st">      ]</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>bril_program <span class="op">=</span> json.loads(bril_json)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> process_bril_program(bril_program):</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    total_instructions <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> function <span class="kw">in</span> bril_program[<span class="st">'functions'</span>]:</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        new_instrs <span class="op">=</span> []</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> instruction <span class="kw">in</span> function[<span class="st">'instrs'</span>]:</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>            total_instructions <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            <span class="co"># add a print instruction before a jump!</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> instruction.get(<span class="st">'op'</span>) <span class="kw">in</span> [<span class="st">'br'</span>, <span class="st">'jmp'</span>]:</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>                print_instr <span class="op">=</span> {</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"op"</span>: <span class="st">"print"</span>,</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"args"</span>: [<span class="st">"Jumping"</span>]</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>                }</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>                new_instrs.append(print_instr)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>            new_instrs.append(instruction)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        function[<span class="st">'instrs'</span>] <span class="op">=</span> new_instrs</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> bril_program, total_instructions</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>modified_program, instruction_count <span class="op">=</span> process_bril_program(bril_program)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Total number of instructions:"</span>, instruction_count)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Modified Bril program:"</span>)</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(modified_program, indent<span class="op">=</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total number of instructions: 11
+Modified Bril program:
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        {
+          "op": "const",
+          "type": "int",
+          "dest": "v0",
+          "value": 1
+        },
+        {
+          "op": "const",
+          "type": "int",
+          "dest": "v1",
+          "value": 2
+        },
+        {
+          "op": "add",
+          "type": "int",
+          "dest": "v2",
+          "args": [
+            "v0",
+            "v1"
+          ]
+        },
+        {
+          "op": "print",
+          "args": [
+            "Jumping"
+          ]
+        },
+        {
+          "op": "br",
+          "args": [
+            "v2"
+          ],
+          "labels": [
+            "then",
+            "else"
+          ]
+        },
+        {
+          "label": "then"
+        },
+        {
+          "op": "print",
+          "args": [
+            "v2"
+          ]
+        },
+        {
+          "op": "print",
+          "args": [
+            "Jumping"
+          ]
+        },
+        {
+          "op": "jmp",
+          "labels": [
+            "end"
+          ]
+        },
+        {
+          "label": "else"
+        },
+        {
+          "op": "print",
+          "args": [
+            "v1"
+          ]
+        },
+        {
+          "label": "end"
+        },
+        {
+          "op": "ret"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+</section>
+<section id="how-the-implementation-is-tested-1" class="level2">
+<h2 class="anchored" data-anchor-id="how-the-implementation-is-tested-1">How the Implementation is Tested</h2>
+<p>To test the implementation, I created a small Bril program called <code>test.json</code> that contains various types of instructions, including constants, an add operation, a branch instruction (<code>br</code>), a jump instruction (<code>jmp</code>), and print statements. I used this file to verify that the transformation was applied correctly and that the total number of instructions was counted.</p>
+<p>Test Input (<code>test.json</code>):</p>
+<pre class="{html}"><code>{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
+        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
+        { "op": "add", "type": "int", "dest": "v2", "args": ["v0", "v1"] },
+        { "op": "br", "args": ["v2"], "labels": ["then", "else"] },
+        { "label": "then" },
+        { "op": "print", "args": ["v2"] },
+        { "op": "jmp", "labels": ["end"] },
+        { "label": "else" },
+        { "op": "print", "args": ["v1"] },
+        { "label": "end" },
+        { "op": "ret" }
+      ]
+    }
+  ]
+}
+</code></pre>
+<p>Output of The program is shown in previous section.</p>
+<p>Quantitative Results: The total number of instructions before the transformation was 11. After transformation, 2 print instructions were added (one before the br and another before the jmp), making the total number of instructions 13. (We can conclude this by counting the instructions in the modified Bril program)</p>
+</section>
+<section id="challenges-faced-1" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced-1">Challenges Faced</h2>
+<p>The most challenging part of the task was ensuring that the additional instructions were inserted in the correct place without modifying the logic of the Bril program. The Bril program must still execute in the intended order, and placing the print instructions incorrectly could have changed the control flow. To address this challenge, I carefully looped through the instruction list, checked for <code>br</code> and <code>jmp</code> operations, and inserted the print instructions before each of these jump-related instructions by also maintaining the program’s original flow and semantics.</p>
 
 
+</section>
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -870,13 +1127,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../homework/2_hw.html" class="pagination-link" aria-label="Homework 2 local optimizations">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 2 local optimizations</span>
+      <a href="../Class_Overview/What_to_do.html" class="pagination-link" aria-label="How to submit assignments">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">How to submit assignments</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../homework/4_hw.html" class="pagination-link" aria-label="homework dominance">
-        <span class="nav-page-text">homework dominance</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../blogs/junk_dir/index.html" class="pagination-link" aria-label="sample blog with an image and a graph">
+        <span class="nav-page-text">sample blog with an image and a graph</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
