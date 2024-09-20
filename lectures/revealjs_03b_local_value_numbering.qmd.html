@@ -691,6 +691,10 @@ a = b[i]
 b[k] =
    =b[i]
    =b[k]</code></pre>
+<p>indexed stores</p>
+<p>when we see an assignment a[i] = exp</p>
+<p>we have 3 value numbers a, i, exp</p>
+<p>give the array a new value number give the array[i] operation the value number of the exp</p>
 </section>
 <section id="local-value-numbering." class="slide level2">
 <h2>Local value numbering.</h2>
@@ -736,7 +740,10 @@ b[k] =
 </section>
 <section id="crossing-blocks" class="slide level2">
 <h2>crossing blocks</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource liwfqghbzle number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
 <span id="cb15-2"><a></a></span>
 <span id="cb15-3"><a></a>graph TB</span>
 <span id="cb15-4"><a></a>A["m = a + b&lt;br/&gt;&lt;span style='color:red'&gt;n = a + b&lt;/span&gt;"]</span>
@@ -763,6 +770,45 @@ b[k] =
 <span id="cb15-25"><a></a>E --&gt; F</span>
 <span id="cb15-26"><a></a>F--&gt; G</span>
 <span id="cb15-27"><a></a>B--&gt; G</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A["m = a + b&lt;br/&gt;&lt;span style='color:red'&gt;n = a + b&lt;/span&gt;"]
+B["p = c + d&lt;br&gt;&lt;span style='color:red'&gt;r = c + d&lt;/span&gt;"]
+
+C["&lt;span style='color:blue'&gt; q = a + b&lt;br&gt; &lt;/span&gt; r = c + d"]
+D["e=b + 18&lt;br&gt; &lt;span style='color:blue'&gt; s = a + b &lt;/span&gt; &lt;br&gt; u = e + f "]
+E["e=a + 17&lt;br&gt; &lt;span style='color:blue'&gt; t = c + d &lt;/span&gt; &lt;br&gt; u = e + f "]
+F["&lt;span style='color:blue'&gt; v = a + b &lt;br&gt; w = c + d &lt;br&gt; x = e + f&lt;/span&gt;"]
+G["&lt;span style='color:blue'&gt; y = a + b &lt;br&gt; z = c + d&lt;/span&gt;"]
+
+style A fill:#ffffff,stroke:#000000,stroke-width:1px
+style B fill:#ffffff,stroke:#000000,stroke-width:1px
+style C fill:#ffffff,stroke:#000000,stroke-width:1px
+style D fill:#ffffff,stroke:#000000,stroke-width:1px
+style E fill:#ffffff,stroke:#000000,stroke-width:1px
+style F fill:#ffffff,stroke:#000000,stroke-width:1px
+style G fill:#ffffff,stroke:#000000,stroke-width:1px
+A--&gt; B
+A--&gt; C
+C --&gt; D
+C --&gt; E
+D--&gt; F
+E --&gt; F
+F--&gt; G
+B--&gt; G
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 </section>
 <section id="extended-basic-blocks" class="slide level2">
 <h2>extended basic blocks</h2>
