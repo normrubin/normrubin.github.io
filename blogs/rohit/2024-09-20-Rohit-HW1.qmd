@@ -1,0 +1,236 @@
+---
+title: "Homework 1"
+author: Rohit Gurusamy Anandakumar
+format: html
+---
+
+## PART 1: Benchmark
+
+### Cyclic Redundancy Check (CRC) in BRIL
+
+#### About CRC:
+A Cyclic Redundancy Check (CRC) is an error-detecting code used in digital networks and storage devices to detect accidental changes to raw data. In embedded systems, CRCs are crucial for ensuring data integrity during communication, verifying data stored in memory, and validating firmware updates. They are popular due to their simplicity, efficiency in binary hardware, and effectiveness in detecting common transmission errors.
+
+- It ensure data integrity in communication protocols like UART, SPI, and I2C by detecting errors caused by noise or interference.
+- How CRC Works:
+    + Polynomial Division: The data block is treated as a large binary number and divided by a fixed polynomial. The remainder of this division is the CRC value.
+    + Appending CRC: The CRC value is appended to the data before transmission or storage.
+    + Verification: Upon retrieval, the same polynomial division is performed. If the remainder matches the CRC value, the data is considered intact; otherwise, it indicates corruption
+- Learn more at: <https://en.wikipedia.org/wiki/Cyclic_redundancy_check>
+
+
+
+#### CRC as Microbenchmark:
+- CRC calculations prominently involve memory allocation, extensively using `ptr<int>`.
+- CRC algorithms typically involve a mix of arithmetic (e.g., addition, subtraction, Multiplication) and bitwise operations (e.g., XOR, shifts).
+- This makes CRC an excellent microbenchmark for evaluating how well your Bril implementation handles these critical operations, which are essential for many real-world applications.
+
+
+#### Helpful Tools:
+- Bril code for CRC is fully hand typed code of 300+ lines using VS Code, the most useful tool ever was `Bril syntax highlighting` Extension in VS Code.
+- `Turnt` tool was used to test and save the output file.
+- `turnt.toml` file:
+```{toml}
+    [envs.test]
+    command = "bril2json < {filename} | brili -p {args}"
+    output.out = "-"
+    output.prof = "2"
+
+```
+- Learn more at: <https://github.com/cucapra/turnt?tab=readme-ov-file>
+
+
+#### Method:
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+%%| echo: false 
+graph LR;
+A[Initialize Inputs]--> B0[Get CRC Remainder] --> B1["Check CRC"] --> B2[Print Outputs];
+```
+
+##### Initialize Inputs:
+- Get _Word_, _Divisor_, _check\_value_ as an **int**.
+- _check\_value_ will be `0` if the bits are missing and error.
+- Append `Divisor size - 1` zeros to _word_.
+- Convert the **int** into array, here in bril we can use **ptr\<int\>** allocations calling `@toPtr` function.
+- Reference to memory allocation in bril: <https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/manually-managed-memory/>
+
+##### Get CRC Remainder:
+- To divide _Word_ and _Divisor_ we need to do `xor` in each bit.
+- First copy first few bits from _Word_ to _Word\_split_ having same length as _Divisor_.
+- Call `@xor`function and overwrite the result to first few bits of _Word_.
+- Call `@shiftleft` function to left shift the _Word_ and decrement _word\_size_.
+- Repeat this process until `Word_size < Div_size`.
+- At the end return _Word_ as a _crc\_rem_ to `@main`.
+- Convert _crc\_rem_ from **ptr\<int\>** to **int** by calling `toNum` function.
+
+##### Check CRC:
+- If: `crc_rem == 0` then there is no error in bit and _crc\_check_ is `true`.
+- Else: there is a error and _crc\_check_ is `false`.
+
+##### Print Outputs:
+- Ouputs are **bool** value _crc\_check_ and **int** value _crc\_rem_.
+- When _check\_value_ is set to `0`
+    + This Indicates that there are error or missing bits.
+    + _crc\_check_ value will be `false`
+    + _check\_rem_ will give out the correct _check\_value_
+    + so again replacing `0` from _check\_rem_ with _check\_value_ and running the code will give us _crc\_check_ as `true` with `check_rem = 0` .
+
+- Full code: <https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril>
+
+#### Test Cases:
+##### Example 1
+###### Get Remainder:
+- Input:
+```{bril}
+    word: int = const 1101101;
+    word_size: int = const 7;
+    divisor: int = const 10101;
+    divisor_size: int = const 5;
+    check_value: int = const 0;
+```
+
+- Output:
+```
+    false
+    1011
+```
+- Total Dynamic  Instructions:
+```
+    total_dyn_inst: 1784
+```
+###### Check CRC:
+- Input:
+```{bril}
+    word: int = const 1101101;
+    word_size: int = const 7;
+    divisor: int = const 10101;
+    divisor_size: int = const 5;
+    check_value: int = const 1011;
+```
+
+- Output:
+```
+    true
+    0
+```
+- Total Dynamic  Instructions:
+```
+    total_dyn_inst: 1784
+```
+
+##### Example 2
+###### Get Remainder:
+- Input:
+```{bril}
+    word: int = const 11010011101100;
+    word_size: int = const 14;
+    divisor: int = const 1011;
+    divisor_size: int = const 4;
+    check_value: int = const 0;
+```
+
+- Output:
+```
+    false
+    100
+```
+- Total Dynamic  Instructions:
+```
+    total_dyn_inst: 3061
+```
+###### Check CRC:
+- Input:
+```{bril}
+    word: int = const 11010011101100;
+    word_size: int = const 14;
+    divisor: int = const 1011;
+    divisor_size: int = const 4;
+    check_value: int = const 100;
+```
+
+- Output:
+```
+    true
+    0
+```
+- Total Dynamic  Instructions:
+```
+    total_dyn_inst: 3061
+```
+
+## PART 2: Analysis:
+### Finding Number of Functions and its Calls
+- Code: <https://github.com/gurusamyanandakuma-r/bril/blob/main/examples/Count_Function.py>
+
+#### Initialize
+- This analysis is done in _python_.
+- Using `bril2json` converting `.bril` file to **JSON**.
+- Loading into _python_ file using `prog = json.load(sys.stdin)`.
+- **JSON** heap structure will be loaded as dictionary in _python_.
+
+#### Process
+- Counting all functions in bril.
+- Counting function calls of a function.
+
+#### Test
+- `Turnt.toml` file:
+```
+    [envs.countFunc]
+    default = false
+    command = "bril2json < {filename} | python3 hw.py > {base}.txt"
+```
+- Output is stored in `.txt` file.
+
+##### Example 1: CRC
+###### Input: 
+- file: <https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril>
+
+###### Output:
+    ```
+    Number of Functions:  11
+    ------------------------
+    Function Call Counts:
+    main     : 0
+    rem      : 1
+    n_zeros  : 2
+    toPtr    : 2
+    wordSplit: 1
+    xor      : 1
+    shiftLeft: 1
+    print_ptr: 0
+    crc_rem  : 1
+    crc_check: 1
+    toNum    : 1
+```
+
+
+##### Example 2: Fibonacci
+###### Input: 
+- file: <https://github.com/normrubin/bril/blob/main/benchmarks/core/fibonacci.bril>
+
+###### Output:
+    ```
+    Number of Functions:  2
+    ------------------------
+    Function Call Counts:
+    main     : 0
+    Fibonacci: 3
+```
+
+
+##### Example 3: Binary Search
+###### Input: 
+- file: <https://github.com/normrubin/bril/blob/main/benchmarks/mem/binary-search.bril>
+
+###### Output:
+```
+    Number of Functions:  4
+    ------------------------
+    Function Call Counts:
+    pack         : 1
+    print_array  : 0
+    binary_search: 3
+    main         : 0
+```
