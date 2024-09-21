@@ -33,7 +33,16 @@ jobs:
           curl -fsSL https://deno.land/install.sh | sh
           echo 'export DENO_INSTALL="/home/runner/.deno"' >> ~/.bashrc
           echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
+          source ~/.bashrc
           python3 -m pip install flit
+
+      - name: Bril tools
+        run: |
+          cd ~/bril
+          deno install brili.ts 
+          deno install --allow-env --allow-read ts2bril.ts
+
+       
 
    
       - name: Render and Publish
