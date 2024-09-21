@@ -25,6 +25,9 @@ jobs:
       - run: pip install jupyter
       - run: pip install -r requirements.txt
 
+      - name: Install Bril tools
+      - run: cd ; pwd
+
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
