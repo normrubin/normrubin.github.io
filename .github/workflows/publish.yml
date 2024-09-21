@@ -26,9 +26,9 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Install Bril tools
-      - run: cd ; pwd
+      - run: cd ; git clone https://github.com/sampsyo/bril.git; curl -fsSL https://deno.land/install.sh | sh
 
-      - name: install Bril tools
+      - name: install Bril tools return 
         run:  pwd
 
       - name: Render and Publish
