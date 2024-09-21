@@ -26,10 +26,10 @@ jobs:
       - run: pip install -r requirements.txt
 
       - name: Install Bril tools
-      - run: git clone https://github.com/sampsyo/bril.git
+        run: git clone https://github.com/sampsyo/bril.git
 
       - name: install Bril tools return 
-      - run:  pwd
+        run:  pwd
 
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
