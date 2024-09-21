@@ -43,6 +43,9 @@ jobs:
           echo "PATH=/home/runner/.deno/bin:$PATH" >> $GITHUB_ENV
           source ~/.bashrc
           /home/runner/.deno/bin/deno install --allow-env --allow-read ts2bril.ts
+          /home/runner/.deno/bin/deno install brili.ts 
+          cd bril-txt
+          flit install --symlink --user
 
        
 
