@@ -25,14 +25,15 @@ jobs:
       - run: pip install jupyter
       - run: pip install -r requirements.txt
 
-      - name: Install Bril tools
+      - name: Install Bril 
         run: cd; git clone https://github.com/sampsyo/bril.git
 
-      - name: Install deno
+      - name: Install deno and flit 
         run: |
           curl -fsSL https://deno.land/install.sh | sh
           echo 'export DENO_INSTALL="/home/runner/.deno"' >> ~/.bashrc
           echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
+          python3 -m pip install flit
 
    
       - name: Render and Publish
