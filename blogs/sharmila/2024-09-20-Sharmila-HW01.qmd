@@ -1,0 +1,153 @@
+---
+author: Sharmila Sivalingam
+format:
+ html: default
+title: Compiler Homework 01 - Trying Out Bril
+---
+
+# About Bril
+
+Bril is a simple educational intermediate representation (IR) language that is used to teach and experiment with compiler and programming language concepts. It provides a set of operations such as arithmetic and logical operations, and basic control flow structures like conditional branches and loops. The idea behind Bril is to keep things minimal and easy to understand, so we can focus on the core concepts of compilers without getting distracted by complicated features found in more advanced languages.
+
+Goal of this Homework is to get familiar with Bril, so I chose to a write a simple benchmark under core without getting inputs(args). 
+
+In this blog, I’ll walk you through two parts of my Homework 01 assignment where I first write a benchmark in Bril and then develop a tool to analyze Bril programs.
+
+# Part 1: Write a New Benchmark
+
+The first part of the assignment involved writing a new benchmark in Bril. This helped me get familiar with Bril’s control flow, syntax, and basic operations.
+
+Benchmark: addsqevenodd.bril
+
+The goal of this benchmark is to calculate the sum of squares of even and odd numbers from 1 to 10 separately. Here’s the Bril program I wrote by hand:
+
+```{html}
+
+@main {
+  sum_even: int = const 0;      
+  sum_odd: int = const 0;       
+  i: int = const 1;             
+  limit: int = const 10;        
+  one: int = const 1;           
+  two: int = const 2;           
+
+.loop:
+  square: int = mul i i;        
+  half: int = div i two;        
+  check: int = mul half two;    
+  is_even: bool = eq check i;   
+  br is_even .even_case .odd_case; 
+
+.even_case:
+  sum_even: int = add sum_even square; 
+  jmp .increment;
+
+.odd_case:
+  sum_odd: int = add sum_odd square;   
+
+.increment:
+  i: int = add i one;           
+  cond: bool = le i limit;      
+  br cond .loop .exit;          
+
+.exit:
+  print sum_even;               
+  print sum_odd;                
+}
+
+```
+
+This program defines a loop that iterates from 1 to 10, calculates the square of each number, and adds the result to two separate sums for even and odd numbers. Finally, it prints the sums of the squares of even and odd numbers
+
+After writing the program, I converted it to a JSON format, which is required for further processing:
+
+bril2json < addsqevenodd.bril > addsqevenodd.json
+
+During this step, I faced an issue where the Bril interpreter (brili) did not accept direct constant values in core instructions. To resolve this, I explicitly declared constants before using them in operations like add or mul. This was a good learning experience that reinforced the importance of proper initialization in IR.
+
+To automate testing, I used turnt to create a test output for this benchmark. I added the following command to a turnt.toml file:
+
+command = "bril2json < {filename} | brili -p {args}"
+
+This command runs the benchmark through brili, captures the output, and saves it in an output file. After creating the test, I ran:
+
+turnt --save addsqevenodd.bril
+
+This command saved the output in a file named addsqevenodd.out, which can be used for further validation.
+
+# Part 2: Write a Bril Analyzer
+
+In this part, I developed a small tool to analyze Bril programs using python. I chose to count the number of add and print instructions in the Bril program to better understand the operations performed in the code.
+
+Here’s the Python code I implemented to count the add and print instructions in a Bril program:
+
+```{python}
+import json
+import sys
+
+
+def count_add_instrs(bril_program):
+
+    count = 0
+    print = 0
+    for func in bril_program['functions']:
+        for instr in func['instrs']:
+            if 'op' in instr:
+                if instr['op'] == 'add':
+                    count += 1
+
+    return count
+
+def count_print_instrs(bril_program):
+
+    printcount = 0
+    for func in bril_program['functions']:
+        for instr in func['instrs']:
+            if 'op' in instr:
+                if instr['op'] == 'print':
+                    printcount += 1
+                    
+    return printcount
+
+if __name__ == "__main__":
+
+    json_file = "/home/sharmila_ubuntu/Compiler HW 01/addsqevenodd.json"
+    with open(json_file,'r') as f:
+        bril_program = json.load(f)
+    count = count_add_instrs(bril_program)
+    print(f"Number of add instructions in addsqevenodd.json file : {count}")
+    printcount = count_print_instrs(bril_program)
+    print(f"Number of print instructions in addsqevenodd.json file : {printcount}")
+
+
+```
+
+This script loads the Bril program in JSON format, iterates over its instructions, and counts how many add and print operations are present.
+
+I tested my analyzer using turnt by adding the following command to the turnt.toml file:
+
+command = "bril2json < {filename} | python3 analyzebril.py"
+
+This command takes the Bril program, converts it to JSON, and runs my Python script (analyzebril.py) to analyze the JSON file. The output file generated by this process contains the number of add and print instructions in the program.
+
+# Conclusion: Summary of this Homework 01
+
+* Part 1: I wrote a benchmark (addsqevenodd.bril) that computes the sum of squares of even and odd numbers from 1 to 10 separately. I used bril2json to convert the program into JSON and ran it with brili. I also used turnt to create an automated test for the benchmark.
+
+* Part 2: I created a Python tool to analyze the Bril program. The tool counts add and print instructions in the JSON representation of the Bril program. I tested the tool using turnt, ensuring it ran correctly.
+
+# Test and Results:
+
+To verify this analyzer I tested with 3 example: 
+(obtained the later two examples from (https://github.com/sampsyo/bril/tree/main/benchmarks)
+
+* Initially, I used my benchmark to test the implementation, that is, using both the addsqevenodd.bril file and its corresponding json file (addsqevenodd.json). The analyzed correctly counted 3 add instructions and 2 print instructions.
+
+* And then, I verified using bubblesort.bril, loading it's json file and analyzed correctly as 8 add instructions and 1 print instruction.
+
+* Finally, I verifies using mat-inv.bril, loading it's json file and analyzed correctly as 12 add instruction and 2 print instruction.
+
+# Challenges Faced and Solution: 
+
+The hardest part of this task was dealing with the restriction on directly using constants in core Bril instructions. I initially overlooked this, but after debugging, I realized that every constant had to be initialized in a separate instruction. This helped me better understand Bril’s structure and rules. 
+Moreover, learning to use turnt for automating tests was a valuable lesson, as it streamlines the testing process significantly.
