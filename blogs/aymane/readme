@@ -1,0 +1,255 @@
+---
+author: Aymane El Jerari
+format:
+  html: default
+title: Homework 1 -- Trying Out Bril
+
+---
+
+# Part 1
+
+To compile from typescript to bril and execute the program run the following:
+
+```
+$ ts2bril bench.ts > bench.bril && brili < bench.bril
+727
+```
+
+The typescript benchmark I wrote performs a series of simple arithmetic, logical and alu operations. The function outputs `727` with the default input value 10.
+
+## Passing Command Line Arugments
+When writing the typescript benchmark, the input function argument was hardcoded to have value `10`. So I couldn't parametrized the `turnt` tests. I wanted to figure out a way to pass the input as a command line argument from `stdin` in order to generate different tests. Now I could do this by importing a typescript package to handle user input. But I've decided to manually modify my benchmark at the bril level.
+
+Initially, the typescript benchmark I wrote resulted in the following bril ir:
+
+`bench.bril`:
+```
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        {
+          "op": "const",
+          "value": 10,
+          "dest": "v31",
+          "type": "int"
+        },
+        ...
+      ]
+      "args": []
+    },
+    ...
+  ]
+}
+```
+
+The value 10 is passed in as a constant to main. In order to parametrize it, a few things need to be modified. First, we need to change the `op` field from `const` to `id`. As explained in the [bril documentation](https://capra.cs.cornell.edu/bril/lang/core.html#miscellaneous), the `id` opcode is a type-insensitive identity we can use to pass variables around. Additonally, we also need specify the arguments passed to main. To do so, we pass a argument to the function. So the new bril representation becomes:
+
+`bench-param.bril`:
+```
+{
+  "functions": [
+    {
+      "name": "main",
+      "args": [
+        {
+          "name": "val",
+          "type": "int"
+        }
+      ],
+      "instrs": [
+        {
+          "args": [
+            "val"
+          ],
+          "dest": "v31",
+          "op": "id",
+          "type": "int"
+        }, 
+      ],
+    },
+    ...
+  ]
+}
+
+```
+
+Now we can pass any value to the function:
+```
+$ brili < bench-param.bril 12
+2796
+```
+
+To more easily view these changes, let's look at the text formatting of bril by running these commands to convert from json to text.
+
+```
+$ bril2txt < bench.bril > bench.txt && bril2txt < bench-param.bril > bench-param.txt
+```
+
+`bench.txt`
+```
+@main {
+  v31: int = const 10;
+  ...
+}
+```
+
+`bench-param.txt`
+```
+@main(val: int) {
+  v31: int = id val;
+  ...
+}
+```
+
+# Part 2
+
+I wrote a `find_op(bril_file, op)` function that takes as input the bril json formated file as well as the opcode of the target instruction. The fuction returns all occurencens of the input opcode.  
+
+```
+def find_op(bril_file, op):
+    add_instrs = []
+    
+    functions = bril_file.get('functions', [])
+
+    for function in functions:
+        instrs = function.get('instrs', [])
+        num_instrs = len(instrs)
+        
+        print(f"Function '{function['name']}' has {num_instrs} instructions.")
+        
+        for instr in instrs:
+            if instr.get('op') == op:
+                add_instrs.append(instr)
+
+    return add_instrs
+
+find_op(bril_file, "br")
+
+ ---------------
+|    OUTPUT     |
+ ---------------
+
+Function 'main' has 6 instructions.
+Function 'benchmark' has 54 instructions.
+
+[{'op': 'br', 'args': ['v7'], 'labels': ['for.body.3', 'for.end.3']},
+ {'op': 'br', 'args': ['v20'], 'labels': ['then.17', 'else.17']}]
+```
+
+The second function `count_instruction_types(bril_file)` returns the number of occurences for all opcodes.
+
+```
+def count_instruction_types(bril_file):
+    instruction_count = {}
+    
+    functions = bril_file.get('functions', [])
+
+    for function in functions:
+        instrs = function.get('instrs', [])
+        
+        for instr in instrs:
+            op_type = instr.get('op')
+            if op_type:
+
+                instruction_count[op_type] = instruction_count.get(op_type, 0) + 1
+
+    return instruction_count
+
+count_instruction_types(bril_file)
+
+
+ ---------------
+|    OUTPUT     |
+ ---------------
+
+{'const': 10,
+ 'call': 1,
+ 'id': 25,
+ 'print': 1,
+ 'lt': 1,
+ 'br': 2,
+ 'add': 3,
+ 'mul': 1,
+ 'sub': 2,
+ 'eq': 1,
+ 'jmp': 2,
+ 'ret': 1}
+```
+
+The last function `insert_before_op_code(bril_json, target_op_code):` takes as input the json formatted bril, and an instruction opcode, then proceeds to insert the following instructions before every occurence of the opcode:
+
+```
+{"op": "id", 
+  "dest": "v30", 
+  "type": "int", 
+  "args": ["i"]},
+{"op": "print", 
+  "args": ["v30"]}
+```
+
+The first instruction loads the value `i` into `v30`, which is the loop iterator. Then prints out the value.
+
+```
+def insert_before_op_code(bril_file, target_op_code):
+    functions = bril_file.get('functions', [])
+
+    for function in functions:
+        instrs = function.get('instrs', [])
+
+        modified_instrs = []
+
+        for instr in instrs:
+            if instr.get('op') == target_op_code:
+                modified_instrs.append({"op": "id", 
+                                        "dest": "v30", 
+                                        "type": "int", 
+                                        "args": ["i"]})
+                                        
+                modified_instrs.append({"op": "print", 
+                                         "args": ["v30"]})
+
+            modified_instrs.append(instr)
+
+        function['instrs'] = modified_instrs
+
+    return bril_file
+
+with open('bench.bril', 'r') as file:
+    bril_file = json.load(file)
+
+print_after_jmp = insert_before_op_code(bril_file, "jmp")
+print(print_after_jmp)
+
+with open("bench-print-after-jmp.bril", 'w') as file:
+    json.dump(print_after_jmp, file)
+```
+The implementation below adds print statements before `jmp` instructions, then saves the new program (with added print statements) into a new file called `bench-print-before-jmp.bril`.
+
+To execute the new program, run:
+
+```
+$ brili < bench-print-before-jmp.bril
+
+ ---------------
+|    OUTPUT     |
+ ---------------
+
+0
+1
+2
+2
+3
+4
+4
+5
+6
+6
+7
+8
+8
+9
+10
+727
+```
