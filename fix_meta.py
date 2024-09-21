@@ -122,8 +122,7 @@ for file in files:
 
     # Check if 'blogs' is in the directory path
     if 'blogs' in directory:
-        print(f"'blogs' found in directory path: {directory}")
-        yaml_template = yaml.safe_load(yaml_for_blogs)
+        continue
 
 
     if directory.endswith('lectures'):
