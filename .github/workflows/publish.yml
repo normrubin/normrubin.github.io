@@ -27,9 +27,8 @@ jobs:
 
       - name: Install Bril tools
         run: cd; git clone https://github.com/sampsyo/bril.git
+        run: cd; curl -fsSL https://deno.land/install.sh | sh
 
-      - name: install Bril tools return 
-        run:  pwd
 
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
