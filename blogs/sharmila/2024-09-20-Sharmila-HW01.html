@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Sharmila Sivalingam">
 
-<title>brench – EECE7398 Fall 2024</title>
+<title>Compiler Homework 01 - Trying Out Bril – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,25 +21,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../../../">
-<script src="../../../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" rel="next">
+<link href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -67,7 +104,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="EECE7398 Fall 2024">
+<meta property="og:title" content="Compiler Homework 01 - Trying Out Bril – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -81,9 +118,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      EECE7398 Fall 2024
-      </li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Compiler Homework 01 - Trying Out Bril</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -98,7 +133,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../../../../">EECE7398 Fall 2024</a> 
+      <a href="../../">EECE7398 Fall 2024</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -119,47 +154,47 @@ ul.task-list li input[type="checkbox"] {
       <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../weekly.html" class="sidebar-item-text sidebar-link">
+  <a href="../../weekly.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Weekly Schedule</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
+  <a href="../../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How to submit assignments</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Blogs</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework1 - Sana</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">sample blog with an image and a graph</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../blogs/junk.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/junk.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">sample blog</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Oscar</span></a>
+ <span class="menu-text">Michael</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -167,75 +202,25 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HW1 - Trying Out Bril</span></a>
+  <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
-      </ul>
-  </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Homework</span></a>
+ <span class="menu-text">Oscar</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../homework/1.hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 1 trying out bril</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/2_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 2 local optimizations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/3_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 3 data flow</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/4_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">homework dominance</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/5_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 5 SSA</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 6 loop optimization</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/dynamic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">homework 7 dynamic compile</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/hw0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">homework 0</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../../../homework/project.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">project</span></a>
+  <a href="../../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HW1 - Trying Out Bril</span></a>
   </div>
 </li>
       </ul>
@@ -243,153 +228,288 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
- <span class="menu-text">Lectures</span></a>
+ <span class="menu-text">Qucheng</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1: Exploring Bril</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Rohit</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Sharmila</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Compiler Homework 01 - Trying Out Bril</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Yashaswini</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework1 - Yashaswini</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Homework</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/1.hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1 trying out bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/2_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2 local optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/3_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3 data flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/4_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/5_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5 SSA</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 6 loop optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/dynamic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework 7 dynamic compile</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/hw0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework 0</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">project</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lectures</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement part 1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement part 2</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Representation of programs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview of Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/03_local.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/03_local.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">local value numbering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/05_global.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05_global.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">5 Global Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">loop invariant code motion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">_ partial_redundancy elimination</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Static Single Assignment</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">7 LLVM</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">8 classic loop optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Polyhedral Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">10 MLIR</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">11 Whole program</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Dynamic Memory Management</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Dynamic Compilers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">GPU Compilers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/mlir.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/mlir.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Polyhedral Compilation Opportunities in MLIR</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Testing Register allocators</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../../../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Register Allocation</span></a>
   </div>
 </li>
@@ -424,61 +544,153 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Compiler Homework 01 - Trying Out Bril</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Compiler Homework 01 - Trying Out Bril</h1>
+</div>
 
 
 
-<section id="brench" class="level1">
-<h1>Brench</h1>
-<p>Brench is a simple benchmark runner to help you measure the impact of optimizations. It can run the same set of benchmarks under multiple treatments, check that they still produce the correct answer, and report their performance under every condition.</p>
-<section id="set-up" class="level2">
-<h2 class="anchored" data-anchor-id="set-up">Set Up</h2>
-<p>Brench is a Python tool. There is a <code>brench/</code> subdirectory in the Bril repository. Get <a href="https://flit.readthedocs.io/">Flit</a> and then type:</p>
-<pre><code>$ flit install --symlink --user</code></pre>
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Sharmila Sivalingam </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="about-bril" class="level1">
+<h1>About Bril</h1>
+<p>Bril is a simple educational intermediate representation (IR) language that is used to teach and experiment with compiler and programming language concepts. It provides a set of operations such as arithmetic and logical operations, and basic control flow structures like conditional branches and loops. The idea behind Bril is to keep things minimal and easy to understand, so we can focus on the core concepts of compilers without getting distracted by complicated features found in more advanced languages.</p>
+<p>Goal of this Homework is to get familiar with Bril, so I chose to a write a simple benchmark under core without getting inputs(args).</p>
+<p>In this blog, I’ll walk you through two parts of my Homework 01 assignment where I first write a benchmark in Bril and then develop a tool to analyze Bril programs.</p>
 </section>
-<section id="configure" class="level2">
-<h2 class="anchored" data-anchor-id="configure">Configure</h2>
-<p>Write a configuration file using <a href="https://toml.io/">TOML</a>. Start with something like this:</p>
-<pre><code>extract = 'total_dyn_inst: (\d+)'
-benchmarks = '../benchmarks/*.bril'
+<section id="part-1-write-a-new-benchmark" class="level1">
+<h1>Part 1: Write a New Benchmark</h1>
+<p>The first part of the assignment involved writing a new benchmark in Bril. This helped me get familiar with Bril’s control flow, syntax, and basic operations.</p>
+<p>Benchmark: addsqevenodd.bril</p>
+<p>The goal of this benchmark is to calculate the sum of squares of even and odd numbers from 1 to 10 separately. Here’s the Bril program I wrote by hand:</p>
+<pre class="{html}"><code>
+@main {
+  sum_even: int = const 0;      
+  sum_odd: int = const 0;       
+  i: int = const 1;             
+  limit: int = const 10;        
+  one: int = const 1;           
+  two: int = const 2;           
 
-[runs.baseline]
-pipeline = [
-    "bril2json",
-    "brili -p {args}",
-]
+.loop:
+  square: int = mul i i;        
+  half: int = div i two;        
+  check: int = mul half two;    
+  is_even: bool = eq check i;   
+  br is_even .even_case .odd_case; 
 
-[runs.myopt]
-pipeline = [
-    "bril2json",
-    "myopt",
-    "brili -p {args}",
-]</code></pre>
-<p>The global options are:</p>
-<ul>
-<li><code>extract</code>: A regular expression to extract the figure of merit from a given run of a given benchmark. The example above gets the simple profiling output from <a href="../../../../src/briltxt/docs/tools/interp.html">the Bril interpreter</a> in <code>-p</code> mode.</li>
-<li><code>benchmarks</code> (optional): A shell glob matching the benchmark files to run. You can also specify the files on the command line (see below).</li>
-<li><code>timeout</code> (optional): The timeout of each benchmark run in seconds. Default of 5 seconds.</li>
-</ul>
-<p>Then, define an map of <em>runs</em>, which are the different treatments you want to give to each benchmark. Each one needs a <code>pipeline</code>, which is a list of shell commands to run in a pipelined fashion on the benchmark file, which Brench will send to the first command’s standard input. The first run constitutes the “golden” output; subsequent runs will need to match this output.</p>
-<p>Run</p>
-<hr>
-<p>Just give Brench your config file and it will give you results as a CSV:</p>
-<pre><code>$ brench example.toml &gt; results.csv</code></pre>
-<p>You can also specify a list of files after the configuration file to run a specified list of benchmarks, ignoring the pre-configured glob in the configuration file.</p>
-<p>The command has only one command-line option:</p>
-<ul>
-<li><code>--jobs</code> or <code>-j</code>: The number of parallel jobs to run. Set to 1 to run everything sequentially. By default, Brench tries to guess an adequate number of threads to fill up your machine.</li>
-</ul>
-<p>The output CSV has three columns: <code>benchmark</code>, <code>run</code>, and <code>result</code>. The latter is the value extracted from the run’s standard output and standard error using the <code>extract</code> regular expression or one of these three status indicators:</p>
-<ul>
-<li><code>incorrect</code>: The output did not match the “golden” output (from the first run).</li>
-<li><code>timeout</code>: Execution took too long.</li>
-<li><code>missing</code>: The <code>extract</code> regex did not match in the final pipeline stage’s standard output or standard error.</li>
-</ul>
-<p>To check that a run’s output is “correct,” Brench compares its standard output to that of the first run (<code>baseline</code> in the above example, but it’s whichever run configuration comes first). The comparison is an exact string match.</p>
+.even_case:
+  sum_even: int = add sum_even square; 
+  jmp .increment;
 
+.odd_case:
+  sum_odd: int = add sum_odd square;   
 
+.increment:
+  i: int = add i one;           
+  cond: bool = le i limit;      
+  br cond .loop .exit;          
+
+.exit:
+  print sum_even;               
+  print sum_odd;                
+}
+</code></pre>
+<p>This program defines a loop that iterates from 1 to 10, calculates the square of each number, and adds the result to two separate sums for even and odd numbers. Finally, it prints the sums of the squares of even and odd numbers</p>
+<p>After writing the program, I converted it to a JSON format, which is required for further processing:</p>
+<p>bril2json &lt; addsqevenodd.bril &gt; addsqevenodd.json</p>
+<p>During this step, I faced an issue where the Bril interpreter (brili) did not accept direct constant values in core instructions. To resolve this, I explicitly declared constants before using them in operations like add or mul. This was a good learning experience that reinforced the importance of proper initialization in IR.</p>
+<p>To automate testing, I used turnt to create a test output for this benchmark. I added the following command to a turnt.toml file:</p>
+<p>command = “bril2json &lt; {filename} | brili -p {args}”</p>
+<p>This command runs the benchmark through brili, captures the output, and saves it in an output file. After creating the test, I ran:</p>
+<p>turnt –save addsqevenodd.bril</p>
+<p>This command saved the output in a file named addsqevenodd.out, which can be used for further validation.</p>
 </section>
+<section id="part-2-write-a-bril-analyzer" class="level1">
+<h1>Part 2: Write a Bril Analyzer</h1>
+<p>In this part, I developed a small tool to analyze Bril programs using python. I chose to count the number of add and print instructions in the Bril program to better understand the operations performed in the code.</p>
+<p>Here’s the Python code I implemented to count the add and print instructions in a Bril program:</p>
+<div id="3927f811" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_add_instrs(bril_program):</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> func <span class="kw">in</span> bril_program[<span class="st">'functions'</span>]:</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> instr <span class="kw">in</span> func[<span class="st">'instrs'</span>]:</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">'op'</span> <span class="kw">in</span> instr:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> instr[<span class="st">'op'</span>] <span class="op">==</span> <span class="st">'add'</span>:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                    count <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> count</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_print_instrs(bril_program):</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    printcount <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> func <span class="kw">in</span> bril_program[<span class="st">'functions'</span>]:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> instr <span class="kw">in</span> func[<span class="st">'instrs'</span>]:</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">'op'</span> <span class="kw">in</span> instr:</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> instr[<span class="st">'op'</span>] <span class="op">==</span> <span class="st">'print'</span>:</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                    printcount <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                    </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> printcount</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    json_file <span class="op">=</span> <span class="st">"/home/sharmila_ubuntu/Compiler HW 01/addsqevenodd.json"</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(json_file,<span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        bril_program <span class="op">=</span> json.load(f)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    count <span class="op">=</span> count_add_instrs(bril_program)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Number of add instructions in addsqevenodd.json file : </span><span class="sc">{</span>count<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    printcount <span class="op">=</span> count_print_instrs(bril_program)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Number of print instructions in addsqevenodd.json file : </span><span class="sc">{</span>printcount<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This script loads the Bril program in JSON format, iterates over its instructions, and counts how many add and print operations are present.</p>
+<p>I tested my analyzer using turnt by adding the following command to the turnt.toml file:</p>
+<p>command = “bril2json &lt; {filename} | python3 analyzebril.py”</p>
+<p>This command takes the Bril program, converts it to JSON, and runs my Python script (analyzebril.py) to analyze the JSON file. The output file generated by this process contains the number of add and print instructions in the program.</p>
+</section>
+<section id="conclusion-summary-of-this-homework-01" class="level1">
+<h1>Conclusion: Summary of this Homework 01</h1>
+<ul>
+<li><p>Part 1: I wrote a benchmark (addsqevenodd.bril) that computes the sum of squares of even and odd numbers from 1 to 10 separately. I used bril2json to convert the program into JSON and ran it with brili. I also used turnt to create an automated test for the benchmark.</p></li>
+<li><p>Part 2: I created a Python tool to analyze the Bril program. The tool counts add and print instructions in the JSON representation of the Bril program. I tested the tool using turnt, ensuring it ran correctly.</p></li>
+</ul>
+</section>
+<section id="test-and-results" class="level1">
+<h1>Test and Results:</h1>
+<p>To verify this analyzer I tested with 3 example: (obtained the later two examples from (https://github.com/sampsyo/bril/tree/main/benchmarks)</p>
+<ul>
+<li><p>Initially, I used my benchmark to test the implementation, that is, using both the addsqevenodd.bril file and its corresponding json file (addsqevenodd.json). The analyzed correctly counted 3 add instructions and 2 print instructions.</p></li>
+<li><p>And then, I verified using bubblesort.bril, loading it’s json file and analyzed correctly as 8 add instructions and 1 print instruction.</p></li>
+<li><p>Finally, I verifies using mat-inv.bril, loading it’s json file and analyzed correctly as 12 add instruction and 2 print instruction.</p></li>
+</ul>
+</section>
+<section id="challenges-faced-and-solution" class="level1">
+<h1>Challenges Faced and Solution:</h1>
+<p>The hardest part of this task was dealing with the restriction on directly using constants in core Bril instructions. I initially overlooked this, but after debugging, I realized that every constant had to be initialized in a separate instruction. This helped me better understand Bril’s structure and rules. Moreover, learning to use turnt for automating tests was a valuable lesson, as it streamlines the testing process significantly.</p>
+
+
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -902,6 +1114,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="pagination-link" aria-label="Homework 1">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 1</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="pagination-link" aria-label="Homework1 - Yashaswini">
+        <span class="nav-page-text">Homework1 - Yashaswini</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

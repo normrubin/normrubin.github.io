@@ -155,23 +155,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="lets-look-at-a-bril-program." class="level2">
 <h2 class="anchored" data-anchor-id="lets-look-at-a-bril-program.">Lets look at a bril program.</h2>
 <p>Bril is written in JSON format. Almost all programming languages have a way to read json.</p>
-<div id="e9a8d70b" class="cell" data-execution_count="1">
+<div id="fd26d35d" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os </span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># read from a file </span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>,<span class="st">"r"</span>) <span class="im">as</span> f:</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    bril_program <span class="op">=</span> json.load(f)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># read from a pipe</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># bril_program = json.load(sys.stdin)</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(bril_program, </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    indent<span class="op">=</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">### temp </span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> subprocess.check_output(<span class="st">'which python'</span>, shell<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(out)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'***********************'</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># read from a file </span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"images/add.json"</span>,<span class="st">"r"</span>) <span class="im">as</span> f:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    bril_program <span class="op">=</span> json.load(f)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># read from a pipe</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># bril_program = json.load(sys.stdin)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(json.dumps(bril_program, </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    indent<span class="op">=</span><span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>{
+<pre><code>b'/opt/hostedtoolcache/Python/3.10.15/x64/bin/python\n'
+***********************
+{
   "functions": [
     {
       "name": "main",
@@ -274,11 +282,11 @@ deno install --allow-env --allow-read ts2bril.ts
 <pre><code>cd bril-txt
 flit install --symlink --user</code></pre>
 <p>run json to text</p>
-<pre class="{bash}"><code>bril2txt &lt; images/add.json</code></pre>
+<pre><code>bril2txt &lt; images/add.json</code></pre>
 </section>
 <section id="connect-tools-via-pipes" class="level2">
 <h2 class="anchored" data-anchor-id="connect-tools-via-pipes">connect tools via pipes</h2>
-<pre class="{bash}"><code>cat images/add.json'
+<pre><code>cat images/add.json'
 bril2txt &lt; images/add.json | bril2json</code></pre>
 </section>
 <section id="other-tools" class="level2">
@@ -377,7 +385,7 @@ for each basic block
 <p>Given a list of Bril instructions, generate a sequence of instruction lists representing the basic blocks in the program.</p>
 <p>Every instruction in <code>instr</code> will show up in exactly one block. Jump and branch instructions may only appear at the end of a block, and control can transfer only to the top of a basic block—so labels can only appear at the <em>start</em> of a basic block. Basic blocks may not be empty.</p>
 <hr>
-<div id="10eaf3d6" class="cell" data-execution_count="2">
+<div id="0b8cb90f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Instructions that terminate a basic block.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    TERMINATORS <span class="op">=</span> <span class="st">'br'</span>, <span class="st">'jmp'</span>, <span class="st">'ret'</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -412,7 +420,7 @@ for each basic block
 </section>
 <section id="as-a-test-lets-print-out-the-blocks" class="level2">
 <h2 class="anchored" data-anchor-id="as-a-test-lets-print-out-the-blocks">as a test, lets print out the blocks</h2>
-<div id="f2a22ee2" class="cell" data-execution_count="3">
+<div id="52380acc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> print_blocks(bril):</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Given a Bril program, print out its basic blocks.</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
@@ -458,7 +466,7 @@ for each basic block
 <h2 class="anchored" data-anchor-id="running-commands-inside-python">running commands inside python</h2>
 <p>GitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.</p>
 <hr>
-<div id="97d6d2b4" class="cell" data-output-location="fragment" data-execution_count="4">
+<div id="136bc6a6" class="cell" data-output-location="fragment" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Run a command and capture its output</span></span>
@@ -470,54 +478,54 @@ for each basic block
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(output_str)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>total 596
--rw-r--r-- 1 runner docker 40847 Sep 20 15:42 010_compiler_overview.html
--rw-r--r-- 1 runner docker 11163 Sep 20 15:42 010_compiler_overview.qmd
--rw-r--r-- 1 runner docker  3000 Sep 20 15:42 01a1_performance_measurement.qmd
--rw-r--r-- 1 runner docker  3000 Sep 20 15:42 01a2_performance_measurement.qmd
--rw-r--r-- 1 runner docker  4134 Sep 20 15:42 01a_performance_measurement.qmd
--rw-r--r-- 1 runner docker  7413 Sep 20 15:42 02a_representation.qmd
--rw-r--r-- 1 runner docker 13675 Sep 20 15:42 02b_bril.qmd
--rw-r--r-- 1 runner docker 24233 Sep 20 15:42 02b_bril.quarto_ipynb
--rw-r--r-- 1 runner docker 12742 Sep 20 15:42 03_local.qmd
--rw-r--r-- 1 runner docker 13488 Sep 20 15:42 03b_local_value_numbering.qmd
--rw-r--r-- 1 runner docker  5154 Sep 20 15:42 04_data_flow.qmd
--rw-r--r-- 1 runner docker  9974 Sep 20 15:42 05_global.qmd
--rw-r--r-- 1 runner docker  4875 Sep 20 15:42 05b_licm.qmd
--rw-r--r-- 1 runner docker 33595 Sep 20 15:42 05c_pre.html
--rw-r--r-- 1 runner docker  3148 Sep 20 15:42 05c_pre.qmd
--rw-r--r-- 1 runner docker 16413 Sep 20 15:42 06_ssa.qmd
--rwxr-xr-x 1 runner docker 29710 Sep 20 15:41 07_llvm.ipynb
--rw-r--r-- 1 runner docker  5691 Sep 20 15:42 08_classic_loop_ops.qmd
--rwxr-xr-x 1 runner docker 32457 Sep 20 15:42 09_poly.qmd
--rw-r--r-- 1 runner docker   302 Sep 20 15:42 100_mlir.qmd
--rw-r--r-- 1 runner docker   320 Sep 20 15:42 110_whole_program.qmd
--rw-r--r-- 1 runner docker 21228 Sep 20 15:42 12_memory.html
--rw-r--r-- 1 runner docker   316 Sep 20 15:42 12_memory.qmd
--rw-r--r-- 1 runner docker 16077 Sep 20 15:42 13_dynamic_compilers.qmd
--rw-r--r-- 1 runner docker 10116 Sep 20 15:42 14_gpu_compilers.qmd
--rw-r--r-- 1 runner docker  4682 Sep 20 15:41 a.json
--rw-r--r-- 1 runner docker   248 Sep 20 15:41 a.ts
-drwxr-xr-x 2 runner docker  4096 Sep 20 15:41 df
--rw-r--r-- 1 runner docker  4595 Sep 20 15:41 errors
--rw-r--r-- 1 runner docker  3623 Sep 20 15:41 foo.ll
--rw-r--r-- 1 runner docker  2296 Sep 20 15:41 identity.bc
-drwxr-xr-x 2 runner docker  4096 Sep 20 15:41 images
--rw-r--r-- 1 runner docker  2260 Sep 20 15:42 mlir.qmd
-drwxr-xr-x 2 runner docker  4096 Sep 20 15:41 papers
-drwxr-xr-x 2 runner docker  4096 Sep 20 15:41 ra
--rw-r--r-- 1 runner docker  8226 Sep 20 15:42 ra-checking.qmd
--rw-r--r-- 1 runner docker  7965 Sep 20 15:42 register_allocation.qmd
--rw-r--r-- 1 runner docker 52254 Sep 20 15:42 revealjs_010_compiler_overview.qmd.html
--rw-r--r-- 1 runner docker 44624 Sep 20 15:42 revealjs_05c_pre.qmd.html
--rw-r--r-- 1 runner docker 33176 Sep 20 15:42 revealjs_12_memory.qmd.html
--rw-r--r-- 1 runner docker 22316 Sep 20 15:41 xx
+-rw-r--r-- 1 runner docker 40847 Sep 21 15:46 010_compiler_overview.html
+-rw-r--r-- 1 runner docker 11163 Sep 21 15:46 010_compiler_overview.qmd
+-rw-r--r-- 1 runner docker  3000 Sep 21 15:46 01a1_performance_measurement.qmd
+-rw-r--r-- 1 runner docker  3000 Sep 21 15:46 01a2_performance_measurement.qmd
+-rw-r--r-- 1 runner docker  4134 Sep 21 15:46 01a_performance_measurement.qmd
+-rw-r--r-- 1 runner docker  7413 Sep 21 15:46 02a_representation.qmd
+-rw-r--r-- 1 runner docker 13777 Sep 21 15:46 02b_bril.qmd
+-rw-r--r-- 1 runner docker 23797 Sep 21 15:46 02b_bril.quarto_ipynb
+-rw-r--r-- 1 runner docker 12742 Sep 21 15:46 03_local.qmd
+-rw-r--r-- 1 runner docker 13488 Sep 21 15:46 03b_local_value_numbering.qmd
+-rw-r--r-- 1 runner docker  5154 Sep 21 15:46 04_data_flow.qmd
+-rw-r--r-- 1 runner docker  9974 Sep 21 15:46 05_global.qmd
+-rw-r--r-- 1 runner docker  4875 Sep 21 15:46 05b_licm.qmd
+-rw-r--r-- 1 runner docker 33595 Sep 21 15:46 05c_pre.html
+-rw-r--r-- 1 runner docker  3148 Sep 21 15:46 05c_pre.qmd
+-rw-r--r-- 1 runner docker 16413 Sep 21 15:46 06_ssa.qmd
+-rwxr-xr-x 1 runner docker 29710 Sep 21 15:45 07_llvm.ipynb
+-rw-r--r-- 1 runner docker  5691 Sep 21 15:46 08_classic_loop_ops.qmd
+-rwxr-xr-x 1 runner docker 32457 Sep 21 15:46 09_poly.qmd
+-rw-r--r-- 1 runner docker   302 Sep 21 15:46 100_mlir.qmd
+-rw-r--r-- 1 runner docker   320 Sep 21 15:46 110_whole_program.qmd
+-rw-r--r-- 1 runner docker 21228 Sep 21 15:46 12_memory.html
+-rw-r--r-- 1 runner docker   316 Sep 21 15:46 12_memory.qmd
+-rw-r--r-- 1 runner docker 16077 Sep 21 15:46 13_dynamic_compilers.qmd
+-rw-r--r-- 1 runner docker 10116 Sep 21 15:46 14_gpu_compilers.qmd
+-rw-r--r-- 1 runner docker  4682 Sep 21 15:45 a.json
+-rw-r--r-- 1 runner docker   248 Sep 21 15:45 a.ts
+drwxr-xr-x 2 runner docker  4096 Sep 21 15:45 df
+-rw-r--r-- 1 runner docker  4595 Sep 21 15:45 errors
+-rw-r--r-- 1 runner docker  3623 Sep 21 15:45 foo.ll
+-rw-r--r-- 1 runner docker  2296 Sep 21 15:45 identity.bc
+drwxr-xr-x 2 runner docker  4096 Sep 21 15:45 images
+-rw-r--r-- 1 runner docker  2260 Sep 21 15:46 mlir.qmd
+drwxr-xr-x 2 runner docker  4096 Sep 21 15:45 papers
+drwxr-xr-x 2 runner docker  4096 Sep 21 15:45 ra
+-rw-r--r-- 1 runner docker  8226 Sep 21 15:46 ra-checking.qmd
+-rw-r--r-- 1 runner docker  7965 Sep 21 15:46 register_allocation.qmd
+-rw-r--r-- 1 runner docker 52254 Sep 21 15:46 revealjs_010_compiler_overview.qmd.html
+-rw-r--r-- 1 runner docker 44624 Sep 21 15:46 revealjs_05c_pre.qmd.html
+-rw-r--r-- 1 runner docker 33176 Sep 21 15:46 revealjs_12_memory.qmd.html
+-rw-r--r-- 1 runner docker 22316 Sep 21 15:45 xx
 </code></pre>
 </div>
 </div>
 </section>
 <section id="print-the-blocks" class="level2">
 <h2 class="anchored" data-anchor-id="print-the-blocks">print the blocks</h2>
-<div id="346fddc0" class="cell" data-output-location="fragment" data-execution_count="5">
+<div id="65d35d4b" class="cell" data-output-location="fragment" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json </span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
@@ -538,7 +546,7 @@ block somewhere
 </section>
 <section id="the-map-label-names-to-blocks" class="level2">
 <h2 class="anchored" data-anchor-id="the-map-label-names-to-blocks">the map (label names to blocks)</h2>
-<div id="9f91dd2e" class="cell" data-execution_count="6">
+<div id="8cb7c6ce" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -598,7 +606,7 @@ for i,block in enumerate(blocks)  # blocks is a ordereddict
 </section>
 <section id="cfg" class="level2">
 <h2 class="anchored" data-anchor-id="cfg">cfg</h2>
-<div id="a0500741" class="cell" data-execution_count="7">
+<div id="e1745f2d" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_cfg(ordered_blocks):</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    cfg <span class="op">=</span> {}</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
