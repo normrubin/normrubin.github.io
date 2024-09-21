@@ -29,9 +29,12 @@ jobs:
         run: cd; git clone https://github.com/sampsyo/bril.git
 
       - name: Install deno
-        run: cd; curl -fsSL https://deno.land/install.sh | sh
+        run: |
+          curl -fsSL https://deno.land/install.sh | sh
+          echo 'export DENO_INSTALL="/home/runner/.deno"' >> ~/.bashrc
+          echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
 
-
+   
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
