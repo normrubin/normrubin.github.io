@@ -28,6 +28,9 @@ jobs:
       - name: Install Bril tools
       - run: cd ; pwd
 
+      - name: install Bril tools
+        run:  pwd
+
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:
