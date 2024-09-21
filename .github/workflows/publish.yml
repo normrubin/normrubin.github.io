@@ -41,6 +41,7 @@ jobs:
           cd ~/bril
           echo "DENO_INSTALL=/home/runner/.deno" >> $GITHUB_ENV
           echo "PATH=/home/runner/.deno/bin:$PATH" >> $GITHUB_ENV
+          source ~/.bashrc
           deno install --allow-env --allow-read ts2bril.ts
 
        
