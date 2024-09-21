@@ -1,0 +1,298 @@
+ ---
+author: Yashaswini Makaram
+format:
+  html: default
+title: Homework1 - Yashaswini
+
+---
+
+ 
+# Part 1
+
+I created a program that iterates through an array of values both suming and multiplying the values.
+
+## About the Code
+
+the code was written in text forma ns used a pointer to initialize the array.  store and load instructions were used to access the array and 
+.loop with a jmp was used for the iterations
+
+
+## Testing
+
+The code was tested with different size arrays with the answers check using an external calculator.
+
+## Challenges 
+
+The main challenge for this was finding the best way to populate the array with values.  brili is very simple and using just stores and loads to index into the array gave added complexity.
+
+# Part 2
+
+My python tool accomplished 2 functions:
+
+- **1.**  Count the number on and instrucitons in the bril code
+
+- **2.**  Add a print instruction before every `jmp`
+
+
+
+## Python Tool
+The python tool was run on the a new add.json file based off of my benchmark from part 1
+
+```{python}
+import json
+
+def load_bril_program(filename):
+    """Load the Bril program from a JSON file."""
+    with open(filename, 'r') as file:
+        return json.load(file)
+
+def count_add_instructions(program):
+    """Count the number of 'add' instructions in the Bril program."""
+    add_count = 0
+    for func in program['functions']:
+        for instr in func['instrs']:
+            if instr.get('op') == 'add':
+                add_count += 1
+    return add_count
+
+def add_print_before_jumps(program):
+    """Insert a 'print' instruction before every 'jmp' instruction."""
+    for func in program['functions']:
+        new_instrs = []
+        for instr in func['instrs']:
+            if instr.get('op') == 'jmp':
+                # Add a print instruction before the jump
+                new_instr = {
+                    "op": "print",
+                    "args": ["jmp"]
+                }
+                new_instrs.append(new_instr)
+            new_instrs.append(instr)
+        func['instrs'] = new_instrs
+    return program
+
+def save_bril_program(program, filename):
+    """Save the transformed Bril program back to a JSON file."""
+    with open(filename, 'w') as file:
+        json.dump(program, file, indent=2)
+
+# Main function to load, transform, and save the Bril program
+def main():
+    # Load the Bril program from a file
+    bril_program = load_bril_program('add.json')
+
+    # Count the number of 'add' instructions
+    add_count = count_add_instructions(bril_program)
+    print(f"Number of 'add' instructions: {add_count}")
+
+    # Add 'print' before 'jmp' instructions
+    transformed_program = add_print_before_jumps(bril_program)
+
+    # Save the transformed Bril program to a file
+    save_bril_program(transformed_program, 'output_add.json')
+
+# Run the main function
+if __name__ == "__main__":
+    main()
+
+```
+
+## Output
+the program found 2 add instrucitons and produced and output file shown below
+
+```
+{
+  "functions": [
+    {
+      "instrs": [
+        {
+          "dest": "c5",
+          "op": "const",
+          "type": "int",
+          "value": 5
+        },
+        {
+          "args": [
+            "c5"
+          ],
+          "dest": "v0",
+          "op": "alloc",
+          "type": {
+            "ptr": "int"
+          }
+        },
+        {
+          "dest": "j",
+          "op": "const",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "dest": "c1",
+          "op": "const",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "args": [
+            "v0",
+            "c1"
+          ],
+          "op": "store"
+        },
+        {
+          "dest": "c2",
+          "op": "const",
+          "type": "int",
+          "value": 2
+        },
+        {
+          "args": [
+            "v0",
+            "c2"
+          ],
+          "op": "store"
+        },
+        {
+          "dest": "c3",
+          "op": "const",
+          "type": "int",
+          "value": 3
+        },
+        {
+          "args": [
+            "v0",
+            "c2"
+          ],
+          "op": "store"
+        },
+        {
+          "dest": "c4",
+          "op": "const",
+          "type": "int",
+          "value": 4
+        },
+        {
+          "args": [
+            "v0",
+            "c2"
+          ],
+          "op": "store"
+        },
+        {
+          "dest": "c5",
+          "op": "const",
+          "type": "int",
+          "value": 5
+        },
+        {
+          "args": [
+            "v0",
+            "c2"
+          ],
+          "op": "store"
+        },
+        {
+          "dest": "sum",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "dest": "i",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "label": "loop"
+        },
+        {
+          "args": [
+            "i",
+            "c5"
+          ],
+          "dest": "cond",
+          "op": "lt",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "cond"
+          ],
+          "labels": [
+            "body",
+            "end"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "body"
+        },
+        {
+          "args": [
+            "v0"
+          ],
+          "dest": "current",
+          "op": "load",
+          "type": "int"
+        },
+        {
+          "args": [
+            "sum",
+            "current"
+          ],
+          "dest": "sum",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "args": [
+            "i",
+            "j"
+          ],
+          "dest": "i",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "op": "print",
+          "args": [
+            "jmp"
+          ]
+        },
+        {
+          "labels": [
+            "loop"
+          ],
+          "op": "jmp"
+        },
+        {
+          "label": "end"
+        },
+        {
+          "args": [
+            "sum"
+          ],
+          "op": "print"
+        },
+        {
+          "args": [
+            "v0"
+          ],
+          "op": "free"
+        },
+        {
+          "op": "ret"
+        }
+      ],
+      "name": "main"
+    }
+  ]
+}
+```
+
+##Testing
+ 
+a good way to otest this is using small scripts where the number of adds is known or can be calculates.  
+I could also develop a tool to reverse the addition of prints before `jmp` and compare the output to the original code using turnt.
