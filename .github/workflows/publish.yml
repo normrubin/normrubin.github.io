@@ -39,7 +39,7 @@ jobs:
       - name: Bril tools
         run: |
           cd ~/bril
-          deno install brili.ts 
+          echo $PATH 
           deno install --allow-env --allow-read ts2bril.ts
 
        
