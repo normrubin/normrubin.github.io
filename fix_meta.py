@@ -84,7 +84,17 @@ yaml_without_slides = """
 title: title
 format:
     html: default
+execute:
+    enabled: false
 """
+
+
+yaml_for_blogs = """
+title: title
+format:
+    html: default
+"""
+
 
 yaml_with_slides = """
 title: title
@@ -109,6 +119,12 @@ for file in files:
     directory, _, file_name = file.rpartition('/')
     yaml_template = yaml.safe_load(yaml_without_slides)
     use_revealjs = False 
+
+    # Check if 'blogs' is in the directory path
+    if 'blogs' in directory:
+        #print(f"'blogs' found in directory path: {directory}")
+        aml_template = yaml.safe_load(yaml_for_blogs)
+
 
     if directory.endswith('lectures'):
         yaml_template = yaml.safe_load(yaml_with_slides)
