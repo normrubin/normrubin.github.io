@@ -4,6 +4,7 @@ from pathlib import Path
 from requests import post
 import yaml
 
+debug = False
 
 def list_all_files(root_dir):
     """List all files in a directory and its subdirectories."""
@@ -119,6 +120,9 @@ for file in files:
     directory, _, file_name = file.rpartition('/')
     yaml_template = yaml.safe_load(yaml_without_slides)
     use_revealjs = False 
+
+    if debug:
+        print(f"scan {file_name} in {directory}")
 
     # Check if 'blogs' is in the directory path
     if 'blogs' in directory:

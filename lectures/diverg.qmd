@@ -1,6 +1,20 @@
 ---
-title: "divergent flow "
-format: html
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_diverg.qmd
+    output-location: slide
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: 'divergent flow '
+
 ---
 
 ## What is the cost of divergence 
@@ -87,6 +101,8 @@ and in ptx
 
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 Graph TB
 B0--> Bzr
 B0--> B1
@@ -144,6 +160,13 @@ some code deadlocks:
 ## volta and newer 
 
 [possible structure](https://arxiv.org/pdf/2407.02944)
+
+Handles unstructured code nicely 
+always makes forward progress 
+
+adds a new set of registers called barrier registers 
+
+
 
 
 
