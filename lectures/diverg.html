@@ -68,6 +68,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="divergent flow – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
@@ -203,13 +232,175 @@ a:                        r  r  r  r      a: 1111
 <h2 class="anchored" data-anchor-id="volta-and-newer">volta and newer</h2>
 <p><a href="https://arxiv.org/pdf/2407.02944">possible structure</a></p>
 <p>Handles unstructured code nicely always makes forward progress</p>
-<p>adds a new set of registers called barrier registers</p>
+<pre><code>
+                          t0 t1 t2 t3    
+a:                        r  r  r  r      
+--------------------------------------------------------
+  if (tid% 4 &lt; 2) {       r  r  r  r    
+                                                                           
+----------------------------------------------------------
+    b:                    r r   -  -    
+    d:                    - -   r r  
+    c:                    r r   -  -  
+    e:                    - -   r r    
+-------------------------------------------------
+                
+  f:                      r r  --
+                          - -  r r 
+   _syncthreads()         r r r r 
+  g:             </code></pre>
+<p>adds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize</p>
+<p>new instructions:</p>
+<ol type="1">
+<li>bssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point</li>
+<li>bmov copies between barrier registers and regular registers</li>
+<li>bsync forces threads in the mask to wait</li>
+<li>bbreak removes threads from mask</li>
+</ol>
 </section>
-<section id="code-for-an-if-statement-reconverga-nbce" class="level2">
-<h2 class="anchored" data-anchor-id="code-for-an-if-statement-reconverga-nbce">code for an if statement reconverga nbce</h2>
-<p>in AMD terms</p>
+<section id="what-does-this-solve" class="level2">
+<h2 class="anchored" data-anchor-id="what-does-this-solve">what does this solve</h2>
+<p>The Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity2 of previous hardware architectures.</p>
+<p>When porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.</p>
+<p>To avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.</p>
+<p>Applications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.</p>
+<p>Applications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.</p>
+</section>
+<section id="amd" class="level2">
+<h2 class="anchored" data-anchor-id="amd">AMD</h2>
+<p>AMD implemented the early version. scalar registers are used as an ‘exec mask’ to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions</p>
 <p>save the exec mask set exect mask to running threads do the then invert the exec mask if there is an else do the else restore the exec mask</p>
-<p>where in the cfg do we restore the exec mask</p>
+</section>
+<section id="static-detection-of-divergences" class="level2">
+<h2 class="anchored" data-anchor-id="static-detection-of-divergences">static detection of divergences</h2>
+<p>can we determine which branches may cause divergences and which branches are uniform?</p>
+<p>at a dirergent branch some threads go one way, some the other, we will need to insert instructions for reconvergence at a uniform branch all threads go the same way</p>
+</section>
+<section id="divergent-and-uniform-variables" class="level2">
+<h2 class="anchored" data-anchor-id="divergent-and-uniform-variables">divergent and uniform variables</h2>
+<p>A program variable is divergent if different threads see different values.</p>
+<p>If different threads always see that variable with the same value, then the variable is uniform</p>
+<p>divergent variables</p>
+<ol type="1">
+<li>v = tid</li>
+<li>atomic()</li>
+<li>v is data dependent on a divergent variable</li>
+<li>v is control dependent on a divergent variable</li>
+</ol>
+<p>## thread id is always divergent</p>
+<pre><code> __global__ 
+ void saxpy (int n, float alpha, float *x, float *y) {
+   int i = blockIdx.x * blockDim.x + threadIdx.x;  
+  if (i &lt; n) y[i] = alpha * x[i] + y[i]; } </code></pre>
+<p>Each thread sees a different value</p>
+<p>Threads in different blocks see the same threadid - is that a problem</p>
+</section>
+<section id="variables-defined-by-atomic-operations" class="level2">
+<h2 class="anchored" data-anchor-id="variables-defined-by-atomic-operations">variables defined by atomic operations</h2>
+<pre><code>__global__ void ex_atomic (int index, float* v) {
+   int i = 0; 
+   i = ATOMINC( v[index] ); } </code></pre>
+</section>
+<section id="dependences" class="level2">
+<h2 class="anchored" data-anchor-id="dependences">dependences</h2>
+<p>Two types of dependences: data and control.</p>
+<p>If the program contains an assignment such as v = f(v1, v2, …, vn), then v is data dependent on the arguments v1,v2 …</p>
+<p>If the value assigned to variable v depends on a branch controlled by p, then we say that v is control dependent on p.&nbsp;</p>
+<p>Divergences propagate transitively on the graph determined by the dependence relation.</p>
+<p>A variable might be divergent at one program point and uniform at another</p>
+</section>
+<section id="an-example" class="level2">
+<h2 class="anchored" data-anchor-id="an-example">an example</h2>
+<p><img src="images/da10.svg" class="img-fluid"></p>
+</section>
+<section id="section" class="level2">
+<h2 class="anchored" data-anchor-id="section"></h2>
+<p><img src="images/da9.svg" class="img-fluid"> ##</p>
+<p><img src="images/da11.svg" class="img-fluid"></p>
+</section>
+<section id="section-1" class="level2">
+<h2 class="anchored" data-anchor-id="section-1"></h2>
+<p><img src="images/da12.svg" class="img-fluid"></p>
+</section>
+<section id="section-2" class="level2">
+<h2 class="anchored" data-anchor-id="section-2"></h2>
+<p><img src="images/da13.svg" class="img-fluid"></p>
+</section>
+<section id="section-3" class="level2">
+<h2 class="anchored" data-anchor-id="section-3"></h2>
+<p><img src="images/da14.svg" class="img-fluid"></p>
+</section>
+<section id="section-4" class="level2">
+<h2 class="anchored" data-anchor-id="section-4"></h2>
+<p><img src="images/da15.svg" class="img-fluid"></p>
+</section>
+<section id="section-5" class="level2">
+<h2 class="anchored" data-anchor-id="section-5"></h2>
+<p><img src="images/da17.svg" class="img-fluid"></p>
+</section>
+<section id="section-6" class="level2">
+<h2 class="anchored" data-anchor-id="section-6"></h2>
+<p><img src="images/da16.svg" class="img-fluid"></p>
+</section>
+<section id="section-7" class="level2">
+<h2 class="anchored" data-anchor-id="section-7"></h2>
+<p><img src="images/da18.svg" class="img-fluid"></p>
+</section>
+<section id="section-8" class="level2">
+<h2 class="anchored" data-anchor-id="section-8"></h2>
+<p><img src="images/da19.svg" class="img-fluid"></p>
+</section>
+<section id="section-9" class="level2">
+<h2 class="anchored" data-anchor-id="section-9"></h2>
+<p><img src="images/da20.svg" class="img-fluid"></p>
+</section>
+<section id="section-10" class="level2">
+<h2 class="anchored" data-anchor-id="section-10"></h2>
+<p><img src="images/da21.svg" class="img-fluid"></p>
+</section>
+<section id="section-11" class="level2">
+<h2 class="anchored" data-anchor-id="section-11"></h2>
+<p><img src="images/da22.svg" class="img-fluid"></p>
+</section>
+<section id="section-12" class="level2">
+<h2 class="anchored" data-anchor-id="section-12"></h2>
+<p><img src="images/da23.svg" class="img-fluid"></p>
+</section>
+<section id="finding-control-dependences" class="level2">
+<h2 class="anchored" data-anchor-id="finding-control-dependences">finding control dependences</h2>
+<p>let branch p, label be a branch instruction and <span class="math inline">\(I_p\)</span> be its post dominator. A varable v is control dependent on p if</p>
+<ol type="1">
+<li>v is defined inside the influence region of p</li>
+<li>v reaches <span class="math inline">\(I_p\)</span></li>
+</ol>
+</section>
+<section id="section-13" class="level2">
+<h2 class="anchored" data-anchor-id="section-13"></h2>
+<p><img src="images/da26.svg" class="img-fluid"></p>
+</section>
+<section id="section-14" class="level2">
+<h2 class="anchored" data-anchor-id="section-14"></h2>
+<p><img src="images/da27.svg" class="img-fluid"></p>
+</section>
+<section id="section-15" class="level2">
+<h2 class="anchored" data-anchor-id="section-15"></h2>
+<p><img src="images/da28.svg" class="img-fluid"></p>
+</section>
+<section id="section-16" class="level2">
+<h2 class="anchored" data-anchor-id="section-16"></h2>
+<p><img src="images/da29.svg" class="img-fluid"></p>
+</section>
+<section id="section-17" class="level2">
+<h2 class="anchored" data-anchor-id="section-17"></h2>
+<p><img src="images/da30.svg" class="img-fluid"></p>
+</section>
+<section id="some-optimizations" class="level2">
+<h2 class="anchored" data-anchor-id="some-optimizations">some optimizations</h2>
+<ol type="1">
+<li>on AMD use scalar processor</li>
+<li>if a branch condition is uniform no need for a sync in the post dominator</li>
+<li>place uniform spills in shared memory</li>
+</ol>
 
 
 </section>

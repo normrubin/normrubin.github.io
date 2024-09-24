@@ -981,7 +981,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#e32970e1 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#ecac6c31 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2177,7 +2177,7 @@
     "href": "lectures/diverg.html#volta-and-newer",
     "title": "divergent flow",
     "section": "volta and newer",
-    "text": "volta and newer\npossible structure\nHandles unstructured code nicely always makes forward progress\nadds a new set of registers called barrier registers",
+    "text": "volta and newer\npossible structure\nHandles unstructured code nicely always makes forward progress\n\n                          t0 t1 t2 t3    \na:                        r  r  r  r      \n--------------------------------------------------------\n  if (tid% 4 &lt; 2) {       r  r  r  r    \n                                                                           \n----------------------------------------------------------\n    b:                    r r   -  -    \n    d:                    - -   r r  \n    c:                    r r   -  -  \n    e:                    - -   r r    \n-------------------------------------------------\n                \n  f:                      r r  --\n                          - -  r r \n   _syncthreads()         r r r r \n  g:             \nadds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize\nnew instructions:\n\nbssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point\nbmov copies between barrier registers and regular registers\nbsync forces threads in the mask to wait\nbbreak removes threads from mask",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2185,11 +2185,119 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#code-for-an-if-statement-reconverga-nbce",
-    "href": "lectures/diverg.html#code-for-an-if-statement-reconverga-nbce",
+    "objectID": "lectures/diverg.html#what-does-this-solve",
+    "href": "lectures/diverg.html#what-does-this-solve",
     "title": "divergent flow",
-    "section": "code for an if statement reconverga nbce",
-    "text": "code for an if statement reconverga nbce\nin AMD terms\nsave the exec mask set exect mask to running threads do the then invert the exec mask if there is an else do the else restore the exec mask\nwhere in the cfg do we restore the exec mask",
+    "section": "what does this solve",
+    "text": "what does this solve\nThe Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity2 of previous hardware architectures.\nWhen porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.\nTo avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.\nApplications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.\nApplications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#amd",
+    "href": "lectures/diverg.html#amd",
+    "title": "divergent flow",
+    "section": "AMD",
+    "text": "AMD\nAMD implemented the early version. scalar registers are used as an ‘exec mask’ to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions\nsave the exec mask set exect mask to running threads do the then invert the exec mask if there is an else do the else restore the exec mask",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#static-detection-of-divergences",
+    "href": "lectures/diverg.html#static-detection-of-divergences",
+    "title": "divergent flow",
+    "section": "static detection of divergences",
+    "text": "static detection of divergences\ncan we determine which branches may cause divergences and which branches are uniform?\nat a dirergent branch some threads go one way, some the other, we will need to insert instructions for reconvergence at a uniform branch all threads go the same way",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#divergent-and-uniform-variables",
+    "href": "lectures/diverg.html#divergent-and-uniform-variables",
+    "title": "divergent flow",
+    "section": "divergent and uniform variables",
+    "text": "divergent and uniform variables\nA program variable is divergent if different threads see different values.\nIf different threads always see that variable with the same value, then the variable is uniform\ndivergent variables\n\nv = tid\natomic()\nv is data dependent on a divergent variable\nv is control dependent on a divergent variable\n\n## thread id is always divergent\n __global__ \n void saxpy (int n, float alpha, float *x, float *y) {\n   int i = blockIdx.x * blockDim.x + threadIdx.x;  \n  if (i &lt; n) y[i] = alpha * x[i] + y[i]; } \nEach thread sees a different value\nThreads in different blocks see the same threadid - is that a problem",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#variables-defined-by-atomic-operations",
+    "href": "lectures/diverg.html#variables-defined-by-atomic-operations",
+    "title": "divergent flow",
+    "section": "variables defined by atomic operations",
+    "text": "variables defined by atomic operations\n__global__ void ex_atomic (int index, float* v) {\n   int i = 0; \n   i = ATOMINC( v[index] ); }",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#dependences",
+    "href": "lectures/diverg.html#dependences",
+    "title": "divergent flow",
+    "section": "dependences",
+    "text": "dependences\nTwo types of dependences: data and control.\nIf the program contains an assignment such as v = f(v1, v2, …, vn), then v is data dependent on the arguments v1,v2 …\nIf the value assigned to variable v depends on a branch controlled by p, then we say that v is control dependent on p. \nDivergences propagate transitively on the graph determined by the dependence relation.\nA variable might be divergent at one program point and uniform at another",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#an-example",
+    "href": "lectures/diverg.html#an-example",
+    "title": "divergent flow",
+    "section": "an example",
+    "text": "an example",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#section",
+    "href": "lectures/diverg.html#section",
+    "title": "divergent flow",
+    "section": "",
+    "text": "##",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#finding-control-dependences",
+    "href": "lectures/diverg.html#finding-control-dependences",
+    "title": "divergent flow",
+    "section": "finding control dependences",
+    "text": "finding control dependences\nlet branch p, label be a branch instruction and \\(I_p\\) be its post dominator. A varable v is control dependent on p if\n\nv is defined inside the influence region of p\nv reaches \\(I_p\\)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#some-optimizations",
+    "href": "lectures/diverg.html#some-optimizations",
+    "title": "divergent flow",
+    "section": "some optimizations",
+    "text": "some optimizations\n\non AMD use scalar processor\nif a branch condition is uniform no need for a sync in the post dominator\nplace uniform spills in shared memory",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2236,14 +2344,77 @@
     "href": "lectures/revealjs_diverg.qmd.html#volta-and-newer",
     "title": "divergent flow",
     "section": "volta and newer",
-    "text": "volta and newer\npossible structure\nHandles unstructured code nicely always makes forward progress\nadds a new set of registers called barrier registers"
+    "text": "volta and newer\npossible structure\nHandles unstructured code nicely always makes forward progress\n\n                          t0 t1 t2 t3    \na:                        r  r  r  r      \n--------------------------------------------------------\n  if (tid% 4 &lt; 2) {       r  r  r  r    \n                                                                           \n----------------------------------------------------------\n    b:                    r r   -  -    \n    d:                    - -   r r  \n    c:                    r r   -  -  \n    e:                    - -   r r    \n-------------------------------------------------\n                \n  f:                      r r  --\n                          - -  r r \n   _syncthreads()         r r r r \n  g:             \nadds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize\nnew instructions:\n\nbssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point\nbmov copies between barrier registers and regular registers\nbsync forces threads in the mask to wait\nbbreak removes threads from mask"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#code-for-an-if-statement-reconverga-nbce",
-    "href": "lectures/revealjs_diverg.qmd.html#code-for-an-if-statement-reconverga-nbce",
+    "objectID": "lectures/revealjs_diverg.qmd.html#what-does-this-solve",
+    "href": "lectures/revealjs_diverg.qmd.html#what-does-this-solve",
     "title": "divergent flow",
-    "section": "code for an if statement reconverga nbce",
-    "text": "code for an if statement reconverga nbce\nin AMD terms\nsave the exec mask set exect mask to running threads do the then invert the exec mask if there is an else do the else restore the exec mask\nwhere in the cfg do we restore the exec mask"
+    "section": "what does this solve",
+    "text": "what does this solve\nThe Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity2 of previous hardware architectures.\nWhen porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.\nTo avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.\nApplications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.\nApplications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#amd",
+    "href": "lectures/revealjs_diverg.qmd.html#amd",
+    "title": "divergent flow",
+    "section": "AMD",
+    "text": "AMD\nAMD implemented the early version. scalar registers are used as an ‘exec mask’ to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions\nsave the exec mask set exect mask to running threads do the then invert the exec mask if there is an else do the else restore the exec mask"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#static-detection-of-divergences",
+    "href": "lectures/revealjs_diverg.qmd.html#static-detection-of-divergences",
+    "title": "divergent flow",
+    "section": "static detection of divergences",
+    "text": "static detection of divergences\ncan we determine which branches may cause divergences and which branches are uniform?\nat a dirergent branch some threads go one way, some the other, we will need to insert instructions for reconvergence at a uniform branch all threads go the same way"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#divergent-and-uniform-variables",
+    "href": "lectures/revealjs_diverg.qmd.html#divergent-and-uniform-variables",
+    "title": "divergent flow",
+    "section": "divergent and uniform variables",
+    "text": "divergent and uniform variables\nA program variable is divergent if different threads see different values.\nIf different threads always see that variable with the same value, then the variable is uniform\ndivergent variables\n\nv = tid\natomic()\nv is data dependent on a divergent variable\nv is control dependent on a divergent variable\n\n## thread id is always divergent\n __global__ \n void saxpy (int n, float alpha, float *x, float *y) {\n   int i = blockIdx.x * blockDim.x + threadIdx.x;  \n  if (i &lt; n) y[i] = alpha * x[i] + y[i]; } \nEach thread sees a different value\nThreads in different blocks see the same threadid - is that a problem"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#variables-defined-by-atomic-operations",
+    "href": "lectures/revealjs_diverg.qmd.html#variables-defined-by-atomic-operations",
+    "title": "divergent flow",
+    "section": "variables defined by atomic operations",
+    "text": "variables defined by atomic operations\n__global__ void ex_atomic (int index, float* v) {\n   int i = 0; \n   i = ATOMINC( v[index] ); }"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#dependences",
+    "href": "lectures/revealjs_diverg.qmd.html#dependences",
+    "title": "divergent flow",
+    "section": "dependences",
+    "text": "dependences\nTwo types of dependences: data and control.\nIf the program contains an assignment such as v = f(v1, v2, …, vn), then v is data dependent on the arguments v1,v2 …\nIf the value assigned to variable v depends on a branch controlled by p, then we say that v is control dependent on p. \nDivergences propagate transitively on the graph determined by the dependence relation.\nA variable might be divergent at one program point and uniform at another"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#an-example",
+    "href": "lectures/revealjs_diverg.qmd.html#an-example",
+    "title": "divergent flow",
+    "section": "an example",
+    "text": "an example"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#section",
+    "href": "lectures/revealjs_diverg.qmd.html#section",
+    "title": "divergent flow",
+    "section": "",
+    "text": "##"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#finding-control-dependences",
+    "href": "lectures/revealjs_diverg.qmd.html#finding-control-dependences",
+    "title": "divergent flow",
+    "section": "finding control dependences",
+    "text": "finding control dependences\nlet branch p, label be a branch instruction and \\(I_p\\) be its post dominator. A varable v is control dependent on p if\n\nv is defined inside the influence region of p\nv reaches \\(I_p\\)"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#some-optimizations",
+    "href": "lectures/revealjs_diverg.qmd.html#some-optimizations",
+    "title": "divergent flow",
+    "section": "some optimizations",
+    "text": "some optimizations\n\non AMD use scalar processor\nif a branch condition is uniform no need for a sync in the post dominator\nplace uniform spills in shared memory"
   },
   {
     "objectID": "lectures/04_data_flow.html",
@@ -5131,7 +5302,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 600\n-rw-r--r-- 1 runner docker 40847 Sep 24 11:35 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 24 11:35 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 24 11:35 01a1_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 24 11:35 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 24 11:35 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  7413 Sep 24 11:35 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 24 11:35 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 24 11:35 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 24 11:35 03_local.qmd\n-rw-r--r-- 1 runner docker 13260 Sep 24 11:35 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  5154 Sep 24 11:35 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 24 11:35 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 24 11:35 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 24 11:35 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 24 11:35 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 24 11:35 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 24 11:34 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 24 11:35 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 24 11:35 09_poly.qmd\n-rw-r--r-- 1 runner docker   302 Sep 24 11:35 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 24 11:35 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 24 11:35 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 24 11:35 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 24 11:35 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 24 11:35 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 24 11:34 a.json\n-rw-r--r-- 1 runner docker   248 Sep 24 11:34 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 24 11:34 df\n-rw-r--r-- 1 runner docker  3729 Sep 24 11:35 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 24 11:34 errors\n-rw-r--r-- 1 runner docker  3623 Sep 24 11:34 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 24 11:34 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 24 11:34 images\n-rw-r--r-- 1 runner docker  2260 Sep 24 11:35 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 24 11:34 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 24 11:34 ra\n-rw-r--r-- 1 runner docker  8226 Sep 24 11:35 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 24 11:35 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 24 11:35 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 24 11:35 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 24 11:35 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 24 11:34 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 608\n-rw-r--r-- 1 runner docker 40847 Sep 24 14:27 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 24 14:27 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 24 14:27 01a1_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 24 14:27 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 24 14:27 01a_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  7413 Sep 24 14:27 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 24 14:27 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 24 14:27 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 24 14:27 03_local.qmd\n-rw-r--r-- 1 runner docker 13260 Sep 24 14:27 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  5154 Sep 24 14:27 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 24 14:27 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 24 14:27 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 24 14:27 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 24 14:27 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 24 14:27 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 24 14:26 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 24 14:27 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 24 14:27 09_poly.qmd\n-rw-r--r-- 1 runner docker   302 Sep 24 14:27 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 24 14:27 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 24 14:27 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 24 14:27 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 24 14:27 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 24 14:27 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 24 14:26 a.json\n-rw-r--r-- 1 runner docker   248 Sep 24 14:26 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 24 14:26 df\n-rw-r--r-- 1 runner docker  9019 Sep 24 14:27 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 24 14:26 errors\n-rw-r--r-- 1 runner docker  3623 Sep 24 14:26 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 24 14:26 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 24 14:26 images\n-rw-r--r-- 1 runner docker  2260 Sep 24 14:27 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 24 14:26 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 24 14:26 ra\n-rw-r--r-- 1 runner docker  8226 Sep 24 14:27 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 24 14:27 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 24 14:27 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 24 14:27 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 24 14:27 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 24 14:26 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
