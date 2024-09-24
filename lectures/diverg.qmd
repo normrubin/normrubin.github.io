@@ -164,16 +164,55 @@ some code deadlocks:
 Handles unstructured code nicely 
 always makes forward progress 
 
-adds a new set of registers called barrier registers 
+
+```
+
+                          t0 t1 t2 t3    
+a:                        r  r  r  r      
+--------------------------------------------------------
+  if (tid% 4 < 2) {       r  r  r  r    
+                                                                           
+----------------------------------------------------------
+    b:                    r r   -  -    
+    d:                    - -   r r  
+    c:                    r r   -  -  
+    e:                    - -   r r    
+-------------------------------------------------
+                
+  f:                      r r  --
+                          - -  r r 
+   _syncthreads()         r r r r 
+  g:             
+```
 
 
+adds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize 
+
+new instructions:
+
+1. bssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point
+2. bmov copies between barrier registers and regular registers 
+3. bsync forces threads in the mask to wait 
+4. bbreak removes threads from mask
 
 
+## what does this solve 
+
+The Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity2 of previous hardware architectures.
+
+When porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.
+
+To avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.
+
+Applications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.
+
+Applications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.
+
+## AMD 
+
+AMD implemented the early version.  scalar registers are used as an 'exec mask' to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions 
 
 
-## code for an if statement reconverga nbce 
-
-in AMD terms 
 
 save the exec mask
 set exect mask to running threads
@@ -182,6 +221,138 @@ invert the exec mask if there is an else
 do the else 
 restore the exec mask 
 
-where in the cfg do we restore the exec mask 
+
+## static detection of divergences 
+
+can we determine which branches may cause divergences and which branches are uniform?
+
+at a dirergent branch some threads go one way, some the other, we will need to insert instructions for reconvergence
+at a uniform branch all threads go the same way 
+
+## divergent and uniform variables 
+
+ A	program	variable is	divergent	if	different	threads	see	different values.	
+ 
+ If	different threads	always	see	that	variable	with	the	same	value,	then the variable is uniform 	
+
+ divergent variables
+
+ 1. v = tid 
+ 1. atomic()
+ 1. v is data dependent on a divergent variable
+ 1. v is control dependent on a divergent variable 
+
+ ## thread id is always divergent 
+
+```
+ __global__ 
+ void saxpy (int n, float alpha, float *x, float *y) {
+   int i = blockIdx.x * blockDim.x + threadIdx.x;  
+  if (i < n) y[i] = alpha * x[i] + y[i]; } 
+```
+
+Each thread sees a different value 
+
+Threads in different blocks see the same threadid - is that a problem 
+
+## variables defined by atomic operations 
+
+```
+__global__ void ex_atomic (int index, float* v) {
+   int i = 0; 
+   i = ATOMINC( v[index] ); } 
+```
+
+## dependences 
+
+Two	types	of	dependences:	data	and	control.	
+
+If	the	program	contains	an	assignment	such	as	v	=	f(v1,	v2,	…,	vn),	then	v	is	data	dependent on the arguments v1,v2 ...
+
+If	the	value	assigned	to	variable	v	depends	on	a	branch	controlled	by	p,	then	we	say	that	v	is	control	dependent	on	p.	
+ 
+Divergences	propagate	transitively	on	the	graph	determined	by	the	dependence	relation.	
+
+A variable might be divergent at one program point and uniform at another
+
+## an example 
+
+![](images/da10.svg)
+
+## 
+
+![](images/da9.svg)
+##
+
+![](images/da11.svg)
+
+## 
+![](images/da12.svg)
+
+## 
+![](images/da13.svg)
+
+## 
+![](images/da14.svg)
+
+## 
+![](images/da15.svg)
+
+## 
+![](images/da17.svg)
 
 
+## 
+![](images/da16.svg)
+
+## 
+![](images/da18.svg)
+
+## 
+![](images/da19.svg)
+
+
+## 
+![](images/da20.svg)
+
+
+## 
+![](images/da21.svg)
+
+
+## 
+![](images/da22.svg)
+
+
+## 
+![](images/da23.svg)
+
+## finding control dependences
+
+let branch p, label  be a branch instruction and $I_p$ be its post dominator. A varable v is control dependent on p if 
+
+1. v is defined inside the influence region of p
+1. v reaches $I_p$
+
+## 
+![](images/da26.svg)
+
+
+## 
+![](images/da27.svg)
+
+
+## 
+![](images/da28.svg)
+
+## 
+![](images/da29.svg)
+
+## 
+![](images/da30.svg)
+
+## some optimizations 
+
+1. on AMD use scalar processor 
+1. if a branch condition is uniform no need for a sync in the post dominator 
+1. place uniform spills in shared memory 
