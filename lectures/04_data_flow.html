@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -141,796 +107,525 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>The material in these slides have been taken from “Lecture Notes in Static Analysis” (Sec.6), by Michael I. Schwartzbach, https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/, “Principles of Program Analysis”, Chapter 6, by Niesen et al, and from Miachel Schwartzbach’s “Lecture notes in Static Analysis”, Chapter 6, First Section.</p>
-<div id="104782e2" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">131</span>):</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"![](df/ra</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">.svg)</span><span class="ch">\n</span><span class="ss">##"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>![](df/ra1.svg)
-##
-![](df/ra2.svg)
-##
-![](df/ra3.svg)
-##
-![](df/ra4.svg)
-##
-![](df/ra5.svg)
-##
-![](df/ra6.svg)
-##
-![](df/ra7.svg)
-##
-![](df/ra8.svg)
-##
-![](df/ra9.svg)
-##
-![](df/ra10.svg)
-##
-![](df/ra11.svg)
-##
-![](df/ra12.svg)
-##
-![](df/ra13.svg)
-##
-![](df/ra14.svg)
-##
-![](df/ra15.svg)
-##
-![](df/ra16.svg)
-##
-![](df/ra17.svg)
-##
-![](df/ra18.svg)
-##
-![](df/ra19.svg)
-##
-![](df/ra20.svg)
-##
-![](df/ra21.svg)
-##
-![](df/ra22.svg)
-##
-![](df/ra23.svg)
-##
-![](df/ra24.svg)
-##
-![](df/ra25.svg)
-##
-![](df/ra26.svg)
-##
-![](df/ra27.svg)
-##
-![](df/ra28.svg)
-##
-![](df/ra29.svg)
-##
-![](df/ra30.svg)
-##
-![](df/ra31.svg)
-##
-![](df/ra32.svg)
-##
-![](df/ra33.svg)
-##
-![](df/ra34.svg)
-##
-![](df/ra35.svg)
-##
-![](df/ra36.svg)
-##
-![](df/ra37.svg)
-##
-![](df/ra38.svg)
-##
-![](df/ra39.svg)
-##
-![](df/ra40.svg)
-##
-![](df/ra41.svg)
-##
-![](df/ra42.svg)
-##
-![](df/ra43.svg)
-##
-![](df/ra44.svg)
-##
-![](df/ra45.svg)
-##
-![](df/ra46.svg)
-##
-![](df/ra47.svg)
-##
-![](df/ra48.svg)
-##
-![](df/ra49.svg)
-##
-![](df/ra50.svg)
-##
-![](df/ra51.svg)
-##
-![](df/ra52.svg)
-##
-![](df/ra53.svg)
-##
-![](df/ra54.svg)
-##
-![](df/ra55.svg)
-##
-![](df/ra56.svg)
-##
-![](df/ra57.svg)
-##
-![](df/ra58.svg)
-##
-![](df/ra59.svg)
-##
-![](df/ra60.svg)
-##
-![](df/ra61.svg)
-##
-![](df/ra62.svg)
-##
-![](df/ra63.svg)
-##
-![](df/ra64.svg)
-##
-![](df/ra65.svg)
-##
-![](df/ra66.svg)
-##
-![](df/ra67.svg)
-##
-![](df/ra68.svg)
-##
-![](df/ra69.svg)
-##
-![](df/ra70.svg)
-##
-![](df/ra71.svg)
-##
-![](df/ra72.svg)
-##
-![](df/ra73.svg)
-##
-![](df/ra74.svg)
-##
-![](df/ra75.svg)
-##
-![](df/ra76.svg)
-##
-![](df/ra77.svg)
-##
-![](df/ra78.svg)
-##
-![](df/ra79.svg)
-##
-![](df/ra80.svg)
-##
-![](df/ra81.svg)
-##
-![](df/ra82.svg)
-##
-![](df/ra83.svg)
-##
-![](df/ra84.svg)
-##
-![](df/ra85.svg)
-##
-![](df/ra86.svg)
-##
-![](df/ra87.svg)
-##
-![](df/ra88.svg)
-##
-![](df/ra89.svg)
-##
-![](df/ra90.svg)
-##
-![](df/ra91.svg)
-##
-![](df/ra92.svg)
-##
-![](df/ra93.svg)
-##
-![](df/ra94.svg)
-##
-![](df/ra95.svg)
-##
-![](df/ra96.svg)
-##
-![](df/ra97.svg)
-##
-![](df/ra98.svg)
-##
-![](df/ra99.svg)
-##
-![](df/ra100.svg)
-##
-![](df/ra101.svg)
-##
-![](df/ra102.svg)
-##
-![](df/ra103.svg)
-##
-![](df/ra104.svg)
-##
-![](df/ra105.svg)
-##
-![](df/ra106.svg)
-##
-![](df/ra107.svg)
-##
-![](df/ra108.svg)
-##
-![](df/ra109.svg)
-##
-![](df/ra110.svg)
-##
-![](df/ra111.svg)
-##
-![](df/ra112.svg)
-##
-![](df/ra113.svg)
-##
-![](df/ra114.svg)
-##
-![](df/ra115.svg)
-##
-![](df/ra116.svg)
-##
-![](df/ra117.svg)
-##
-![](df/ra118.svg)
-##
-![](df/ra119.svg)
-##
-![](df/ra120.svg)
-##
-![](df/ra121.svg)
-##
-![](df/ra122.svg)
-##
-![](df/ra123.svg)
-##
-![](df/ra124.svg)
-##
-![](df/ra125.svg)
-##
-![](df/ra126.svg)
-##
-![](df/ra127.svg)
-##
-![](df/ra128.svg)
-##
-![](df/ra129.svg)
-##
-![](df/ra130.svg)
-##
-![](df/ra131.svg)
-##</code></pre>
-</div>
-</div>
+<p>##typeo in data flow <img src="df/ra1.svg" class="img-fluid"></p>
 <section id="section" class="level2">
 <h2 class="anchored" data-anchor-id="section"></h2>
-<p><img src="df/ra1.svg" class="img-fluid"></p>
+<p><img src="df/ra2.svg" class="img-fluid"></p>
 </section>
 <section id="section-1" class="level2">
 <h2 class="anchored" data-anchor-id="section-1"></h2>
-<p><img src="df/ra2.svg" class="img-fluid"></p>
+<p><img src="df/ra3.svg" class="img-fluid"></p>
 </section>
 <section id="section-2" class="level2">
 <h2 class="anchored" data-anchor-id="section-2"></h2>
-<p><img src="df/ra3.svg" class="img-fluid"></p>
+<p><img src="df/ra4.svg" class="img-fluid"></p>
 </section>
 <section id="section-3" class="level2">
 <h2 class="anchored" data-anchor-id="section-3"></h2>
-<p><img src="df/ra4.svg" class="img-fluid"></p>
+<p><img src="df/ra5.svg" class="img-fluid"></p>
 </section>
 <section id="section-4" class="level2">
 <h2 class="anchored" data-anchor-id="section-4"></h2>
-<p><img src="df/ra5.svg" class="img-fluid"></p>
+<p><img src="df/ra6.svg" class="img-fluid"></p>
 </section>
 <section id="section-5" class="level2">
 <h2 class="anchored" data-anchor-id="section-5"></h2>
-<p><img src="df/ra6.svg" class="img-fluid"></p>
+<p><img src="df/ra7.svg" class="img-fluid"></p>
 </section>
 <section id="section-6" class="level2">
 <h2 class="anchored" data-anchor-id="section-6"></h2>
-<p><img src="df/ra7.svg" class="img-fluid"></p>
+<p><img src="df/ra8.svg" class="img-fluid"></p>
 </section>
 <section id="section-7" class="level2">
 <h2 class="anchored" data-anchor-id="section-7"></h2>
-<p><img src="df/ra8.svg" class="img-fluid"></p>
+<p><img src="df/ra9.svg" class="img-fluid"></p>
 </section>
 <section id="section-8" class="level2">
 <h2 class="anchored" data-anchor-id="section-8"></h2>
-<p><img src="df/ra9.svg" class="img-fluid"></p>
+<p><img src="df/ra10.svg" class="img-fluid"></p>
 </section>
 <section id="section-9" class="level2">
 <h2 class="anchored" data-anchor-id="section-9"></h2>
-<p><img src="df/ra10.svg" class="img-fluid"></p>
+<p><img src="df/ra11.svg" class="img-fluid"></p>
 </section>
 <section id="section-10" class="level2">
 <h2 class="anchored" data-anchor-id="section-10"></h2>
-<p><img src="df/ra11.svg" class="img-fluid"></p>
+<p><img src="df/ra12.svg" class="img-fluid"></p>
 </section>
 <section id="section-11" class="level2">
 <h2 class="anchored" data-anchor-id="section-11"></h2>
-<p><img src="df/ra12.svg" class="img-fluid"></p>
+<p><img src="df/ra13.svg" class="img-fluid"></p>
 </section>
 <section id="section-12" class="level2">
 <h2 class="anchored" data-anchor-id="section-12"></h2>
-<p><img src="df/ra13.svg" class="img-fluid"></p>
+<p><img src="df/ra14.svg" class="img-fluid"></p>
 </section>
 <section id="section-13" class="level2">
 <h2 class="anchored" data-anchor-id="section-13"></h2>
-<p><img src="df/ra14.svg" class="img-fluid"></p>
+<p><img src="df/ra15.svg" class="img-fluid"></p>
 </section>
 <section id="section-14" class="level2">
 <h2 class="anchored" data-anchor-id="section-14"></h2>
-<p><img src="df/ra15.svg" class="img-fluid"></p>
+<p><img src="df/ra16.svg" class="img-fluid"></p>
 </section>
 <section id="section-15" class="level2">
 <h2 class="anchored" data-anchor-id="section-15"></h2>
-<p><img src="df/ra16.svg" class="img-fluid"></p>
+<p><img src="df/ra17.svg" class="img-fluid"></p>
 </section>
 <section id="section-16" class="level2">
 <h2 class="anchored" data-anchor-id="section-16"></h2>
-<p><img src="df/ra17.svg" class="img-fluid"></p>
+<p><img src="df/ra18.svg" class="img-fluid"></p>
 </section>
 <section id="section-17" class="level2">
 <h2 class="anchored" data-anchor-id="section-17"></h2>
-<p><img src="df/ra18.svg" class="img-fluid"></p>
+<p><img src="df/ra19.svg" class="img-fluid"></p>
 </section>
 <section id="section-18" class="level2">
 <h2 class="anchored" data-anchor-id="section-18"></h2>
-<p><img src="df/ra19.svg" class="img-fluid"></p>
+<p><img src="df/ra20.svg" class="img-fluid"></p>
 </section>
 <section id="section-19" class="level2">
 <h2 class="anchored" data-anchor-id="section-19"></h2>
-<p><img src="df/ra20.svg" class="img-fluid"></p>
+<p><img src="df/ra21.svg" class="img-fluid"></p>
 </section>
 <section id="section-20" class="level2">
 <h2 class="anchored" data-anchor-id="section-20"></h2>
-<p><img src="df/ra21.svg" class="img-fluid"></p>
+<p><img src="df/ra22.svg" class="img-fluid"></p>
 </section>
 <section id="section-21" class="level2">
 <h2 class="anchored" data-anchor-id="section-21"></h2>
-<p><img src="df/ra22.svg" class="img-fluid"></p>
+<p><img src="df/ra23.svg" class="img-fluid"></p>
 </section>
 <section id="section-22" class="level2">
 <h2 class="anchored" data-anchor-id="section-22"></h2>
-<p><img src="df/ra23.svg" class="img-fluid"></p>
+<p><img src="df/ra24.svg" class="img-fluid"></p>
 </section>
 <section id="section-23" class="level2">
 <h2 class="anchored" data-anchor-id="section-23"></h2>
-<p><img src="df/ra24.svg" class="img-fluid"></p>
+<p><img src="df/ra25.svg" class="img-fluid"></p>
 </section>
 <section id="section-24" class="level2">
 <h2 class="anchored" data-anchor-id="section-24"></h2>
-<p><img src="df/ra25.svg" class="img-fluid"></p>
+<p><img src="df/ra26.svg" class="img-fluid"></p>
 </section>
 <section id="section-25" class="level2">
 <h2 class="anchored" data-anchor-id="section-25"></h2>
-<p><img src="df/ra26.svg" class="img-fluid"></p>
+<p><img src="df/ra27.svg" class="img-fluid"></p>
 </section>
 <section id="section-26" class="level2">
 <h2 class="anchored" data-anchor-id="section-26"></h2>
-<p><img src="df/ra27.svg" class="img-fluid"></p>
+<p><img src="df/ra28.svg" class="img-fluid"></p>
 </section>
 <section id="section-27" class="level2">
 <h2 class="anchored" data-anchor-id="section-27"></h2>
-<p><img src="df/ra28.svg" class="img-fluid"></p>
+<p><img src="df/ra29.svg" class="img-fluid"></p>
 </section>
 <section id="section-28" class="level2">
 <h2 class="anchored" data-anchor-id="section-28"></h2>
-<p><img src="df/ra29.svg" class="img-fluid"></p>
+<p><img src="df/ra30.svg" class="img-fluid"></p>
 </section>
 <section id="section-29" class="level2">
 <h2 class="anchored" data-anchor-id="section-29"></h2>
-<p><img src="df/ra30.svg" class="img-fluid"></p>
+<p><img src="df/ra31.svg" class="img-fluid"></p>
 </section>
 <section id="section-30" class="level2">
 <h2 class="anchored" data-anchor-id="section-30"></h2>
-<p><img src="df/ra31.svg" class="img-fluid"></p>
+<p><img src="df/ra32.svg" class="img-fluid"></p>
 </section>
 <section id="section-31" class="level2">
 <h2 class="anchored" data-anchor-id="section-31"></h2>
-<p><img src="df/ra32.svg" class="img-fluid"></p>
+<p><img src="df/ra33.svg" class="img-fluid"></p>
 </section>
 <section id="section-32" class="level2">
 <h2 class="anchored" data-anchor-id="section-32"></h2>
-<p><img src="df/ra33.svg" class="img-fluid"></p>
+<p><img src="df/ra34.svg" class="img-fluid"></p>
 </section>
 <section id="section-33" class="level2">
 <h2 class="anchored" data-anchor-id="section-33"></h2>
-<p><img src="df/ra34.svg" class="img-fluid"></p>
+<p><img src="df/ra35.svg" class="img-fluid"></p>
 </section>
 <section id="section-34" class="level2">
 <h2 class="anchored" data-anchor-id="section-34"></h2>
-<p><img src="df/ra35.svg" class="img-fluid"></p>
+<p><img src="df/ra36.svg" class="img-fluid"></p>
 </section>
 <section id="section-35" class="level2">
 <h2 class="anchored" data-anchor-id="section-35"></h2>
-<p><img src="df/ra36.svg" class="img-fluid"></p>
+<p><img src="df/ra37.svg" class="img-fluid"></p>
 </section>
 <section id="section-36" class="level2">
 <h2 class="anchored" data-anchor-id="section-36"></h2>
-<p><img src="df/ra37.svg" class="img-fluid"></p>
+<p><img src="df/ra38.svg" class="img-fluid"></p>
 </section>
 <section id="section-37" class="level2">
 <h2 class="anchored" data-anchor-id="section-37"></h2>
-<p><img src="df/ra38.svg" class="img-fluid"></p>
+<p><img src="df/ra39.svg" class="img-fluid"></p>
 </section>
 <section id="section-38" class="level2">
 <h2 class="anchored" data-anchor-id="section-38"></h2>
-<p><img src="df/ra39.svg" class="img-fluid"></p>
+<p><img src="df/ra40.svg" class="img-fluid"></p>
 </section>
 <section id="section-39" class="level2">
 <h2 class="anchored" data-anchor-id="section-39"></h2>
-<p><img src="df/ra40.svg" class="img-fluid"></p>
+<p><img src="df/ra41.svg" class="img-fluid"></p>
 </section>
 <section id="section-40" class="level2">
 <h2 class="anchored" data-anchor-id="section-40"></h2>
-<p><img src="df/ra41.svg" class="img-fluid"></p>
+<p><img src="df/ra42.svg" class="img-fluid"></p>
 </section>
 <section id="section-41" class="level2">
 <h2 class="anchored" data-anchor-id="section-41"></h2>
-<p><img src="df/ra42.svg" class="img-fluid"></p>
+<p><img src="df/ra43.svg" class="img-fluid"></p>
 </section>
 <section id="section-42" class="level2">
 <h2 class="anchored" data-anchor-id="section-42"></h2>
-<p><img src="df/ra43.svg" class="img-fluid"></p>
+<p><img src="df/ra44.svg" class="img-fluid"></p>
 </section>
 <section id="section-43" class="level2">
 <h2 class="anchored" data-anchor-id="section-43"></h2>
-<p><img src="df/ra44.svg" class="img-fluid"></p>
+<p><img src="df/ra45.svg" class="img-fluid"></p>
 </section>
 <section id="section-44" class="level2">
 <h2 class="anchored" data-anchor-id="section-44"></h2>
-<p><img src="df/ra45.svg" class="img-fluid"></p>
+<p><img src="df/ra46.svg" class="img-fluid"></p>
 </section>
 <section id="section-45" class="level2">
 <h2 class="anchored" data-anchor-id="section-45"></h2>
-<p><img src="df/ra46.svg" class="img-fluid"></p>
+<p><img src="df/ra47.svg" class="img-fluid"></p>
 </section>
 <section id="section-46" class="level2">
 <h2 class="anchored" data-anchor-id="section-46"></h2>
-<p><img src="df/ra47.svg" class="img-fluid"></p>
+<p><img src="df/ra48.svg" class="img-fluid"></p>
 </section>
 <section id="section-47" class="level2">
 <h2 class="anchored" data-anchor-id="section-47"></h2>
-<p><img src="df/ra48.svg" class="img-fluid"></p>
+<p><img src="df/ra49.svg" class="img-fluid"></p>
 </section>
 <section id="section-48" class="level2">
 <h2 class="anchored" data-anchor-id="section-48"></h2>
-<p><img src="df/ra49.svg" class="img-fluid"></p>
+<p><img src="df/ra50.svg" class="img-fluid"></p>
 </section>
 <section id="section-49" class="level2">
 <h2 class="anchored" data-anchor-id="section-49"></h2>
-<p><img src="df/ra50.svg" class="img-fluid"></p>
+<p><img src="df/ra51.svg" class="img-fluid"></p>
 </section>
 <section id="section-50" class="level2">
 <h2 class="anchored" data-anchor-id="section-50"></h2>
-<p><img src="df/ra51.svg" class="img-fluid"></p>
+<p><img src="df/ra52.svg" class="img-fluid"></p>
 </section>
 <section id="section-51" class="level2">
 <h2 class="anchored" data-anchor-id="section-51"></h2>
-<p><img src="df/ra52.svg" class="img-fluid"></p>
+<p><img src="df/ra53.svg" class="img-fluid"></p>
 </section>
 <section id="section-52" class="level2">
 <h2 class="anchored" data-anchor-id="section-52"></h2>
-<p><img src="df/ra53.svg" class="img-fluid"></p>
+<p><img src="df/ra54.svg" class="img-fluid"></p>
 </section>
 <section id="section-53" class="level2">
 <h2 class="anchored" data-anchor-id="section-53"></h2>
-<p><img src="df/ra54.svg" class="img-fluid"></p>
+<p><img src="df/ra55.svg" class="img-fluid"></p>
 </section>
 <section id="section-54" class="level2">
 <h2 class="anchored" data-anchor-id="section-54"></h2>
-<p><img src="df/ra55.svg" class="img-fluid"></p>
+<p><img src="df/ra56.svg" class="img-fluid"></p>
 </section>
 <section id="section-55" class="level2">
 <h2 class="anchored" data-anchor-id="section-55"></h2>
-<p><img src="df/ra56.svg" class="img-fluid"></p>
+<p><img src="df/ra57.svg" class="img-fluid"></p>
 </section>
 <section id="section-56" class="level2">
 <h2 class="anchored" data-anchor-id="section-56"></h2>
-<p><img src="df/ra57.svg" class="img-fluid"></p>
+<p><img src="df/ra58.svg" class="img-fluid"></p>
 </section>
 <section id="section-57" class="level2">
 <h2 class="anchored" data-anchor-id="section-57"></h2>
-<p><img src="df/ra58.svg" class="img-fluid"></p>
+<p><img src="df/ra59.svg" class="img-fluid"></p>
 </section>
 <section id="section-58" class="level2">
 <h2 class="anchored" data-anchor-id="section-58"></h2>
-<p><img src="df/ra59.svg" class="img-fluid"></p>
+<p><img src="df/ra60.svg" class="img-fluid"></p>
 </section>
 <section id="section-59" class="level2">
 <h2 class="anchored" data-anchor-id="section-59"></h2>
-<p><img src="df/ra60.svg" class="img-fluid"></p>
+<p><img src="df/ra61.svg" class="img-fluid"></p>
 </section>
 <section id="section-60" class="level2">
 <h2 class="anchored" data-anchor-id="section-60"></h2>
-<p><img src="df/ra61.svg" class="img-fluid"></p>
+<p><img src="df/ra62.svg" class="img-fluid"></p>
 </section>
 <section id="section-61" class="level2">
 <h2 class="anchored" data-anchor-id="section-61"></h2>
-<p><img src="df/ra62.svg" class="img-fluid"></p>
+<p><img src="df/ra63.svg" class="img-fluid"></p>
 </section>
 <section id="section-62" class="level2">
 <h2 class="anchored" data-anchor-id="section-62"></h2>
-<p><img src="df/ra63.svg" class="img-fluid"></p>
+<p><img src="df/ra64.svg" class="img-fluid"></p>
 </section>
 <section id="section-63" class="level2">
 <h2 class="anchored" data-anchor-id="section-63"></h2>
-<p><img src="df/ra64.svg" class="img-fluid"></p>
+<p><img src="df/ra65.svg" class="img-fluid"></p>
 </section>
 <section id="section-64" class="level2">
 <h2 class="anchored" data-anchor-id="section-64"></h2>
-<p><img src="df/ra65.svg" class="img-fluid"></p>
+<p><img src="df/ra66.svg" class="img-fluid"></p>
 </section>
 <section id="section-65" class="level2">
 <h2 class="anchored" data-anchor-id="section-65"></h2>
-<p><img src="df/ra66.svg" class="img-fluid"></p>
+<p><img src="df/ra67.svg" class="img-fluid"></p>
 </section>
 <section id="section-66" class="level2">
 <h2 class="anchored" data-anchor-id="section-66"></h2>
-<p><img src="df/ra67.svg" class="img-fluid"></p>
+<p><img src="df/ra68.svg" class="img-fluid"></p>
 </section>
 <section id="section-67" class="level2">
 <h2 class="anchored" data-anchor-id="section-67"></h2>
-<p><img src="df/ra68.svg" class="img-fluid"></p>
+<p><img src="df/ra69.svg" class="img-fluid"></p>
 </section>
 <section id="section-68" class="level2">
 <h2 class="anchored" data-anchor-id="section-68"></h2>
-<p><img src="df/ra69.svg" class="img-fluid"></p>
+<p><img src="df/ra70.svg" class="img-fluid"></p>
 </section>
 <section id="section-69" class="level2">
 <h2 class="anchored" data-anchor-id="section-69"></h2>
-<p><img src="df/ra70.svg" class="img-fluid"></p>
+<p><img src="df/ra71.svg" class="img-fluid"></p>
 </section>
 <section id="section-70" class="level2">
 <h2 class="anchored" data-anchor-id="section-70"></h2>
-<p><img src="df/ra71.svg" class="img-fluid"></p>
+<p><img src="df/ra72.svg" class="img-fluid"></p>
 </section>
 <section id="section-71" class="level2">
 <h2 class="anchored" data-anchor-id="section-71"></h2>
-<p><img src="df/ra72.svg" class="img-fluid"></p>
+<p><img src="df/ra73.svg" class="img-fluid"></p>
 </section>
 <section id="section-72" class="level2">
 <h2 class="anchored" data-anchor-id="section-72"></h2>
-<p><img src="df/ra73.svg" class="img-fluid"></p>
+<p><img src="df/ra74.svg" class="img-fluid"></p>
 </section>
 <section id="section-73" class="level2">
 <h2 class="anchored" data-anchor-id="section-73"></h2>
-<p><img src="df/ra74.svg" class="img-fluid"></p>
+<p><img src="df/ra75.svg" class="img-fluid"></p>
 </section>
 <section id="section-74" class="level2">
 <h2 class="anchored" data-anchor-id="section-74"></h2>
-<p><img src="df/ra75.svg" class="img-fluid"></p>
+<p><img src="df/ra76.svg" class="img-fluid"></p>
 </section>
 <section id="section-75" class="level2">
 <h2 class="anchored" data-anchor-id="section-75"></h2>
-<p><img src="df/ra76.svg" class="img-fluid"></p>
+<p><img src="df/ra77.svg" class="img-fluid"></p>
 </section>
 <section id="section-76" class="level2">
 <h2 class="anchored" data-anchor-id="section-76"></h2>
-<p><img src="df/ra77.svg" class="img-fluid"></p>
+<p><img src="df/ra78.svg" class="img-fluid"></p>
 </section>
 <section id="section-77" class="level2">
 <h2 class="anchored" data-anchor-id="section-77"></h2>
-<p><img src="df/ra78.svg" class="img-fluid"></p>
+<p><img src="df/ra79.svg" class="img-fluid"></p>
 </section>
 <section id="section-78" class="level2">
 <h2 class="anchored" data-anchor-id="section-78"></h2>
-<p><img src="df/ra79.svg" class="img-fluid"></p>
+<p><img src="df/ra80.svg" class="img-fluid"></p>
 </section>
 <section id="section-79" class="level2">
 <h2 class="anchored" data-anchor-id="section-79"></h2>
-<p><img src="df/ra80.svg" class="img-fluid"></p>
+<p><img src="df/ra81.svg" class="img-fluid"></p>
 </section>
 <section id="section-80" class="level2">
 <h2 class="anchored" data-anchor-id="section-80"></h2>
-<p><img src="df/ra81.svg" class="img-fluid"></p>
+<p><img src="df/ra82.svg" class="img-fluid"></p>
 </section>
 <section id="section-81" class="level2">
 <h2 class="anchored" data-anchor-id="section-81"></h2>
-<p><img src="df/ra82.svg" class="img-fluid"></p>
-</section>
-<section id="section-82" class="level2">
-<h2 class="anchored" data-anchor-id="section-82"></h2>
 <p><img src="df/ra83.svg" class="img-fluid"></p>
 </section>
-<section id="section-83" class="level2">
-<h2 class="anchored" data-anchor-id="section-83">84</h2>
+<section id="section-82" class="level2">
+<h2 class="anchored" data-anchor-id="section-82">84</h2>
 <p><img src="df/ra84.svg" class="img-fluid"></p>
+</section>
+<section id="section-83" class="level2">
+<h2 class="anchored" data-anchor-id="section-83"></h2>
+<p><img src="df/ra85.svg" class="img-fluid"></p>
 </section>
 <section id="section-84" class="level2">
 <h2 class="anchored" data-anchor-id="section-84"></h2>
-<p><img src="df/ra85.svg" class="img-fluid"></p>
+<p><img src="df/ra86.svg" class="img-fluid"></p>
 </section>
 <section id="section-85" class="level2">
 <h2 class="anchored" data-anchor-id="section-85"></h2>
-<p><img src="df/ra86.svg" class="img-fluid"></p>
+<p><img src="df/ra87.svg" class="img-fluid"></p>
 </section>
 <section id="section-86" class="level2">
 <h2 class="anchored" data-anchor-id="section-86"></h2>
-<p><img src="df/ra87.svg" class="img-fluid"></p>
+<p><img src="df/ra88.svg" class="img-fluid"></p>
 </section>
 <section id="section-87" class="level2">
 <h2 class="anchored" data-anchor-id="section-87"></h2>
-<p><img src="df/ra88.svg" class="img-fluid"></p>
+<p><img src="df/ra89.svg" class="img-fluid"></p>
 </section>
 <section id="section-88" class="level2">
 <h2 class="anchored" data-anchor-id="section-88"></h2>
-<p><img src="df/ra89.svg" class="img-fluid"></p>
+<p><img src="df/ra90.svg" class="img-fluid"></p>
 </section>
 <section id="section-89" class="level2">
 <h2 class="anchored" data-anchor-id="section-89"></h2>
-<p><img src="df/ra90.svg" class="img-fluid"></p>
+<p><img src="df/ra91.svg" class="img-fluid"></p>
 </section>
 <section id="section-90" class="level2">
 <h2 class="anchored" data-anchor-id="section-90"></h2>
-<p><img src="df/ra91.svg" class="img-fluid"></p>
+<p><img src="df/ra92.svg" class="img-fluid"></p>
 </section>
 <section id="section-91" class="level2">
 <h2 class="anchored" data-anchor-id="section-91"></h2>
-<p><img src="df/ra92.svg" class="img-fluid"></p>
+<p><img src="df/ra93.svg" class="img-fluid"></p>
 </section>
 <section id="section-92" class="level2">
 <h2 class="anchored" data-anchor-id="section-92"></h2>
-<p><img src="df/ra93.svg" class="img-fluid"></p>
+<p><img src="df/ra94.svg" class="img-fluid"></p>
 </section>
 <section id="section-93" class="level2">
 <h2 class="anchored" data-anchor-id="section-93"></h2>
-<p><img src="df/ra94.svg" class="img-fluid"></p>
+<p><img src="df/ra95.svg" class="img-fluid"></p>
 </section>
 <section id="section-94" class="level2">
 <h2 class="anchored" data-anchor-id="section-94"></h2>
-<p><img src="df/ra95.svg" class="img-fluid"></p>
+<p><img src="df/ra96.svg" class="img-fluid"></p>
 </section>
 <section id="section-95" class="level2">
 <h2 class="anchored" data-anchor-id="section-95"></h2>
-<p><img src="df/ra96.svg" class="img-fluid"></p>
+<p><img src="df/ra97.svg" class="img-fluid"></p>
 </section>
 <section id="section-96" class="level2">
 <h2 class="anchored" data-anchor-id="section-96"></h2>
-<p><img src="df/ra97.svg" class="img-fluid"></p>
+<p><img src="df/ra98.svg" class="img-fluid"></p>
 </section>
 <section id="section-97" class="level2">
 <h2 class="anchored" data-anchor-id="section-97"></h2>
-<p><img src="df/ra98.svg" class="img-fluid"></p>
+<p><img src="df/ra99.svg" class="img-fluid"></p>
 </section>
 <section id="section-98" class="level2">
 <h2 class="anchored" data-anchor-id="section-98"></h2>
-<p><img src="df/ra99.svg" class="img-fluid"></p>
+<p><img src="df/ra100.svg" class="img-fluid"></p>
 </section>
 <section id="section-99" class="level2">
 <h2 class="anchored" data-anchor-id="section-99"></h2>
-<p><img src="df/ra100.svg" class="img-fluid"></p>
+<p><img src="df/ra101.svg" class="img-fluid"></p>
 </section>
 <section id="section-100" class="level2">
 <h2 class="anchored" data-anchor-id="section-100"></h2>
-<p><img src="df/ra101.svg" class="img-fluid"></p>
+<p><img src="df/ra102.svg" class="img-fluid"></p>
 </section>
 <section id="section-101" class="level2">
 <h2 class="anchored" data-anchor-id="section-101"></h2>
-<p><img src="df/ra102.svg" class="img-fluid"></p>
+<p><img src="df/ra103.svg" class="img-fluid"></p>
 </section>
 <section id="section-102" class="level2">
 <h2 class="anchored" data-anchor-id="section-102"></h2>
-<p><img src="df/ra103.svg" class="img-fluid"></p>
+<p><img src="df/ra104.svg" class="img-fluid"></p>
 </section>
 <section id="section-103" class="level2">
 <h2 class="anchored" data-anchor-id="section-103"></h2>
-<p><img src="df/ra104.svg" class="img-fluid"></p>
+<p><img src="df/ra105.svg" class="img-fluid"></p>
 </section>
 <section id="section-104" class="level2">
 <h2 class="anchored" data-anchor-id="section-104"></h2>
-<p><img src="df/ra105.svg" class="img-fluid"></p>
+<p><img src="df/ra106.svg" class="img-fluid"></p>
 </section>
 <section id="section-105" class="level2">
 <h2 class="anchored" data-anchor-id="section-105"></h2>
-<p><img src="df/ra106.svg" class="img-fluid"></p>
+<p><img src="df/ra107.svg" class="img-fluid"></p>
 </section>
 <section id="section-106" class="level2">
 <h2 class="anchored" data-anchor-id="section-106"></h2>
-<p><img src="df/ra107.svg" class="img-fluid"></p>
+<p><img src="df/ra108.svg" class="img-fluid"></p>
 </section>
 <section id="section-107" class="level2">
 <h2 class="anchored" data-anchor-id="section-107"></h2>
-<p><img src="df/ra108.svg" class="img-fluid"></p>
+<p><img src="df/ra109.svg" class="img-fluid"></p>
 </section>
 <section id="section-108" class="level2">
 <h2 class="anchored" data-anchor-id="section-108"></h2>
-<p><img src="df/ra109.svg" class="img-fluid"></p>
+<p><img src="df/ra110.svg" class="img-fluid"></p>
 </section>
 <section id="section-109" class="level2">
 <h2 class="anchored" data-anchor-id="section-109"></h2>
-<p><img src="df/ra110.svg" class="img-fluid"></p>
+<p><img src="df/ra111.svg" class="img-fluid"></p>
 </section>
 <section id="section-110" class="level2">
 <h2 class="anchored" data-anchor-id="section-110"></h2>
-<p><img src="df/ra111.svg" class="img-fluid"></p>
+<p><img src="df/ra112.svg" class="img-fluid"></p>
 </section>
 <section id="section-111" class="level2">
 <h2 class="anchored" data-anchor-id="section-111"></h2>
-<p><img src="df/ra112.svg" class="img-fluid"></p>
+<p><img src="df/ra113.svg" class="img-fluid"></p>
 </section>
 <section id="section-112" class="level2">
 <h2 class="anchored" data-anchor-id="section-112"></h2>
-<p><img src="df/ra113.svg" class="img-fluid"></p>
+<p><img src="df/ra114.svg" class="img-fluid"></p>
 </section>
 <section id="section-113" class="level2">
 <h2 class="anchored" data-anchor-id="section-113"></h2>
-<p><img src="df/ra114.svg" class="img-fluid"></p>
+<p><img src="df/ra115.svg" class="img-fluid"></p>
 </section>
 <section id="section-114" class="level2">
 <h2 class="anchored" data-anchor-id="section-114"></h2>
-<p><img src="df/ra115.svg" class="img-fluid"></p>
+<p><img src="df/ra116.svg" class="img-fluid"></p>
 </section>
 <section id="section-115" class="level2">
 <h2 class="anchored" data-anchor-id="section-115"></h2>
-<p><img src="df/ra116.svg" class="img-fluid"></p>
+<p><img src="df/ra117.svg" class="img-fluid"></p>
 </section>
 <section id="section-116" class="level2">
 <h2 class="anchored" data-anchor-id="section-116"></h2>
-<p><img src="df/ra117.svg" class="img-fluid"></p>
+<p><img src="df/ra118.svg" class="img-fluid"></p>
 </section>
 <section id="section-117" class="level2">
 <h2 class="anchored" data-anchor-id="section-117"></h2>
-<p><img src="df/ra118.svg" class="img-fluid"></p>
+<p><img src="df/ra119.svg" class="img-fluid"></p>
 </section>
 <section id="section-118" class="level2">
 <h2 class="anchored" data-anchor-id="section-118"></h2>
-<p><img src="df/ra119.svg" class="img-fluid"></p>
+<p><img src="df/ra120.svg" class="img-fluid"></p>
 </section>
 <section id="section-119" class="level2">
 <h2 class="anchored" data-anchor-id="section-119"></h2>
-<p><img src="df/ra120.svg" class="img-fluid"></p>
+<p><img src="df/ra121.svg" class="img-fluid"></p>
 </section>
 <section id="section-120" class="level2">
 <h2 class="anchored" data-anchor-id="section-120"></h2>
-<p><img src="df/ra121.svg" class="img-fluid"></p>
+<p><img src="df/ra122.svg" class="img-fluid"></p>
 </section>
 <section id="section-121" class="level2">
 <h2 class="anchored" data-anchor-id="section-121"></h2>
-<p><img src="df/ra122.svg" class="img-fluid"></p>
+<p><img src="df/ra123.svg" class="img-fluid"></p>
 </section>
 <section id="section-122" class="level2">
 <h2 class="anchored" data-anchor-id="section-122"></h2>
-<p><img src="df/ra123.svg" class="img-fluid"></p>
+<p><img src="df/ra124.svg" class="img-fluid"></p>
 </section>
 <section id="section-123" class="level2">
 <h2 class="anchored" data-anchor-id="section-123"></h2>
-<p><img src="df/ra124.svg" class="img-fluid"></p>
+<p><img src="df/ra125.svg" class="img-fluid"></p>
 </section>
 <section id="section-124" class="level2">
 <h2 class="anchored" data-anchor-id="section-124"></h2>
-<p><img src="df/ra125.svg" class="img-fluid"></p>
+<p><img src="df/ra126.svg" class="img-fluid"></p>
 </section>
 <section id="section-125" class="level2">
 <h2 class="anchored" data-anchor-id="section-125"></h2>
-<p><img src="df/ra126.svg" class="img-fluid"></p>
+<p><img src="df/ra127.svg" class="img-fluid"></p>
 </section>
 <section id="section-126" class="level2">
 <h2 class="anchored" data-anchor-id="section-126"></h2>
-<p><img src="df/ra127.svg" class="img-fluid"></p>
+<p><img src="df/ra128.svg" class="img-fluid"></p>
 </section>
 <section id="section-127" class="level2">
 <h2 class="anchored" data-anchor-id="section-127"></h2>
-<p><img src="df/ra128.svg" class="img-fluid"></p>
+<p><img src="df/ra129.svg" class="img-fluid"></p>
 </section>
 <section id="section-128" class="level2">
 <h2 class="anchored" data-anchor-id="section-128"></h2>
-<p><img src="df/ra129.svg" class="img-fluid"></p>
+<p><img src="df/ra130.svg" class="img-fluid"></p>
 </section>
 <section id="section-129" class="level2">
 <h2 class="anchored" data-anchor-id="section-129"></h2>
-<p><img src="df/ra130.svg" class="img-fluid"></p>
-</section>
-<section id="section-130" class="level2">
-<h2 class="anchored" data-anchor-id="section-130"></h2>
 <p><img src="df/ra131.svg" class="img-fluid"></p>
 </section>
 <section id="pseudo-code" class="level2">
