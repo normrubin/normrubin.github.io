@@ -612,9 +612,9 @@ evn(b, stack)
 <p>if the result of evaluating E1 cannot be distinguished from evaluating E the compiler is free to replace E with E1</p>
 <p>Some compilers assume it is ok if E1 produces less errors than E</p>
 <p>some compilers assume that safety is only required for “standard conforming” code and undefined behavior for other code.</p>
-<p>While is value numbering safe?</p>
+<p>Why is value numbering safe?</p>
 <ol type="1">
-<li>if an expression is in the table, it must have occurred at least one in the block</li>
+<li>if an expression is in the hash table, it must have occurred at least one in the block</li>
 <li>Algorithm modified the code but does not invalidate the table</li>
 </ol>
 </section>
