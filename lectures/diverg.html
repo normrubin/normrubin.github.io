@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Performance and Measurement part 1 – EECE7398 Fall 2024</title>
+<title>divergent flow – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/01a2_performance_measurement.html" rel="next">
-<link href="../lectures/01a_performance_measurement.html" rel="prev">
+<link href="../lectures/mlir.html" rel="next">
+<link href="../lectures/14_gpu_compilers.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -103,7 +69,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Performance and Measurement part 1 – EECE7398 Fall 2024">
+<meta property="og:title" content="divergent flow – EECE7398 Fall 2024">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
@@ -116,13 +83,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs_01a1_performance_measurement.qmd.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs_diverg.qmd.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/01a1_performance_measurement.html">Performance and Measurement part 1</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/diverg.html">divergent flow</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Performance and Measurement part 1</h1>
+<h1 class="title">divergent flow</h1>
 </div>
 
 
@@ -139,137 +106,112 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="measurement" class="level1">
-<h1>Measurement</h1>
-<section id="example-1" class="level2">
-<h2 class="anchored" data-anchor-id="example-1">example 1</h2>
-<p><a href="papers/wrong_data.pdf">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
-<p>445 references</p>
-<hr>
-<p>A sample blog post about this paper <a href="https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/measurement/">blog</a></p>
-</section>
-<section id="violin-plots" class="level2">
-<h2 class="anchored" data-anchor-id="violin-plots">violin plots</h2>
-<p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
-<p>A dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle</p>
-<div id="0b246f11" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library &amp; dataset</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'images/chip_dataset.csv'</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sns.set_palette(<span class="st">"pastel"</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>sns.violinplot(x<span class="op">=</span>df[<span class="st">"Vendor"</span>], y<span class="op">=</span>np.log(df[<span class="st">"Freq (MHz)"</span>]), hue<span class="op">=</span>df[<span class="st">'Type'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \
-0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   
-1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   
-2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   
-3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   
-4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   
-
-   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \
-0     45.0             77.0                  122.0      2200.0  Unknown   
-1     35.0            192.0                 4800.0      3200.0  Unknown   
-2     28.0              NaN                    NaN      2600.0    Intel   
-3     80.0            160.0                 1400.0      1800.0    Intel   
-4    125.0            258.0                  758.0      3700.0  Unknown   
-
-  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  
-0    AMD          NaN          NaN          NaN  
-1    AMD          NaN          NaN          NaN  
-2  Intel          NaN          NaN          NaN  
-3  Intel          NaN          NaN          NaN  
-4    AMD          NaN          NaN          NaN  </code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="01a1_performance_measurement_files/figure-html/cell-2-output-2.png" width="576" height="429" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>apply np.log to the Freq (MHz) column. Because of wide range of values</p>
-<p>Set a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot</p>
-<p>Hue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette</p>
-<p>Data Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.</p>
-<p>I might want to take date into account in these plots</p>
-<hr>
-<p>A violin plot shows density curves. The width is the approximate frequency of data points at that value</p>
-<p>Best for comparing distributions</p>
-<p>consider ordering the groups</p>
-<p>The details</p>
+<section id="what-is-the-cost-of-divergence" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-the-cost-of-divergence">What is the cost of divergence</h2>
+<pre class="{cuda}"><code>__global__ void dec2zero(int* v, int N) { 
+    int xIndex = blockIdx.x*blockDim.x+threadIdx.x;   
+    if (xIndex &lt; N) {
+             while (v[xIndex] &gt; 0) { v[xIndex]--;     
+             }     
+        } 
+} </code></pre>
+<p>Depending on how we initialize the vector, we get different times and different subtracts</p>
 <ol type="1">
-<li>the white dot represents the median</li>
-<li>the thick gray bar in the center represents the inter-quartile range</li>
-<li>the thin gray line represents the rest of the distribution, except for points that are determined to be “outliers” using a method that is a function of the inter-quartile range.</li>
-<li>On each side of the gray line is a kernel density estimation to show the distribution shape of the data. Wider sections of the violin plot represent a higher probability that members of the population will take on the given value; the skinnier sections represent a lower probability.</li>
+<li>Size of array 1048576</li>
+<li>Threads Per Block = 256</li>
+<li>Blocks In Grid = 4096</li>
 </ol>
 </section>
-<section id="error-bars" class="level2">
-<h2 class="anchored" data-anchor-id="error-bars">error bars</h2>
-<div id="5cf437c7" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.describe())</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Assuming df is your DataFrame and 'Release Date' is the column</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Release Date'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'Release Date'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'Release Year'</span>] <span class="op">=</span> ((df[<span class="st">'Release Date'</span>].dt.year) <span class="op">//</span> <span class="dv">5</span>) <span class="op">*</span> <span class="dv">5</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Now df['Release Year'] contains the year extracted from 'Release Date'</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># plot a bar chart</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.barplot(x<span class="op">=</span>df[<span class="st">'Release Year'</span>], y<span class="op">=</span>df[<span class="st">"TDP (W)"</span>], hue <span class="op">=</span>df[<span class="st">'Type'</span>], estimator<span class="op">=</span>np.mean, errorbar<span class="op">=</span>(<span class="st">"sd"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>        Unnamed: 0  Process Size (nm)      TDP (W)  Die Size (mm^2)  \
-count  4854.000000        4845.000000  4228.000000      4139.000000   
-mean   2426.500000          55.109598    81.359981       188.440445   
-std    1401.373433          44.998676    76.807808       126.189383   
-min       0.000000           0.000000     1.000000         1.000000   
-25%    1213.250000          22.000000    33.000000       104.000000   
-50%    2426.500000          40.000000    65.000000       148.000000   
-75%    3639.750000          90.000000   100.000000       239.000000   
-max    4853.000000         250.000000   900.000000       826.000000   
-
-       Transistors (million)   Freq (MHz)    FP16 GFLOPS   FP32 GFLOPS  \
-count            4143.000000  4854.000000     536.000000   1948.000000   
-mean             1929.922279  1484.406057    8397.459851   2134.756653   
-std              4044.891098  1066.701523   13799.551131   3898.431487   
-min                 8.000000   100.000000      10.020000     12.800000   
-25%               154.000000   590.000000     768.800000    257.300000   
-50%               624.000000  1073.500000    2965.500000    696.000000   
-75%              1550.000000  2400.000000   10600.000000   2116.750000   
-max             54200.000000  4700.000000  184600.000000  40000.000000   
-
-        FP64 GFLOPS  
-count   1306.000000  
-mean     363.670511  
-std     1145.931856  
-min        3.600000  
-25%       38.295000  
-50%       89.280000  
-75%      220.000000  
-max    11540.000000  </code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="01a1_performance_measurement_files/figure-html/cell-3-output-2.png" width="593" height="433" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-
-
+<section id="some-initializers" class="level2">
+<h2 class="anchored" data-anchor-id="some-initializers">some initializers</h2>
+<pre class="{C}"><code>  // all 1
+  for (int i = 0; i &lt; n; i++) {
+    A[i] = 1; 
+  }
+  // subtracts 1048576
+  // time      0.1 ms</code></pre>
+<pre class="{c}"><code>// decreasing values from n-1 to 0
+  for (int i = 0; i &lt; n; i++) {
+    A[i] = n - i - 1;  // count should be N*(n+1)/2 = 54975572...
+  }
+  // subtracts 549755289600
+  // time  45.7 ms</code></pre>
+<pre class="{c}"><code>// Fill function to set all elements of the array to the middle value of n
+  for (int i = 0; i &lt; n; i++) {
+    A[i] = n / 2;  // count should be N*N/2 54975572...
+    // subtracts 549755813888
+    // time  45.6 ms</code></pre>
+<pre class="{c}"><code>// Fill function to set alternate elements to 0 or n
+  for (int i = 0; i &lt; n; i++) {
+    A[i] = 0;
+    if (i%2){ A[i] = n;} 
+    // subtacts 549755813888
+    // time 83.9 ms
+  }</code></pre>
 </section>
+<section id="divergence-example" class="level2">
+<h2 class="anchored" data-anchor-id="divergence-example">divergence example</h2>
+<p>```<strong>global</strong> void example(float* v){ if (v[tid]) &lt; 2.0){ v[tid] = /=2; } else { v[tid] = 0; } }</p>
+<p>and in ptx</p>
+<pre><code>1. b0: r1 = addr v[tid]
+2. f1 = load r1
+3. p1 = set.lt f0, 0.0
+
+5. @p1? Bzr: f2 = div f1, 2
+6. @p1? jmp Bst
+
+7. !@p1? b1: f2 = 0.0
+
+8. Bst: store r1, f2</code></pre>
+<pre class="{mermaid}"><code>%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+Graph TB
+B0--&gt; Bzr
+B0--&gt; B1
+Bzr--&gt; Bst
+b1 --&gt; Bst</code></pre>
+</section>
+<section id="what-happens-to-implement-this" class="level2">
+<h2 class="anchored" data-anchor-id="what-happens-to-implement-this">what happens to implement this?</h2>
+</section>
+<section id="harware-version-1-pre-volta-nvidia-chips" class="level2">
+<h2 class="anchored" data-anchor-id="harware-version-1-pre-volta-nvidia-chips">harware version 1 (pre volta nvidia chips)</h2>
+<p>There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reachs an if- push 3 entries pc then, mask for then pc else, mask for else pc reconvergence pt, mask for recovergence</p>
+<pre><code>
+                          t0 t1 t2 t3    stack
+a:                        r  r  r  r      a: 1111
+--------------------------------------------------------
+  if (tid% 4 &lt; 2) {       r  r  r  r      b  1100
+                                          c  0011
+                                          f  1111
+----------------------------------------------------------
+    b:                    r r   -  -      c 0011
+    c:                    r r   -  -      f  1111
+-------------------------------------------------
+  } else {                
+    d:                    - -   r r 
+    e:                    - -   r r
+  }
+  f:                                    stack is empty    </code></pre>
+<p>at else pc matches tos at f pc matches tos</p>
+<p>rules: 1. divergent paths execute serially 1. threads execute in lock step 1. recoverge at immed post dominator</p>
+<p>easy to find post dominator for reducible control flow</p>
+<p>some code deadlocks:</p>
+<p>1: *mutex = 0; 2: 3 while(!atomicCAS(mutex,0,1)); 3: // Critical Section 4: atomicExch(mutex,0);</p>
+</section>
+<section id="volta-and-newer" class="level2">
+<h2 class="anchored" data-anchor-id="volta-and-newer">volta and newer</h2>
+<p><a href="https://arxiv.org/pdf/2407.02944">possible structure</a></p>
+<p>Handles unstructured code nicely always makes forward progress</p>
+<p>adds a new set of registers called barrier registers</p>
+</section>
+<section id="code-for-an-if-statement-reconverga-nbce" class="level2">
+<h2 class="anchored" data-anchor-id="code-for-an-if-statement-reconverga-nbce">code for an if statement reconverga nbce</h2>
+<p>in AMD terms</p>
+<p>save the exec mask set exect mask to running threads do the then invert the exec mask if there is an else do the else restore the exec mask</p>
+<p>where in the cfg do we restore the exec mask</p>
+
+
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -695,13 +637,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/01a_performance_measurement.html" class="pagination-link" aria-label="Performance and Measurement">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Performance and Measurement</span>
+      <a href="../lectures/14_gpu_compilers.html" class="pagination-link" aria-label="GPU Compilers">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">GPU Compilers</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/01a2_performance_measurement.html" class="pagination-link" aria-label="Performance and Measurement part 2">
-        <span class="nav-page-text">Performance and Measurement part 2</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/mlir.html" class="pagination-link" aria-label="Polyhedral Compilation Opportunities in MLIR">
+        <span class="nav-page-text">Polyhedral Compilation Opportunities in MLIR</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
