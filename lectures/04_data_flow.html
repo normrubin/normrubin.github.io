@@ -68,6 +68,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="Data Flow – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
@@ -362,6 +391,14 @@ ul.task-list li input[type="checkbox"] {
 <section id="section-63" class="level2">
 <h2 class="anchored" data-anchor-id="section-63"></h2>
 <p><img src="df/ra64.svg" class="img-fluid"></p>
+</section>
+<section id="implementation-notes" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-notes">implementation notes</h2>
+<ol type="1">
+<li>we can represent these sets as bit vectors</li>
+<li>all these transfer functions look like <span class="math display">\[ f(x) = (x-K) \bigcup(G) \]</span> We can summarize K and G over each basic block</li>
+</ol>
+<p>K is called the kill set, G is the Gen sets</p>
 </section>
 <section id="section-64" class="level2">
 <h2 class="anchored" data-anchor-id="section-64"></h2>
