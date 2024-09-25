@@ -600,7 +600,7 @@ while worklist is not empty
 
 evn(b, stack)
    t = new table for b  
-   link t to scope 
+   link t above stack  
    lvn(b,t) 
    for each s successor of b,
      if s has one pred then evn(s, t)

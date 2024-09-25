@@ -28,6 +28,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -322,6 +387,9 @@
       margin-right: 0; 
     }
   </style>
+  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <meta property="og:title" content="Data Flow – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -384,215 +452,296 @@
 <h2></h2>
 
 <img data-src="df/ra11.svg" class="r-stretch"></section>
+<section id="in-and-out" class="slide level2">
+<h2>IN and OUT</h2>
+
+<img data-src="df/ra12.svg" class="r-stretch"></section>
+<section id="equations" class="slide level2">
+<h2>EQUATIONS</h2>
+
+<img data-src="df/ra13.svg" class="r-stretch"></section>
 <section id="section-11" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra12.svg" class="r-stretch"></section>
+<img data-src="df/ra14.svg" class="r-stretch"></section>
 <section id="section-12" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra13.svg" class="r-stretch"></section>
+<img data-src="df/ra15.svg" class="r-stretch"></section>
 <section id="section-13" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra14.svg" class="r-stretch"></section>
+<img data-src="df/ra16.svg" class="r-stretch"></section>
+<section id="liveness-example" class="slide level2">
+<h2>Liveness Example</h2>
+
+<img data-src="df/ra17.svg" class="r-stretch"></section>
+<section id="summary-by-basic-blocks" class="slide level2">
+<h2>Summary by basic blocks</h2>
+<p>The dataflow equations used for a given basic block b and exiting block final in live variable analysis:</p>
+<p><span class="math inline">\(\operatorname{GEN}[b]\)</span> - The set of variables that are used in b before any assignment in the same basic block.</p>
+<p><span class="math inline">\(\operatorname{KILL}[b]\)</span> - The set of variables that are assigned a value in b</p>
+<p>The in-state of a block is the set of variables that are live at the start of the block. Its out-state is the set of variables that are live at the end of it. The out-state is the union of the in-states of the block’s successors. The transfer function of a statement is applied by making the variables that are written dead, then making the variables that are read live.</p>
+</section>
+<section id="equations-1" class="slide level2">
+<h2>equations</h2>
+$
+<span class="math display">\[\begin{aligned}
+  &amp; \operatorname{IN}[b]=\operatorname{GEN}[b] \cup\left(\operatorname{OUT}[b]-\operatorname{KILL}[s]\right) \\
+  &amp; \operatorname{OUT}[\text { final }]=\emptyset \\
+  &amp; \operatorname{OUT}[b]=\bigcup_{p \in s u c c[b]} \operatorname{IN}[p] \\
+  &amp; \operatorname{GEN}\left[b: y \leftarrow f\left(x_1, \cdots, x_n\right)\right]=\left\{x_1, \ldots, x_n\right\} \\
+  &amp; \operatorname{KILL}\left[b: y \leftarrow f\left(x_1, \cdots, x_n\right)\right]=\{y\}
+
+\end{aligned}\]</span>
+<p>$</p>
+</section>
+<section id="an-example" class="slide level2">
+<h2>an example</h2>
+<pre><code>b1: 
+a = 3
+b = 5
+d = 4
+x = 100
+if a &gt; b then 
+
+   b2: 
+    c = a + b
+    d = 2 
+
+b3: 
+   c = 4
+   return b*d +c</code></pre>
+<p><span class="math inline">\(\operatorname{GEN}[b]\)</span> - The set of variables that are used in b before any assignment in the same basic block.</p>
+<p><span class="math inline">\(\operatorname{KILL}[b]\)</span> - The set of variables that are assigned a value in b</p>
+</section>
+<section class="slide level2">
+
+<pre><code>GEN[b1] = []         kill[b1] = [a,b,d,x]
+GEN[b2] = [a,b]      kill[b2] = [c,d]
+GEN[b3] = [b,d]      Kill[b3] = [c]</code></pre>
+</section>
+<section id="processing" class="slide level2">
+<h2>processing</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb3-2"><a></a>graph TB</span>
+<span id="cb3-3"><a></a>b1--&gt; b2</span>
+<span id="cb3-4"><a></a>b1 --&gt; b3</span>
+<span id="cb3-5"><a></a>b2--&gt; b3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+b1--&gt; b2
+b1 --&gt; b3
+b2--&gt; b3
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<pre><code>GEN[b1] = []         kill[b1] = [a,b,d,x]
+GEN[b2] = [a,b]      kill[b2] = [c,d]
+GEN[b3] = [b,d]      Kill[b3] = [c]</code></pre>
+<pre><code>block OUT       IN   Next IN        worklist  
+b3    []        []    [b,d]           b1,b2
+b1    [b,d]     []    []              b2
+b2    [b,d]     []    [a,b]           b1
+b1    [a,b,d]   []    []              empty
+</code></pre>
+</section>
 <section id="section-14" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra15.svg" class="r-stretch"></section>
+<img data-src="df/ra18.svg" class="r-stretch"></section>
 <section id="section-15" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra16.svg" class="r-stretch"></section>
+<img data-src="df/ra19.svg" class="r-stretch"></section>
 <section id="section-16" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra17.svg" class="r-stretch"></section>
+<img data-src="df/ra20.svg" class="r-stretch"></section>
 <section id="section-17" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra18.svg" class="r-stretch"></section>
+<img data-src="df/ra21.svg" class="r-stretch"></section>
 <section id="section-18" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra19.svg" class="r-stretch"></section>
+<img data-src="df/ra22.svg" class="r-stretch"></section>
 <section id="section-19" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra20.svg" class="r-stretch"></section>
+<img data-src="df/ra23.svg" class="r-stretch"></section>
 <section id="section-20" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra21.svg" class="r-stretch"></section>
+<img data-src="df/ra24.svg" class="r-stretch"></section>
 <section id="section-21" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra22.svg" class="r-stretch"></section>
+<img data-src="df/ra25.svg" class="r-stretch"></section>
 <section id="section-22" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra23.svg" class="r-stretch"></section>
+<img data-src="df/ra26.svg" class="r-stretch"></section>
 <section id="section-23" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra24.svg" class="r-stretch"></section>
+<img data-src="df/ra27.svg" class="r-stretch"></section>
 <section id="section-24" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra25.svg" class="r-stretch"></section>
+<img data-src="df/ra28.svg" class="r-stretch"></section>
 <section id="section-25" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra26.svg" class="r-stretch"></section>
+<img data-src="df/ra29.svg" class="r-stretch"></section>
 <section id="section-26" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra27.svg" class="r-stretch"></section>
+<img data-src="df/ra30.svg" class="r-stretch"></section>
 <section id="section-27" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra28.svg" class="r-stretch"></section>
+<img data-src="df/ra31.svg" class="r-stretch"></section>
 <section id="section-28" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra29.svg" class="r-stretch"></section>
+<img data-src="df/ra32.svg" class="r-stretch"></section>
 <section id="section-29" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra30.svg" class="r-stretch"></section>
+<img data-src="df/ra33.svg" class="r-stretch"></section>
 <section id="section-30" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra31.svg" class="r-stretch"></section>
+<img data-src="df/ra34.svg" class="r-stretch"></section>
 <section id="section-31" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra32.svg" class="r-stretch"></section>
+<img data-src="df/ra35.svg" class="r-stretch"></section>
 <section id="section-32" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra33.svg" class="r-stretch"></section>
+<img data-src="df/ra36.svg" class="r-stretch"></section>
 <section id="section-33" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra34.svg" class="r-stretch"></section>
+<img data-src="df/ra37.svg" class="r-stretch"></section>
 <section id="section-34" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra35.svg" class="r-stretch"></section>
+<img data-src="df/ra38.svg" class="r-stretch"></section>
 <section id="section-35" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra36.svg" class="r-stretch"></section>
+<img data-src="df/ra39.svg" class="r-stretch"></section>
 <section id="section-36" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra37.svg" class="r-stretch"></section>
+<img data-src="df/ra40.svg" class="r-stretch"></section>
 <section id="section-37" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra38.svg" class="r-stretch"></section>
+<img data-src="df/ra41.svg" class="r-stretch"></section>
 <section id="section-38" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra39.svg" class="r-stretch"></section>
+<img data-src="df/ra42.svg" class="r-stretch"></section>
 <section id="section-39" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra40.svg" class="r-stretch"></section>
+<img data-src="df/ra43.svg" class="r-stretch"></section>
 <section id="section-40" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra41.svg" class="r-stretch"></section>
+<img data-src="df/ra44.svg" class="r-stretch"></section>
 <section id="section-41" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra42.svg" class="r-stretch"></section>
+<img data-src="df/ra45.svg" class="r-stretch"></section>
 <section id="section-42" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra43.svg" class="r-stretch"></section>
+<img data-src="df/ra46.svg" class="r-stretch"></section>
 <section id="section-43" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra44.svg" class="r-stretch"></section>
+<img data-src="df/ra47.svg" class="r-stretch"></section>
 <section id="section-44" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra45.svg" class="r-stretch"></section>
+<img data-src="df/ra48.svg" class="r-stretch"></section>
 <section id="section-45" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra46.svg" class="r-stretch"></section>
+<img data-src="df/ra49.svg" class="r-stretch"></section>
 <section id="section-46" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra47.svg" class="r-stretch"></section>
+<img data-src="df/ra50.svg" class="r-stretch"></section>
 <section id="section-47" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra48.svg" class="r-stretch"></section>
+<img data-src="df/ra51.svg" class="r-stretch"></section>
 <section id="section-48" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra49.svg" class="r-stretch"></section>
+<img data-src="df/ra52.svg" class="r-stretch"></section>
 <section id="section-49" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra50.svg" class="r-stretch"></section>
+<img data-src="df/ra53.svg" class="r-stretch"></section>
 <section id="section-50" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra51.svg" class="r-stretch"></section>
+<img data-src="df/ra54.svg" class="r-stretch"></section>
 <section id="section-51" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra52.svg" class="r-stretch"></section>
+<img data-src="df/ra55.svg" class="r-stretch"></section>
 <section id="section-52" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra53.svg" class="r-stretch"></section>
+<img data-src="df/ra56.svg" class="r-stretch"></section>
 <section id="section-53" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra54.svg" class="r-stretch"></section>
+<img data-src="df/ra57.svg" class="r-stretch"></section>
 <section id="section-54" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra55.svg" class="r-stretch"></section>
+<img data-src="df/ra58.svg" class="r-stretch"></section>
 <section id="section-55" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra56.svg" class="r-stretch"></section>
+<img data-src="df/ra59.svg" class="r-stretch"></section>
 <section id="section-56" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra57.svg" class="r-stretch"></section>
+<img data-src="df/ra60.svg" class="r-stretch"></section>
 <section id="section-57" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra58.svg" class="r-stretch"></section>
+<img data-src="df/ra61.svg" class="r-stretch"></section>
 <section id="section-58" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra59.svg" class="r-stretch"></section>
+<img data-src="df/ra62.svg" class="r-stretch"></section>
 <section id="section-59" class="slide level2">
 <h2></h2>
 
-<img data-src="df/ra60.svg" class="r-stretch"></section>
-<section id="section-60" class="slide level2">
-<h2></h2>
-
-<img data-src="df/ra61.svg" class="r-stretch"></section>
-<section id="section-61" class="slide level2">
-<h2></h2>
-
-<img data-src="df/ra62.svg" class="r-stretch"></section>
-<section id="section-62" class="slide level2">
-<h2></h2>
-
 <img data-src="df/ra63.svg" class="r-stretch"></section>
-<section id="section-63" class="slide level2">
+<section id="section-60" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra64.svg" class="r-stretch"></section>
@@ -604,271 +753,271 @@
 </ol>
 <p>K is called the kill set, G is the Gen sets</p>
 </section>
-<section id="section-64" class="slide level2">
+<section id="section-61" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra65.svg" class="r-stretch"></section>
-<section id="section-65" class="slide level2">
+<section id="section-62" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra66.svg" class="r-stretch"></section>
-<section id="section-66" class="slide level2">
+<section id="section-63" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra67.svg" class="r-stretch"></section>
-<section id="section-67" class="slide level2">
+<section id="section-64" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra68.svg" class="r-stretch"></section>
-<section id="section-68" class="slide level2">
+<section id="section-65" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra69.svg" class="r-stretch"></section>
-<section id="section-69" class="slide level2">
+<section id="section-66" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra70.svg" class="r-stretch"></section>
-<section id="section-70" class="slide level2">
+<section id="section-67" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra71.svg" class="r-stretch"></section>
-<section id="section-71" class="slide level2">
+<section id="section-68" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra72.svg" class="r-stretch"></section>
-<section id="section-72" class="slide level2">
+<section id="section-69" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra73.svg" class="r-stretch"></section>
-<section id="section-73" class="slide level2">
+<section id="section-70" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra74.svg" class="r-stretch"></section>
-<section id="section-74" class="slide level2">
+<section id="section-71" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra75.svg" class="r-stretch"></section>
-<section id="section-75" class="slide level2">
+<section id="section-72" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra76.svg" class="r-stretch"></section>
-<section id="section-76" class="slide level2">
+<section id="section-73" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra77.svg" class="r-stretch"></section>
-<section id="section-77" class="slide level2">
+<section id="section-74" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra78.svg" class="r-stretch"></section>
-<section id="section-78" class="slide level2">
+<section id="section-75" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra79.svg" class="r-stretch"></section>
-<section id="section-79" class="slide level2">
+<section id="section-76" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra80.svg" class="r-stretch"></section>
-<section id="section-80" class="slide level2">
+<section id="section-77" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra81.svg" class="r-stretch"></section>
-<section id="section-81" class="slide level2">
+<section id="section-78" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra82.svg" class="r-stretch"></section>
-<section id="section-82" class="slide level2">
+<section id="section-79" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra83.svg" class="r-stretch"></section>
-<section id="section-83" class="slide level2">
+<section id="section-80" class="slide level2">
 <h2>84</h2>
 
 <img data-src="df/ra84.svg" class="r-stretch"></section>
-<section id="section-84" class="slide level2">
+<section id="section-81" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra85.svg" class="r-stretch"></section>
-<section id="section-85" class="slide level2">
+<section id="section-82" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra86.svg" class="r-stretch"></section>
-<section id="section-86" class="slide level2">
+<section id="section-83" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra87.svg" class="r-stretch"></section>
-<section id="section-87" class="slide level2">
+<section id="section-84" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra88.svg" class="r-stretch"></section>
-<section id="section-88" class="slide level2">
+<section id="section-85" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra89.svg" class="r-stretch"></section>
-<section id="section-89" class="slide level2">
+<section id="section-86" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra90.svg" class="r-stretch"></section>
-<section id="section-90" class="slide level2">
+<section id="section-87" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra91.svg" class="r-stretch"></section>
-<section id="section-91" class="slide level2">
+<section id="section-88" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra92.svg" class="r-stretch"></section>
-<section id="section-92" class="slide level2">
+<section id="section-89" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra93.svg" class="r-stretch"></section>
-<section id="section-93" class="slide level2">
+<section id="section-90" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra94.svg" class="r-stretch"></section>
-<section id="section-94" class="slide level2">
+<section id="section-91" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra95.svg" class="r-stretch"></section>
-<section id="section-95" class="slide level2">
+<section id="section-92" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra96.svg" class="r-stretch"></section>
-<section id="section-96" class="slide level2">
+<section id="section-93" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra97.svg" class="r-stretch"></section>
-<section id="section-97" class="slide level2">
+<section id="section-94" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra98.svg" class="r-stretch"></section>
-<section id="section-98" class="slide level2">
+<section id="section-95" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra99.svg" class="r-stretch"></section>
-<section id="section-99" class="slide level2">
+<section id="section-96" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra100.svg" class="r-stretch"></section>
-<section id="section-100" class="slide level2">
+<section id="section-97" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra101.svg" class="r-stretch"></section>
-<section id="section-101" class="slide level2">
+<section id="section-98" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra102.svg" class="r-stretch"></section>
-<section id="section-102" class="slide level2">
+<section id="section-99" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra103.svg" class="r-stretch"></section>
-<section id="section-103" class="slide level2">
+<section id="section-100" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra104.svg" class="r-stretch"></section>
-<section id="section-104" class="slide level2">
+<section id="section-101" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra105.svg" class="r-stretch"></section>
-<section id="section-105" class="slide level2">
+<section id="section-102" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra106.svg" class="r-stretch"></section>
-<section id="section-106" class="slide level2">
+<section id="section-103" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra107.svg" class="r-stretch"></section>
-<section id="section-107" class="slide level2">
+<section id="section-104" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra108.svg" class="r-stretch"></section>
-<section id="section-108" class="slide level2">
+<section id="section-105" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra109.svg" class="r-stretch"></section>
-<section id="section-109" class="slide level2">
+<section id="section-106" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra110.svg" class="r-stretch"></section>
-<section id="section-110" class="slide level2">
+<section id="section-107" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra111.svg" class="r-stretch"></section>
-<section id="section-111" class="slide level2">
+<section id="section-108" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra112.svg" class="r-stretch"></section>
-<section id="section-112" class="slide level2">
+<section id="section-109" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra113.svg" class="r-stretch"></section>
-<section id="section-113" class="slide level2">
+<section id="section-110" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra114.svg" class="r-stretch"></section>
-<section id="section-114" class="slide level2">
+<section id="section-111" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra115.svg" class="r-stretch"></section>
-<section id="section-115" class="slide level2">
+<section id="section-112" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra116.svg" class="r-stretch"></section>
-<section id="section-116" class="slide level2">
+<section id="section-113" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra117.svg" class="r-stretch"></section>
-<section id="section-117" class="slide level2">
+<section id="section-114" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra118.svg" class="r-stretch"></section>
-<section id="section-118" class="slide level2">
+<section id="section-115" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra119.svg" class="r-stretch"></section>
-<section id="section-119" class="slide level2">
+<section id="section-116" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra120.svg" class="r-stretch"></section>
-<section id="section-120" class="slide level2">
+<section id="section-117" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra121.svg" class="r-stretch"></section>
-<section id="section-121" class="slide level2">
+<section id="section-118" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra122.svg" class="r-stretch"></section>
-<section id="section-122" class="slide level2">
+<section id="section-119" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra123.svg" class="r-stretch"></section>
-<section id="section-123" class="slide level2">
+<section id="section-120" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra124.svg" class="r-stretch"></section>
-<section id="section-124" class="slide level2">
+<section id="section-121" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra125.svg" class="r-stretch"></section>
-<section id="section-125" class="slide level2">
+<section id="section-122" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra126.svg" class="r-stretch"></section>
-<section id="section-126" class="slide level2">
+<section id="section-123" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra127.svg" class="r-stretch"></section>
-<section id="section-127" class="slide level2">
+<section id="section-124" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra128.svg" class="r-stretch"></section>
-<section id="section-128" class="slide level2">
+<section id="section-125" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra129.svg" class="r-stretch"></section>
-<section id="section-129" class="slide level2">
+<section id="section-126" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra130.svg" class="r-stretch"></section>
-<section id="section-130" class="slide level2">
+<section id="section-127" class="slide level2">
 <h2></h2>
 
 <img data-src="df/ra131.svg" class="r-stretch"></section>

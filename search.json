@@ -981,7 +981,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#72dcaf56 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#f77fedd9 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2429,6 +2429,90 @@
     ]
   },
   {
+    "objectID": "lectures/04_data_flow.html#in-and-out",
+    "href": "lectures/04_data_flow.html#in-and-out",
+    "title": "Data Flow",
+    "section": "IN and OUT",
+    "text": "IN and OUT",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#equations",
+    "href": "lectures/04_data_flow.html#equations",
+    "title": "Data Flow",
+    "section": "EQUATIONS",
+    "text": "EQUATIONS",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#liveness-example",
+    "href": "lectures/04_data_flow.html#liveness-example",
+    "title": "Data Flow",
+    "section": "Liveness Example",
+    "text": "Liveness Example",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#summary-by-basic-blocks",
+    "href": "lectures/04_data_flow.html#summary-by-basic-blocks",
+    "title": "Data Flow",
+    "section": "Summary by basic blocks",
+    "text": "Summary by basic blocks\nThe dataflow equations used for a given basic block b and exiting block final in live variable analysis:\n\\(\\operatorname{GEN}[b]\\) - The set of variables that are used in b before any assignment in the same basic block.\n\\(\\operatorname{KILL}[b]\\) - The set of variables that are assigned a value in b\nThe in-state of a block is the set of variables that are live at the start of the block. Its out-state is the set of variables that are live at the end of it. The out-state is the union of the in-states of the block’s successors. The transfer function of a statement is applied by making the variables that are written dead, then making the variables that are read live.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#equations-1",
+    "href": "lectures/04_data_flow.html#equations-1",
+    "title": "Data Flow",
+    "section": "equations",
+    "text": "equations\n$\n\\[\\begin{aligned}\n  & \\operatorname{IN}[b]=\\operatorname{GEN}[b] \\cup\\left(\\operatorname{OUT}[b]-\\operatorname{KILL}[s]\\right) \\\\\n  & \\operatorname{OUT}[\\text { final }]=\\emptyset \\\\\n  & \\operatorname{OUT}[b]=\\bigcup_{p \\in s u c c[b]} \\operatorname{IN}[p] \\\\\n  & \\operatorname{GEN}\\left[b: y \\leftarrow f\\left(x_1, \\cdots, x_n\\right)\\right]=\\left\\{x_1, \\ldots, x_n\\right\\} \\\\\n  & \\operatorname{KILL}\\left[b: y \\leftarrow f\\left(x_1, \\cdots, x_n\\right)\\right]=\\{y\\}\n\n\\end{aligned}\\]\n$",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#an-example",
+    "href": "lectures/04_data_flow.html#an-example",
+    "title": "Data Flow",
+    "section": "an example",
+    "text": "an example\nb1: \na = 3\nb = 5\nd = 4\nx = 100\nif a &gt; b then \n\n   b2: \n    c = a + b\n    d = 2 \n\nb3: \n   c = 4\n   return b*d +c\n\\(\\operatorname{GEN}[b]\\) - The set of variables that are used in b before any assignment in the same basic block.\n\\(\\operatorname{KILL}[b]\\) - The set of variables that are assigned a value in b\n\nGEN[b1] = []         kill[b1] = [a,b,d,x]\nGEN[b2] = [a,b]      kill[b2] = [c,d]\nGEN[b3] = [b,d]      Kill[b3] = [c]",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#processing",
+    "href": "lectures/04_data_flow.html#processing",
+    "title": "Data Flow",
+    "section": "processing",
+    "text": "processing\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nb1--&gt; b2\nb1 --&gt; b3\nb2--&gt; b3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nb1--&gt; b2\nb1 --&gt; b3\nb2--&gt; b3\n\n\n\n\n\n\nGEN[b1] = []         kill[b1] = [a,b,d,x]\nGEN[b2] = [a,b]      kill[b2] = [c,d]\nGEN[b3] = [b,d]      Kill[b3] = [c]\nblock OUT       IN   Next IN        worklist  \nb3    []        []    [b,d]           b1,b2\nb1    [b,d]     []    []              b2\nb2    [b,d]     []    [a,b]           b1\nb1    [a,b,d]   []    []              empty",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
     "objectID": "lectures/04_data_flow.html#implementation-notes",
     "href": "lectures/04_data_flow.html#implementation-notes",
     "title": "Data Flow",
@@ -2441,8 +2525,8 @@
     ]
   },
   {
-    "objectID": "lectures/04_data_flow.html#section-83",
-    "href": "lectures/04_data_flow.html#section-83",
+    "objectID": "lectures/04_data_flow.html#section-80",
+    "href": "lectures/04_data_flow.html#section-80",
     "title": "Data Flow",
     "section": "84",
     "text": "84",
@@ -2501,6 +2585,55 @@
     ]
   },
   {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#in-and-out",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#in-and-out",
+    "title": "Data Flow",
+    "section": "IN and OUT",
+    "text": "IN and OUT"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#equations",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#equations",
+    "title": "Data Flow",
+    "section": "EQUATIONS",
+    "text": "EQUATIONS"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#liveness-example",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#liveness-example",
+    "title": "Data Flow",
+    "section": "Liveness Example",
+    "text": "Liveness Example"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#summary-by-basic-blocks",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#summary-by-basic-blocks",
+    "title": "Data Flow",
+    "section": "Summary by basic blocks",
+    "text": "Summary by basic blocks\nThe dataflow equations used for a given basic block b and exiting block final in live variable analysis:\n\\(\\operatorname{GEN}[b]\\) - The set of variables that are used in b before any assignment in the same basic block.\n\\(\\operatorname{KILL}[b]\\) - The set of variables that are assigned a value in b\nThe in-state of a block is the set of variables that are live at the start of the block. Its out-state is the set of variables that are live at the end of it. The out-state is the union of the in-states of the block’s successors. The transfer function of a statement is applied by making the variables that are written dead, then making the variables that are read live."
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#equations-1",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#equations-1",
+    "title": "Data Flow",
+    "section": "equations",
+    "text": "equations\n$\n\\[\\begin{aligned}\n  & \\operatorname{IN}[b]=\\operatorname{GEN}[b] \\cup\\left(\\operatorname{OUT}[b]-\\operatorname{KILL}[s]\\right) \\\\\n  & \\operatorname{OUT}[\\text { final }]=\\emptyset \\\\\n  & \\operatorname{OUT}[b]=\\bigcup_{p \\in s u c c[b]} \\operatorname{IN}[p] \\\\\n  & \\operatorname{GEN}\\left[b: y \\leftarrow f\\left(x_1, \\cdots, x_n\\right)\\right]=\\left\\{x_1, \\ldots, x_n\\right\\} \\\\\n  & \\operatorname{KILL}\\left[b: y \\leftarrow f\\left(x_1, \\cdots, x_n\\right)\\right]=\\{y\\}\n\n\\end{aligned}\\]\n$"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#an-example",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#an-example",
+    "title": "Data Flow",
+    "section": "an example",
+    "text": "an example\nb1: \na = 3\nb = 5\nd = 4\nx = 100\nif a &gt; b then \n\n   b2: \n    c = a + b\n    d = 2 \n\nb3: \n   c = 4\n   return b*d +c\n\\(\\operatorname{GEN}[b]\\) - The set of variables that are used in b before any assignment in the same basic block.\n\\(\\operatorname{KILL}[b]\\) - The set of variables that are assigned a value in b"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#processing",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#processing",
+    "title": "Data Flow",
+    "section": "processing",
+    "text": "processing\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nb1--&gt; b2\nb1 --&gt; b3\nb2--&gt; b3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nb1--&gt; b2\nb1 --&gt; b3\nb2--&gt; b3\n\n\n\n\n\n\nGEN[b1] = []         kill[b1] = [a,b,d,x]\nGEN[b2] = [a,b]      kill[b2] = [c,d]\nGEN[b3] = [b,d]      Kill[b3] = [c]\nblock OUT       IN   Next IN        worklist  \nb3    []        []    [b,d]           b1,b2\nb1    [b,d]     []    []              b2\nb2    [b,d]     []    [a,b]           b1\nb1    [a,b,d]   []    []              empty"
+  },
+  {
     "objectID": "lectures/revealjs_04_data_flow.qmd.html#implementation-notes",
     "href": "lectures/revealjs_04_data_flow.qmd.html#implementation-notes",
     "title": "Data Flow",
@@ -2508,8 +2641,8 @@
     "text": "implementation notes\n\nwe can represent these sets as bit vectors\nall these transfer functions look like \\[ f(x) = (x-K) \\bigcup(G) \\] We can summarize K and G over each basic block\n\nK is called the kill set, G is the Gen sets"
   },
   {
-    "objectID": "lectures/revealjs_04_data_flow.qmd.html#section-83",
-    "href": "lectures/revealjs_04_data_flow.qmd.html#section-83",
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#section-80",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#section-80",
     "title": "Data Flow",
     "section": "84",
     "text": "84"
@@ -2763,7 +2896,7 @@
     "href": "lectures/03b_local_value_numbering.html#extended-basic-blocks",
     "title": "local value numbering",
     "section": "extended basic blocks",
-    "text": "extended basic blocks\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n\nhow do we extend the hash tables over the boundary\nwe need to do value numbering over each path\nworklist = {entry block}\nstack = {}\nwhile worklist is not empty \n   remove a block b from the worklist \n   evn(b)\n\nevn(b, stack)\n   t = new table for b  \n   link t to scope \n   lvn(b,t) \n   for each s successor of b,\n     if s has one pred then evn(s, t)\n     else add s to worklist \n   dealocate t",
+    "text": "extended basic blocks\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n\nhow do we extend the hash tables over the boundary\nwe need to do value numbering over each path\nworklist = {entry block}\nstack = {}\nwhile worklist is not empty \n   remove a block b from the worklist \n   evn(b)\n\nevn(b, stack)\n   t = new table for b  \n   link t above stack  \n   lvn(b,t) \n   for each s successor of b,\n     if s has one pred then evn(s, t)\n     else add s to worklist \n   dealocate t",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2918,7 +3051,7 @@
     "href": "lectures/revealjs_03b_local_value_numbering.qmd.html#extended-basic-blocks",
     "title": "local value numbering",
     "section": "extended basic blocks",
-    "text": "extended basic blocks\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n\nhow do we extend the hash tables over the boundary\nwe need to do value numbering over each path\nworklist = {entry block}\nstack = {}\nwhile worklist is not empty \n   remove a block b from the worklist \n   evn(b)\n\nevn(b, stack)\n   t = new table for b  \n   link t to scope \n   lvn(b,t) \n   for each s successor of b,\n     if s has one pred then evn(s, t)\n     else add s to worklist \n   dealocate t"
+    "text": "extended basic blocks\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;b\nA--&gt;c\nc--&gt;d\nc--&gt;e\n\n\n\n\n\n\nhow do we extend the hash tables over the boundary\nwe need to do value numbering over each path\nworklist = {entry block}\nstack = {}\nwhile worklist is not empty \n   remove a block b from the worklist \n   evn(b)\n\nevn(b, stack)\n   t = new table for b  \n   link t above stack  \n   lvn(b,t) \n   for each s successor of b,\n     if s has one pred then evn(s, t)\n     else add s to worklist \n   dealocate t"
   },
   {
     "objectID": "lectures/revealjs_03b_local_value_numbering.qmd.html#safety",
@@ -5321,7 +5454,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 620\n-rw-r--r-- 1 runner docker 40847 Sep 24 15:58 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 24 15:57 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 24 15:57 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 24 15:56 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Sep 24 15:57 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 24 15:57 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 24 15:56 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 24 15:57 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 24 15:57 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 24 15:58 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 24 15:57 03_local.qmd\n-rw-r--r-- 1 runner docker 13263 Sep 24 15:57 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  5323 Sep 24 15:57 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 24 15:57 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 24 15:57 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 24 15:58 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 24 15:57 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 24 15:57 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 24 15:56 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 24 15:57 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 24 15:57 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 24 15:56 09_poly_files\n-rw-r--r-- 1 runner docker   302 Sep 24 15:57 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 24 15:57 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 24 15:58 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 24 15:57 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 24 15:57 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 24 15:57 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 24 15:56 a.json\n-rw-r--r-- 1 runner docker   248 Sep 24 15:56 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 24 15:56 df\n-rw-r--r-- 1 runner docker  9019 Sep 24 15:57 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 24 15:56 errors\n-rw-r--r-- 1 runner docker  3623 Sep 24 15:56 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 24 15:56 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 24 15:56 images\n-rw-r--r-- 1 runner docker  2260 Sep 24 15:57 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 24 15:56 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 24 15:56 ra\n-rw-r--r-- 1 runner docker  8226 Sep 24 15:57 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 24 15:57 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 24 15:58 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 24 15:58 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 24 15:58 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 24 15:56 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 620\n-rw-r--r-- 1 runner docker 40847 Sep 25 16:32 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 25 16:31 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 25 16:31 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 25 16:30 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Sep 25 16:31 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 25 16:31 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 25 16:30 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 25 16:31 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 25 16:31 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 25 16:32 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 25 16:31 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Sep 25 16:31 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  7508 Sep 25 16:31 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 25 16:31 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 25 16:31 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 25 16:32 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 25 16:31 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 25 16:31 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 25 16:30 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 25 16:31 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 25 16:31 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 25 16:30 09_poly_files\n-rw-r--r-- 1 runner docker   302 Sep 25 16:31 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 25 16:31 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 25 16:32 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 25 16:31 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 25 16:31 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 25 16:31 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 25 16:30 a.json\n-rw-r--r-- 1 runner docker   248 Sep 25 16:30 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 25 16:30 df\n-rw-r--r-- 1 runner docker  9019 Sep 25 16:31 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 25 16:30 errors\n-rw-r--r-- 1 runner docker  3623 Sep 25 16:30 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 25 16:30 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 25 16:30 images\n-rw-r--r-- 1 runner docker  2260 Sep 25 16:31 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 25 16:30 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 25 16:30 ra\n-rw-r--r-- 1 runner docker  8226 Sep 25 16:31 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 25 16:31 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 25 16:32 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 25 16:32 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 25 16:32 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 25 16:30 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
