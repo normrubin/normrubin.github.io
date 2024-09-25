@@ -52,10 +52,10 @@ https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/),  "Principles of
 ##
 ![](df/ra11.svg)
 
-##
+## IN and OUT
 ![](df/ra12.svg)
 
-##
+## EQUATIONS
 ![](df/ra13.svg)
 
 ##
@@ -67,8 +67,94 @@ https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/),  "Principles of
 ##
 ![](df/ra16.svg)
 
-##
+## Liveness Example 
 ![](df/ra17.svg)
+
+## Summary by basic blocks
+
+The dataflow equations used for a given basic block b and exiting block final  in live variable analysis:
+
+$\operatorname{GEN}[b]$ - The set of variables that are used in b before any assignment in the same basic block.
+
+$\operatorname{KILL}[b]$ - The set of variables that are assigned a value in b
+
+
+The in-state of a block is the set of variables that are live at the start of the block. Its out-state is the set of variables that are live at the end of it. The out-state is the union of the in-states of the block's successors. The transfer function of a statement is applied by making the variables that are written dead, then making the variables that are read live.
+
+## equations 
+
+$
+\begin{aligned}
+  & \operatorname{IN}[b]=\operatorname{GEN}[b] \cup\left(\operatorname{OUT}[b]-\operatorname{KILL}[s]\right) \\
+  & \operatorname{OUT}[\text { final }]=\emptyset \\ 
+  & \operatorname{OUT}[b]=\bigcup_{p \in s u c c[b]} \operatorname{IN}[p] \\ 
+  & \operatorname{GEN}\left[b: y \leftarrow f\left(x_1, \cdots, x_n\right)\right]=\left\{x_1, \ldots, x_n\right\} \\ 
+  & \operatorname{KILL}\left[b: y \leftarrow f\left(x_1, \cdots, x_n\right)\right]=\{y\}
+
+\end{aligned}
+$
+
+
+
+## an example 
+
+```
+b1: 
+a = 3
+b = 5
+d = 4
+x = 100
+if a > b then 
+
+   b2: 
+    c = a + b
+    d = 2 
+
+b3: 
+   c = 4
+   return b*d +c
+```
+
+$\operatorname{GEN}[b]$ - The set of variables that are used in b before any assignment in the same basic block.
+
+$\operatorname{KILL}[b]$ - The set of variables that are assigned a value in b
+
+---
+
+```
+GEN[b1] = []         kill[b1] = [a,b,d,x]
+GEN[b2] = [a,b]      kill[b2] = [c,d]
+GEN[b3] = [b,d]      Kill[b3] = [c]
+```
+
+## processing 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+b1--> b2
+b1 --> b3
+b2--> b3
+```
+
+```
+GEN[b1] = []         kill[b1] = [a,b,d,x]
+GEN[b2] = [a,b]      kill[b2] = [c,d]
+GEN[b3] = [b,d]      Kill[b3] = [c]
+```
+
+
+```
+block OUT       IN   Next IN        worklist  
+b3    []        []    [b,d]           b1,b2
+b1    [b,d]     []    []              b2
+b2    [b,d]     []    [a,b]           b1
+b1    [a,b,d]   []    []              empty
+
+```
+
+
+  
 
 ##
 ![](df/ra18.svg)
