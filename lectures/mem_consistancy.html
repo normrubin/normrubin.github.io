@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>divergent flow – EECE7398 Fall 2024</title>
+<title>memory consistancy – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../lectures/mem_consistancy.html" rel="next">
-<link href="../lectures/14_gpu_compilers.html" rel="prev">
+<link href="../lectures/mlir.html" rel="next">
+<link href="../lectures/diverg.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -68,37 +68,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta property="og:title" content="divergent flow – EECE7398 Fall 2024">
+<meta property="og:title" content="memory consistancy – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -112,13 +83,13 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs_diverg.qmd.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs_mem_consistancy.qmd.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/diverg.html">divergent flow</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/mem_consistancy.html">memory consistancy</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">divergent flow</h1>
+<h1 class="title">memory consistancy</h1>
 </div>
 
 
@@ -135,274 +106,314 @@ window.Quarto = {
 </header>
 
 
-<section id="what-is-the-cost-of-divergence" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-the-cost-of-divergence">What is the cost of divergence</h2>
-<pre class="{cuda}"><code>__global__ void dec2zero(int* v, int N) { 
-    int xIndex = blockIdx.x*blockDim.x+threadIdx.x;   
-    if (xIndex &lt; N) {
-             while (v[xIndex] &gt; 0) { v[xIndex]--;     
-             }     
-        } 
-} </code></pre>
-<p>Depending on how we initialize the vector, we get different times and different subtracts</p>
+<section id="multi-threaded-programs" class="level2">
+<h2 class="anchored" data-anchor-id="multi-threaded-programs">multi-threaded programs</h2>
+<p>Compilers started out assuming targets are single threaded. What optimizations change for multi-threaded code? How do users tell compiler that the target is multi-threaded?</p>
+</section>
+<section id="shared-memory-multi-threading" class="level2">
+<h2 class="anchored" data-anchor-id="shared-memory-multi-threading">shared memory multi-threading</h2>
+<p>The most common parallel system is</p>
 <ol type="1">
-<li>Size of array 1048576</li>
-<li>Threads Per Block = 256</li>
-<li>Blocks In Grid = 4096</li>
+<li>A single big memory</li>
+<li>multiple threads address that memory</li>
 </ol>
 </section>
-<section id="some-initializers" class="level2">
-<h2 class="anchored" data-anchor-id="some-initializers">some initializers</h2>
-<pre class="{C}"><code>  // all 1
-  for (int i = 0; i &lt; n; i++) {
-    A[i] = 1; 
-  }
-  // subtracts 1048576
-  // time      0.1 ms</code></pre>
-<pre class="{c}"><code>// decreasing values from n-1 to 0
-  for (int i = 0; i &lt; n; i++) {
-    A[i] = n - i - 1;  // count should be N*(n+1)/2 = 54975572...
-  }
-  // subtracts 549755289600
-  // time  45.7 ms</code></pre>
-<pre class="{c}"><code>// Fill function to set all elements of the array to the middle value of n
-  for (int i = 0; i &lt; n; i++) {
-    A[i] = n / 2;  // count should be N*N/2 54975572...
-    // subtracts 549755813888
-    // time  45.6 ms</code></pre>
-<pre class="{c}"><code>// Fill function to set alternate elements to 0 or n
-  for (int i = 0; i &lt; n; i++) {
-    A[i] = 0;
-    if (i%2){ A[i] = n;} 
-    // subtacts 549755813888
-    // time 83.9 ms
-  }</code></pre>
-</section>
-<section id="divergence-example" class="level2">
-<h2 class="anchored" data-anchor-id="divergence-example">divergence example</h2>
-<p>```<strong>global</strong> void example(float* v){ if (v[tid]) &lt; 2.0){ v[tid] = /=2; } else { v[tid] = 0; } }</p>
-<p>and in ptx</p>
-<pre><code>1. b0: r1 = addr v[tid]
-2. f1 = load r1
-3. p1 = set.lt f0, 0.0
+<section id="an-example" class="level1">
+<h1>an example</h1>
+<p>Pretend we have parallel programming in bril</p>
+<pre><code>setup:
+  zero: int = const 0;
+  one:  int = const 1;
+  a: ptr&lt;int&gt; = alloc one;
+  b: ptr&lt;int&gt; = alloc one;
+  store a zero;
+  store b zero;
 
-5. @p1? Bzr: f2 = div f1, 2
-6. @p1? jmp Bst
+  create two threads somehow 
 
-7. !@p1? b1: f2 = 0.0
+  thread 1                  thread 2
+  store a one;              store b one
+  bv: int = load b;         av: int load a;</code></pre>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>av</th>
+<th>bv</th>
+<th>allowed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>0</td>
+<td>1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<section id="what-is-sequential-consistency-sq" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-sequential-consistency-sq">what is sequential consistency SQ</h2>
+<p>Program Order is Maintained Within Threads:</p>
+<p>Operations (reads and writes) appear to occur in the order they are issued by each individual thread. If a thread performs a write followed by a read, the read cannot appear to happen before the write in the execution.</p>
+<p>Global Order of Operations Across Threads:</p>
+<p>All threads see the effects of memory operations in the same sequential order. Every thread agrees on the order of reads and writes, though the specific order is not predefined—it just needs to be consistent across all threads. Interleaving of Operations:</p>
+<p>The execution can be viewed as an interleaving of instructions from all threads. However, the interleaving must follow the program order within each thread.</p>
+<p>no real machine/compiler implements this</p>
+</section>
+<section id="compiler-effects" class="level2">
+<h2 class="anchored" data-anchor-id="compiler-effects">compiler effects</h2>
+<p>Compiler transformations that break multi-thread sequential consistency (SC) often reorder or optimize instructions in ways that do not respect the original program order seen by other threads. These transformations can lead to subtle bugs in multithreaded programs where the expected interleaving of operations is violated.</p>
+</section>
+<section id="loadstore-reordering" class="level2">
+<h2 class="anchored" data-anchor-id="loadstore-reordering">Load/Store Reordering</h2>
+<p>Transformation: Compilers might reorder loads and stores to improve performance. Violation: In a multi-threaded environment, this can lead to a situation where one thread sees stale or unexpected data. Example:</p>
+<pre><code>Copy code
+// Thread 1
+x = 1;     // Store
+r1 = y;    // Load
 
-8. Bst: store r1, f2</code></pre>
-<pre class="{mermaid}"><code>%%{init: {"flowchart": {"htmlLabels": false}} }%%
+// Thread 2
+y = 1;     // Store
+r2 = x;    // Load</code></pre>
+<p>Under sequential consistency, if thread 1’s x = 1 happens before thread 2’s r2 = x, then thread 2 should observe r2 == 1. But reordering could result in thread 2 reading x as 0.</p>
+</section>
+<section id="common-subexpression-elimination-cse" class="level2">
+<h2 class="anchored" data-anchor-id="common-subexpression-elimination-cse">Common Subexpression Elimination (CSE)</h2>
+<p>Transformation: If a variable or expression is computed multiple times, the compiler may optimize by reusing the result of an earlier computation. Violation: This assumes that no other thread modifies shared variables between these uses. Example:</p>
+<pre><code>// Original code
+r1 = x;
+r2 = x;
 
-Graph TB
-B0--&gt; Bzr
-B0--&gt; B1
-Bzr--&gt; Bst
-b1 --&gt; Bst</code></pre>
+// Transformed code (CSE applied)
+temp = x;
+r1 = temp;
+r2 = temp;</code></pre>
+<p>If x is modified by another thread between the two reads, the transformed code will incorrectly assume the value of x hasn’t changed.</p>
 </section>
-<section id="what-happens-to-implement-this" class="level2">
-<h2 class="anchored" data-anchor-id="what-happens-to-implement-this">what happens to implement this?</h2>
+<section id="dead-code-elimination-dce" class="level2">
+<h2 class="anchored" data-anchor-id="dead-code-elimination-dce">Dead Code Elimination (DCE)</h2>
+<p>Transformation: The compiler may remove stores to variables that are not subsequently read in the same thread. Violation: If the variable is shared and accessed by other threads, removing the store could lead to unexpected behavior. Example:</p>
+<pre><code>// Original code
+x = 1;
+
+// Transformed code (DCE applied)</code></pre>
+<p>// x = 1 is removed because x is not used locally If another thread reads x, it expects the store to have happened, but DCE breaks this assumption.</p>
 </section>
-<section id="harware-version-1-pre-volta-nvidia-chips" class="level2">
-<h2 class="anchored" data-anchor-id="harware-version-1-pre-volta-nvidia-chips">harware version 1 (pre volta nvidia chips)</h2>
-<p>There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reachs an if- push 3 entries pc then, mask for then pc else, mask for else pc reconvergence pt, mask for recovergence</p>
-<pre><code>
-                          t0 t1 t2 t3    stack
-a:                        r  r  r  r      a: 1111
---------------------------------------------------------
-  if (tid% 4 &lt; 2) {       r  r  r  r      b  1100
-                                          c  0011
-                                          f  1111
-----------------------------------------------------------
-    b:                    r r   -  -      c 0011
-    c:                    r r   -  -      f  1111
--------------------------------------------------
-  } else {                
-    d:                    - -   r r 
-    e:                    - -   r r
-  }
-  f:                                    stack is empty    </code></pre>
-<p>at else pc matches tos at f pc matches tos</p>
-<p>rules: 1. divergent paths execute serially 1. threads execute in lock step 1. recoverge at immed post dominator</p>
-<p>easy to find post dominator for reducible control flow</p>
-<p>some code deadlocks:</p>
-<p>1: *mutex = 0; 2: 3 while(!atomicCAS(mutex,0,1)); 3: // Critical Section 4: atomicExch(mutex,0);</p>
+<section id="speculative-execution-out-of-order-execution" class="level2">
+<h2 class="anchored" data-anchor-id="speculative-execution-out-of-order-execution">Speculative Execution (Out-of-Order Execution)</h2>
+<p>Transformation: Compilers (or hardware) may execute instructions speculatively, assuming certain branches are likely to be taken. Violation: This can cause out-of-order writes or reads visible to other threads, breaking SC. Example:</p>
+<pre><code>if (flag) {
+    r1 = x;
+}</code></pre>
+<p>If the compiler speculatively reads x before knowing the value of flag, another thread’s write to x might be missed or observed out-of-order.</p>
 </section>
-<section id="volta-and-newer" class="level2">
-<h2 class="anchored" data-anchor-id="volta-and-newer">volta and newer</h2>
-<p><a href="https://arxiv.org/pdf/2407.02944">possible structure</a></p>
-<p>Handles unstructured code nicely always makes forward progress</p>
-<pre><code>
-                          t0 t1 t2 t3    
-a:                        r  r  r  r      
---------------------------------------------------------
-  if (tid% 4 &lt; 2) {       r  r  r  r    
-                                                                           
-----------------------------------------------------------
-    b:                    r r   -  -    
-    d:                    - -   r r  
-    c:                    r r   -  -  
-    e:                    - -   r r    
--------------------------------------------------
-                
-  f:                      r r  --
-                          - -  r r 
-   _syncthreads()         r r r r 
-  g:             </code></pre>
-<p>adds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize</p>
-<p>new instructions:</p>
+<section id="loop-invariant-code-motion" class="level2">
+<h2 class="anchored" data-anchor-id="loop-invariant-code-motion">Loop Invariant Code Motion</h2>
+<p>Transformation: The compiler moves computations that are invariant inside a loop to outside the loop. Violation: If these computations involve shared variables modified by other threads within the loop, moving them outside could make the code see stale values. Example:</p>
+<pre><code>// Original code
+while (condition) {
+    r = shared_variable;
+}
+
+// Transformed code (Loop Invariant Code Motion)
+temp = shared_variable;
+while (condition) {
+    r = temp;
+}</code></pre>
+<p>If shared_variable is updated by another thread, the transformed code might keep using the old value.</p>
+<section id="register-allocation-caching-shared-variables-in-registers" class="level3">
+<h3 class="anchored" data-anchor-id="register-allocation-caching-shared-variables-in-registers">Register Allocation (Caching Shared Variables in Registers)</h3>
+<p>Transformation: Compilers can keep a shared variable in a register for efficiency rather than repeatedly loading it from memory. Violation: If another thread modifies that shared variable in memory, the compiler’s register optimization would cause the thread to read stale data. Example:</p>
+<pre><code>while (flag == 0) {
+    // busy-wait
+}</code></pre>
+<p>If flag is cached in a register, updates to flag by another thread in memory won’t be reflected, breaking SC.</p>
+</section>
+</section>
+<section id="instruction-fusion-combining-loadsstores" class="level2">
+<h2 class="anchored" data-anchor-id="instruction-fusion-combining-loadsstores">Instruction Fusion (Combining Loads/Stores)</h2>
+<p>Transformation: The compiler may combine consecutive memory accesses into one, such as merging adjacent stores into a single store or combining two loads. Violation: If other threads expect these loads or stores to happen separately, they might see an inconsistent view of memory. Example:</p>
+<pre><code>// Original code
+x = 1;
+y = 2;
+
+// Transformed code (store fusion)
+// x and y are stored together in a single transaction</code></pre>
+<p>A thread expecting x and y to be updated separately might observe an inconsistent state if this transformation is applied.</p>
+</section>
+<section id="thread-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="thread-libraries">thread libraries</h2>
+<p>start out assuming single threaded, add a threads library like pthreads</p>
+<p>multiple threads could access shared memory simultaneously, leading to race conditions, inconsistent data, and undefined behavior.</p>
+<p>Modern CPUs and compilers perform optimizations like instruction reordering, which can break assumptions about the order of memory operations in multithreaded programs.</p>
+<p>Multithreaded code is harder to test because race conditions and bugs might only manifest under certain timing conditions.</p>
+<p>Debugging multithreaded programs is more difficult due to the unpredictable nature of thread execution and interactions.</p>
+<p>Some optimizations might reorder instructions in a way that is incompatible with multithreading, introducing subtle bugs or performance regressions.</p>
+<p>Caching, prefetching, or other memory optimizations need to account for the fact that multiple threads may be accessing the same memory, which a simple thread library does not handle.</p>
+</section>
+<section id="using-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="using-libraries">using libraries</h2>
 <ol type="1">
-<li>bssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point</li>
-<li>bmov copies between barrier registers and regular registers</li>
-<li>bsync forces threads in the mask to wait</li>
-<li>bbreak removes threads from mask</li>
+<li><p>Functions such as pthread mutex lock() that are guaranteed by the standard to “synchronize memory” include hardware instructions (“memory barriers”) that prevent hardware reordering of memory operations around the call</p></li>
+<li><p>To prevent the compiler from moving memory operations around calls to functions such as pthread mutex lock(), they are essentially treated as calls to opaque functions, about which the compiler has no information.</p></li>
 </ol>
+<p>The compiler effectively assumes that pthread mutex lock() may read or write any global variable. Thus a memory reference cannot simply be moved across the call. This approach also ensures that transitive calls, e.g.&nbsp;a call to a function f() which then calls pthread mutex lock(), are handled in the same way more or less appropriately, i.e.&nbsp;memory operations are not moved across the call to f() either, whether or not the entire user program is being analyzed at once.</p>
 </section>
-<section id="what-does-this-solve" class="level2">
-<h2 class="anchored" data-anchor-id="what-does-this-solve">what does this solve</h2>
-<p>The Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity2 of previous hardware architectures.</p>
-<p>When porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.</p>
-<p>To avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.</p>
-<p>Applications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.</p>
-<p>Applications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.</p>
 </section>
-<section id="amd" class="level2">
-<h2 class="anchored" data-anchor-id="amd">AMD</h2>
-<p>AMD implemented the early version. scalar registers are used as an ‘exec mask’ to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions</p>
-<p>save the exec mask set exect mask to running threads do the then invert the exec mask if there is an else do the else restore the exec mask</p>
+<section id="example-2" class="level1">
+<h1>example 2</h1>
+<pre><code>for (...) {
+     ... 
+     if (mt) pthread_mutex_lock(...); 
+     x = ... x ...
+     if (mt) pthread_mutex_unlock(...)
+    }</code></pre>
+<p>r = x; for (…) { … if (mt) { x = r; pthread_mutex_lock(…); r = x; } r = … r … if (mt) { x = r; pthread_mutex_unlock(…); r = x; } } x = r;</p>
+<section id="adding-multi-threading-to-user-explaining-the-intent" class="level2">
+<h2 class="anchored" data-anchor-id="adding-multi-threading-to-user-explaining-the-intent">adding multi-threading to user explaining the intent</h2>
+<p>c++/c added atomics</p>
+<p>Atomic operations are operations that are completed as a single, uninterruptible action. No other thread can observe a partial update or interfere with the operation.</p>
+<p>These operations ensure that read-modify-write sequences are safe without needing explicit locks.</p>
 </section>
-<section id="static-detection-of-divergences" class="level2">
-<h2 class="anchored" data-anchor-id="static-detection-of-divergences">static detection of divergences</h2>
-<p>can we determine which branches may cause divergences and which branches are uniform?</p>
-<p>at a dirergent branch some threads go one way, some the other, we will need to insert instructions for reconvergence at a uniform branch all threads go the same way</p>
+<section id="an-example-1" class="level2">
+<h2 class="anchored" data-anchor-id="an-example-1">an example</h2>
+<pre><code>#include &lt;atomic&gt;
+#include &lt;iostream&gt;
+#include &lt;thread&gt;
+
+// Global spinlock using atomic_flag
+std::atomic_flag lock = ATOMIC_FLAG_INIT;
+
+void enter_critical_section() {
+    // Busy-wait (spin) until the lock is acquired
+    while (lock.test_and_set(std::memory_order_acquire)) {
+        // Spin and wait for the lock to become available
+    }
+}
+
+void leave_critical_section() {
+    // Release the lock
+    lock.clear(std::memory_order_release);
+}
+
+// Shared resource
+int shared_counter = 0;
+
+void critical_section_task(int num_increments) {
+    for (int i = 0; i &lt; num_increments; ++i) {
+        enter_critical_section();
+        // Begin critical section
+        ++shared_counter;
+        // End critical section
+        leave_critical_section();
+    }
+}</code></pre>
 </section>
-<section id="divergent-and-uniform-variables" class="level2">
-<h2 class="anchored" data-anchor-id="divergent-and-uniform-variables">divergent and uniform variables</h2>
-<p>A program variable is divergent if different threads see different values.</p>
-<p>If different threads always see that variable with the same value, then the variable is uniform</p>
-<p>divergent variables</p>
+<section id="load-acquire-needs-special-hardware" class="level2">
+<h2 class="anchored" data-anchor-id="load-acquire-needs-special-hardware">load acquire (needs special hardware )</h2>
+<p>used by default with atomics not used for non-atomics</p>
+<p>all memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.</p>
+<p>a one way fence - nothing can move up</p>
+</section>
+<section id="write-release-needs-special-hardware" class="level2">
+<h2 class="anchored" data-anchor-id="write-release-needs-special-hardware">write release (needs special hardware )</h2>
+<p>prevents the compiler or processor from reordering any memory operations (reads or writes) that appear before the release store. This guarantees that all operations that modify shared data before the release are visible to other threads that subsequently perform an acquire operation.</p>
+<p>also a one way fence - nothing can move down</p>
+<pre><code>load.acquire - 
+loads and stores on non-atomics  - compiler picks the order for these operations 
+store.release </code></pre>
+</section>
+<section id="using-atomics" class="level2">
+<h2 class="anchored" data-anchor-id="using-atomics">using atomics</h2>
+<p>All operations appear to occur in a single total order that is consistent across all threads. This means that the results of operations are predictable and consistent as if all operations were executed in some sequential order.</p>
+<p>limits the hardware and compiler because it prevents reordering</p>
+</section>
+<section id="data-race-free" class="level2">
+<h2 class="anchored" data-anchor-id="data-race-free">Data Race Free</h2>
+<p>Data Race Free (DRF) means that a program is free from data races, which occur when:</p>
 <ol type="1">
-<li>v = tid</li>
-<li>atomic()</li>
-<li>v is data dependent on a divergent variable</li>
-<li>v is control dependent on a divergent variable</li>
+<li>Two or more threads access the same variable concurrently.</li>
+<li>At least one of the accesses is a write.</li>
 </ol>
-<p>## thread id is always divergent</p>
-<pre><code> __global__ 
- void saxpy (int n, float alpha, float *x, float *y) {
-   int i = blockIdx.x * blockDim.x + threadIdx.x;  
-  if (i &lt; n) y[i] = alpha * x[i] + y[i]; } </code></pre>
-<p>Each thread sees a different value</p>
-<p>Threads in different blocks see the same threadid - is that a problem</p>
+<p>There is no synchronization mechanism (like mutexes or atomic operations) to control the access. In a data race-free program, every shared variable is accessed in a way that ensures predictable results. C++ provides various synchronization primitives (such as mutexes and atomic types) to help developers write DRF code.</p>
+<p>All shared variables must be accessed using synchronization to prevent concurrent threads from modifying shared data simultaneously without coordination.</p>
 </section>
-<section id="variables-defined-by-atomic-operations" class="level2">
-<h2 class="anchored" data-anchor-id="variables-defined-by-atomic-operations">variables defined by atomic operations</h2>
-<pre><code>__global__ void ex_atomic (int index, float* v) {
-   int i = 0; 
-   i = ATOMINC( v[index] ); } </code></pre>
+<section id="an-example-2" class="level2">
+<h2 class="anchored" data-anchor-id="an-example-2">an example</h2>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;atomic&gt;
+#include &lt;thread&gt;
+
+int shared_counter1 = 0;                  // First non-atomic shared variable
+int shared_counter2 = 0;                  // Second non-atomic shared variable
+std::atomic&lt;bool&gt; lock_flag(false);       // Atomic flag to control access
+
+void safe_increment() {
+    for (int i = 0; i &lt; 1000; ++i) {
+        // Spin until the lock is acquired
+        while (lock_flag.exchange(true)) {
+            // Busy-wait (spin) until the lock is free
+        }
+
+        // Critical section: update the non-atomic shared variables
+        ++shared_counter1;
+        ++shared_counter2;
+
+        // Release the lock
+        lock_flag.store(false);
+    }
+}</code></pre>
 </section>
-<section id="dependences" class="level2">
-<h2 class="anchored" data-anchor-id="dependences">dependences</h2>
-<p>Two types of dependences: data and control.</p>
-<p>If the program contains an assignment such as v = f(v1, v2, …, vn), then v is data dependent on the arguments v1,v2 …</p>
-<p>If the value assigned to variable v depends on a branch controlled by p, then we say that v is control dependent on p.&nbsp;</p>
-<p>Divergences propagate transitively on the graph determined by the dependence relation.</p>
-<p>A variable might be divergent at one program point and uniform at another</p>
+<section id="language-rules" class="level2">
+<h2 class="anchored" data-anchor-id="language-rules">language rules</h2>
+<p>C and C++</p>
+<p>do not define what happens in the presence of data races. If a program has data races (e.g., multiple threads concurrently reading and writing to the same variable without synchronization), the behavior is considered undefined. This means that the program may produce unexpected results, crash, or behave inconsistently across different executions or platforms.</p>
+<p>Java</p>
+<p>tries to define what happens but definition is very complex and maybe inconsistent</p>
+<p>Rust</p>
+<p>Compile-Time Guarantees: Rust’s ownership and borrowing system prevents data races at compile time. If a program is not DRF, the Rust compiler will typically refuse to compile it, enforcing memory safety guarantees.</p>
 </section>
-<section id="an-example" class="level2">
-<h2 class="anchored" data-anchor-id="an-example">an example</h2>
-<p><img src="images/da10.svg" class="img-fluid"></p>
+<section id="can-the-compiler-add-a-race-to-a-drf-program" class="level2">
+<h2 class="anchored" data-anchor-id="can-the-compiler-add-a-race-to-a-drf-program">can the compiler add a race to a drf program</h2>
+<p>new rule, compiler cannot add a write to a shared variable</p>
+<pre><code>if (x ==1) y++
+
+to 
+y++
+if (x!=1) y--
+</code></pre>
 </section>
-<section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section"></h2>
-<p><img src="images/da9.svg" class="img-fluid"> ##</p>
-<p><img src="images/da11.svg" class="img-fluid"></p>
-</section>
-<section id="section-1" class="level2">
-<h2 class="anchored" data-anchor-id="section-1"></h2>
-<p><img src="images/da12.svg" class="img-fluid"></p>
-</section>
-<section id="section-2" class="level2">
-<h2 class="anchored" data-anchor-id="section-2"></h2>
-<p><img src="images/da13.svg" class="img-fluid"></p>
-</section>
-<section id="section-3" class="level2">
-<h2 class="anchored" data-anchor-id="section-3"></h2>
-<p><img src="images/da14.svg" class="img-fluid"></p>
-</section>
-<section id="section-4" class="level2">
-<h2 class="anchored" data-anchor-id="section-4"></h2>
-<p><img src="images/da15.svg" class="img-fluid"></p>
-</section>
-<section id="section-5" class="level2">
-<h2 class="anchored" data-anchor-id="section-5"></h2>
-<p><img src="images/da17.svg" class="img-fluid"></p>
-</section>
-<section id="section-6" class="level2">
-<h2 class="anchored" data-anchor-id="section-6"></h2>
-<p><img src="images/da16.svg" class="img-fluid"></p>
-</section>
-<section id="section-7" class="level2">
-<h2 class="anchored" data-anchor-id="section-7"></h2>
-<p><img src="images/da18.svg" class="img-fluid"></p>
-</section>
-<section id="section-8" class="level2">
-<h2 class="anchored" data-anchor-id="section-8"></h2>
-<p><img src="images/da19.svg" class="img-fluid"></p>
-</section>
-<section id="section-9" class="level2">
-<h2 class="anchored" data-anchor-id="section-9"></h2>
-<p><img src="images/da20.svg" class="img-fluid"></p>
-</section>
-<section id="section-10" class="level2">
-<h2 class="anchored" data-anchor-id="section-10"></h2>
-<p><img src="images/da21.svg" class="img-fluid"></p>
-</section>
-<section id="section-11" class="level2">
-<h2 class="anchored" data-anchor-id="section-11"></h2>
-<p><img src="images/da22.svg" class="img-fluid"></p>
-</section>
-<section id="section-12" class="level2">
-<h2 class="anchored" data-anchor-id="section-12"></h2>
-<p><img src="images/da23.svg" class="img-fluid"></p>
-</section>
-<section id="finding-control-dependences" class="level2">
-<h2 class="anchored" data-anchor-id="finding-control-dependences">finding control dependences</h2>
-<p>let branch p, label be a branch instruction and <span class="math inline">\(I_p\)</span> be its post dominator. A varable v is control dependent on p if</p>
-<ol type="1">
-<li>v is defined inside the influence region of p</li>
-<li>v reaches <span class="math inline">\(I_p\)</span></li>
-</ol>
-</section>
-<section id="section-13" class="level2">
-<h2 class="anchored" data-anchor-id="section-13"></h2>
-<p><img src="images/da26.svg" class="img-fluid"></p>
-</section>
-<section id="section-14" class="level2">
-<h2 class="anchored" data-anchor-id="section-14"></h2>
-<p><img src="images/da27.svg" class="img-fluid"></p>
-</section>
-<section id="section-15" class="level2">
-<h2 class="anchored" data-anchor-id="section-15"></h2>
-<p><img src="images/da28.svg" class="img-fluid"></p>
-</section>
-<section id="section-16" class="level2">
-<h2 class="anchored" data-anchor-id="section-16"></h2>
-<p><img src="images/da29.svg" class="img-fluid"></p>
-</section>
-<section id="section-17" class="level2">
-<h2 class="anchored" data-anchor-id="section-17"></h2>
-<p><img src="images/da30.svg" class="img-fluid"></p>
-</section>
-<section id="some-optimizations" class="level2">
-<h2 class="anchored" data-anchor-id="some-optimizations">some optimizations</h2>
-<ol type="1">
-<li>on AMD use scalar processor</li>
-<li>if a branch condition is uniform no need for a sync in the post dominator</li>
-<li>place uniform spills in shared memory</li>
-</ol>
+<section id="how-does-this-effect-hardware" class="level2">
+<h2 class="anchored" data-anchor-id="how-does-this-effect-hardware">how does this effect hardware?</h2>
+<pre><code>struct { char a; char b; char c; char d;} s;
+s.a = 1
+s.c = 3
+
+can a compiler do 
+char temp[4] = s // load 32 bits 
+temp[0] = 1
+temp[2] = 3
+s = temp</code></pre>
+<p>not allowed - reads/writes b and d, so compiler incorrectly added writes</p>
+<p>options are either have byte addressable hardware, or pad so that each char gets 32 bits</p>
+<p>Vendors forced to add 8 byte loads/stores</p>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -828,13 +839,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../lectures/14_gpu_compilers.html" class="pagination-link" aria-label="GPU Compilers">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">GPU Compilers</span>
+      <a href="../lectures/diverg.html" class="pagination-link" aria-label="divergent flow">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">divergent flow</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../lectures/mem_consistancy.html" class="pagination-link" aria-label="memory consistancy">
-        <span class="nav-page-text">memory consistancy</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../lectures/mlir.html" class="pagination-link" aria-label="Polyhedral Compilation Opportunities in MLIR">
+        <span class="nav-page-text">Polyhedral Compilation Opportunities in MLIR</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
