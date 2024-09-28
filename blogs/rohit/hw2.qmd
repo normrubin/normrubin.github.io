@@ -1,0 +1,226 @@
+---
+title: "Homework 2"
+author: Rohit Gurusamy Anandakumar
+format: html
+---
+
+## PART 1: Trivial dead code elimination which you delete instructions that are never used before they are reassigned. 
+
+
+### About Dead Code Elimination:
+**Definition:** An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block
+
+- The code should remove the instructions that are reassigned without being used.
+- If the value in being used in between the reassigning, then the instruction should be retained.
+
+### Implementation:
+#### myCFG Function:
+- This function generates control flow blocks from a list of instructions.
+- _Parameters:_ `instrs` - a list of instructions.
+- Process:
+    + It iterates through each instruction.
+    + If the instruction contains an operation (`op`), it adds it to the current block.
+    + If the operation is a terminator (`br`, `jmp`, `ret`), it yields the current block and starts a new one.
+    + If the instruction does not contain an operation, it yields the current block and starts a new one.
+    + At the end, if there are any remaining instructions in the current block, it yields that block.
+- _Returns:_ Yields blocks of instructions.
+
+
+#### remove_reassigned Function:
+- This function removes instructions that are redefined without being used in a function.
+- _Parameters:_ `func` - a dictionary representing a function with a list of instructions.
+- Process:
+    + It repeatedly splits the function’s instructions into blocks using myCFG.
+    + For each block, it tracks the last definition of each variable and identifies instructions to drop.
+    + It removes instructions that are redefined without being used.
+    + It updates the function’s instructions with the optimized blocks.
+    + The loop continues until no more changes are made.
+- _Returns:_ None (modifies the function in place).
+
+#### main Function:
+- This is the main function that orchestrates the optimization process.
+
+- Process:
+    + It reads a JSON object from standard input.
+    + For each function in the JSON object, it applies remove_reassigned to optimize the instructions.
+    + It writes the optimized JSON object to standard output.
+
+### Example:
+#### If `a` is reassigned without used inbetween
+##### Input bril:
+```{bril}
+    @main {
+    a: int = const 100;
+    a: int = const 42;
+    b: int = const 100;
+    b: int = const 42;
+    }
+```
+
+##### Output bril:
+```{bril}
+    @main {
+    a: int = const 42;
+    b: int = const 42;
+    }
+```
+
+#### If `a` is reassigned with used inbetween
+##### Input bril:
+```{bril}
+    @main {
+    a: int = const 100;
+    print a;
+    a: int = const 42;
+    b: int = const 100;
+    b: int = const 42;
+    }
+```
+
+##### Output bril:
+```{bril}
+    @main {
+    a: int = const 100;
+    print a;
+    a: int = const 42;
+    b: int = const 42;
+    }
+```
+
+
+## PART 2: Implement local value numbering 
+
+
+### About local value numbering:
+**Definition:** Local Value Numbering (LVN) is a compiler optimization technique used to eliminate redundant calculations by assigning unique numbers to equivalent expressions. This helps in identifying and reusing previously computed values, thus improving the efficiency of the code.
+
+### Implementation:
+#### __init__(self)
+- This is the constructor for the ImprovedLVN class. It initializes several dictionaries and counters used in the Local Value Numbering (LVN) process.
+
+- `self.var2num`: Maps variables to their value numbers.
+- `self.value2num`: Maps operations to value numbers.
+- `self.num2var`: Maps value numbers to variable names.
+- `self.next_vn`: Counter for the next value number.
+- `self.last_computed`: Maps operations to their last computed variable.
+
+#### fresh_value_number(self)
+- This function generates a fresh value number.
+- _Returns:_ A new value number and increments the counter.
+
+#### canonicalize(self, value)
+- This function canonicalizes commutative operations like addition and multiplication to ensure consistent ordering of arguments.
+- _Parameters:_ value - a Value namedtuple representing an operation and its arguments.
+- _Returns:_ A canonicalized Value namedtuple.
+
+#### get_lvn_var(self, vn)
+- This function generates a variable name for a given value number.
+- Parameters: vn - a value number.
+- Returns: A string representing the LVN variable name.
+
+#### process_block(self, block)
+- This function performs Local Value Numbering (LVN) on a single block of instructions.
+- Parameters: block - a list of instructions.
+- Process:
+    + Iterates through each instruction in the block.
+    + If the instruction has a destination ('dest'), it processes the instruction:
+        - Fetches value numbers for arguments.
+        - Creates a canonicalized value for the current instruction.
+        - Checks if the value is already computed:
+            + If yes, it uses the previous result.
+            + If no, it assigns a fresh value number and updates mappings.
+    + Adds the processed instruction to the new block.
+- Returns: A new block of optimized instructions.
+
+#### run_lvn(self, bril_program)
+- This function runs LVN on the entire program.
+- Parameters: bril_program - a dictionary representing the BRIL program.
+- Process:
+    + Iterates through each function in the program.
+    + Applies process_block to the instructions of each function.
+- Returns: The optimized BRIL program.
+
+
+
+### Example:
+#### with `a b` no permutted
+##### Input bril:
+```{bril}
+    @main {
+        a: int = const 4;
+        b: int = const 2;
+        sum1: int = div a b;
+        sum2: int = div a b;
+        prod: int = mul sum1 sum2;
+        sum2: int = div a b;
+        print prod;
+    }
+```
+
+##### Output bril:
+```{bril}
+    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = div a b;
+    sum2 = id sum1;
+    prod: int = mul sum1 sum1;
+    sum2 = id sum1;
+    print prod;
+    }
+
+```
+
+##### pairing with dead code analysis:
+```{bril}
+@main {
+  a: int = const 4;
+  b: int = const 2;
+  sum1: int = div a b;
+  prod: int = mul sum1 sum1;
+  sum2 = id sum1;
+  print prod;
+}
+
+```
+#### with `a b` with permutted
+##### Input bril:
+```{bril}
+    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add b a;
+    prod: int = mul sum1 sum2;
+    sum2: int = add b a;
+    print prod;
+    }
+
+```
+
+##### Output bril:
+```{bril}
+    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2 = id sum1;
+    prod: int = mul sum1 sum1;
+    sum2 = id sum1;
+    print prod;
+    }
+
+```
+
+##### pairing with dead code analysis:
+```{bril}
+    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = div a b;
+    prod: int = mul sum1 sum1;
+    sum2 = id sum1;
+    print prod;
+    }
+
+```
