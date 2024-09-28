@@ -1,0 +1,196 @@
+---
+author: Sharmila Sivalingam
+execute:
+  enabled: false
+format:
+  html: default
+title: Compiler Homework 02 - Local Optimization
+------
+
+# Part 1: Dead Code Elimination
+
+Dead Code Elimination (DCE) is an optimization technique in compiler design, aiming to remove instructions that do not affect the program's final output.
+
+In Homework 2, I implemented a "trivial" DCE, where instructions that are never used before being reassigned are deleted. 
+
+The Basic Idea behind this is to identify and remove the redundant assignment those are never implemented before reassignment.
+
+In this blog, I'll walk throught the implementation process and verify it with an example.
+
+# Implementation Process:
+
+I used 3 key step to acheive this task: DCE, Reassignment Handling and Iteration until no changes.
+
+In DCE step, identifies the variables that are used by collecting all arguments in the blocks and removes instructions where the destination variable (dest) is not in the used set (indicating it's redundant). It modifies the blocks and flattens them back into the instruction list. At the next step, Reassignment Handling, removes redundant reassignments. If a variable is defined but then reassigned before its value is used, the earlier definition is deleted. The process is applied block by block.Finally, Iteration until no changes, repeatedly applies DCE and reassignment elimination until no further changes occur.
+
+# Example:
+
+``` {html}
+
+@main {
+  a: int = const 100;
+  a: int = const 42;
+  b: int = const 5;
+  sum: int = add a b;
+  c: int = id b;
+  sum: int = add c a;
+  print sum;
+}
+
+```
+
+Here, the variable a is assigned the value 100, but it is immediately overwritten with the value 42, making the first assignment redundant. Similarly, the first computation of sum is also unnecessary as it is overwritten before being used.
+After running my implementation:
+
+``` {html}
+
+@main {
+  a: int = const 42;
+  b: int = const 5;
+  c: int = id b;
+  sum: int = add c a;
+  print sum;
+}
+
+```
+
+ The redundant instructions have been successfully removed. The total number of dynamic instructions has been reduced from 7 to 5. Thus it is verified that my implementation acheived the task of the homework.
+
+ And another example to verify further, that the code delete instructions that are never used before they are reassigned. 
+
+ ``` {html}
+
+@main {
+  a: int = const 100;
+  a: int = const 42;
+  b: int = const 5;
+  sum: int = add a b;
+  print sum;
+  c: int = id b;
+  sum: int = add c a;
+  print sum;
+}
+
+```
+
+After running the code:
+
+``` {html}
+@main {
+  a: int = const 42;
+  b: int = const 5;
+  sum: int = add a b;
+  print sum;
+  c: int = id b;
+  sum: int = add c a;
+  print sum;
+}
+
+```
+
+Here, the variable a is assigned the value 100, but it is immediately overwritten with the value 42, making the first assignment redundant. Since the first sum is used therefore it is not a redundant. 
+
+# Part 2: Local Value Numbering
+
+Local Value Numbering (LVN) is an optimization technique used in compilers to eliminate redundant calculations. By assigning a unique number to each distinct computation, LVN helps minimize repeated evaluations of the same expression.
+In this part, the task is to implement Local value numbering and further to pair with DCE
+
+# Implementation:
+
+Pseudo Code of the implementation:
+
+Define a named tuple 'Value' to represent a computation.
+Create a 'Numbering' class to manage unique identifiers for each computation.
+Implement the 'last_writes' function to identify the last write instructions for each variable.
+Implement the 'read_first' function to determine which variables are read before being written to.
+Define 'lvn_block' to process each block of instructions:
+    Initialize mappings for variable-to-number and value-to-number.
+    For each variable read first, assign a unique number.
+    For each instruction, retrieve argument numbers and check for redundancy:
+      If the computation has been seen, replace the instruction with an identity operation.
+      If it's a new computation, assign a fresh number and record it.
+Define 'lvn' to iterate through functions in the input data and apply 'lvn_block'.
+Load JSON data, call 'lvn', and output the optimized result.
+
+This code implementation is verfied by using an example:
+
+``` {html}
+@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 5;
+  sum1: int = add a b;
+  sum2: int = add a b;
+  prod1: int = mul sum1 sum2;
+  sum1: int = const 0;
+  sum2: int = const 0;
+  sum3: int = add a b;
+  prod2: int = mul sum3 sum3;
+  print prod2;
+}
+```
+
+Output of the implement:
+
+``` {html}
+@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 5;
+  lvn.3: int = add a b;                
+  sum2: int = id lvn.3;                
+  prod1: int = mul lvn.3 lvn.3;        
+  sum1: int = const 0;
+  sum2: int = const 0;
+  sum3: int = id lvn.3;                
+  prod2: int = id prod1;              
+  print prod1;                         
+}
+```
+
+In this output,the operation add a b is computed once and assigned a unique identifier lvn.3, effectively avoiding redundant calculations. Instead of recalculating add a b for sum2 and sum3, the code uses id lvn.3, indicating that these instructions simply take the value of lvn.3. Furthermore, the instruction prod1 utilizes lvn.3 to multiply with itself, showcasing the efficient reuse of computed values and optimizing the overall execution of the code.
+
+# Pairing with DCE:
+
+I used an example to verify
+
+```{html}
+@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 5;
+  sum1: int = add a b;
+  sum2: int = add a b;
+  prod1: int = mul sum1 sum2;
+
+  sum1: int = const 0;
+  sum2: int = const 0;
+  c: int = const 10;
+  sum3: int = add a b;
+  prod2: int = mul sum3 sum3;
+
+  print prod2;
+}
+```
+
+Here c variable is initiallized twice and not used before reassigned.
+
+Output:
+
+@main {
+  a: int = const 4;
+  b: int = const 2;
+  sum1: int = add a b;
+  sum2: int = add a b;
+  prod1: int = mul sum1 sum2;
+
+  sum1: int = const 0;
+  sum2: int = const 0;
+  c: int = const 10;
+  sum3: int = add a b;
+  prod2: int = mul sum3 sum3;
+
+  print prod2;
+}
+
+The implementation of Local Value Numbering optimizes computations by eliminating redundancy, thus enhancing performance. This example illustrates how LVN effectively manages computations through unique identifiers.
