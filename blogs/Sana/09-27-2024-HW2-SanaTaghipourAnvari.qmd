@@ -1,0 +1,329 @@
+ ---
+author: Sana Taghipour Anvari
+format:
+  html: default
+title: Homework2 - local optimizations
+
+---
+
+ 
+# Part 1
+
+## Explanation of the Code
+The code I wrote for this question implements a trivial dead code elimination (DCE) optimization for Bril programs. It works by iterating through the instructions in reverse order, maintaining a set of used variables. Instructions that define variables not in this set are eliminated. The algorithm adds variables used as arguments to the set and removes variables when their defining instruction is processed. This approach ensures that instructions defining unused variables are removed while preserving the program's essential structure and functionality.
+
+Output of the code with Example 1 as the input:
+
+```{python}
+import json
+import copy
+
+
+def tdce(func):
+    used_vars = set()
+    instructions = func['instrs']
+    new_instructions = []
+
+    for instr in reversed(instructions):
+        if 'dest' in instr:
+            if instr['dest'] not in used_vars:
+                continue  # skip this instruction as its destination is never used
+            used_vars.remove(instr['dest'])
+        
+        if 'args' in instr:
+            used_vars.update(instr['args'])
+        
+        new_instructions.append(instr)
+    
+    func['instrs'] = list(reversed(new_instructions))
+    return func
+
+def main(input_str):
+    prog = json.loads(example1)
+    
+    for func in prog['functions']:
+        func = tdce(func)
+    
+    return json.dumps(prog, indent=2)
+
+# Example 1 as a JSON string (after bril2json conversion)
+example1 = '''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "a", "value": 4 },
+        { "op": "const", "type": "int", "dest": "b", "value": 2 },
+        { "op": "const", "type": "int", "dest": "c", "value": 1 },
+        { "op": "add", "type": "int", "dest": "d", "args": ["a", "b"] },
+        { "op": "print", "args": ["d"] }
+      ]
+    }
+  ]
+}
+'''
+
+print("Original program:")
+print(example1)
+print("\nOptimized program:")
+optimized_prog = main(example1)
+print(optimized_prog)
+```
+
+
+## Testing the Code
+
+As we can see in above output, line 3 'c: int = const 1;' is removed because c is assigned and never used. we can also further test the code with a bigger input:
+
+example2:
+```json
+@main {
+  # Variables with different usage patterns
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 1;  # This is dead code
+  d: int = add a b;
+  e: int = add c d;  # 'c' is used here, but 'e' is never used
+  
+  # Reassignment
+  a: int = const 200;  # This overwrites the previous 'a'
+  
+  # Prints to mark usage
+  print a;
+  print d;
+}
+```
+
+
+
+```{python}
+import json
+import copy
+
+
+def tdce(func):
+    used_vars = set()
+    instructions = func['instrs']
+    new_instructions = []
+
+    for instr in reversed(instructions):
+        if 'dest' in instr:
+            if instr['dest'] not in used_vars:
+                continue  # skip this instruction as its destination is never used
+            used_vars.remove(instr['dest'])
+        
+        if 'args' in instr:
+            used_vars.update(instr['args'])
+        
+        new_instructions.append(instr)
+    
+    func['instrs'] = list(reversed(new_instructions))
+    return func
+
+def main(input_str):
+    prog = json.loads(example2)
+    
+    for func in prog['functions']:
+        func = tdce(func)
+    
+    return json.dumps(prog, indent=2)
+
+# Example 2 as a JSON string (after bril2json conversion)
+example2 = '''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "a", "value": 4 },
+        { "op": "const", "type": "int", "dest": "b", "value": 2 },
+        { "op": "const", "type": "int", "dest": "c", "value": 1 },
+        { "op": "add", "type": "int", "dest": "e", "args": ["c", "d"] },
+        { "op": "add", "type": "int", "dest": "d", "args": ["a", "b"] },
+        { "op": "const", "type": "int", "dest": "a", "value": 10 },
+        { "op": "const", "type": "int", "dest": "a", "value": 200 },
+        { "op": "print", "args": ["a"] },
+        { "op": "print", "args": ["d"] }
+      ]
+    }
+  ]
+}
+'''
+
+print("Original program:")
+print(example2)
+print("\nOptimized program:")
+optimized_prog = main(example2)
+print(optimized_prog)
+```
+
+As we expect, we can see that line 3 ise removed, because `c` is assigned and used in line 5 for defining `e` but `e` is never used so these two lines are both dead code, also `a` is reassigned in line 6 and thus removed.
+
+## Challenges Faced
+One of the challenges that I can think of in this question, is that for large and complex programs, the reverse iteration and set operations might become a performance bottleneck. Addressing these challenges would involve extending the algorithm, careful consideration of Bril's semantics, and developing more sophisticated testing strategies.
+
+
+## Part 2
+
+
+## Explanation of the Code
+
+The `lvn` code implements Local Value Numbering to optimize Bril programs by eliminating redundant computations within basic blocks. It processes each instruction, assigns value numbers to expressions based on their operations and operands, and maintains tables to track these values. When it encounters a redundant computation, it eliminates it by reusing the previously computed result, effectively reducing the number of instructions and optimizing the code.
+
+Example input:
+```json
+@main() {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add a b;
+    prod: int = mul sum1 sum2;
+    print prod;
+}
+
+```
+
+```{python}
+import json
+import sys
+
+
+def lvn(func):
+    new_instrs = []
+    value_table = {}  
+    var_table = {}   
+
+    for instr in func['instrs']:
+        if 'op' in instr:
+            if instr['op'] == 'const':
+                value = instr['value']
+                value_num = get_value_number(value_table, ('const', value))
+                value_table[value_num] = ('const', value, instr['dest'])
+                var_table[instr['dest']] = value_num
+                new_instrs.append(instr)
+            elif instr['op'] == 'print':
+                new_instr = instr.copy()
+                if 'args' in new_instr:
+                    new_instr['args'] = [value_table[var_table[arg]][2] for arg in new_instr['args']]
+                new_instrs.append(new_instr)
+            else:
+                args = [var_table.get(arg, arg) for arg in instr.get('args', [])]
+                value_num = get_value_number(value_table, (instr['op'], tuple(args)))
+
+                if value_num in value_table:
+                    # Redundant computation found here!
+                    canonical_op, canonical_args, canonical_var = value_table[value_num]
+                    var_table[instr['dest']] = value_num
+                else:
+                    new_instr = instr.copy()
+                    new_instr['args'] = [value_table[arg][2] if arg in value_table else arg for arg in args]
+                    value_table[value_num] = (instr['op'], tuple(args), instr['dest'])
+                    var_table[instr['dest']] = value_num
+                    new_instrs.append(new_instr)
+        else:
+            new_instrs.append(instr)
+
+    func['instrs'] = new_instrs
+    return func
+
+       
+def get_value_number(value_table, key):
+    for num, (op, args, var) in value_table.items():
+        if op == key[0] and args == key[1]:
+            return num
+    return len(value_table)
+
+def main():
+    try:
+        bril_input = json.loads(example1)
+        for func in bril_input['functions']:
+            lvn(func)
+        json.dump(bril_input, sys.stdout, indent=2)
+        sys.stdout.flush()
+    except Exception as e:
+        print(f"An error occurred: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+
+
+# Example 1 as a JSON string (after bril2json conversion)
+example1 = '''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "a", "value": 4 },
+        { "op": "const", "type": "int", "dest": "b", "value": 2 },
+        { "op": "add", "type": "int", "dest": "sum1", "args": ["a", "b"] },
+        { "op": "add", "type": "int", "dest": "sum2", "args": ["a", "b"] },
+        { "op": "mul", "type": "int", "dest": "prod", "args": ["sum1", "sum2"] },
+        { "op": "print", "args": ["prod"] }
+      ]
+    }
+  ]
+}
+
+'''
+
+if __name__ == '__main__':
+    main()
+
+```
+
+
+As we can see in the output above, line 5 has been changed to `prod: int = mul sum1 sum1;`
+
+## Testing the Code 
+
+For testing the correctness of the code, I used `brench.py` code in bril, and for that we need to have a brench.toml file (or a configuration file for `brench.py`) configures the Brench tool to run a Bril benchmark through four different pipelines: baseline (no optimization), DCE only, LVN only, and LVN followed by DCE. It then extracts the total number of dynamic instructions executed for each run, allowing us to compare the effectiveness of these optimizations.
+We use `brench.toml` with `python3 ../brench/brench.py brench.toml > results.csv`
+
+example test:
+```json
+@main {
+    a: int = const 1;
+    b: int = const 2;
+
+    c: int = add a b;
+    d: int = add a b;    # Redundant computation
+    e: int = add b a;    # Redundant due to commutativity
+    f: int = mul c d;
+    g: int = mul c e;    # Redundant computation
+
+    sum1: int = add a b; # Same as c, d, and e
+    sum2: int = add a b; # Same as c, d, e, and sum1
+    prod: int = mul sum1 sum2; # Uses two identical values
+
+    h: int = sub f g;    # Dead code: computed but never used
+    i: int = add a a;    # Dead code: computed but never used
+
+    print f;
+    print g;
+    print prod;
+}
+```
+results.csv:
+```css
+benchmark,run,result
+test_lvn,baseline,15
+test_lvn,dce,13
+test_lvn,lvn,11
+test_lvn,lvn_dce,9
+
+```
+
+Based on this analysis, let's count the instructions that should remain after each optimization:
+
+Baseline: 15 instructions (all original instructions)
+
+DCE: 13 instructions (removes h and i)
+
+LVN: 11 instructions (keeps a, b, c, f, prod, and the three print statements)
+
+LVN + DCE: 9 instructions (same as LVN, but also removes h and i)
+
+Therefore, We can confirm the correctness of the implementations.
+
+## Challenges 
+The main challenges in `lvn.py` include handling commutative operations (like recognizing that add a b and add b a are equivalent) and ensuring that value numbering accurately tracks and replaces redundant computations without altering the program's correct behavior.
