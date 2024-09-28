@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Qucheng Jiang">
+<meta name="author" content="Sharmila Sivalingam">
 
-<title>Homework 1: Exploring Bril – EECE7398 Fall 2024</title>
+<title>Compiler Homework 02 - Local Optimization – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" rel="next">
-<link href="../../blogs/oscar/2024-09-20-HW1.html" rel="prev">
+<link href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" rel="next">
+<link href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1: Exploring Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="Compiler Homework 02 - Local Optimization – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html">Compiler Homework 02 - Local Optimization</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -222,16 +222,16 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
  <span class="menu-text">Qucheng</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1: Exploring Bril</span></a>
   </div>
 </li>
@@ -285,13 +285,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
  <span class="menu-text">Sharmila</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
@@ -300,7 +300,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Compiler Homework 02 - Local Optimization</span></a>
   </div>
 </li>
@@ -592,9 +592,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html">Compiler Homework 02 - Local Optimization</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1: Exploring Bril</h1>
+<h1 class="title">Compiler Homework 02 - Local Optimization</h1>
 </div>
 
 
@@ -604,7 +604,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Qucheng Jiang </p>
+             <p>Sharmila Sivalingam </p>
           </div>
   </div>
     
@@ -617,24 +617,131 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.</p>
+<section id="part-1-dead-code-elimination" class="level1">
+<h1>Part 1: Dead Code Elimination</h1>
+<p>Dead Code Elimination (DCE) is an optimization technique in compiler design, aiming to remove instructions that do not affect the program’s final output.</p>
+<p>In Homework 2, I implemented a “trivial” DCE, where instructions that are never used before being reassigned are deleted.</p>
+<p>The Basic Idea behind this is to identify and remove the redundant assignment those are never implemented before reassignment.</p>
+<p>In this blog, I’ll walk throught the implementation process and verify it with an example.</p>
 </section>
-<section id="detail-design" class="level2">
-<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
-<p>The homework was divided into two main parts. I’ll walk through the details of my implementation, challenges faced, and the testing process.</p>
-<ul>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part1"><strong>Part 1</strong></a>: Creating and Running a New Benchmark</li>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part2"><strong>Part 2</strong></a>: Implementing a Bril Program Stub-Analyzer</li>
-</ul>
+<section id="implementation-process" class="level1">
+<h1>Implementation Process:</h1>
+<p>I used 3 key step to acheive this task: DCE, Reassignment Handling and Iteration until no changes.</p>
+<p>In DCE step, identifies the variables that are used by collecting all arguments in the blocks and removes instructions where the destination variable (dest) is not in the used set (indicating it’s redundant). It modifies the blocks and flattens them back into the instruction list. At the next step, Reassignment Handling, removes redundant reassignments. If a variable is defined but then reassigned before its value is used, the earlier definition is deleted. The process is applied block by block.Finally, Iteration until no changes, repeatedly applies DCE and reassignment elimination until no further changes occur.</p>
 </section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>This assignment provided a comprehensive introduction to Bril and its tooling ecosystem. By creating benchmarks and developing a custom analyzer, I gained insights into compiler design and intermediate representations.</p>
-<p><strong>Hardest Part</strong>: The most challenging aspect was managing dependencies and environment setup for the Bril toolchain. Careful attention to the <code>makefile</code> and troubleshooting through GitHub Discussions helped overcome these issues.</p>
-<p><strong>Testing and Results</strong>: I validated my benchmarks and analyzer using various Bril programs. The tools successfully transformed and analyzed the input programs, demonstrating the utility of Bril in simple code analysis and transformation tasks.</p>
-<p>This experience has equipped me with practical skills in working with compiler tools and representations, paving the way for more complex analyses in future assignments.</p>
+<section id="example" class="level1">
+<h1>Example:</h1>
+<pre class="{html}"><code>
+@main {
+  a: int = const 100;
+  a: int = const 42;
+  b: int = const 5;
+  sum: int = add a b;
+  c: int = id b;
+  sum: int = add c a;
+  print sum;
+}
+</code></pre>
+<p>Here, the variable a is assigned the value 100, but it is immediately overwritten with the value 42, making the first assignment redundant. Similarly, the first computation of sum is also unnecessary as it is overwritten before being used. After running my implementation:</p>
+<pre class="{html}"><code>
+@main {
+  a: int = const 42;
+  b: int = const 5;
+  c: int = id b;
+  sum: int = add c a;
+  print sum;
+}
+</code></pre>
+<p>The redundant instructions have been successfully removed. The total number of dynamic instructions has been reduced from 7 to 5. Thus it is verified that my implementation acheived the task of the homework.</p>
+<p>And another example to verify further, that the code delete instructions that are never used before they are reassigned.</p>
+<pre class="{html}"><code>
+@main {
+ a: int = const 100;
+ a: int = const 42;
+ b: int = const 5;
+ sum: int = add a b;
+ print sum;
+ c: int = id b;
+ sum: int = add c a;
+ print sum;
+}
+</code></pre>
+<p>After running the code:</p>
+<pre class="{html}"><code>@main {
+  a: int = const 42;
+  b: int = const 5;
+  sum: int = add a b;
+  print sum;
+  c: int = id b;
+  sum: int = add c a;
+  print sum;
+}
+</code></pre>
+<p>Here, the variable a is assigned the value 100, but it is immediately overwritten with the value 42, making the first assignment redundant. Since the first sum is used therefore it is not a redundant.</p>
+</section>
+<section id="part-2-local-value-numbering" class="level1">
+<h1>Part 2: Local Value Numbering</h1>
+<p>Local Value Numbering (LVN) is an optimization technique used in compilers to eliminate redundant calculations. By assigning a unique number to each distinct computation, LVN helps minimize repeated evaluations of the same expression. In this part, the task is to implement Local value numbering and further to pair with DCE</p>
+</section>
+<section id="implementation" class="level1">
+<h1>Implementation:</h1>
+<p>Pseudo Code of the implementation:</p>
+<p>Define a named tuple ‘Value’ to represent a computation. Create a ‘Numbering’ class to manage unique identifiers for each computation. Implement the ‘last_writes’ function to identify the last write instructions for each variable. Implement the ‘read_first’ function to determine which variables are read before being written to. Define ‘lvn_block’ to process each block of instructions: Initialize mappings for variable-to-number and value-to-number. For each variable read first, assign a unique number. For each instruction, retrieve argument numbers and check for redundancy: If the computation has been seen, replace the instruction with an identity operation. If it’s a new computation, assign a fresh number and record it. Define ‘lvn’ to iterate through functions in the input data and apply ‘lvn_block’. Load JSON data, call ‘lvn’, and output the optimized result.</p>
+<p>This code implementation is verfied by using an example:</p>
+<pre class="{html}"><code>@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 5;
+  sum1: int = add a b;
+  sum2: int = add a b;
+  prod1: int = mul sum1 sum2;
+  sum1: int = const 0;
+  sum2: int = const 0;
+  sum3: int = add a b;
+  prod2: int = mul sum3 sum3;
+  print prod2;
+}</code></pre>
+<p>Output of the implement:</p>
+<pre class="{html}"><code>@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 5;
+  lvn.3: int = add a b;                
+  sum2: int = id lvn.3;                
+  prod1: int = mul lvn.3 lvn.3;        
+  sum1: int = const 0;
+  sum2: int = const 0;
+  sum3: int = id lvn.3;                
+  prod2: int = id prod1;              
+  print prod1;                         
+}</code></pre>
+<p>In this output,the operation add a b is computed once and assigned a unique identifier lvn.3, effectively avoiding redundant calculations. Instead of recalculating add a b for sum2 and sum3, the code uses id lvn.3, indicating that these instructions simply take the value of lvn.3. Furthermore, the instruction prod1 utilizes lvn.3 to multiply with itself, showcasing the efficient reuse of computed values and optimizing the overall execution of the code.</p>
+</section>
+<section id="pairing-with-dce" class="level1">
+<h1>Pairing with DCE:</h1>
+<p>I used an example to verify</p>
+<pre class="{html}"><code>@main {
+  a: int = const 4;
+  b: int = const 2;
+  c: int = const 5;
+  sum1: int = add a b;
+  sum2: int = add a b;
+  prod1: int = mul sum1 sum2;
+
+  sum1: int = const 0;
+  sum2: int = const 0;
+  c: int = const 10;
+  sum3: int = add a b;
+  prod2: int = mul sum3 sum3;
+
+  print prod2;
+}</code></pre>
+<p>Here c variable is initiallized twice and not used before reassigned.</p>
+<p>Output:</p>
+<p><span class="citation" data-cites="main">@main</span> { a: int = const 4; b: int = const 2; sum1: int = add a b; sum2: int = add a b; prod1: int = mul sum1 sum2;</p>
+<p>sum1: int = const 0; sum2: int = const 0; c: int = const 10; sum3: int = add a b; prod2: int = mul sum3 sum3;</p>
+<p>print prod2; }</p>
+<p>The implementation of Local Value Numbering optimizes computations by eliminating redundancy, thus enhancing performance. This example illustrates how LVN effectively manages computations through unique identifiers.</p>
 
 
 </section>
@@ -1062,13 +1169,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/oscar/2024-09-20-HW1.html" class="pagination-link" aria-label="HW1 - Trying Out Bril">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">HW1 - Trying Out Bril</span>
+      <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="pagination-link" aria-label="Compiler Homework 01 - Trying Out Bril">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Compiler Homework 01 - Trying Out Bril</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="pagination-link" aria-label="Homework 2: Optimizing with DCE and LVN">
-        <span class="nav-page-text">Homework 2: Optimizing with DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="pagination-link" aria-label="Homework1 - Yashaswini">
+        <span class="nav-page-text">Homework1 - Yashaswini</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

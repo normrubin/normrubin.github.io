@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Qucheng Jiang">
+<meta name="author" content="Michael Maurer">
 
-<title>Homework 1: Exploring Bril – EECE7398 Fall 2024</title>
+<title>EECE7309 Homework 2 – Local Optimizations – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" rel="next">
-<link href="../../blogs/oscar/2024-09-20-HW1.html" rel="prev">
+<link href="../../blogs/oscar/2024-09-20-HW1.html" rel="next">
+<link href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1: Exploring Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7309 Homework 2 – Local Optimizations – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html">EECE7309 Homework 2 – Local Optimizations</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,13 +182,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
  <span class="menu-text">Michael</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
@@ -197,7 +197,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">EECE7309 Homework 2 – Local Optimizations</span></a>
   </div>
 </li>
@@ -222,16 +222,16 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
  <span class="menu-text">Qucheng</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1: Exploring Bril</span></a>
   </div>
 </li>
@@ -592,9 +592,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html">EECE7309 Homework 2 – Local Optimizations</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1: Exploring Bril</h1>
+<h1 class="title">EECE7309 Homework 2 – Local Optimizations</h1>
 </div>
 
 
@@ -604,7 +604,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Qucheng Jiang </p>
+             <p>Michael Maurer </p>
           </div>
   </div>
     
@@ -619,22 +619,91 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.</p>
+<p>This assignment introduces trivial dead code elimination, and local value numbering. Python code which performs these optimizations are available at the link provided in the Code section.</p>
 </section>
-<section id="detail-design" class="level2">
-<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
-<p>The homework was divided into two main parts. I’ll walk through the details of my implementation, challenges faced, and the testing process.</p>
-<ul>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part1"><strong>Part 1</strong></a>: Creating and Running a New Benchmark</li>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part2"><strong>Part 2</strong></a>: Implementing a Bril Program Stub-Analyzer</li>
-</ul>
+<section id="part-1-trivial-dead-code-elimination" class="level2">
+<h2 class="anchored" data-anchor-id="part-1-trivial-dead-code-elimination">Part 1: Trivial Dead Code Elimination</h2>
+<p>In the first part of this assignment, we implemented trivial dead code elimination. By this, we mean removing instructions which are not used before reassignment. Another way to say this, is that an instruction is not dead if it is used, or if it reaches the end of the basic block, before it is reassigned.</p>
 </section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>This assignment provided a comprehensive introduction to Bril and its tooling ecosystem. By creating benchmarks and developing a custom analyzer, I gained insights into compiler design and intermediate representations.</p>
-<p><strong>Hardest Part</strong>: The most challenging aspect was managing dependencies and environment setup for the Bril toolchain. Careful attention to the <code>makefile</code> and troubleshooting through GitHub Discussions helped overcome these issues.</p>
-<p><strong>Testing and Results</strong>: I validated my benchmarks and analyzer using various Bril programs. The tools successfully transformed and analyzed the input programs, demonstrating the utility of Bril in simple code analysis and transformation tasks.</p>
-<p>This experience has equipped me with practical skills in working with compiler tools and representations, paving the way for more complex analyses in future assignments.</p>
+<section id="challenges-faced" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced">Challenges Faced</h2>
+<p>The primary challenge I faced here was in attempting to implement more sophisticated dead code elimination, such as at the global scope. I thought this would be interesting to explore, but abandoned it as it is out of scope for this assignment. What proved particularly challenging on this front was handling the case where a variable is used across blocks, where the control flow forms cycles. The code I wrote was considering certain instructions to be unused when there were possible paths in which the instructions were used. When only performing local DCE, this task became much more achievable.</p>
+</section>
+<section id="implementation" class="level2">
+<h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
+<p>To perform local DCE, first I wrote some code which could partition every function into blocks. With these blocks, we have all the code chunks which are candidates for local DCE. Then, determining dead code was simply determining which instructions are not used by any later instructions in the block. This was done repetitively, as some instructions may on first pass not be considered dead, however they are only used by a dead instruction which will be eliminated.</p>
+</section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">Testing</h2>
+<p>My initial line of testing was very curated, and used the following source code:</p>
+<pre class="{bril}"><code>@main {
+    a: int = const 4;           # Will be eliminated
+    prod: int = id a;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add a b;        # Will be eliminated
+    prod: int = mul sum1 sum2;  # Will be eliminated
+    sum2: int = id a;
+    prod: int = id sum2;
+    print prod;
+}</code></pre>
+<p>Here, we would expect that the first two instructions assigning <code>prod</code> would be eliminated, and then as a follow-on effect, the first assignment of <code>sum2</code> also becomes dead code. What we observe aligns with these expectations, and is shown below:</p>
+<pre class="{bril}"><code>@main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = id a;
+    prod: int = id sum2;
+    print prod;
+}</code></pre>
+<p>To further test my dead code elimination, I leveraged the <code>brench</code> tool provided by <code>bril</code>. This tool allows for a pipeline to be created, which source code is passed through. Then, using <code>turnt</code> the results of running the optimized code can be compared to what is expected. In the code repository, there is a <code>.csv</code> file containing the results of running <code>brench</code> against all benchmarks in the <code>bril</code> repository. We observe that all tests pass (or timeout in the case of <code>function_call</code>, which times out with or without optimization). Further, and perhaps dissapointingly, we notice that the number of instructions does not change after optimization for these benchmarks. However, this may be unsurprising, as these benchmarks are in a public code-base, and are less likely to have trivial dead code.</p>
+</section>
+<section id="part-2-local-value-numbering" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-local-value-numbering">Part 2: Local Value Numbering</h2>
+<p>For the second part of this assignment, we implemented local value numbering to optimize the number of dynamic instructions executed by a program. The strategy here is to identify where computations have happened before in the code, and where possible do not re-evaluate them, and instead favor a copy.</p>
+</section>
+<section id="implementation-1" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-1">Implementation</h2>
+<p>I used a very straightforward method of implementing LVN, as was discussed in our lectures as well as those from Cornell. The primary difference that one may notice in the code is that there is more significant exception handling which must be done to achieve consistent results.</p>
+</section>
+<section id="challenges-faced-1" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced-1">Challenges Faced</h2>
+<p>My initial implementation appeared to work well on some programs, but returned incorrect results on others. This was quite puzzling, but looking at the code which was being produced, it quickly became clear what was going wrong. As a demonstration, consider the following code from <code>dot-product.bril</code>:</p>
+<pre class="{bril}"><code>vectorA: ptr&lt;int&gt; = alloc size;
+...
+vectorB: ptr&lt;int&gt; = alloc size;</code></pre>
+<p>This particular benchmark was failing when testing my initial code, and investigating the results showed the following:</p>
+<pre class="{bril}"><code>vectorA: ptr&lt;int&gt; = alloc size;
+...
+vectorB: ptr&lt;int&gt; = id vectorA;</code></pre>
+<p>This is not good! My hashing / replacement scheme was based entirely off of the instruction operation and the arguments involved, and so in this case, I registered the instruction <code>alloc size</code> as redundant and simply assigned <code>vectorB</code> to <code>vectorA</code>. For simpler instructions this makes sense, however as we are trying to have these vectors point at some dynamically allocated memory, this causes serious issues. So, to handle this, I created a list of special instructions which were not to be optimized in this manner, including functions like <code>alloc</code>.</p>
+<p>After this, all but one of the benchmarks was passing, with the lone failure being <code>riemann.bril</code>. Again, this appeared to be a result of the hash function I implemented. Consider the following code:</p>
+<pre class="{bril}"><code>left: float = call @left_riemann a b n;
+print left;
+midpoint: float = call @midpoint_riemann a b n;
+print midpoint;
+right: float = call @right_riemann a b n;</code></pre>
+<p>My setup was optimizing this code to the following:</p>
+<pre class="{bril}"><code>left: float = call @left_riemann a b n;
+print left;
+midpoint: float = id @midpoint_riemann left;
+print midpoint;
+right: float = id @right_riemann left;</code></pre>
+<p>This realization came much quicker, as it was clear I omitted certain important values in my hashing function, in this case being the function name which is called. Before this, my algorithm determined that <code>left</code>, <code>midpoint</code>, and <code>right</code> all hashed to <code>callabn</code>, indicating that they are the same value, when of course this is not the case.</p>
+<p>After these issues were resolved, everything worked quite well. I spent some time laying the groundwork for constant folding, however I was not able to finish this in reasonable time.</p>
+</section>
+<section id="testing-1" class="level2">
+<h2 class="anchored" data-anchor-id="testing-1">Testing</h2>
+<p>The primary line of testing for the LVN code was using <code>brench</code>, and using the code which I have developed for this assignment, in the repository linked below, it can be verified that all <code>bril</code> benchmarks pass through a <code>brench</code> test.</p>
+<p>What was interesting was that some benchmarks had a substantial decrease in number of dynamic instructions. One in particular was the <code>quadratic.bril</code> benchmark. What I noticed was that there were calls to <code>@sqrt</code> which took the same inputs, and then these were optimized out using local value numbering. This reduced the number of executed instructions from 785 to 412 (a 47.5% decrease!).</p>
+</section>
+<section id="dce-and-lvn" class="level2">
+<h2 class="anchored" data-anchor-id="dce-and-lvn">DCE and LVN</h2>
+<p>In the code submitted with this assignment, the provided <code>brench</code> setup actually tests both optimizations, and passes the input code through <code>dce.py</code> first, followed by <code>lvn.py</code>. The results indicate that all tests still pass, and therefore we can say these optimizations work together!</p>
+</section>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<p>The code for this assignment is contained in a <a href="https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw2">public GitHub repository</a> which I set up. Notably, to run brench using the provided <code>brench_config.toml</code> file, <code>bril</code> is expected to be two directories above this one. This can be changed by modifying the benchmarks variable in <code>brench_config.toml</code>.</p>
 
 
 </section>
@@ -1062,13 +1131,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/oscar/2024-09-20-HW1.html" class="pagination-link" aria-label="HW1 - Trying Out Bril">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">HW1 - Trying Out Bril</span>
+      <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="pagination-link" aria-label="EECE7309 Homework 1 -- Trying Out Bril">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">EECE7309 Homework 1 – Trying Out Bril</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="pagination-link" aria-label="Homework 2: Optimizing with DCE and LVN">
-        <span class="nav-page-text">Homework 2: Optimizing with DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/oscar/2024-09-20-HW1.html" class="pagination-link" aria-label="HW1 - Trying Out Bril">
+        <span class="nav-page-text">HW1 - Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
