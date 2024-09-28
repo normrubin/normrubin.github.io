@@ -981,7 +981,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#b8d9e54d .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#b3a3a507 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4077,7 +4077,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 636\n-rw-r--r-- 1 runner docker 40847 Sep 27 14:04 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 27 14:04 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 27 14:04 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 27 14:03 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Sep 27 14:04 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 27 14:04 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 27 14:03 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 27 14:04 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 27 14:04 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 27 14:04 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 27 14:04 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Sep 27 14:04 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  7508 Sep 27 14:04 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 27 14:04 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 27 14:04 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 27 14:04 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 27 14:04 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 27 14:04 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 27 14:03 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 27 14:04 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 27 14:04 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 27 14:03 09_poly_files\n-rw-r--r-- 1 runner docker   302 Sep 27 14:04 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 27 14:04 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 27 14:04 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 27 14:04 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 27 14:04 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 27 14:04 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 27 14:03 a.json\n-rw-r--r-- 1 runner docker   248 Sep 27 14:03 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 27 14:03 df\n-rw-r--r-- 1 runner docker  9019 Sep 27 14:04 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 27 14:03 errors\n-rw-r--r-- 1 runner docker  3623 Sep 27 14:03 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 27 14:03 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 27 14:03 images\n-rw-r--r-- 1 runner docker 13221 Sep 27 14:04 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Sep 27 14:04 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 27 14:03 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 27 14:03 ra\n-rw-r--r-- 1 runner docker  8226 Sep 27 14:04 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 27 14:04 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 27 14:04 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 27 14:04 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 27 14:04 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 27 14:03 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 636\n-rw-r--r-- 1 runner docker 40847 Sep 28 11:55 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 28 11:55 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 28 11:55 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 28 11:54 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Sep 28 11:55 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 28 11:55 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 28 11:54 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 28 11:55 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 28 11:55 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 28 11:55 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 28 11:55 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Sep 28 11:55 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  7508 Sep 28 11:55 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 28 11:55 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 28 11:55 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 28 11:55 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 28 11:55 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 28 11:55 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 29710 Sep 28 11:54 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 28 11:55 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 28 11:55 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 28 11:54 09_poly_files\n-rw-r--r-- 1 runner docker   302 Sep 28 11:55 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 28 11:55 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 28 11:55 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 28 11:55 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 28 11:55 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 28 11:55 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 28 11:54 a.json\n-rw-r--r-- 1 runner docker   248 Sep 28 11:54 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 28 11:54 df\n-rw-r--r-- 1 runner docker  9019 Sep 28 11:55 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 28 11:54 errors\n-rw-r--r-- 1 runner docker  3623 Sep 28 11:54 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 28 11:54 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 28 11:54 images\n-rw-r--r-- 1 runner docker 13221 Sep 28 11:55 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Sep 28 11:55 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 28 11:54 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 28 11:54 ra\n-rw-r--r-- 1 runner docker  8226 Sep 28 11:55 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 28 11:55 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 28 11:55 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 28 11:55 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 28 11:55 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 28 11:54 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4412,145 +4412,399 @@
     ]
   },
   {
-    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html",
-    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html",
-    "title": "Homework 1: Exploring Bril",
+    "objectID": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html",
+    "href": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html",
+    "title": "Homework 2: Optimizing with DCE and LVN",
     "section": "",
-    "text": "For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.",
+    "text": "This assignment aims to implement two key local optimizations for the Bril intermediate language: Trivial Dead Code Elimination (DCE) and Local Value Numbering (LVN). These optimizations enhance the efficiency of Bril programs by removing unnecessary instructions and consolidating equivalent expressions. This report outlines the development process, testing methodology, and analysis of the implemented optimizations.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
       "Qucheng",
-      "Homework 1: Exploring Bril"
+      "Homework 2: Optimizing with DCE and LVN"
     ]
   },
   {
-    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#introduction",
-    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#introduction",
-    "title": "Homework 1: Exploring Bril",
+    "objectID": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#introduction",
+    "href": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#introduction",
+    "title": "Homework 2: Optimizing with DCE and LVN",
     "section": "",
-    "text": "For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.",
+    "text": "This assignment aims to implement two key local optimizations for the Bril intermediate language: Trivial Dead Code Elimination (DCE) and Local Value Numbering (LVN). These optimizations enhance the efficiency of Bril programs by removing unnecessary instructions and consolidating equivalent expressions. This report outlines the development process, testing methodology, and analysis of the implemented optimizations.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
       "Qucheng",
-      "Homework 1: Exploring Bril"
+      "Homework 2: Optimizing with DCE and LVN"
     ]
   },
   {
-    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#detail-design",
-    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#detail-design",
-    "title": "Homework 1: Exploring Bril",
+    "objectID": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#detail-design",
+    "href": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#detail-design",
+    "title": "Homework 2: Optimizing with DCE and LVN",
     "section": "Detail Design",
-    "text": "Detail Design\nThe homework was divided into two main parts. I’ll walk through the details of my implementation, challenges faced, and the testing process.\n\nPart 1: Creating and Running a New Benchmark\nPart 2: Implementing a Bril Program Stub-Analyzer",
+    "text": "Detail Design\nCode: For details, check the code repository.\n\nAbstraction Classes\nThe core of the Bril language representation in this project is implemented in the bril_model/_bril_struct.py file. This module provides a structured and object-oriented way to represent Bril programs (BrilScript), functions (BrilFunction), and instructions (BrilInstruction). Each Bril instruction is modeled as a Python object, enabling intuitive manipulation and transformation of the program during optimization.\nThe primary classes include:\nBril Program: Represents the entire Bril program, containing multiple functions.\nBril Function: Encapsulates a sequence of instructions and metadata for a function within the program.\nBril Instruction: Models individual instructions, differentiating between operations (e.g., addition, multiplication) and effectful statements (e.g., print).\nFirst, the BrilInstruction class is the base class for all instructions. Its constructor accepts a dictionary raw and deeply copies its contents into the instance variable _raw. It also initializes a mark dictionary _marks to track whether the instruction has been deleted, modified, or replaced. The constructor also checks whether the key in the raw dictionary is in the allowed key set AVAILABLE_KEYS, and throws NotImplementedError if there is an unrecognized key. The class also defines a series of properties and methods for accessing and modifying various parts of the instruction, such as dest, type, op, args, etc.\nNext are several subclasses inherited from BrilInstruction, which handle different types of instructions. The BrilInstruction_Const class is used to handle constant instructions. It checks whether the opcode is const in the constructor and verifies whether the key in the dictionary is in the allowed set. The BrilInstruction_Label class is used to handle label instructions. It checks whether the label exists in the constructor and verifies the key in the dictionary. The BrilInstruction_ValOp class is used to handle operation instructions with a return value. It checks whether the opcode is in the allowed set and verifies the key in the dictionary in the constructor. The BrilInstruction_EffOp class is used to handle operation instructions without a return value. It performs similar checks and verifications in the constructor.\nThe BrilFunction class is used to represent a Bril function. Its constructor accepts a dictionary raw and extracts the instruction list instrs from it, converting each instruction into a corresponding BrilInstruction subclass instance. It also checks whether the key in the dictionary is in the allowed set. The class also defines some properties and methods for accessing and modifying various parts of the function, such as name, type, args, etc.\nFinally, the BrilScript class is used to represent a Bril script. Its constructor accepts a dictionary raw and extracts the function list functions from it, converting each function into a BrilFunction instance. It also checks whether the key in the dictionary is in the allowed set. The class also defines some properties and methods for accessing and modifying various parts of the script, such as functions, etc.\nTogether, these classes form a framework for processing Bril language instructions and scripts, providing a wealth of properties and methods to access and modify various parts of instructions and scripts.\n\n\nTrivial Dead Code Elimination (DCE)\nThe Trivial-DCE implementation is encapsulated in tdce.py. This script scans through the instructions of a Bril function and removes any instructions whose results are not used before being overwritten. The optimization process involves:\nThe trivial_dce_once function performs a dead code elimination operation. It traverses all instructions in the function, collects all used variables, and marks unused instructions for deletion. Then, it updates the function’s instruction list, deletes the instructions marked for deletion, and returns a Boolean value indicating whether the instruction is deleted.\nThe trivial_dce function is a loop that repeatedly calls the trivial_dce_once function until no more instructions are deleted.\nThe _block_mark_reassign_before_use function deletes instructions that are reassigned before use within a single basic block. It maintains a dictionary to track the most recent unused assignment instructions and deletes old assignment instructions before reassignment is found.\nThe rm_reassign_before_use function traverses all basic blocks of the function, calls the _block_mark_reassign_before_use function to delete instructions that are reassigned before use, and updates the function’s instruction list.\nThe trivial_dce_plus function combines function-level dead code elimination with instruction removal before reassignment until there are no more instructions to remove.\nThis straightforward approach efficiently eliminates redundant calculations, contributing to a cleaner and faster program.\n\n\nLocal Value Numbering (LVN)\nLocal Value Numbering optimization is implemented in lvn.py, LVN assigns unique numbers to distinct computations to detect and eliminate redundant expressions within a single block. Key steps include:\nNumbering Expressions: LVN assigns a unique identifier to each distinct computation. This identifier, or value number, is used to track expressions within a block. If an identical computation is encountered later, the existing value number is reused, eliminating the need to recompute the expression. For example, if the expression a + b is already computed and assigned a value number, any subsequent occurrence of a + b will directly use the same value number instead of recalculating the result.\nSimplification and Substitution: The script replaces redundant operations with precomputed values or previously assigned variables, reducing the number of cpu-intense operations in the block. This is done by looking up the value number table for existing computations and substituting them wherever possible. By minimizing redundant calculations, LVN not only optimizes runtime performance but also simplifies the code.\nConstant Folding: Constant folding is a compile-time optimization technique that evaluates expressions with known constant values. For instance, an expression like const 2 + const 3 is directly replaced with const 5. In the script, a dictionary named FOLDABLE_OPS maps operation names (e.g., add, mul, sub) to their respective lambda functions that perform the computation. When the LVN process encounters an expression with constant arguments, it applies the corresponding function to compute the result immediately. Credit: Bril Official Example\nExpression Tracking and Reuse: An Expr class is defined to uniquely represent computations in terms of operations and their arguments. This allows the LVN process to easily check if a computation has been previously performed and reuse the result if possible. The implementation also handles commutative operations (e.g., add, mul, and, or, eq) by normalizing the order of arguments, ensuring that expressions like a + b and b + a are recognized as identical.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
       "Qucheng",
-      "Homework 1: Exploring Bril"
+      "Homework 2: Optimizing with DCE and LVN"
     ]
   },
   {
-    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#conclusion",
-    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#conclusion",
-    "title": "Homework 1: Exploring Bril",
+    "objectID": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#integration-and-testing",
+    "href": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#integration-and-testing",
+    "title": "Homework 2: Optimizing with DCE and LVN",
+    "section": "Integration and Testing",
+    "text": "Integration and Testing\nThe brench tool is used for batch testing both optimizations across a variety of Bril programs. The brench_test_lvn.toml and brench_test_tdce.toml configuration files specify the programs and expected results for LVN and DCE tests, respectively. This ensures that both optimizations work correctly and consistently.\nAs defined in brench_test_lvn.toml, we specifies the path to the Bril benchmark programs to be tested, which are all the *.bril located in the ../bril/benchmarks/core/.\nThe configuration file defines multiple test run pipelines, each of which is defined in the [runs.&lt;name&gt;] section. Each pipeline contains a pipeline field that lists the sequence of commands to be executed.\nThe baseline pipeline is a baseline test without any optimization. It first converts the Bril program to JSON format and then runs the program using the brili interpreter.\nThe hw2p1_s0 pipeline is used to test whether the input and output structures are correct, but it does not perform any optimization. The purpose of this pipeline is to test if the Bril Construction work has no bug in it.\nThe hw2p1_s1 pipeline tests simple dead code elimination optimization. It calls the tdce.py script and passes the tdce parameter to enable function-level dead code elimination.\nThe hw2p1_s2 pipeline tests the instruction removal optimization used before revalue. It calls the tdce.py script and passes the raby argument to enable the rm_reassign_before_use pass optimization.\nThe hw2p1_s3 pipeline combines function-level dead code elimination and instruction removal optimization used before revalue. It calls the tdce.py script and passes the tdce+ argument to enable both optimizations.\nEach pipeline ultimately runs the optimized Bril program using the brili interpreter, passing arguments via the -p {args} option.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Qucheng",
+      "Homework 2: Optimizing with DCE and LVN"
+    ]
+  },
+  {
+    "objectID": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#results-and-analysis",
+    "href": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#results-and-analysis",
+    "title": "Homework 2: Optimizing with DCE and LVN",
+    "section": "Results and Analysis",
+    "text": "Results and Analysis\nThe optimizations were tested using brench tool, which verifies the correctness and performance of the implemented passes. The tool checks the brili Standard Output (STDOUT) for each test specification to ensure that the optimized programs produce the same results as their unoptimized counterparts. This rigorous testing confirms that the optimization passes do not alter the semantics of the Bril programs.\nThe testing demonstrated significant improvements in reducing the number of executed instructions for each Bril program. Programs with redundant calculations and unused instructions were simplified, leading to a reduced instruction count and faster execution times (based on Instructions Executed reported by brili -p).\nFor example, in the original benchmark check-primes, the program required 8,468 instructions to complete its execution. After applying the hw2p1_s3 optimization pipeline (DCE-only), the number of instructions executed was reduced to 8,419. Furthermore, using the hw2p2_s2 optimization pipeline (LVN+DCE), the total instructions executed dropped significantly to 4,238, representing a reduction to 50.05% of the original execution time. This demonstrates the substantial impact of combining LVN and DCE optimizations on program efficiency.\n\nRaw test log\n❯ brench brench_test_tdce.toml\nbenchmark,run,result\nfact,baseline,229\nfact,hw2p1_s0,229\nfact,hw2p1_s1,228\nfact,hw2p1_s2,229\nfact,hw2p1_s3,228\nquadratic,baseline,785\nquadratic,hw2p1_s0,785\nquadratic,hw2p1_s1,783\nquadratic,hw2p1_s2,785\nquadratic,hw2p1_s3,783\nrecfact,baseline,104\nrecfact,hw2p1_s0,104\nrecfact,hw2p1_s1,103\nrecfact,hw2p1_s2,104\nrecfact,hw2p1_s3,103\npascals-row,baseline,146\npascals-row,hw2p1_s0,146\npascals-row,hw2p1_s1,139\npascals-row,hw2p1_s2,146\npascals-row,hw2p1_s3,139\nloopfact,baseline,116\nloopfact,hw2p1_s0,116\nloopfact,hw2p1_s1,115\nloopfact,hw2p1_s2,116\nloopfact,hw2p1_s3,115\nsum-sq-diff,baseline,3038\nsum-sq-diff,hw2p1_s0,3038\nsum-sq-diff,hw2p1_s1,3036\nsum-sq-diff,hw2p1_s2,3038\nsum-sq-diff,hw2p1_s3,3036\nbirthday,baseline,484\nbirthday,hw2p1_s0,484\nbirthday,hw2p1_s1,483\nbirthday,hw2p1_s2,484\nbirthday,hw2p1_s3,483\nmod_inv,baseline,558\nmod_inv,hw2p1_s0,558\nmod_inv,hw2p1_s1,555\nmod_inv,hw2p1_s2,558\nmod_inv,hw2p1_s3,555\ncheck-primes,baseline,8468\ncheck-primes,hw2p1_s0,8468\ncheck-primes,hw2p1_s1,8419\ncheck-primes,hw2p1_s2,8468\ncheck-primes,hw2p1_s3,8419\nbitwise-ops,baseline,1690\nbitwise-ops,hw2p1_s0,1690\nbitwise-ops,hw2p1_s1,1689\nbitwise-ops,hw2p1_s2,1690\nbitwise-ops,hw2p1_s3,1689\nrelative-primes,baseline,1923\nrelative-primes,hw2p1_s0,1923\nrelative-primes,hw2p1_s1,1914\nrelative-primes,hw2p1_s2,1923\nrelative-primes,hw2p1_s3,1914\neuclid,baseline,563\neuclid,hw2p1_s0,563\neuclid,hw2p1_s1,562\neuclid,hw2p1_s2,563\neuclid,hw2p1_s3,562\nprimes-between,baseline,574100\nprimes-between,hw2p1_s0,574100\nprimes-between,hw2p1_s1,574100\nprimes-between,hw2p1_s2,574100\nprimes-between,hw2p1_s3,574100\nsum-check,baseline,5018\nsum-check,hw2p1_s0,5018\nsum-check,hw2p1_s1,5018\nsum-check,hw2p1_s2,5018\nsum-check,hw2p1_s3,5018\narmstrong,baseline,133\narmstrong,hw2p1_s0,133\narmstrong,hw2p1_s1,130\narmstrong,hw2p1_s2,133\narmstrong,hw2p1_s3,130\n\n❯ brench brench_test_lvn.toml\nbenchmark,run,result\nfact,baseline,229\nfact,hw2p2_s1,229\nfact,hw2p2_s2,167\nis-decreasing,baseline,127\nis-decreasing,hw2p2_s1,127\nis-decreasing,hw2p2_s2,123\nquadratic,baseline,785\nquadratic,hw2p2_s1,785\nquadratic,hw2p2_s2,500\nrecfact,baseline,104\nrecfact,hw2p2_s1,104\nrecfact,hw2p2_s2,64\nfizz-buzz,baseline,3652\nfizz-buzz,hw2p2_s1,3652\nfizz-buzz,hw2p2_s2,2103\npascals-row,baseline,146\npascals-row,hw2p2_s1,146\npascals-row,hw2p2_s2,68\nloopfact,baseline,116\nloopfact,hw2p2_s1,116\nloopfact,hw2p2_s2,78\nreverse,baseline,46\nreverse,hw2p2_s1,46\nreverse,hw2p2_s2,38\nsum-sq-diff,baseline,3038\nsum-sq-diff,hw2p2_s1,3038\nsum-sq-diff,hw2p2_s2,1717\nbirthday,baseline,484\nbirthday,hw2p2_s1,484\nbirthday,hw2p2_s2,278\nmod_inv,baseline,558\nmod_inv,hw2p2_s1,558\nmod_inv,hw2p2_s2,304\ncheck-primes,baseline,8468\ncheck-primes,hw2p2_s1,8468\ncheck-primes,hw2p2_s2,4238\nbitwise-ops,baseline,1690\nbitwise-ops,hw2p2_s1,1690\nbitwise-ops,hw2p2_s2,1689\nrelative-primes,baseline,1923\nrelative-primes,hw2p2_s1,1923\nrelative-primes,hw2p2_s2,1207\neuclid,baseline,563\neuclid,hw2p2_s1,563\neuclid,hw2p2_s2,272\nprimes-between,baseline,574100\nprimes-between,hw2p2_s1,574100\nprimes-between,hw2p2_s2,571439\nperfect,baseline,232\nperfect,hw2p2_s1,232\nperfect,hw2p2_s2,231\nbitshift,baseline,167\nbitshift,hw2p2_s1,167\nbitshift,hw2p2_s2,104\nsum-check,baseline,5018\nsum-check,hw2p2_s1,5018\nsum-check,hw2p2_s2,5018\narmstrong,baseline,133\narmstrong,hw2p2_s1,133\narmstrong,hw2p2_s2,130",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Qucheng",
+      "Homework 2: Optimizing with DCE and LVN"
+    ]
+  },
+  {
+    "objectID": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#conclusion",
+    "href": "blogs/Qucheng/2024-09-27-Qucheng-HW2.html#conclusion",
+    "title": "Homework 2: Optimizing with DCE and LVN",
     "section": "Conclusion",
-    "text": "Conclusion\nThis assignment provided a comprehensive introduction to Bril and its tooling ecosystem. By creating benchmarks and developing a custom analyzer, I gained insights into compiler design and intermediate representations.\nHardest Part: The most challenging aspect was managing dependencies and environment setup for the Bril toolchain. Careful attention to the makefile and troubleshooting through GitHub Discussions helped overcome these issues.\nTesting and Results: I validated my benchmarks and analyzer using various Bril programs. The tools successfully transformed and analyzed the input programs, demonstrating the utility of Bril in simple code analysis and transformation tasks.\nThis experience has equipped me with practical skills in working with compiler tools and representations, paving the way for more complex analyses in future assignments.",
+    "text": "Conclusion\nThe implementation successfully optimizes Bril programs through Trivial Dead Code Elimination and Local Value Numbering. Both techniques were integrated and tested using brench, confirming their effectiveness. Future work could focus on extending these optimizations to handle more complex cases, such as multi-block programs and interprocedural optimizations.\nThis project demonstrates the power of local optimizations in streamlining intermediate representations and serves as a solid foundation for further exploration of compiler optimization techniques.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
       "Qucheng",
-      "Homework 1: Exploring Bril"
+      "Homework 2: Optimizing with DCE and LVN"
     ]
   },
   {
-    "objectID": "blogs/oscar/2024-09-20-HW1.html",
-    "href": "blogs/oscar/2024-09-20-HW1.html",
-    "title": "HW1 - Trying Out Bril",
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html",
+    "title": "Homework1 - Sana",
     "section": "",
-    "text": "Bril is a very simple and educational instruction-based intermediate represnetation (IR) that is represented in JSON. It features a simple syntax that can be converted as JSON, and a suite of tools to execute the program.\nIn this assignment, we implement a basic benchmarking program with Bril, then write a simple analysis program that analyzes a Bril (JSON) program, as well as create tests for both of these using Turnt (a snapshot testing tool).",
+    "text": "I created a Brill benchmark that calculates and prints the sum of prime numbers and composite numbers up to a given input (in this case, 100). The algorithm used here is very similar to the algorithm used in sieve.bril code in the Brill benchmark folder which is designed to find and print all prime numbers up to a specified limit. It emphasizes the identification of primes through boolean flags and modular functions. Our implementation extends the algorithm to calculate the sum of primes and the sum of composites up to a specified limit. It uses an integer array to flag primes and composites and focuses on aggregating values rather than listing them.\n\n\n\nTo give a little explanation about what each part of the code does:\n\n\n@sumOfPrimes: This function calculates the sum of all prime numbers up to n. First, an array nums of size n is allocated, where each index represents whether a number is prime or composite (1 for prime, 0 for composite). Initially, all numbers are marked as prime. Starting from current = 2, the function marks the multiples of each number as composite (0), skipping prime numbers. The outer loop increments current, and the inner loop marks all multiples of current as composite. After marking non-primes, the function iterates over the array from 2 to n and sums the numbers where the value is 1 (they are prime).\n@sumOfComposites: This function calculates the sum of all composite numbers up to n. It works similarly to the sumOfPrimes function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from 4 (since 1 is neither prime nor composite, and 2 and 3 are primes) and adds all numbers marked as 0 (composite).\n\n\n\n\nTo test the implementation, I used the following approach:\n\na) I ran the benchmark with different input values, starting with small numbers like 10, 20, and then larger numbers like 100.\nb) I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.\nc) I used the Brill interpreter (brili) to run the benchmark and checked both the output and the number of dynamic instructions executed.\n\nQuantitative results for input 100:\n1060\n3889\n\n\n\nThe most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (br) and jumps (jmp). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Oscar",
-      "HW1 - Trying Out Bril"
+      "Homework1 - Sana"
     ]
   },
   {
-    "objectID": "blogs/oscar/2024-09-20-HW1.html#overview",
-    "href": "blogs/oscar/2024-09-20-HW1.html#overview",
-    "title": "HW1 - Trying Out Bril",
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code",
+    "title": "Homework1 - Sana",
     "section": "",
-    "text": "Bril is a very simple and educational instruction-based intermediate represnetation (IR) that is represented in JSON. It features a simple syntax that can be converted as JSON, and a suite of tools to execute the program.\nIn this assignment, we implement a basic benchmarking program with Bril, then write a simple analysis program that analyzes a Bril (JSON) program, as well as create tests for both of these using Turnt (a snapshot testing tool).",
+    "text": "To give a little explanation about what each part of the code does:\n\n\n@sumOfPrimes: This function calculates the sum of all prime numbers up to n. First, an array nums of size n is allocated, where each index represents whether a number is prime or composite (1 for prime, 0 for composite). Initially, all numbers are marked as prime. Starting from current = 2, the function marks the multiples of each number as composite (0), skipping prime numbers. The outer loop increments current, and the inner loop marks all multiples of current as composite. After marking non-primes, the function iterates over the array from 2 to n and sums the numbers where the value is 1 (they are prime).\n@sumOfComposites: This function calculates the sum of all composite numbers up to n. It works similarly to the sumOfPrimes function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from 4 (since 1 is neither prime nor composite, and 2 and 3 are primes) and adds all numbers marked as 0 (composite).",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Oscar",
-      "HW1 - Trying Out Bril"
+      "Homework1 - Sana"
     ]
   },
   {
-    "objectID": "blogs/oscar/2024-09-20-HW1.html#part-1-bril-benchmark-program",
-    "href": "blogs/oscar/2024-09-20-HW1.html#part-1-bril-benchmark-program",
-    "title": "HW1 - Trying Out Bril",
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested",
+    "title": "Homework1 - Sana",
+    "section": "",
+    "text": "To test the implementation, I used the following approach:\n\na) I ran the benchmark with different input values, starting with small numbers like 10, 20, and then larger numbers like 100.\nb) I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.\nc) I used the Brill interpreter (brili) to run the benchmark and checked both the output and the number of dynamic instructions executed.\n\nQuantitative results for input 100:\n1060\n3889",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced",
+    "title": "Homework1 - Sana",
+    "section": "",
+    "text": "The most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (br) and jumps (jmp). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code-1",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code-1",
+    "title": "Homework1 - Sana",
+    "section": "Explanation of the Code",
+    "text": "Explanation of the Code\nThe code first iterates through each function in the program using the outer loop. Inside the function, the inner loop goes through each instruction. For each instruction, it increments the instruction count and checks if the instruction is a jump (br or jmp). If it is, a print instruction is added before the jump.\n\nimport json\nimport copy\n\nbril_json = \"\"\"\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\", \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"br\", \"args\": [\"v2\"], \"labels\": [\"then\", \"else\"] },\n        { \"label\": \"then\" },\n        { \"op\": \"print\", \"args\": [\"v2\"] },\n        { \"op\": \"jmp\", \"labels\": [\"end\"] },\n        { \"label\": \"else\" },\n        { \"op\": \"print\", \"args\": [\"v1\"] },\n        { \"label\": \"end\" },\n        { \"op\": \"ret\" }\n      ]\n    }\n  ]\n}\n\"\"\"\n\nbril_program = json.loads(bril_json)\n\ndef process_bril_program(bril_program):\n    total_instructions = 0\n    for function in bril_program['functions']:\n        new_instrs = []\n        for instruction in function['instrs']:\n            total_instructions += 1\n            \n            # add a print instruction before a jump!\n            if instruction.get('op') in ['br', 'jmp']:\n                print_instr = {\n                    \"op\": \"print\",\n                    \"args\": [\"Jumping\"]\n                }\n                new_instrs.append(print_instr)\n            \n            new_instrs.append(instruction)\n        \n        function['instrs'] = new_instrs\n\n    return bril_program, total_instructions\n\nmodified_program, instruction_count = process_bril_program(bril_program)\n\nprint(\"Total number of instructions:\", instruction_count)\nprint(\"Modified Bril program:\")\nprint(json.dumps(modified_program, indent=2))\n\nTotal number of instructions: 11\nModified Bril program:\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        {\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"dest\": \"v0\",\n          \"value\": 1\n        },\n        {\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"dest\": \"v1\",\n          \"value\": 2\n        },\n        {\n          \"op\": \"add\",\n          \"type\": \"int\",\n          \"dest\": \"v2\",\n          \"args\": [\n            \"v0\",\n            \"v1\"\n          ]\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"Jumping\"\n          ]\n        },\n        {\n          \"op\": \"br\",\n          \"args\": [\n            \"v2\"\n          ],\n          \"labels\": [\n            \"then\",\n            \"else\"\n          ]\n        },\n        {\n          \"label\": \"then\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"v2\"\n          ]\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"Jumping\"\n          ]\n        },\n        {\n          \"op\": \"jmp\",\n          \"labels\": [\n            \"end\"\n          ]\n        },\n        {\n          \"label\": \"else\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"v1\"\n          ]\n        },\n        {\n          \"label\": \"end\"\n        },\n        {\n          \"op\": \"ret\"\n        }\n      ]\n    }\n  ]\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested-1",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested-1",
+    "title": "Homework1 - Sana",
+    "section": "How the Implementation is Tested",
+    "text": "How the Implementation is Tested\nTo test the implementation, I created a small Bril program called test.json that contains various types of instructions, including constants, an add operation, a branch instruction (br), a jump instruction (jmp), and print statements. I used this file to verify that the transformation was applied correctly and that the total number of instructions was counted.\nTest Input (test.json):\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\", \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"br\", \"args\": [\"v2\"], \"labels\": [\"then\", \"else\"] },\n        { \"label\": \"then\" },\n        { \"op\": \"print\", \"args\": [\"v2\"] },\n        { \"op\": \"jmp\", \"labels\": [\"end\"] },\n        { \"label\": \"else\" },\n        { \"op\": \"print\", \"args\": [\"v1\"] },\n        { \"label\": \"end\" },\n        { \"op\": \"ret\" }\n      ]\n    }\n  ]\n}\n\nOutput of The program is shown in previous section.\nQuantitative Results: The total number of instructions before the transformation was 11. After transformation, 2 print instructions were added (one before the br and another before the jmp), making the total number of instructions 13. (We can conclude this by counting the instructions in the modified Bril program)",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced-1",
+    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced-1",
+    "title": "Homework1 - Sana",
+    "section": "Challenges Faced",
+    "text": "Challenges Faced\nThe most challenging part of the task was ensuring that the additional instructions were inserted in the correct place without modifying the logic of the Bril program. The Bril program must still execute in the intended order, and placing the print instructions incorrectly could have changed the control flow. To address this challenge, I carefully looped through the instruction list, checked for br and jmp operations, and inserted the print instructions before each of these jump-related instructions by also maintaining the program’s original flow and semantics.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Homework1 - Sana"
+    ]
+  },
+  {
+    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html",
+    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html",
+    "title": "Homework1 - Yashaswini",
+    "section": "",
+    "text": "I created a program that iterates through an array of values both suming and multiplying the values.\n\n\nthe code was written in text forma ns used a pointer to initialize the array. store and load instructions were used to access the array and .loop with a jmp was used for the iterations\n\n\n\nThe code was tested with different size arrays with the answers check using an external calculator.\n\n\n\nThe main challenge for this was finding the best way to populate the array with values. brili is very simple and using just stores and loads to index into the array gave added complexity.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Yashaswini",
+      "Homework1 - Yashaswini"
+    ]
+  },
+  {
+    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#about-the-code",
+    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#about-the-code",
+    "title": "Homework1 - Yashaswini",
+    "section": "",
+    "text": "the code was written in text forma ns used a pointer to initialize the array. store and load instructions were used to access the array and .loop with a jmp was used for the iterations",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Yashaswini",
+      "Homework1 - Yashaswini"
+    ]
+  },
+  {
+    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#testing",
+    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#testing",
+    "title": "Homework1 - Yashaswini",
+    "section": "",
+    "text": "The code was tested with different size arrays with the answers check using an external calculator.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Yashaswini",
+      "Homework1 - Yashaswini"
+    ]
+  },
+  {
+    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#challenges",
+    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#challenges",
+    "title": "Homework1 - Yashaswini",
+    "section": "",
+    "text": "The main challenge for this was finding the best way to populate the array with values. brili is very simple and using just stores and loads to index into the array gave added complexity.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Yashaswini",
+      "Homework1 - Yashaswini"
+    ]
+  },
+  {
+    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#python-tool",
+    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#python-tool",
+    "title": "Homework1 - Yashaswini",
+    "section": "Python Tool",
+    "text": "Python Tool\nThe python tool was run on the a new add.json file based off of my benchmark from part 1\nimport json\n\ndef load_bril_program(filename):\n    \"\"\"Load the Bril program from a JSON file.\"\"\"\n    with open(filename, 'r') as file:\n        return json.load(file)\n\ndef count_add_instructions(program):\n    \"\"\"Count the number of 'add' instructions in the Bril program.\"\"\"\n    add_count = 0\n    for func in program['functions']:\n        for instr in func['instrs']:\n            if instr.get('op') == 'add':\n                add_count += 1\n    return add_count\n\ndef add_print_before_jumps(program):\n    \"\"\"Insert a 'print' instruction before every 'jmp' instruction.\"\"\"\n    for func in program['functions']:\n        new_instrs = []\n        for instr in func['instrs']:\n            if instr.get('op') == 'jmp':\n                # Add a print instruction before the jump\n                new_instr = {\n                    \"op\": \"print\",\n                    \"args\": [\"jmp\"]\n                }\n                new_instrs.append(new_instr)\n            new_instrs.append(instr)\n        func['instrs'] = new_instrs\n    return program\n\ndef save_bril_program(program, filename):\n    \"\"\"Save the transformed Bril program back to a JSON file.\"\"\"\n    with open(filename, 'w') as file:\n        json.dump(program, file, indent=2)\n\n# Main function to load, transform, and save the Bril program\ndef main():\n    # Load the Bril program from a file\n    bril_program = load_bril_program('add.json')\n\n    # Count the number of 'add' instructions\n    add_count = count_add_instructions(bril_program)\n    print(f\"Number of 'add' instructions: {add_count}\")\n\n    # Add 'print' before 'jmp' instructions\n    transformed_program = add_print_before_jumps(bril_program)\n\n    # Save the transformed Bril program to a file\n    save_bril_program(transformed_program, 'output_add.json')\n\n# Run the main function\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Yashaswini",
+      "Homework1 - Yashaswini"
+    ]
+  },
+  {
+    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#output",
+    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#output",
+    "title": "Homework1 - Yashaswini",
+    "section": "Output",
+    "text": "Output\nthe program found 2 add instrucitons and produced and output file shown below\n{\n  \"functions\": [\n    {\n      \"instrs\": [\n        {\n          \"dest\": \"c5\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 5\n        },\n        {\n          \"args\": [\n            \"c5\"\n          ],\n          \"dest\": \"v0\",\n          \"op\": \"alloc\",\n          \"type\": {\n            \"ptr\": \"int\"\n          }\n        },\n        {\n          \"dest\": \"j\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 1\n        },\n        {\n          \"dest\": \"c1\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 1\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c1\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c2\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 2\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c3\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 3\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c4\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 4\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c5\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 5\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"sum\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 0\n        },\n        {\n          \"dest\": \"i\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 0\n        },\n        {\n          \"label\": \"loop\"\n        },\n        {\n          \"args\": [\n            \"i\",\n            \"c5\"\n          ],\n          \"dest\": \"cond\",\n          \"op\": \"lt\",\n          \"type\": \"bool\"\n        },\n        {\n          \"args\": [\n            \"cond\"\n          ],\n          \"labels\": [\n            \"body\",\n            \"end\"\n          ],\n          \"op\": \"br\"\n        },\n        {\n          \"label\": \"body\"\n        },\n        {\n          \"args\": [\n            \"v0\"\n          ],\n          \"dest\": \"current\",\n          \"op\": \"load\",\n          \"type\": \"int\"\n        },\n        {\n          \"args\": [\n            \"sum\",\n            \"current\"\n          ],\n          \"dest\": \"sum\",\n          \"op\": \"add\",\n          \"type\": \"int\"\n        },\n        {\n          \"args\": [\n            \"i\",\n            \"j\"\n          ],\n          \"dest\": \"i\",\n          \"op\": \"add\",\n          \"type\": \"int\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"jmp\"\n          ]\n        },\n        {\n          \"labels\": [\n            \"loop\"\n          ],\n          \"op\": \"jmp\"\n        },\n        {\n          \"label\": \"end\"\n        },\n        {\n          \"args\": [\n            \"sum\"\n          ],\n          \"op\": \"print\"\n        },\n        {\n          \"args\": [\n            \"v0\"\n          ],\n          \"op\": \"free\"\n        },\n        {\n          \"op\": \"ret\"\n        }\n      ],\n      \"name\": \"main\"\n    }\n  ]\n}\n##Testing\na good way to otest this is using small scripts where the number of adds is known or can be calculates.\nI could also develop a tool to reverse the addition of prints before jmp and compare the output to the original code using turnt.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Yashaswini",
+      "Homework1 - Yashaswini"
+    ]
+  },
+  {
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "section": "",
+    "text": "This assignment is designed to allow us to get comfortable with Bril, an intermediate representation designed for learning. In this assignment, we add a benchmark program to the suite, and write a tool for analyzing JSON formatted Bril.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#introduction",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#introduction",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "section": "",
+    "text": "This assignment is designed to allow us to get comfortable with Bril, an intermediate representation designed for learning. In this assignment, we add a benchmark program to the suite, and write a tool for analyzing JSON formatted Bril.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-1-bril-benchmark-program",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-1-bril-benchmark-program",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
     "section": "Part 1: Bril Benchmark Program",
-    "text": "Part 1: Bril Benchmark Program\nAfter reviewing the list of existing benchmark programs within the Bril repository (under the benchmarks directory), we notice that most benchmarks tend to consist of basic sample programs that runs a handwritten algorithm that returns some output value.\nIn keeping with this pattern, I had originally wanted to write a program that performs a single forward convolutional pass through a large matrix of data, however after noticing the tedious process of packing individual data values into large arrays, I felt that an implementation of this would be too messy. I had also wanted to test recusion in Bril, so naturally an implementation of Merge Sort would fit this purpose well. I chose an in-place version of the algorithm to reduce the complexity a little.\nAs mentioned earlier, creating arrays appear to require painstakingly pack all the individual values one at a time into memory. I had borrowed the @pack function from the bubblesort.bril benchmark to help create this array from the passed arguments for my program, 8 integer values to be stored into an unsorted array. These arguments are passed in when the program is called, as opposed to many other benchmark programs that hardcode the input values into the program.\nTaking an existing implementation of in-place merge sort written in C and converting it to a functional bril program was a relatively simple task, given the procedural and imperative nature of both languages. The difficulty mostly came down to writing proper control flow (inverting condition statements to support &gt;= and &lt;=), the verbosity of accessing individual elements in an array, and keeping track of what variables to modify. Keeping temporary notes in listing what variables are currently used within a certain scope helps keep track of how state may change in a program if a particular variable is used elsewhere.",
+    "text": "Part 1: Bril Benchmark Program\nA good benchmark for this assignment is one which is new to the repository, but is fairly simple. As such, a benchmark which fits into the benchmark/core suite is likely a good choice.\nMy first idea was to implement a benchmark which computes the Hamming distance between two integers. In a high level language with a shift operator, this is a fairly easy program to write. However, Bril does not have a built-in shift operator. I spent some time writing a function to compute the Hamming distance without shifting, but it quickly became cumbersome and I searched for other ideas to not overcomplicate this work.\nMy next idea was to write a benchmark which computes the \\(nth\\) value in the Fibonacci sequence recursively. This is a sensible benchmark, as it may test a system’s ability to handle recursive programs, and further tests whether a compiler preserves this relationship.\nTo create this, only about 11 lines of TypeScript were required (when paired with the TypeScript compiler).\nAt the end, I created a program to compute the \\(nth\\) value in the Fibonacci sequence recursively, which can be found at benchmarks/core/fibonacci.bril, and can be tested with turnt.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Oscar",
-      "HW1 - Trying Out Bril"
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/oscar/2024-09-20-HW1.html#part-2-analysis-tool",
-    "href": "blogs/oscar/2024-09-20-HW1.html#part-2-analysis-tool",
-    "title": "HW1 - Trying Out Bril",
-    "section": "Part 2: Analysis Tool",
-    "text": "Part 2: Analysis Tool\nFor the second part of the assignment, we are tasked to write a small program that analyzes or modifies a Bril program in some way. I had originally tried to write my program in Zig for some extra practice, but time constraints locked me back to Python for convenience (JSON handling is a lot easier in Python).\nThe program I had written performs a couple of basic scans through the functions of the specified Bril program, and prints out the following for each function (if applicable):\n\nThe arguments of the function and their types\nThe list of all function calls made and their arguments\nIf recursion is present\nThe number of potential loops found within the function\n\nA potential loop is found by simply scanning for all unique labels that have a jmp or br instruction located somewhere after the label that jumps to said label.\nGathering these statistics for all functions could potentially help internally organize programs into a convenient structure and identify what the most dominating section of code is. I find that it provides a nice synopsis on what a high-level breakdown of a Bril program looks like.\nOriginally, I had also planned to add functionality that will analyze whether variables are unused, but it got needlessly complicated and felt more appropriate for dead code elimination in a later assignment.",
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#problems-faced",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#problems-faced",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "section": "Problems Faced",
+    "text": "Problems Faced\nOne challenge as I learned was that the TS compiler does not recognize many types, and further regards many types as Any when they cannot be easily predicted. This was not much of a challenge to handle, however I am not much of a TS programmer so learning enough of the language was a step in the process.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Oscar",
-      "HW1 - Trying Out Bril"
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/oscar/2024-09-20-HW1.html#testing",
-    "href": "blogs/oscar/2024-09-20-HW1.html#testing",
-    "title": "HW1 - Trying Out Bril",
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
     "section": "Testing",
-    "text": "Testing\nAn in-place merge sort implementation in Bril and a simple program to analyze Bril programs were developed. Both of these programs have associated Turnt tests to ensure that the outputs for these programs are matching the expected result when I had written them. For the analysis tool (flow_detect.py), I have included other existing benchmark Bril programs in testing for a variety of outputs.\nHere are some outputs for our Merge Sort program:\n$ bril2json &lt; mergesort-inplace.bril | brili -p 8 1 2 7 3 6 5 4\n1\n2\n3\n4\n5\n6\n7\n8\ntotal_dyn_inst: 677\n$ bril2json &lt; mergesort-inplace.bril | brili -p 8 7 6 5 4 3 2 1\n1\n2\n3\n4\n5\n6\n7\n8\ntotal_dyn_inst: 803\n$ bril2json &lt; mergesort-inplace.bril | brili -p 2 2 2 2 2 2 2 1\n1\n2\n2\n2\n2\n2\n2\n2\ntotal_dyn_inst: 486\nFor our analysis tool, I had selected a handful of benchmarks that have a variety of control flow. Here is the output for eight-queens:\nmain:\n    args:\n        int: input\n    function calls: 1\n        queen(zero, n, icount, site)\n\nqueen:\n    args:\n        int: n, queens, icount\n        int ptr: site\n    num potential loops: 1\n    function calls: 2\n        valid(n, site)\n        queen(n_1, queens, icount, site)\n    recursion present\n\nvalid:\n    args:\n        int: n\n        int ptr: site\n    num potential loops: 1\nAs shown, for each function a list of arguments, function calls, and indication of loops and/or recursion is demonstrated, if applicable. I have tested the program on my own Merge Sort file as well:\nmain:\n    args:\n        int: n1, n2, n3, n4, n5, n6, n7, n8\n    function calls: 3\n        pack(size, n1, n2, n3, n4, n5, n6, n7, n8)\n        merge_sort(array, zero, upper_bound)\n        print_array(array, size)\n\npack:\n    args:\n        int: size, n1, n2, n3, n4, n5, n6, n7, n8\n\nmerge:\n    args:\n        int ptr: arr\n        int: start, mid, end\n    num potential loops: 2\n\nmerge_sort:\n    args:\n        int ptr: arr\n        int: l, r\n    function calls: 3\n        merge_sort(arr, l, m)\n        merge_sort(arr, mp1, r)\n        merge(arr, l, m, r)\n    recursion present\n\nprint_array:\n    args:\n        int ptr: array\n        int: size\n    num potential loops: 1\nHere, the program correctly identifies the use of recursion in our @merge_sort function, as well as finding the two nested loops within @merge as well.",
+    "text": "Testing\nTo verify functionality, I first by hand compared the results of execution with different input values of \\(n\\), and additionally developed a turnt test. Results of testing can be observed below:\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 1\n1\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 5\n5\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 10\n55\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 30\n832040\n\n# Including timing results as evidence that recursion is happening \n$ time bril2json &lt; benchmarks/core/fibonacci.bril | brili 30\n832040\n\nreal    0m1.836s\nuser    0m1.817s\nsys 0m0.052s\n[15:02:36] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril$ time bril2json &lt; benchmarks/core/fibonacci.bril | brili 10\n55\n\nreal    0m0.102s\nuser    0m0.096s\nsys 0m0.031s",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Oscar",
-      "HW1 - Trying Out Bril"
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/sharmila/2024-09-20-Sharmila-HW01.html",
-    "href": "blogs/sharmila/2024-09-20-Sharmila-HW01.html",
-    "title": "Compiler Homework 01 - Trying Out Bril",
-    "section": "",
-    "text": "About Bril\nBril is a simple educational intermediate representation (IR) language that is used to teach and experiment with compiler and programming language concepts. It provides a set of operations such as arithmetic and logical operations, and basic control flow structures like conditional branches and loops. The idea behind Bril is to keep things minimal and easy to understand, so we can focus on the core concepts of compilers without getting distracted by complicated features found in more advanced languages.\nGoal of this Homework is to get familiar with Bril, so I chose to a write a simple benchmark under core without getting inputs(args).\nIn this blog, I’ll walk you through two parts of my Homework 01 assignment where I first write a benchmark in Bril and then develop a tool to analyze Bril programs.\n\n\nPart 1: Write a New Benchmark\nThe first part of the assignment involved writing a new benchmark in Bril. This helped me get familiar with Bril’s control flow, syntax, and basic operations.\nBenchmark: addsqevenodd.bril\nThe goal of this benchmark is to calculate the sum of squares of even and odd numbers from 1 to 10 separately. Here’s the Bril program I wrote by hand:\n\n@main {\n  sum_even: int = const 0;      \n  sum_odd: int = const 0;       \n  i: int = const 1;             \n  limit: int = const 10;        \n  one: int = const 1;           \n  two: int = const 2;           \n\n.loop:\n  square: int = mul i i;        \n  half: int = div i two;        \n  check: int = mul half two;    \n  is_even: bool = eq check i;   \n  br is_even .even_case .odd_case; \n\n.even_case:\n  sum_even: int = add sum_even square; \n  jmp .increment;\n\n.odd_case:\n  sum_odd: int = add sum_odd square;   \n\n.increment:\n  i: int = add i one;           \n  cond: bool = le i limit;      \n  br cond .loop .exit;          \n\n.exit:\n  print sum_even;               \n  print sum_odd;                \n}\n\nThis program defines a loop that iterates from 1 to 10, calculates the square of each number, and adds the result to two separate sums for even and odd numbers. Finally, it prints the sums of the squares of even and odd numbers\nAfter writing the program, I converted it to a JSON format, which is required for further processing:\nbril2json &lt; addsqevenodd.bril &gt; addsqevenodd.json\nDuring this step, I faced an issue where the Bril interpreter (brili) did not accept direct constant values in core instructions. To resolve this, I explicitly declared constants before using them in operations like add or mul. This was a good learning experience that reinforced the importance of proper initialization in IR.\nTo automate testing, I used turnt to create a test output for this benchmark. I added the following command to a turnt.toml file:\ncommand = “bril2json &lt; {filename} | brili -p {args}”\nThis command runs the benchmark through brili, captures the output, and saves it in an output file. After creating the test, I ran:\nturnt –save addsqevenodd.bril\nThis command saved the output in a file named addsqevenodd.out, which can be used for further validation.\n\n\nPart 2: Write a Bril Analyzer\nIn this part, I developed a small tool to analyze Bril programs using python. I chose to count the number of add and print instructions in the Bril program to better understand the operations performed in the code.\nHere’s the Python code I implemented to count the add and print instructions in a Bril program:\n\nimport json\nimport sys\n\n\ndef count_add_instrs(bril_program):\n\n    count = 0\n    print = 0\n    for func in bril_program['functions']:\n        for instr in func['instrs']:\n            if 'op' in instr:\n                if instr['op'] == 'add':\n                    count += 1\n\n    return count\n\ndef count_print_instrs(bril_program):\n\n    printcount = 0\n    for func in bril_program['functions']:\n        for instr in func['instrs']:\n            if 'op' in instr:\n                if instr['op'] == 'print':\n                    printcount += 1\n                    \n    return printcount\n\nif __name__ == \"__main__\":\n\n    json_file = \"/home/sharmila_ubuntu/Compiler HW 01/addsqevenodd.json\"\n    with open(json_file,'r') as f:\n        bril_program = json.load(f)\n    count = count_add_instrs(bril_program)\n    print(f\"Number of add instructions in addsqevenodd.json file : {count}\")\n    printcount = count_print_instrs(bril_program)\n    print(f\"Number of print instructions in addsqevenodd.json file : {printcount}\")\n\nThis script loads the Bril program in JSON format, iterates over its instructions, and counts how many add and print operations are present.\nI tested my analyzer using turnt by adding the following command to the turnt.toml file:\ncommand = “bril2json &lt; {filename} | python3 analyzebril.py”\nThis command takes the Bril program, converts it to JSON, and runs my Python script (analyzebril.py) to analyze the JSON file. The output file generated by this process contains the number of add and print instructions in the program.\n\n\nConclusion: Summary of this Homework 01\n\nPart 1: I wrote a benchmark (addsqevenodd.bril) that computes the sum of squares of even and odd numbers from 1 to 10 separately. I used bril2json to convert the program into JSON and ran it with brili. I also used turnt to create an automated test for the benchmark.\nPart 2: I created a Python tool to analyze the Bril program. The tool counts add and print instructions in the JSON representation of the Bril program. I tested the tool using turnt, ensuring it ran correctly.\n\n\n\nTest and Results:\nTo verify this analyzer I tested with 3 example: (obtained the later two examples from (https://github.com/sampsyo/bril/tree/main/benchmarks)\n\nInitially, I used my benchmark to test the implementation, that is, using both the addsqevenodd.bril file and its corresponding json file (addsqevenodd.json). The analyzed correctly counted 3 add instructions and 2 print instructions.\nAnd then, I verified using bubblesort.bril, loading it’s json file and analyzed correctly as 8 add instructions and 1 print instruction.\nFinally, I verifies using mat-inv.bril, loading it’s json file and analyzed correctly as 12 add instruction and 2 print instruction.\n\n\n\nChallenges Faced and Solution:\nThe hardest part of this task was dealing with the restriction on directly using constants in core Bril instructions. I initially overlooked this, but after debugging, I realized that every constant had to be initialized in a separate instruction. This helped me better understand Bril’s structure and rules. Moreover, learning to use turnt for automating tests was a valuable lesson, as it streamlines the testing process significantly.\n\n\n\n\n Back to top",
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-2-bril-tooling",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-2-bril-tooling",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "section": "Part 2: Bril Tooling",
+    "text": "Part 2: Bril Tooling\nFor the second part of this assignment, we were asked to design a tool which either analyzed or modified Bril code stored in JSON format. I chose to make a simple program, which for a given file, computes how many of each “type” of instruction the program contains. The three types of instructions are “Constants”, “Value Operations”, and “Effect Operations” as outlined in the docs.\nTo do this, I wrote a Python script which consumed the input JSON, parsed it to get the available instructions, and iterated through the map. Each instruction type has a unique construction, which I used to determine how many of each type of isntruction was contained. This tool only requires one pass through the program JSON to determine the count of each instruction type.\nThis tool could readily be extended to gather information about the types of instructions in a program.\nThe code for this tool is shared below:\n\n#!/usr/bin/env python3\n\nimport json\nimport sys\n\n# Read the input as json\n# Proc Exit: If valid input rec'd\ndef read_json_file(input):\n    try:\n        data = json.load(input)\n        return data\n    except json.JSONDecodeError:\n        print(f\"Error: The input does not contain valid JSON.\")\n        sys.exit(1)\n    except Exception as e:\n        print(f\"An error occurred: {str(e)}\")\n        sys.exit(1)\n\n# Count the instruction types as specified by Bril syntax\ndef count_instr_types(data: dict):\n    db = {'constant': 0, 'value': 0, 'effect': 0}\n    for func in data['functions']:\n        for instr in func['instrs']:\n            # If instr op is const, it must be a constant instruction\n            if 'op' in instr and instr['op'] == 'const':\n                db['constant'] += 1\n            # If instr has a dest and is not a const, it must be a value instruction\n            elif 'dest' in instr:\n                db['value'] += 1\n            # Continue if this is a label\n            elif 'label' in instr:\n                continue\n            # Otherwise this must be an effect instruction\n            else:\n                db['effect'] += 1\n            # Note: this assumes the json is well-formed Bril.\n    return db\n\n# Main\ndef main():\n    data = read_json_file(sys.stdin)\n    print(count_instr_types(data))\n\nif __name__ == \"__main__\":\n    main()",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Sharmila",
-      "Compiler Homework 01 - Trying Out Bril"
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/junk.html",
-    "href": "blogs/junk.html",
-    "title": "sample blog",
-    "section": "",
-    "text": "this is a sample blog!\n\n\n\n Back to top",
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing-1",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing-1",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "section": "Testing",
+    "text": "Testing\nI tested this program on a handful of the provided benchmarks, and verified the results by hand. Some results are shared below:\n$ bril2json &lt; ../benchmarks/core/hanoi.bril | python tool.py \n{'constant': 5, 'value': 2, 'effect': 6}\n[15:10:42] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril/mytools$ bril2json &lt; ../benchmarks/core/birthday.bril | python tool.py \n{'constant': 9, 'value': 26, 'effect': 4}\n[15:11:04] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril/mytools$ bril2json &lt; ../benchmarks/core/collatz.bril | python tool.py \n{'constant': 3, 'value': 7, 'effect': 7}",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "sample blog"
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#challenges-faced",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#challenges-faced",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "section": "Challenges faced",
+    "text": "Challenges faced\nOriginally, I had planned to construct a program which identified all control flow instructions, and further identified how many basic blocks the program contained. I moved away from this because I was not sure how exactly to handle call and ret instructions at this time, and it seems likely this work is coming in a future assignment.\nAnother challenge was that I had at first not realized that labels are contained within the instructions in the json files. This was causing my program to crash, and required some (brief) debugging.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#code",
+    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#code",
+    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "section": "Code",
+    "text": "Code\nThe code for this assignment is contained in the latest commit in my fork of Bril.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Michael",
+      "EECE7309 Homework 1 -- Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/rohit/2024-09-20-Rohit-HW1.html",
+    "href": "blogs/rohit/2024-09-20-Rohit-HW1.html",
+    "title": "Homework 1",
+    "section": "",
+    "text": "A Cyclic Redundancy Check (CRC) is an error-detecting code used in digital networks and storage devices to detect accidental changes to raw data. In embedded systems, CRCs are crucial for ensuring data integrity during communication, verifying data stored in memory, and validating firmware updates. They are popular due to their simplicity, efficiency in binary hardware, and effectiveness in detecting common transmission errors.\n\nIt ensure data integrity in communication protocols like UART, SPI, and I2C by detecting errors caused by noise or interference.\nHow CRC Works:\n\nPolynomial Division: The data block is treated as a large binary number and divided by a fixed polynomial. The remainder of this division is the CRC value.\nAppending CRC: The CRC value is appended to the data before transmission or storage.\nVerification: Upon retrieval, the same polynomial division is performed. If the remainder matches the CRC value, the data is considered intact; otherwise, it indicates corruption\n\nLearn more at: https://en.wikipedia.org/wiki/Cyclic_redundancy_check\n\n\n\n\n\nCRC calculations prominently involve memory allocation, extensively using ptr&lt;int&gt;.\nCRC algorithms typically involve a mix of arithmetic (e.g., addition, subtraction, Multiplication) and bitwise operations (e.g., XOR, shifts).\nThis makes CRC an excellent microbenchmark for evaluating how well your Bril implementation handles these critical operations, which are essential for many real-world applications.\n\n\n\n\n\nBril code for CRC is fully hand typed code of 300+ lines using VS Code, the most useful tool ever was Bril syntax highlighting Extension in VS Code.\nTurnt tool was used to test and save the output file.\nturnt.toml file:\n\n    [envs.test]\n    command = \"bril2json &lt; {filename} | brili -p {args}\"\n    output.out = \"-\"\n    output.prof = \"2\"\n\n\nLearn more at: https://github.com/cucapra/turnt?tab=readme-ov-file\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Initialize Inputs]--&gt; B0[Get CRC Remainder] --&gt; B1[\"Check CRC\"] --&gt; B2[Print Outputs];\n\n\n\n\n\n\n\n\n\nGet Word, Divisor, check_value as an int.\ncheck_value will be 0 if the bits are missing and error.\nAppend Divisor size - 1 zeros to word.\nConvert the int into array, here in bril we can use ptr&lt;int&gt; allocations calling @toPtr function.\nReference to memory allocation in bril: https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/manually-managed-memory/\n\n\n\n\n\nTo divide Word and Divisor we need to do xor in each bit.\nFirst copy first few bits from Word to Word_split having same length as Divisor.\nCall @xorfunction and overwrite the result to first few bits of Word.\nCall @shiftleft function to left shift the Word and decrement word_size.\nRepeat this process until Word_size &lt; Div_size.\nAt the end return Word as a crc_rem to @main.\nConvert crc_rem from ptr&lt;int&gt; to int by calling toNum function.\n\n\n\n\n\nIf: crc_rem == 0 then there is no error in bit and crc_check is true.\nElse: there is a error and crc_check is false.\n\n\n\n\n\nOuputs are bool value crc_check and int value crc_rem.\nWhen check_value is set to 0\n\nThis Indicates that there are error or missing bits.\ncrc_check value will be false\ncheck_rem will give out the correct check_value\nso again replacing 0 from check_rem with check_value and running the code will give us crc_check as true with check_rem = 0 .\n\nFull code: https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril\n\n\n\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    1011\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 1011;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    100\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 100;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Rohit",
+      "Homework 1"
+    ]
+  },
+  {
+    "objectID": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-1-benchmark",
+    "href": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-1-benchmark",
+    "title": "Homework 1",
+    "section": "",
+    "text": "A Cyclic Redundancy Check (CRC) is an error-detecting code used in digital networks and storage devices to detect accidental changes to raw data. In embedded systems, CRCs are crucial for ensuring data integrity during communication, verifying data stored in memory, and validating firmware updates. They are popular due to their simplicity, efficiency in binary hardware, and effectiveness in detecting common transmission errors.\n\nIt ensure data integrity in communication protocols like UART, SPI, and I2C by detecting errors caused by noise or interference.\nHow CRC Works:\n\nPolynomial Division: The data block is treated as a large binary number and divided by a fixed polynomial. The remainder of this division is the CRC value.\nAppending CRC: The CRC value is appended to the data before transmission or storage.\nVerification: Upon retrieval, the same polynomial division is performed. If the remainder matches the CRC value, the data is considered intact; otherwise, it indicates corruption\n\nLearn more at: https://en.wikipedia.org/wiki/Cyclic_redundancy_check\n\n\n\n\n\nCRC calculations prominently involve memory allocation, extensively using ptr&lt;int&gt;.\nCRC algorithms typically involve a mix of arithmetic (e.g., addition, subtraction, Multiplication) and bitwise operations (e.g., XOR, shifts).\nThis makes CRC an excellent microbenchmark for evaluating how well your Bril implementation handles these critical operations, which are essential for many real-world applications.\n\n\n\n\n\nBril code for CRC is fully hand typed code of 300+ lines using VS Code, the most useful tool ever was Bril syntax highlighting Extension in VS Code.\nTurnt tool was used to test and save the output file.\nturnt.toml file:\n\n    [envs.test]\n    command = \"bril2json &lt; {filename} | brili -p {args}\"\n    output.out = \"-\"\n    output.prof = \"2\"\n\n\nLearn more at: https://github.com/cucapra/turnt?tab=readme-ov-file\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Initialize Inputs]--&gt; B0[Get CRC Remainder] --&gt; B1[\"Check CRC\"] --&gt; B2[Print Outputs];\n\n\n\n\n\n\n\n\n\nGet Word, Divisor, check_value as an int.\ncheck_value will be 0 if the bits are missing and error.\nAppend Divisor size - 1 zeros to word.\nConvert the int into array, here in bril we can use ptr&lt;int&gt; allocations calling @toPtr function.\nReference to memory allocation in bril: https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/manually-managed-memory/\n\n\n\n\n\nTo divide Word and Divisor we need to do xor in each bit.\nFirst copy first few bits from Word to Word_split having same length as Divisor.\nCall @xorfunction and overwrite the result to first few bits of Word.\nCall @shiftleft function to left shift the Word and decrement word_size.\nRepeat this process until Word_size &lt; Div_size.\nAt the end return Word as a crc_rem to @main.\nConvert crc_rem from ptr&lt;int&gt; to int by calling toNum function.\n\n\n\n\n\nIf: crc_rem == 0 then there is no error in bit and crc_check is true.\nElse: there is a error and crc_check is false.\n\n\n\n\n\nOuputs are bool value crc_check and int value crc_rem.\nWhen check_value is set to 0\n\nThis Indicates that there are error or missing bits.\ncrc_check value will be false\ncheck_rem will give out the correct check_value\nso again replacing 0 from check_rem with check_value and running the code will give us crc_check as true with check_rem = 0 .\n\nFull code: https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril\n\n\n\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    1011\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 1011;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    100\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 100;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Rohit",
+      "Homework 1"
+    ]
+  },
+  {
+    "objectID": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-2-analysis",
+    "href": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-2-analysis",
+    "title": "Homework 1",
+    "section": "PART 2: Analysis:",
+    "text": "PART 2: Analysis:\n\nFinding Number of Functions and its Calls\n\nCode: https://github.com/gurusamyanandakuma-r/bril/blob/main/examples/Count_Function.py\n\n\nInitialize\n\nThis analysis is done in python.\nUsing bril2json converting .bril file to JSON.\nLoading into python file using prog = json.load(sys.stdin).\nJSON heap structure will be loaded as dictionary in python.\n\n\n\nProcess\n\nCounting all functions in bril.\nCounting function calls of a function.\n\n\n\nTest\n\nTurnt.toml file:\n\n    [envs.countFunc]\n    default = false\n    command = \"bril2json &lt; {filename} | python3 hw.py &gt; {base}.txt\"\n\nOutput is stored in .txt file.\n\n\nExample 1: CRC\n\nInput:\n\nfile: https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril\n\n\n\nOutput:\n```\nNumber of Functions:  11\n------------------------\nFunction Call Counts:\nmain     : 0\nrem      : 1\nn_zeros  : 2\ntoPtr    : 2\nwordSplit: 1\nxor      : 1\nshiftLeft: 1\nprint_ptr: 0\ncrc_rem  : 1\ncrc_check: 1\ntoNum    : 1\n\n\n##### Example 2: Fibonacci\n###### Input: \n- file: &lt;https://github.com/normrubin/bril/blob/main/benchmarks/core/fibonacci.bril&gt;\n\n###### Output:\n    ```\n    Number of Functions:  2\n    ------------------------\n    Function Call Counts:\n    main     : 0\n    Fibonacci: 3\n\n\n\nExample 3: Binary Search\n\nInput:\n\nfile: https://github.com/normrubin/bril/blob/main/benchmarks/mem/binary-search.bril\n\n\n\nOutput:\n    Number of Functions:  4\n    ------------------------\n    Function Call Counts:\n    pack         : 1\n    print_array  : 0\n    binary_search: 3\n    main         : 0",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Rohit",
+      "Homework 1"
     ]
   },
   {
@@ -4764,321 +5018,184 @@
     ]
   },
   {
-    "objectID": "blogs/rohit/2024-09-20-Rohit-HW1.html",
-    "href": "blogs/rohit/2024-09-20-Rohit-HW1.html",
-    "title": "Homework 1",
+    "objectID": "blogs/rohit/2024-09-28-Rohit-HW2.html",
+    "href": "blogs/rohit/2024-09-28-Rohit-HW2.html",
+    "title": "Homework 2",
     "section": "",
-    "text": "A Cyclic Redundancy Check (CRC) is an error-detecting code used in digital networks and storage devices to detect accidental changes to raw data. In embedded systems, CRCs are crucial for ensuring data integrity during communication, verifying data stored in memory, and validating firmware updates. They are popular due to their simplicity, efficiency in binary hardware, and effectiveness in detecting common transmission errors.\n\nIt ensure data integrity in communication protocols like UART, SPI, and I2C by detecting errors caused by noise or interference.\nHow CRC Works:\n\nPolynomial Division: The data block is treated as a large binary number and divided by a fixed polynomial. The remainder of this division is the CRC value.\nAppending CRC: The CRC value is appended to the data before transmission or storage.\nVerification: Upon retrieval, the same polynomial division is performed. If the remainder matches the CRC value, the data is considered intact; otherwise, it indicates corruption\n\nLearn more at: https://en.wikipedia.org/wiki/Cyclic_redundancy_check\n\n\n\n\n\nCRC calculations prominently involve memory allocation, extensively using ptr&lt;int&gt;.\nCRC algorithms typically involve a mix of arithmetic (e.g., addition, subtraction, Multiplication) and bitwise operations (e.g., XOR, shifts).\nThis makes CRC an excellent microbenchmark for evaluating how well your Bril implementation handles these critical operations, which are essential for many real-world applications.\n\n\n\n\n\nBril code for CRC is fully hand typed code of 300+ lines using VS Code, the most useful tool ever was Bril syntax highlighting Extension in VS Code.\nTurnt tool was used to test and save the output file.\nturnt.toml file:\n\n    [envs.test]\n    command = \"bril2json &lt; {filename} | brili -p {args}\"\n    output.out = \"-\"\n    output.prof = \"2\"\n\n\nLearn more at: https://github.com/cucapra/turnt?tab=readme-ov-file\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Initialize Inputs]--&gt; B0[Get CRC Remainder] --&gt; B1[\"Check CRC\"] --&gt; B2[Print Outputs];\n\n\n\n\n\n\n\n\n\nGet Word, Divisor, check_value as an int.\ncheck_value will be 0 if the bits are missing and error.\nAppend Divisor size - 1 zeros to word.\nConvert the int into array, here in bril we can use ptr&lt;int&gt; allocations calling @toPtr function.\nReference to memory allocation in bril: https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/manually-managed-memory/\n\n\n\n\n\nTo divide Word and Divisor we need to do xor in each bit.\nFirst copy first few bits from Word to Word_split having same length as Divisor.\nCall @xorfunction and overwrite the result to first few bits of Word.\nCall @shiftleft function to left shift the Word and decrement word_size.\nRepeat this process until Word_size &lt; Div_size.\nAt the end return Word as a crc_rem to @main.\nConvert crc_rem from ptr&lt;int&gt; to int by calling toNum function.\n\n\n\n\n\nIf: crc_rem == 0 then there is no error in bit and crc_check is true.\nElse: there is a error and crc_check is false.\n\n\n\n\n\nOuputs are bool value crc_check and int value crc_rem.\nWhen check_value is set to 0\n\nThis Indicates that there are error or missing bits.\ncrc_check value will be false\ncheck_rem will give out the correct check_value\nso again replacing 0 from check_rem with check_value and running the code will give us crc_check as true with check_rem = 0 .\n\nFull code: https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril\n\n\n\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    1011\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 1011;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    100\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 100;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061",
+    "text": "Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block\n\nThe code should remove the instructions that are reassigned without being used.\nIf the value in being used in between the reassigning, then the instruction should be retained.\n\n\n\n\n\n\n\nThis function generates control flow blocks from a list of instructions.\nParameters: instrs - a list of instructions.\nProcess:\n\nIt iterates through each instruction.\nIf the instruction contains an operation (op), it adds it to the current block.\nIf the operation is a terminator (br, jmp, ret), it yields the current block and starts a new one.\nIf the instruction does not contain an operation, it yields the current block and starts a new one.\nAt the end, if there are any remaining instructions in the current block, it yields that block.\n\nReturns: Yields blocks of instructions.\n\n\n\n\n\nThis function removes instructions that are redefined without being used in a function.\nParameters: func - a dictionary representing a function with a list of instructions.\nProcess:\n\nIt repeatedly splits the function’s instructions into blocks using myCFG.\nFor each block, it tracks the last definition of each variable and identifies instructions to drop.\nIt removes instructions that are redefined without being used.\nIt updates the function’s instructions with the optimized blocks.\nThe loop continues until no more changes are made.\n\nReturns: None (modifies the function in place).\n\n\n\n\n\nThis is the main function that orchestrates the optimization process.\nProcess:\n\nIt reads a JSON object from standard input.\nFor each function in the JSON object, it applies remove_reassigned to optimize the instructions.\nIt writes the optimized JSON object to standard output.\n\n\n\n\n\n\n\n\n\n\n    @main {\n    a: int = const 100;\n    a: int = const 42;\n    b: int = const 100;\n    b: int = const 42;\n    }\n\n\n\n    @main {\n    a: int = const 42;\n    b: int = const 42;\n    }\n\n\n\n\n\n\n    @main {\n    a: int = const 100;\n    print a;\n    a: int = const 42;\n    b: int = const 100;\n    b: int = const 42;\n    }\n\n\n\n    @main {\n    a: int = const 100;\n    print a;\n    a: int = const 42;\n    b: int = const 42;\n    }",
     "crumbs": [
       "EECS 7398",
       "Blogs",
       "Rohit",
-      "Homework 1"
+      "Homework 2"
     ]
   },
   {
-    "objectID": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-1-benchmark",
-    "href": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-1-benchmark",
-    "title": "Homework 1",
+    "objectID": "blogs/rohit/2024-09-28-Rohit-HW2.html#part-1-trivial-dead-code-elimination-which-you-delete-instructions-that-are-never-used-before-they-are-reassigned.",
+    "href": "blogs/rohit/2024-09-28-Rohit-HW2.html#part-1-trivial-dead-code-elimination-which-you-delete-instructions-that-are-never-used-before-they-are-reassigned.",
+    "title": "Homework 2",
     "section": "",
-    "text": "A Cyclic Redundancy Check (CRC) is an error-detecting code used in digital networks and storage devices to detect accidental changes to raw data. In embedded systems, CRCs are crucial for ensuring data integrity during communication, verifying data stored in memory, and validating firmware updates. They are popular due to their simplicity, efficiency in binary hardware, and effectiveness in detecting common transmission errors.\n\nIt ensure data integrity in communication protocols like UART, SPI, and I2C by detecting errors caused by noise or interference.\nHow CRC Works:\n\nPolynomial Division: The data block is treated as a large binary number and divided by a fixed polynomial. The remainder of this division is the CRC value.\nAppending CRC: The CRC value is appended to the data before transmission or storage.\nVerification: Upon retrieval, the same polynomial division is performed. If the remainder matches the CRC value, the data is considered intact; otherwise, it indicates corruption\n\nLearn more at: https://en.wikipedia.org/wiki/Cyclic_redundancy_check\n\n\n\n\n\nCRC calculations prominently involve memory allocation, extensively using ptr&lt;int&gt;.\nCRC algorithms typically involve a mix of arithmetic (e.g., addition, subtraction, Multiplication) and bitwise operations (e.g., XOR, shifts).\nThis makes CRC an excellent microbenchmark for evaluating how well your Bril implementation handles these critical operations, which are essential for many real-world applications.\n\n\n\n\n\nBril code for CRC is fully hand typed code of 300+ lines using VS Code, the most useful tool ever was Bril syntax highlighting Extension in VS Code.\nTurnt tool was used to test and save the output file.\nturnt.toml file:\n\n    [envs.test]\n    command = \"bril2json &lt; {filename} | brili -p {args}\"\n    output.out = \"-\"\n    output.prof = \"2\"\n\n\nLearn more at: https://github.com/cucapra/turnt?tab=readme-ov-file\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n%%| echo: false \ngraph LR;\nA[Initialize Inputs]--&gt; B0[Get CRC Remainder] --&gt; B1[\"Check CRC\"] --&gt; B2[Print Outputs];\n\n\n\n\n\n\n\n\n\nGet Word, Divisor, check_value as an int.\ncheck_value will be 0 if the bits are missing and error.\nAppend Divisor size - 1 zeros to word.\nConvert the int into array, here in bril we can use ptr&lt;int&gt; allocations calling @toPtr function.\nReference to memory allocation in bril: https://www.cs.cornell.edu/courses/cs6120/2019fa/blog/manually-managed-memory/\n\n\n\n\n\nTo divide Word and Divisor we need to do xor in each bit.\nFirst copy first few bits from Word to Word_split having same length as Divisor.\nCall @xorfunction and overwrite the result to first few bits of Word.\nCall @shiftleft function to left shift the Word and decrement word_size.\nRepeat this process until Word_size &lt; Div_size.\nAt the end return Word as a crc_rem to @main.\nConvert crc_rem from ptr&lt;int&gt; to int by calling toNum function.\n\n\n\n\n\nIf: crc_rem == 0 then there is no error in bit and crc_check is true.\nElse: there is a error and crc_check is false.\n\n\n\n\n\nOuputs are bool value crc_check and int value crc_rem.\nWhen check_value is set to 0\n\nThis Indicates that there are error or missing bits.\ncrc_check value will be false\ncheck_rem will give out the correct check_value\nso again replacing 0 from check_rem with check_value and running the code will give us crc_check as true with check_rem = 0 .\n\nFull code: https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril\n\n\n\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    1011\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\nInput:\n\n    word: int = const 1101101;\n    word_size: int = const 7;\n    divisor: int = const 10101;\n    divisor_size: int = const 5;\n    check_value: int = const 1011;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 1784\n\n\n\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 0;\n\nOutput:\n\n    false\n    100\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061\n\n\n\n\nInput:\n\n    word: int = const 11010011101100;\n    word_size: int = const 14;\n    divisor: int = const 1011;\n    divisor_size: int = const 4;\n    check_value: int = const 100;\n\nOutput:\n\n    true\n    0\n\nTotal Dynamic Instructions:\n\n    total_dyn_inst: 3061",
+    "text": "Definition: An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block\n\nThe code should remove the instructions that are reassigned without being used.\nIf the value in being used in between the reassigning, then the instruction should be retained.\n\n\n\n\n\n\n\nThis function generates control flow blocks from a list of instructions.\nParameters: instrs - a list of instructions.\nProcess:\n\nIt iterates through each instruction.\nIf the instruction contains an operation (op), it adds it to the current block.\nIf the operation is a terminator (br, jmp, ret), it yields the current block and starts a new one.\nIf the instruction does not contain an operation, it yields the current block and starts a new one.\nAt the end, if there are any remaining instructions in the current block, it yields that block.\n\nReturns: Yields blocks of instructions.\n\n\n\n\n\nThis function removes instructions that are redefined without being used in a function.\nParameters: func - a dictionary representing a function with a list of instructions.\nProcess:\n\nIt repeatedly splits the function’s instructions into blocks using myCFG.\nFor each block, it tracks the last definition of each variable and identifies instructions to drop.\nIt removes instructions that are redefined without being used.\nIt updates the function’s instructions with the optimized blocks.\nThe loop continues until no more changes are made.\n\nReturns: None (modifies the function in place).\n\n\n\n\n\nThis is the main function that orchestrates the optimization process.\nProcess:\n\nIt reads a JSON object from standard input.\nFor each function in the JSON object, it applies remove_reassigned to optimize the instructions.\nIt writes the optimized JSON object to standard output.\n\n\n\n\n\n\n\n\n\n\n    @main {\n    a: int = const 100;\n    a: int = const 42;\n    b: int = const 100;\n    b: int = const 42;\n    }\n\n\n\n    @main {\n    a: int = const 42;\n    b: int = const 42;\n    }\n\n\n\n\n\n\n    @main {\n    a: int = const 100;\n    print a;\n    a: int = const 42;\n    b: int = const 100;\n    b: int = const 42;\n    }\n\n\n\n    @main {\n    a: int = const 100;\n    print a;\n    a: int = const 42;\n    b: int = const 42;\n    }",
     "crumbs": [
       "EECS 7398",
       "Blogs",
       "Rohit",
-      "Homework 1"
+      "Homework 2"
     ]
   },
   {
-    "objectID": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-2-analysis",
-    "href": "blogs/rohit/2024-09-20-Rohit-HW1.html#part-2-analysis",
-    "title": "Homework 1",
-    "section": "PART 2: Analysis:",
-    "text": "PART 2: Analysis:\n\nFinding Number of Functions and its Calls\n\nCode: https://github.com/gurusamyanandakuma-r/bril/blob/main/examples/Count_Function.py\n\n\nInitialize\n\nThis analysis is done in python.\nUsing bril2json converting .bril file to JSON.\nLoading into python file using prog = json.load(sys.stdin).\nJSON heap structure will be loaded as dictionary in python.\n\n\n\nProcess\n\nCounting all functions in bril.\nCounting function calls of a function.\n\n\n\nTest\n\nTurnt.toml file:\n\n    [envs.countFunc]\n    default = false\n    command = \"bril2json &lt; {filename} | python3 hw.py &gt; {base}.txt\"\n\nOutput is stored in .txt file.\n\n\nExample 1: CRC\n\nInput:\n\nfile: https://github.com/gurusamyanandakuma-r/bril/blob/main/benchmarks/mem/crc_check.bril\n\n\n\nOutput:\n```\nNumber of Functions:  11\n------------------------\nFunction Call Counts:\nmain     : 0\nrem      : 1\nn_zeros  : 2\ntoPtr    : 2\nwordSplit: 1\nxor      : 1\nshiftLeft: 1\nprint_ptr: 0\ncrc_rem  : 1\ncrc_check: 1\ntoNum    : 1\n\n\n##### Example 2: Fibonacci\n###### Input: \n- file: &lt;https://github.com/normrubin/bril/blob/main/benchmarks/core/fibonacci.bril&gt;\n\n###### Output:\n    ```\n    Number of Functions:  2\n    ------------------------\n    Function Call Counts:\n    main     : 0\n    Fibonacci: 3\n\n\n\nExample 3: Binary Search\n\nInput:\n\nfile: https://github.com/normrubin/bril/blob/main/benchmarks/mem/binary-search.bril\n\n\n\nOutput:\n    Number of Functions:  4\n    ------------------------\n    Function Call Counts:\n    pack         : 1\n    print_array  : 0\n    binary_search: 3\n    main         : 0",
+    "objectID": "blogs/rohit/2024-09-28-Rohit-HW2.html#part-2-implement-local-value-numbering",
+    "href": "blogs/rohit/2024-09-28-Rohit-HW2.html#part-2-implement-local-value-numbering",
+    "title": "Homework 2",
+    "section": "PART 2: Implement local value numbering",
+    "text": "PART 2: Implement local value numbering\n\nAbout local value numbering:\nDefinition: Local Value Numbering (LVN) is a compiler optimization technique used to eliminate redundant calculations by assigning unique numbers to equivalent expressions. This helps in identifying and reusing previously computed values, thus improving the efficiency of the code.\n\n\nImplementation:\n\ninit(self)\n\nThis is the constructor for the ImprovedLVN class. It initializes several dictionaries and counters used in the Local Value Numbering (LVN) process.\nself.var2num: Maps variables to their value numbers.\nself.value2num: Maps operations to value numbers.\nself.num2var: Maps value numbers to variable names.\nself.next_vn: Counter for the next value number.\nself.last_computed: Maps operations to their last computed variable.\n\n\n\nfresh_value_number(self)\n\nThis function generates a fresh value number.\nReturns: A new value number and increments the counter.\n\n\n\ncanonicalize(self, value)\n\nThis function canonicalizes commutative operations like addition and multiplication to ensure consistent ordering of arguments.\nParameters: value - a Value namedtuple representing an operation and its arguments.\nReturns: A canonicalized Value namedtuple.\n\n\n\nget_lvn_var(self, vn)\n\nThis function generates a variable name for a given value number.\nParameters: vn - a value number.\nReturns: A string representing the LVN variable name.\n\n\n\nprocess_block(self, block)\n\nThis function performs Local Value Numbering (LVN) on a single block of instructions.\nParameters: block - a list of instructions.\nProcess:\n\nIterates through each instruction in the block.\nIf the instruction has a destination (‘dest’), it processes the instruction:\n\nFetches value numbers for arguments.\nCreates a canonicalized value for the current instruction.\nChecks if the value is already computed:\n\nIf yes, it uses the previous result.\nIf no, it assigns a fresh value number and updates mappings.\n\n\nAdds the processed instruction to the new block.\n\nReturns: A new block of optimized instructions.\n\n\n\nrun_lvn(self, bril_program)\n\nThis function runs LVN on the entire program.\nParameters: bril_program - a dictionary representing the BRIL program.\nProcess:\n\nIterates through each function in the program.\nApplies process_block to the instructions of each function.\n\nReturns: The optimized BRIL program.\n\n\n\n\nExample:\n\nwith a b no permutted\n\nInput bril:\n    @main {\n        a: int = const 4;\n        b: int = const 2;\n        sum1: int = div a b;\n        sum2: int = div a b;\n        prod: int = mul sum1 sum2;\n        sum2: int = div a b;\n        print prod;\n    }\n\n\nOutput bril:\n    @main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = div a b;\n    sum2 = id sum1;\n    prod: int = mul sum1 sum1;\n    sum2 = id sum1;\n    print prod;\n    }\n\n\n\npairing with dead code analysis:\n@main {\n  a: int = const 4;\n  b: int = const 2;\n  sum1: int = div a b;\n  prod: int = mul sum1 sum1;\n  sum2 = id sum1;\n  print prod;\n}\n\n\n\n\nwith a b with permutted\n\nInput bril:\n    @main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2: int = add b a;\n    prod: int = mul sum1 sum2;\n    sum2: int = add b a;\n    print prod;\n    }\n\n\n\nOutput bril:\n    @main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = add a b;\n    sum2 = id sum1;\n    prod: int = mul sum1 sum1;\n    sum2 = id sum1;\n    print prod;\n    }\n\n\n\npairing with dead code analysis:\n    @main {\n    a: int = const 4;\n    b: int = const 2;\n    sum1: int = div a b;\n    prod: int = mul sum1 sum1;\n    sum2 = id sum1;\n    print prod;\n    }\n\nfull code: https://github.com/gurusamyanandakuma-r/bril/tree/main/HW/HW2_Rohit",
     "crumbs": [
       "EECS 7398",
       "Blogs",
       "Rohit",
-      "Homework 1"
+      "Homework 2"
     ]
   },
   {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "objectID": "blogs/junk.html",
+    "href": "blogs/junk.html",
+    "title": "sample blog",
     "section": "",
-    "text": "This assignment is designed to allow us to get comfortable with Bril, an intermediate representation designed for learning. In this assignment, we add a benchmark program to the suite, and write a tool for analyzing JSON formatted Bril.",
+    "text": "this is a sample blog!\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
+      "sample blog"
     ]
   },
   {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#introduction",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#introduction",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "objectID": "blogs/sharmila/2024-09-20-Sharmila-HW01.html",
+    "href": "blogs/sharmila/2024-09-20-Sharmila-HW01.html",
+    "title": "Compiler Homework 01 - Trying Out Bril",
     "section": "",
-    "text": "This assignment is designed to allow us to get comfortable with Bril, an intermediate representation designed for learning. In this assignment, we add a benchmark program to the suite, and write a tool for analyzing JSON formatted Bril.",
+    "text": "About Bril\nBril is a simple educational intermediate representation (IR) language that is used to teach and experiment with compiler and programming language concepts. It provides a set of operations such as arithmetic and logical operations, and basic control flow structures like conditional branches and loops. The idea behind Bril is to keep things minimal and easy to understand, so we can focus on the core concepts of compilers without getting distracted by complicated features found in more advanced languages.\nGoal of this Homework is to get familiar with Bril, so I chose to a write a simple benchmark under core without getting inputs(args).\nIn this blog, I’ll walk you through two parts of my Homework 01 assignment where I first write a benchmark in Bril and then develop a tool to analyze Bril programs.\n\n\nPart 1: Write a New Benchmark\nThe first part of the assignment involved writing a new benchmark in Bril. This helped me get familiar with Bril’s control flow, syntax, and basic operations.\nBenchmark: addsqevenodd.bril\nThe goal of this benchmark is to calculate the sum of squares of even and odd numbers from 1 to 10 separately. Here’s the Bril program I wrote by hand:\n\n@main {\n  sum_even: int = const 0;      \n  sum_odd: int = const 0;       \n  i: int = const 1;             \n  limit: int = const 10;        \n  one: int = const 1;           \n  two: int = const 2;           \n\n.loop:\n  square: int = mul i i;        \n  half: int = div i two;        \n  check: int = mul half two;    \n  is_even: bool = eq check i;   \n  br is_even .even_case .odd_case; \n\n.even_case:\n  sum_even: int = add sum_even square; \n  jmp .increment;\n\n.odd_case:\n  sum_odd: int = add sum_odd square;   \n\n.increment:\n  i: int = add i one;           \n  cond: bool = le i limit;      \n  br cond .loop .exit;          \n\n.exit:\n  print sum_even;               \n  print sum_odd;                \n}\n\nThis program defines a loop that iterates from 1 to 10, calculates the square of each number, and adds the result to two separate sums for even and odd numbers. Finally, it prints the sums of the squares of even and odd numbers\nAfter writing the program, I converted it to a JSON format, which is required for further processing:\nbril2json &lt; addsqevenodd.bril &gt; addsqevenodd.json\nDuring this step, I faced an issue where the Bril interpreter (brili) did not accept direct constant values in core instructions. To resolve this, I explicitly declared constants before using them in operations like add or mul. This was a good learning experience that reinforced the importance of proper initialization in IR.\nTo automate testing, I used turnt to create a test output for this benchmark. I added the following command to a turnt.toml file:\ncommand = “bril2json &lt; {filename} | brili -p {args}”\nThis command runs the benchmark through brili, captures the output, and saves it in an output file. After creating the test, I ran:\nturnt –save addsqevenodd.bril\nThis command saved the output in a file named addsqevenodd.out, which can be used for further validation.\n\n\nPart 2: Write a Bril Analyzer\nIn this part, I developed a small tool to analyze Bril programs using python. I chose to count the number of add and print instructions in the Bril program to better understand the operations performed in the code.\nHere’s the Python code I implemented to count the add and print instructions in a Bril program:\n\nimport json\nimport sys\n\n\ndef count_add_instrs(bril_program):\n\n    count = 0\n    print = 0\n    for func in bril_program['functions']:\n        for instr in func['instrs']:\n            if 'op' in instr:\n                if instr['op'] == 'add':\n                    count += 1\n\n    return count\n\ndef count_print_instrs(bril_program):\n\n    printcount = 0\n    for func in bril_program['functions']:\n        for instr in func['instrs']:\n            if 'op' in instr:\n                if instr['op'] == 'print':\n                    printcount += 1\n                    \n    return printcount\n\nif __name__ == \"__main__\":\n\n    json_file = \"/home/sharmila_ubuntu/Compiler HW 01/addsqevenodd.json\"\n    with open(json_file,'r') as f:\n        bril_program = json.load(f)\n    count = count_add_instrs(bril_program)\n    print(f\"Number of add instructions in addsqevenodd.json file : {count}\")\n    printcount = count_print_instrs(bril_program)\n    print(f\"Number of print instructions in addsqevenodd.json file : {printcount}\")\n\nThis script loads the Bril program in JSON format, iterates over its instructions, and counts how many add and print operations are present.\nI tested my analyzer using turnt by adding the following command to the turnt.toml file:\ncommand = “bril2json &lt; {filename} | python3 analyzebril.py”\nThis command takes the Bril program, converts it to JSON, and runs my Python script (analyzebril.py) to analyze the JSON file. The output file generated by this process contains the number of add and print instructions in the program.\n\n\nConclusion: Summary of this Homework 01\n\nPart 1: I wrote a benchmark (addsqevenodd.bril) that computes the sum of squares of even and odd numbers from 1 to 10 separately. I used bril2json to convert the program into JSON and ran it with brili. I also used turnt to create an automated test for the benchmark.\nPart 2: I created a Python tool to analyze the Bril program. The tool counts add and print instructions in the JSON representation of the Bril program. I tested the tool using turnt, ensuring it ran correctly.\n\n\n\nTest and Results:\nTo verify this analyzer I tested with 3 example: (obtained the later two examples from (https://github.com/sampsyo/bril/tree/main/benchmarks)\n\nInitially, I used my benchmark to test the implementation, that is, using both the addsqevenodd.bril file and its corresponding json file (addsqevenodd.json). The analyzed correctly counted 3 add instructions and 2 print instructions.\nAnd then, I verified using bubblesort.bril, loading it’s json file and analyzed correctly as 8 add instructions and 1 print instruction.\nFinally, I verifies using mat-inv.bril, loading it’s json file and analyzed correctly as 12 add instruction and 2 print instruction.\n\n\n\nChallenges Faced and Solution:\nThe hardest part of this task was dealing with the restriction on directly using constants in core Bril instructions. I initially overlooked this, but after debugging, I realized that every constant had to be initialized in a separate instruction. This helped me better understand Bril’s structure and rules. Moreover, learning to use turnt for automating tests was a valuable lesson, as it streamlines the testing process significantly.\n\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
+      "Sharmila",
+      "Compiler Homework 01 - Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-1-bril-benchmark-program",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-1-bril-benchmark-program",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "objectID": "blogs/oscar/2024-09-20-HW1.html",
+    "href": "blogs/oscar/2024-09-20-HW1.html",
+    "title": "HW1 - Trying Out Bril",
+    "section": "",
+    "text": "Bril is a very simple and educational instruction-based intermediate represnetation (IR) that is represented in JSON. It features a simple syntax that can be converted as JSON, and a suite of tools to execute the program.\nIn this assignment, we implement a basic benchmarking program with Bril, then write a simple analysis program that analyzes a Bril (JSON) program, as well as create tests for both of these using Turnt (a snapshot testing tool).",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Oscar",
+      "HW1 - Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#overview",
+    "href": "blogs/oscar/2024-09-20-HW1.html#overview",
+    "title": "HW1 - Trying Out Bril",
+    "section": "",
+    "text": "Bril is a very simple and educational instruction-based intermediate represnetation (IR) that is represented in JSON. It features a simple syntax that can be converted as JSON, and a suite of tools to execute the program.\nIn this assignment, we implement a basic benchmarking program with Bril, then write a simple analysis program that analyzes a Bril (JSON) program, as well as create tests for both of these using Turnt (a snapshot testing tool).",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Oscar",
+      "HW1 - Trying Out Bril"
+    ]
+  },
+  {
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#part-1-bril-benchmark-program",
+    "href": "blogs/oscar/2024-09-20-HW1.html#part-1-bril-benchmark-program",
+    "title": "HW1 - Trying Out Bril",
     "section": "Part 1: Bril Benchmark Program",
-    "text": "Part 1: Bril Benchmark Program\nA good benchmark for this assignment is one which is new to the repository, but is fairly simple. As such, a benchmark which fits into the benchmark/core suite is likely a good choice.\nMy first idea was to implement a benchmark which computes the Hamming distance between two integers. In a high level language with a shift operator, this is a fairly easy program to write. However, Bril does not have a built-in shift operator. I spent some time writing a function to compute the Hamming distance without shifting, but it quickly became cumbersome and I searched for other ideas to not overcomplicate this work.\nMy next idea was to write a benchmark which computes the \\(nth\\) value in the Fibonacci sequence recursively. This is a sensible benchmark, as it may test a system’s ability to handle recursive programs, and further tests whether a compiler preserves this relationship.\nTo create this, only about 11 lines of TypeScript were required (when paired with the TypeScript compiler).\nAt the end, I created a program to compute the \\(nth\\) value in the Fibonacci sequence recursively, which can be found at benchmarks/core/fibonacci.bril, and can be tested with turnt.",
+    "text": "Part 1: Bril Benchmark Program\nAfter reviewing the list of existing benchmark programs within the Bril repository (under the benchmarks directory), we notice that most benchmarks tend to consist of basic sample programs that runs a handwritten algorithm that returns some output value.\nIn keeping with this pattern, I had originally wanted to write a program that performs a single forward convolutional pass through a large matrix of data, however after noticing the tedious process of packing individual data values into large arrays, I felt that an implementation of this would be too messy. I had also wanted to test recusion in Bril, so naturally an implementation of Merge Sort would fit this purpose well. I chose an in-place version of the algorithm to reduce the complexity a little.\nAs mentioned earlier, creating arrays appear to require painstakingly pack all the individual values one at a time into memory. I had borrowed the @pack function from the bubblesort.bril benchmark to help create this array from the passed arguments for my program, 8 integer values to be stored into an unsorted array. These arguments are passed in when the program is called, as opposed to many other benchmark programs that hardcode the input values into the program.\nTaking an existing implementation of in-place merge sort written in C and converting it to a functional bril program was a relatively simple task, given the procedural and imperative nature of both languages. The difficulty mostly came down to writing proper control flow (inverting condition statements to support &gt;= and &lt;=), the verbosity of accessing individual elements in an array, and keeping track of what variables to modify. Keeping temporary notes in listing what variables are currently used within a certain scope helps keep track of how state may change in a program if a particular variable is used elsewhere.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
+      "Oscar",
+      "HW1 - Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#problems-faced",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#problems-faced",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
-    "section": "Problems Faced",
-    "text": "Problems Faced\nOne challenge as I learned was that the TS compiler does not recognize many types, and further regards many types as Any when they cannot be easily predicted. This was not much of a challenge to handle, however I am not much of a TS programmer so learning enough of the language was a step in the process.",
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#part-2-analysis-tool",
+    "href": "blogs/oscar/2024-09-20-HW1.html#part-2-analysis-tool",
+    "title": "HW1 - Trying Out Bril",
+    "section": "Part 2: Analysis Tool",
+    "text": "Part 2: Analysis Tool\nFor the second part of the assignment, we are tasked to write a small program that analyzes or modifies a Bril program in some way. I had originally tried to write my program in Zig for some extra practice, but time constraints locked me back to Python for convenience (JSON handling is a lot easier in Python).\nThe program I had written performs a couple of basic scans through the functions of the specified Bril program, and prints out the following for each function (if applicable):\n\nThe arguments of the function and their types\nThe list of all function calls made and their arguments\nIf recursion is present\nThe number of potential loops found within the function\n\nA potential loop is found by simply scanning for all unique labels that have a jmp or br instruction located somewhere after the label that jumps to said label.\nGathering these statistics for all functions could potentially help internally organize programs into a convenient structure and identify what the most dominating section of code is. I find that it provides a nice synopsis on what a high-level breakdown of a Bril program looks like.\nOriginally, I had also planned to add functionality that will analyze whether variables are unused, but it got needlessly complicated and felt more appropriate for dead code elimination in a later assignment.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
+      "Oscar",
+      "HW1 - Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
+    "objectID": "blogs/oscar/2024-09-20-HW1.html#testing",
+    "href": "blogs/oscar/2024-09-20-HW1.html#testing",
+    "title": "HW1 - Trying Out Bril",
     "section": "Testing",
-    "text": "Testing\nTo verify functionality, I first by hand compared the results of execution with different input values of \\(n\\), and additionally developed a turnt test. Results of testing can be observed below:\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 1\n1\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 5\n5\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 10\n55\n$ bril2json &lt; benchmarks/core/fibonacci.bril | brili 30\n832040\n\n# Including timing results as evidence that recursion is happening \n$ time bril2json &lt; benchmarks/core/fibonacci.bril | brili 30\n832040\n\nreal    0m1.836s\nuser    0m1.817s\nsys 0m0.052s\n[15:02:36] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril$ time bril2json &lt; benchmarks/core/fibonacci.bril | brili 10\n55\n\nreal    0m0.102s\nuser    0m0.096s\nsys 0m0.031s",
+    "text": "Testing\nAn in-place merge sort implementation in Bril and a simple program to analyze Bril programs were developed. Both of these programs have associated Turnt tests to ensure that the outputs for these programs are matching the expected result when I had written them. For the analysis tool (flow_detect.py), I have included other existing benchmark Bril programs in testing for a variety of outputs.\nHere are some outputs for our Merge Sort program:\n$ bril2json &lt; mergesort-inplace.bril | brili -p 8 1 2 7 3 6 5 4\n1\n2\n3\n4\n5\n6\n7\n8\ntotal_dyn_inst: 677\n$ bril2json &lt; mergesort-inplace.bril | brili -p 8 7 6 5 4 3 2 1\n1\n2\n3\n4\n5\n6\n7\n8\ntotal_dyn_inst: 803\n$ bril2json &lt; mergesort-inplace.bril | brili -p 2 2 2 2 2 2 2 1\n1\n2\n2\n2\n2\n2\n2\n2\ntotal_dyn_inst: 486\nFor our analysis tool, I had selected a handful of benchmarks that have a variety of control flow. Here is the output for eight-queens:\nmain:\n    args:\n        int: input\n    function calls: 1\n        queen(zero, n, icount, site)\n\nqueen:\n    args:\n        int: n, queens, icount\n        int ptr: site\n    num potential loops: 1\n    function calls: 2\n        valid(n, site)\n        queen(n_1, queens, icount, site)\n    recursion present\n\nvalid:\n    args:\n        int: n\n        int ptr: site\n    num potential loops: 1\nAs shown, for each function a list of arguments, function calls, and indication of loops and/or recursion is demonstrated, if applicable. I have tested the program on my own Merge Sort file as well:\nmain:\n    args:\n        int: n1, n2, n3, n4, n5, n6, n7, n8\n    function calls: 3\n        pack(size, n1, n2, n3, n4, n5, n6, n7, n8)\n        merge_sort(array, zero, upper_bound)\n        print_array(array, size)\n\npack:\n    args:\n        int: size, n1, n2, n3, n4, n5, n6, n7, n8\n\nmerge:\n    args:\n        int ptr: arr\n        int: start, mid, end\n    num potential loops: 2\n\nmerge_sort:\n    args:\n        int ptr: arr\n        int: l, r\n    function calls: 3\n        merge_sort(arr, l, m)\n        merge_sort(arr, mp1, r)\n        merge(arr, l, m, r)\n    recursion present\n\nprint_array:\n    args:\n        int ptr: array\n        int: size\n    num potential loops: 1\nHere, the program correctly identifies the use of recursion in our @merge_sort function, as well as finding the two nested loops within @merge as well.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
+      "Oscar",
+      "HW1 - Trying Out Bril"
     ]
   },
   {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-2-bril-tooling",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#part-2-bril-tooling",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
-    "section": "Part 2: Bril Tooling",
-    "text": "Part 2: Bril Tooling\nFor the second part of this assignment, we were asked to design a tool which either analyzed or modified Bril code stored in JSON format. I chose to make a simple program, which for a given file, computes how many of each “type” of instruction the program contains. The three types of instructions are “Constants”, “Value Operations”, and “Effect Operations” as outlined in the docs.\nTo do this, I wrote a Python script which consumed the input JSON, parsed it to get the available instructions, and iterated through the map. Each instruction type has a unique construction, which I used to determine how many of each type of isntruction was contained. This tool only requires one pass through the program JSON to determine the count of each instruction type.\nThis tool could readily be extended to gather information about the types of instructions in a program.\nThe code for this tool is shared below:\n\n#!/usr/bin/env python3\n\nimport json\nimport sys\n\n# Read the input as json\n# Proc Exit: If valid input rec'd\ndef read_json_file(input):\n    try:\n        data = json.load(input)\n        return data\n    except json.JSONDecodeError:\n        print(f\"Error: The input does not contain valid JSON.\")\n        sys.exit(1)\n    except Exception as e:\n        print(f\"An error occurred: {str(e)}\")\n        sys.exit(1)\n\n# Count the instruction types as specified by Bril syntax\ndef count_instr_types(data: dict):\n    db = {'constant': 0, 'value': 0, 'effect': 0}\n    for func in data['functions']:\n        for instr in func['instrs']:\n            # If instr op is const, it must be a constant instruction\n            if 'op' in instr and instr['op'] == 'const':\n                db['constant'] += 1\n            # If instr has a dest and is not a const, it must be a value instruction\n            elif 'dest' in instr:\n                db['value'] += 1\n            # Continue if this is a label\n            elif 'label' in instr:\n                continue\n            # Otherwise this must be an effect instruction\n            else:\n                db['effect'] += 1\n            # Note: this assumes the json is well-formed Bril.\n    return db\n\n# Main\ndef main():\n    data = read_json_file(sys.stdin)\n    print(count_instr_types(data))\n\nif __name__ == \"__main__\":\n    main()",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
-    ]
-  },
-  {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing-1",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#testing-1",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
-    "section": "Testing",
-    "text": "Testing\nI tested this program on a handful of the provided benchmarks, and verified the results by hand. Some results are shared below:\n$ bril2json &lt; ../benchmarks/core/hanoi.bril | python tool.py \n{'constant': 5, 'value': 2, 'effect': 6}\n[15:10:42] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril/mytools$ bril2json &lt; ../benchmarks/core/birthday.bril | python tool.py \n{'constant': 9, 'value': 26, 'effect': 4}\n[15:11:04] michaelmaurer:~/Documents/NEU/EECE7309-compilers/bril/mytools$ bril2json &lt; ../benchmarks/core/collatz.bril | python tool.py \n{'constant': 3, 'value': 7, 'effect': 7}",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
-    ]
-  },
-  {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#challenges-faced",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#challenges-faced",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
-    "section": "Challenges faced",
-    "text": "Challenges faced\nOriginally, I had planned to construct a program which identified all control flow instructions, and further identified how many basic blocks the program contained. I moved away from this because I was not sure how exactly to handle call and ret instructions at this time, and it seems likely this work is coming in a future assignment.\nAnother challenge was that I had at first not realized that labels are contained within the instructions in the json files. This was causing my program to crash, and required some (brief) debugging.",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
-    ]
-  },
-  {
-    "objectID": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#code",
-    "href": "blogs/michael/09-20-2024-HW1-MichaelMaurer.html#code",
-    "title": "EECE7309 Homework 1 – Trying Out Bril",
-    "section": "Code",
-    "text": "Code\nThe code for this assignment is contained in the latest commit in my fork of Bril.",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Michael",
-      "EECE7309 Homework 1 -- Trying Out Bril"
-    ]
-  },
-  {
-    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html",
-    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html",
-    "title": "Homework1 - Yashaswini",
+    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html",
+    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html",
+    "title": "Homework 1: Exploring Bril",
     "section": "",
-    "text": "I created a program that iterates through an array of values both suming and multiplying the values.\n\n\nthe code was written in text forma ns used a pointer to initialize the array. store and load instructions were used to access the array and .loop with a jmp was used for the iterations\n\n\n\nThe code was tested with different size arrays with the answers check using an external calculator.\n\n\n\nThe main challenge for this was finding the best way to populate the array with values. brili is very simple and using just stores and loads to index into the array gave added complexity.",
+    "text": "For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Yashaswini",
-      "Homework1 - Yashaswini"
+      "Qucheng",
+      "Homework 1: Exploring Bril"
     ]
   },
   {
-    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#about-the-code",
-    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#about-the-code",
-    "title": "Homework1 - Yashaswini",
+    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#introduction",
+    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#introduction",
+    "title": "Homework 1: Exploring Bril",
     "section": "",
-    "text": "the code was written in text forma ns used a pointer to initialize the array. store and load instructions were used to access the array and .loop with a jmp was used for the iterations",
+    "text": "For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Yashaswini",
-      "Homework1 - Yashaswini"
+      "Qucheng",
+      "Homework 1: Exploring Bril"
     ]
   },
   {
-    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#testing",
-    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#testing",
-    "title": "Homework1 - Yashaswini",
-    "section": "",
-    "text": "The code was tested with different size arrays with the answers check using an external calculator.",
+    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#detail-design",
+    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#detail-design",
+    "title": "Homework 1: Exploring Bril",
+    "section": "Detail Design",
+    "text": "Detail Design\nThe homework was divided into two main parts. I’ll walk through the details of my implementation, challenges faced, and the testing process.\n\nPart 1: Creating and Running a New Benchmark\nPart 2: Implementing a Bril Program Stub-Analyzer",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Yashaswini",
-      "Homework1 - Yashaswini"
+      "Qucheng",
+      "Homework 1: Exploring Bril"
     ]
   },
   {
-    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#challenges",
-    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#challenges",
-    "title": "Homework1 - Yashaswini",
-    "section": "",
-    "text": "The main challenge for this was finding the best way to populate the array with values. brili is very simple and using just stores and loads to index into the array gave added complexity.",
+    "objectID": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#conclusion",
+    "href": "blogs/Qucheng/2024-09-20-Qucheng-HW1.html#conclusion",
+    "title": "Homework 1: Exploring Bril",
+    "section": "Conclusion",
+    "text": "Conclusion\nThis assignment provided a comprehensive introduction to Bril and its tooling ecosystem. By creating benchmarks and developing a custom analyzer, I gained insights into compiler design and intermediate representations.\nHardest Part: The most challenging aspect was managing dependencies and environment setup for the Bril toolchain. Careful attention to the makefile and troubleshooting through GitHub Discussions helped overcome these issues.\nTesting and Results: I validated my benchmarks and analyzer using various Bril programs. The tools successfully transformed and analyzed the input programs, demonstrating the utility of Bril in simple code analysis and transformation tasks.\nThis experience has equipped me with practical skills in working with compiler tools and representations, paving the way for more complex analyses in future assignments.",
     "crumbs": [
       "EECS 7398",
       "Blogs",
-      "Yashaswini",
-      "Homework1 - Yashaswini"
-    ]
-  },
-  {
-    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#python-tool",
-    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#python-tool",
-    "title": "Homework1 - Yashaswini",
-    "section": "Python Tool",
-    "text": "Python Tool\nThe python tool was run on the a new add.json file based off of my benchmark from part 1\nimport json\n\ndef load_bril_program(filename):\n    \"\"\"Load the Bril program from a JSON file.\"\"\"\n    with open(filename, 'r') as file:\n        return json.load(file)\n\ndef count_add_instructions(program):\n    \"\"\"Count the number of 'add' instructions in the Bril program.\"\"\"\n    add_count = 0\n    for func in program['functions']:\n        for instr in func['instrs']:\n            if instr.get('op') == 'add':\n                add_count += 1\n    return add_count\n\ndef add_print_before_jumps(program):\n    \"\"\"Insert a 'print' instruction before every 'jmp' instruction.\"\"\"\n    for func in program['functions']:\n        new_instrs = []\n        for instr in func['instrs']:\n            if instr.get('op') == 'jmp':\n                # Add a print instruction before the jump\n                new_instr = {\n                    \"op\": \"print\",\n                    \"args\": [\"jmp\"]\n                }\n                new_instrs.append(new_instr)\n            new_instrs.append(instr)\n        func['instrs'] = new_instrs\n    return program\n\ndef save_bril_program(program, filename):\n    \"\"\"Save the transformed Bril program back to a JSON file.\"\"\"\n    with open(filename, 'w') as file:\n        json.dump(program, file, indent=2)\n\n# Main function to load, transform, and save the Bril program\ndef main():\n    # Load the Bril program from a file\n    bril_program = load_bril_program('add.json')\n\n    # Count the number of 'add' instructions\n    add_count = count_add_instructions(bril_program)\n    print(f\"Number of 'add' instructions: {add_count}\")\n\n    # Add 'print' before 'jmp' instructions\n    transformed_program = add_print_before_jumps(bril_program)\n\n    # Save the transformed Bril program to a file\n    save_bril_program(transformed_program, 'output_add.json')\n\n# Run the main function\nif __name__ == \"__main__\":\n    main()",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Yashaswini",
-      "Homework1 - Yashaswini"
-    ]
-  },
-  {
-    "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#output",
-    "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html#output",
-    "title": "Homework1 - Yashaswini",
-    "section": "Output",
-    "text": "Output\nthe program found 2 add instrucitons and produced and output file shown below\n{\n  \"functions\": [\n    {\n      \"instrs\": [\n        {\n          \"dest\": \"c5\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 5\n        },\n        {\n          \"args\": [\n            \"c5\"\n          ],\n          \"dest\": \"v0\",\n          \"op\": \"alloc\",\n          \"type\": {\n            \"ptr\": \"int\"\n          }\n        },\n        {\n          \"dest\": \"j\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 1\n        },\n        {\n          \"dest\": \"c1\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 1\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c1\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c2\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 2\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c3\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 3\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c4\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 4\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"c5\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 5\n        },\n        {\n          \"args\": [\n            \"v0\",\n            \"c2\"\n          ],\n          \"op\": \"store\"\n        },\n        {\n          \"dest\": \"sum\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 0\n        },\n        {\n          \"dest\": \"i\",\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"value\": 0\n        },\n        {\n          \"label\": \"loop\"\n        },\n        {\n          \"args\": [\n            \"i\",\n            \"c5\"\n          ],\n          \"dest\": \"cond\",\n          \"op\": \"lt\",\n          \"type\": \"bool\"\n        },\n        {\n          \"args\": [\n            \"cond\"\n          ],\n          \"labels\": [\n            \"body\",\n            \"end\"\n          ],\n          \"op\": \"br\"\n        },\n        {\n          \"label\": \"body\"\n        },\n        {\n          \"args\": [\n            \"v0\"\n          ],\n          \"dest\": \"current\",\n          \"op\": \"load\",\n          \"type\": \"int\"\n        },\n        {\n          \"args\": [\n            \"sum\",\n            \"current\"\n          ],\n          \"dest\": \"sum\",\n          \"op\": \"add\",\n          \"type\": \"int\"\n        },\n        {\n          \"args\": [\n            \"i\",\n            \"j\"\n          ],\n          \"dest\": \"i\",\n          \"op\": \"add\",\n          \"type\": \"int\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"jmp\"\n          ]\n        },\n        {\n          \"labels\": [\n            \"loop\"\n          ],\n          \"op\": \"jmp\"\n        },\n        {\n          \"label\": \"end\"\n        },\n        {\n          \"args\": [\n            \"sum\"\n          ],\n          \"op\": \"print\"\n        },\n        {\n          \"args\": [\n            \"v0\"\n          ],\n          \"op\": \"free\"\n        },\n        {\n          \"op\": \"ret\"\n        }\n      ],\n      \"name\": \"main\"\n    }\n  ]\n}\n##Testing\na good way to otest this is using small scripts where the number of adds is known or can be calculates.\nI could also develop a tool to reverse the addition of prints before jmp and compare the output to the original code using turnt.",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Yashaswini",
-      "Homework1 - Yashaswini"
-    ]
-  },
-  {
-    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html",
-    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html",
-    "title": "Homework1 - Sana",
-    "section": "",
-    "text": "I created a Brill benchmark that calculates and prints the sum of prime numbers and composite numbers up to a given input (in this case, 100). The algorithm used here is very similar to the algorithm used in sieve.bril code in the Brill benchmark folder which is designed to find and print all prime numbers up to a specified limit. It emphasizes the identification of primes through boolean flags and modular functions. Our implementation extends the algorithm to calculate the sum of primes and the sum of composites up to a specified limit. It uses an integer array to flag primes and composites and focuses on aggregating values rather than listing them.\n\n\n\nTo give a little explanation about what each part of the code does:\n\n\n@sumOfPrimes: This function calculates the sum of all prime numbers up to n. First, an array nums of size n is allocated, where each index represents whether a number is prime or composite (1 for prime, 0 for composite). Initially, all numbers are marked as prime. Starting from current = 2, the function marks the multiples of each number as composite (0), skipping prime numbers. The outer loop increments current, and the inner loop marks all multiples of current as composite. After marking non-primes, the function iterates over the array from 2 to n and sums the numbers where the value is 1 (they are prime).\n@sumOfComposites: This function calculates the sum of all composite numbers up to n. It works similarly to the sumOfPrimes function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from 4 (since 1 is neither prime nor composite, and 2 and 3 are primes) and adds all numbers marked as 0 (composite).\n\n\n\n\nTo test the implementation, I used the following approach:\n\na) I ran the benchmark with different input values, starting with small numbers like 10, 20, and then larger numbers like 100.\nb) I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.\nc) I used the Brill interpreter (brili) to run the benchmark and checked both the output and the number of dynamic instructions executed.\n\nQuantitative results for input 100:\n1060\n3889\n\n\n\nThe most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (br) and jumps (jmp). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Homework1 - Sana"
-    ]
-  },
-  {
-    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code",
-    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code",
-    "title": "Homework1 - Sana",
-    "section": "",
-    "text": "To give a little explanation about what each part of the code does:\n\n\n@sumOfPrimes: This function calculates the sum of all prime numbers up to n. First, an array nums of size n is allocated, where each index represents whether a number is prime or composite (1 for prime, 0 for composite). Initially, all numbers are marked as prime. Starting from current = 2, the function marks the multiples of each number as composite (0), skipping prime numbers. The outer loop increments current, and the inner loop marks all multiples of current as composite. After marking non-primes, the function iterates over the array from 2 to n and sums the numbers where the value is 1 (they are prime).\n@sumOfComposites: This function calculates the sum of all composite numbers up to n. It works similarly to the sumOfPrimes function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from 4 (since 1 is neither prime nor composite, and 2 and 3 are primes) and adds all numbers marked as 0 (composite).",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Homework1 - Sana"
-    ]
-  },
-  {
-    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested",
-    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested",
-    "title": "Homework1 - Sana",
-    "section": "",
-    "text": "To test the implementation, I used the following approach:\n\na) I ran the benchmark with different input values, starting with small numbers like 10, 20, and then larger numbers like 100.\nb) I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.\nc) I used the Brill interpreter (brili) to run the benchmark and checked both the output and the number of dynamic instructions executed.\n\nQuantitative results for input 100:\n1060\n3889",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Homework1 - Sana"
-    ]
-  },
-  {
-    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced",
-    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced",
-    "title": "Homework1 - Sana",
-    "section": "",
-    "text": "The most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (br) and jumps (jmp). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Homework1 - Sana"
-    ]
-  },
-  {
-    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code-1",
-    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#explanation-of-the-code-1",
-    "title": "Homework1 - Sana",
-    "section": "Explanation of the Code",
-    "text": "Explanation of the Code\nThe code first iterates through each function in the program using the outer loop. Inside the function, the inner loop goes through each instruction. For each instruction, it increments the instruction count and checks if the instruction is a jump (br or jmp). If it is, a print instruction is added before the jump.\n\nimport json\nimport copy\n\nbril_json = \"\"\"\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\", \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"br\", \"args\": [\"v2\"], \"labels\": [\"then\", \"else\"] },\n        { \"label\": \"then\" },\n        { \"op\": \"print\", \"args\": [\"v2\"] },\n        { \"op\": \"jmp\", \"labels\": [\"end\"] },\n        { \"label\": \"else\" },\n        { \"op\": \"print\", \"args\": [\"v1\"] },\n        { \"label\": \"end\" },\n        { \"op\": \"ret\" }\n      ]\n    }\n  ]\n}\n\"\"\"\n\nbril_program = json.loads(bril_json)\n\ndef process_bril_program(bril_program):\n    total_instructions = 0\n    for function in bril_program['functions']:\n        new_instrs = []\n        for instruction in function['instrs']:\n            total_instructions += 1\n            \n            # add a print instruction before a jump!\n            if instruction.get('op') in ['br', 'jmp']:\n                print_instr = {\n                    \"op\": \"print\",\n                    \"args\": [\"Jumping\"]\n                }\n                new_instrs.append(print_instr)\n            \n            new_instrs.append(instruction)\n        \n        function['instrs'] = new_instrs\n\n    return bril_program, total_instructions\n\nmodified_program, instruction_count = process_bril_program(bril_program)\n\nprint(\"Total number of instructions:\", instruction_count)\nprint(\"Modified Bril program:\")\nprint(json.dumps(modified_program, indent=2))\n\nTotal number of instructions: 11\nModified Bril program:\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        {\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"dest\": \"v0\",\n          \"value\": 1\n        },\n        {\n          \"op\": \"const\",\n          \"type\": \"int\",\n          \"dest\": \"v1\",\n          \"value\": 2\n        },\n        {\n          \"op\": \"add\",\n          \"type\": \"int\",\n          \"dest\": \"v2\",\n          \"args\": [\n            \"v0\",\n            \"v1\"\n          ]\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"Jumping\"\n          ]\n        },\n        {\n          \"op\": \"br\",\n          \"args\": [\n            \"v2\"\n          ],\n          \"labels\": [\n            \"then\",\n            \"else\"\n          ]\n        },\n        {\n          \"label\": \"then\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"v2\"\n          ]\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"Jumping\"\n          ]\n        },\n        {\n          \"op\": \"jmp\",\n          \"labels\": [\n            \"end\"\n          ]\n        },\n        {\n          \"label\": \"else\"\n        },\n        {\n          \"op\": \"print\",\n          \"args\": [\n            \"v1\"\n          ]\n        },\n        {\n          \"label\": \"end\"\n        },\n        {\n          \"op\": \"ret\"\n        }\n      ]\n    }\n  ]\n}",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Homework1 - Sana"
-    ]
-  },
-  {
-    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested-1",
-    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#how-the-implementation-is-tested-1",
-    "title": "Homework1 - Sana",
-    "section": "How the Implementation is Tested",
-    "text": "How the Implementation is Tested\nTo test the implementation, I created a small Bril program called test.json that contains various types of instructions, including constants, an add operation, a branch instruction (br), a jump instruction (jmp), and print statements. I used this file to verify that the transformation was applied correctly and that the total number of instructions was counted.\nTest Input (test.json):\n{\n  \"functions\": [\n    {\n      \"name\": \"main\",\n      \"instrs\": [\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v0\", \"value\": 1 },\n        { \"op\": \"const\", \"type\": \"int\", \"dest\": \"v1\", \"value\": 2 },\n        { \"op\": \"add\", \"type\": \"int\", \"dest\": \"v2\", \"args\": [\"v0\", \"v1\"] },\n        { \"op\": \"br\", \"args\": [\"v2\"], \"labels\": [\"then\", \"else\"] },\n        { \"label\": \"then\" },\n        { \"op\": \"print\", \"args\": [\"v2\"] },\n        { \"op\": \"jmp\", \"labels\": [\"end\"] },\n        { \"label\": \"else\" },\n        { \"op\": \"print\", \"args\": [\"v1\"] },\n        { \"label\": \"end\" },\n        { \"op\": \"ret\" }\n      ]\n    }\n  ]\n}\n\nOutput of The program is shown in previous section.\nQuantitative Results: The total number of instructions before the transformation was 11. After transformation, 2 print instructions were added (one before the br and another before the jmp), making the total number of instructions 13. (We can conclude this by counting the instructions in the modified Bril program)",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Homework1 - Sana"
-    ]
-  },
-  {
-    "objectID": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced-1",
-    "href": "blogs/09-20-2024-HW1-SanaTaghipourAnvari.html#challenges-faced-1",
-    "title": "Homework1 - Sana",
-    "section": "Challenges Faced",
-    "text": "Challenges Faced\nThe most challenging part of the task was ensuring that the additional instructions were inserted in the correct place without modifying the logic of the Bril program. The Bril program must still execute in the intended order, and placing the print instructions incorrectly could have changed the control flow. To address this challenge, I carefully looped through the instruction list, checked for br and jmp operations, and inserted the print instructions before each of these jump-related instructions by also maintaining the program’s original flow and semantics.",
-    "crumbs": [
-      "EECS 7398",
-      "Blogs",
-      "Homework1 - Sana"
+      "Qucheng",
+      "Homework 1: Exploring Bril"
     ]
   },
   {

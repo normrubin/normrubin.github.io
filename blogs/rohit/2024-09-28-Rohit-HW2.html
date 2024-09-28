@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Rohit Gurusamy Anandakumar">
 
-<title>Homework 5 SSA – EECE7398 Fall 2024</title>
+<title>Homework 2 – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +24,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../homework/6_extra_credit.html" rel="next">
-<link href="../homework/4_hw.html" rel="prev">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" rel="next">
+<link href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -69,8 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 5 SSA – EECE7398 Fall 2024">
-<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
+<meta property="og:title" content="Homework 2 – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
@@ -83,7 +83,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../homework/1.hw.html">Homework</a></li><li class="breadcrumb-item"><a href="../homework/5_hw.html">Homework 5 SSA</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html">Rohit</a></li><li class="breadcrumb-item"><a href="../../blogs/rohit/2024-09-28-Rohit-HW2.html">Homework 2</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -98,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../">EECE7398 Fall 2024</a> 
+      <a href="../../">EECE7398 Fall 2024</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -119,40 +119,40 @@ ul.task-list li input[type="checkbox"] {
       <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weekly.html" class="sidebar-item-text sidebar-link">
+  <a href="../../weekly.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Weekly Schedule</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
+  <a href="../../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How to submit assignments</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Blogs</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework1 - Sana</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">sample blog with an image and a graph</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/junk.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/junk.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">sample blog</span></a>
   </div>
 </li>
@@ -167,7 +167,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
@@ -184,7 +184,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
@@ -201,7 +201,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HW1 - Trying Out Bril</span></a>
   </div>
 </li>
@@ -218,13 +218,13 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1: Exploring Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2: Optimizing with DCE and LVN</span></a>
   </div>
 </li>
@@ -232,22 +232,22 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
  <span class="menu-text">Rohit</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/rohit/2024-09-20-Rohit-HW1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/rohit/2024-09-28-Rohit-HW2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/rohit/2024-09-28-Rohit-HW2.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Homework 2</span></a>
   </div>
 </li>
@@ -264,7 +264,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Homework 01 - Trying Out Bril</span></a>
   </div>
 </li>
@@ -281,7 +281,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework1 - Yashaswini</span></a>
   </div>
 </li>
@@ -291,64 +291,64 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
  <span class="menu-text">Homework</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/1.hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/1.hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 trying out bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/2_hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/2_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2 local optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/3_hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/3_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 3 data flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/4_hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/4_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homework dominance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/5_hw.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../homework/5_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 5 SSA</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 6 loop optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/dynamic.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/dynamic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homework 7 dynamic compile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/hw0.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/hw0.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homework 0</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/project.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/project.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">project</span></a>
   </div>
 </li>
@@ -365,157 +365,157 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement part 1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement part 2</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Representation of programs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview of Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/03_local.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">local value numbering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05_global.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">5 Global Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">loop invariant code motion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">_ partial_redundancy elimination</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Static Single Assignment</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">7 LLVM</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">8 classic loop optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Polyhedral Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">10 MLIR</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">11 Whole program</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Dynamic Memory Management</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Dynamic Compilers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">GPU Compilers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/diverg.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/diverg.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">divergent flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/mem_consistancy.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/mem_consistancy.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">memory consistancy</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/mlir.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/mlir.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Polyhedral Compilation Opportunities in MLIR</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Testing Register allocators</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Register Allocation</span></a>
   </div>
 </li>
@@ -550,15 +550,21 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../homework/1.hw.html">Homework</a></li><li class="breadcrumb-item"><a href="../homework/5_hw.html">Homework 5 SSA</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html">Rohit</a></li><li class="breadcrumb-item"><a href="../../blogs/rohit/2024-09-28-Rohit-HW2.html">Homework 2</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 5 SSA</h1>
+<h1 class="title">Homework 2</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Rohit Gurusamy Anandakumar </p>
+          </div>
+  </div>
     
   
     
@@ -569,9 +575,275 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Implement the into SSA and out of SSA transformations on Bril functions. Watch out for variables that are undefined on some paths. The script “is_ssa.py can check if a program is really in SSA and the Bril interpreter bili supports phi functions so you can execute code in the midpoint of your round trip. Measure the overhead (does the final program have more instructions (static or dynamic) the original, be sure to report the overhead in your writeup.</p>
+<section id="part-1-trivial-dead-code-elimination-which-you-delete-instructions-that-are-never-used-before-they-are-reassigned." class="level2">
+<h2 class="anchored" data-anchor-id="part-1-trivial-dead-code-elimination-which-you-delete-instructions-that-are-never-used-before-they-are-reassigned.">PART 1: Trivial dead code elimination which you delete instructions that are never used before they are reassigned.</h2>
+<section id="about-dead-code-elimination" class="level3">
+<h3 class="anchored" data-anchor-id="about-dead-code-elimination">About Dead Code Elimination:</h3>
+<p><strong>Definition:</strong> An instruction is dead if that instruction writes a variable v and no path within the block starting at that instruction reaches a use of v in the same block or reaches the exit of the block</p>
+<ul>
+<li>The code should remove the instructions that are reassigned without being used.</li>
+<li>If the value in being used in between the reassigning, then the instruction should be retained.</li>
+</ul>
+</section>
+<section id="implementation" class="level3">
+<h3 class="anchored" data-anchor-id="implementation">Implementation:</h3>
+<section id="mycfg-function" class="level4">
+<h4 class="anchored" data-anchor-id="mycfg-function">myCFG Function:</h4>
+<ul>
+<li>This function generates control flow blocks from a list of instructions.</li>
+<li><em>Parameters:</em> <code>instrs</code> - a list of instructions.</li>
+<li>Process:
+<ul>
+<li>It iterates through each instruction.</li>
+<li>If the instruction contains an operation (<code>op</code>), it adds it to the current block.</li>
+<li>If the operation is a terminator (<code>br</code>, <code>jmp</code>, <code>ret</code>), it yields the current block and starts a new one.</li>
+<li>If the instruction does not contain an operation, it yields the current block and starts a new one.</li>
+<li>At the end, if there are any remaining instructions in the current block, it yields that block.</li>
+</ul></li>
+<li><em>Returns:</em> Yields blocks of instructions.</li>
+</ul>
+</section>
+<section id="remove_reassigned-function" class="level4">
+<h4 class="anchored" data-anchor-id="remove_reassigned-function">remove_reassigned Function:</h4>
+<ul>
+<li>This function removes instructions that are redefined without being used in a function.</li>
+<li><em>Parameters:</em> <code>func</code> - a dictionary representing a function with a list of instructions.</li>
+<li>Process:
+<ul>
+<li>It repeatedly splits the function’s instructions into blocks using myCFG.</li>
+<li>For each block, it tracks the last definition of each variable and identifies instructions to drop.</li>
+<li>It removes instructions that are redefined without being used.</li>
+<li>It updates the function’s instructions with the optimized blocks.</li>
+<li>The loop continues until no more changes are made.</li>
+</ul></li>
+<li><em>Returns:</em> None (modifies the function in place).</li>
+</ul>
+</section>
+<section id="main-function" class="level4">
+<h4 class="anchored" data-anchor-id="main-function">main Function:</h4>
+<ul>
+<li><p>This is the main function that orchestrates the optimization process.</p></li>
+<li><p>Process:</p>
+<ul>
+<li>It reads a JSON object from standard input.</li>
+<li>For each function in the JSON object, it applies remove_reassigned to optimize the instructions.</li>
+<li>It writes the optimized JSON object to standard output.</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="example" class="level3">
+<h3 class="anchored" data-anchor-id="example">Example:</h3>
+<section id="if-a-is-reassigned-without-used-inbetween" class="level4">
+<h4 class="anchored" data-anchor-id="if-a-is-reassigned-without-used-inbetween">If <code>a</code> is reassigned without used inbetween</h4>
+<section id="input-bril" class="level5">
+<h5 class="anchored" data-anchor-id="input-bril">Input bril:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 100;
+    a: int = const 42;
+    b: int = const 100;
+    b: int = const 42;
+    }</code></pre>
+</section>
+<section id="output-bril" class="level5">
+<h5 class="anchored" data-anchor-id="output-bril">Output bril:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 42;
+    b: int = const 42;
+    }</code></pre>
+</section>
+</section>
+<section id="if-a-is-reassigned-with-used-inbetween" class="level4">
+<h4 class="anchored" data-anchor-id="if-a-is-reassigned-with-used-inbetween">If <code>a</code> is reassigned with used inbetween</h4>
+<section id="input-bril-1" class="level5">
+<h5 class="anchored" data-anchor-id="input-bril-1">Input bril:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 100;
+    print a;
+    a: int = const 42;
+    b: int = const 100;
+    b: int = const 42;
+    }</code></pre>
+</section>
+<section id="output-bril-1" class="level5">
+<h5 class="anchored" data-anchor-id="output-bril-1">Output bril:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 100;
+    print a;
+    a: int = const 42;
+    b: int = const 42;
+    }</code></pre>
+</section>
+</section>
+</section>
+</section>
+<section id="part-2-implement-local-value-numbering" class="level2">
+<h2 class="anchored" data-anchor-id="part-2-implement-local-value-numbering">PART 2: Implement local value numbering</h2>
+<section id="about-local-value-numbering" class="level3">
+<h3 class="anchored" data-anchor-id="about-local-value-numbering">About local value numbering:</h3>
+<p><strong>Definition:</strong> Local Value Numbering (LVN) is a compiler optimization technique used to eliminate redundant calculations by assigning unique numbers to equivalent expressions. This helps in identifying and reusing previously computed values, thus improving the efficiency of the code.</p>
+</section>
+<section id="implementation-1" class="level3">
+<h3 class="anchored" data-anchor-id="implementation-1">Implementation:</h3>
+<section id="initself" class="level4">
+<h4 class="anchored" data-anchor-id="initself"><strong>init</strong>(self)</h4>
+<ul>
+<li><p>This is the constructor for the ImprovedLVN class. It initializes several dictionaries and counters used in the Local Value Numbering (LVN) process.</p></li>
+<li><p><code>self.var2num</code>: Maps variables to their value numbers.</p></li>
+<li><p><code>self.value2num</code>: Maps operations to value numbers.</p></li>
+<li><p><code>self.num2var</code>: Maps value numbers to variable names.</p></li>
+<li><p><code>self.next_vn</code>: Counter for the next value number.</p></li>
+<li><p><code>self.last_computed</code>: Maps operations to their last computed variable.</p></li>
+</ul>
+</section>
+<section id="fresh_value_numberself" class="level4">
+<h4 class="anchored" data-anchor-id="fresh_value_numberself">fresh_value_number(self)</h4>
+<ul>
+<li>This function generates a fresh value number.</li>
+<li><em>Returns:</em> A new value number and increments the counter.</li>
+</ul>
+</section>
+<section id="canonicalizeself-value" class="level4">
+<h4 class="anchored" data-anchor-id="canonicalizeself-value">canonicalize(self, value)</h4>
+<ul>
+<li>This function canonicalizes commutative operations like addition and multiplication to ensure consistent ordering of arguments.</li>
+<li><em>Parameters:</em> value - a Value namedtuple representing an operation and its arguments.</li>
+<li><em>Returns:</em> A canonicalized Value namedtuple.</li>
+</ul>
+</section>
+<section id="get_lvn_varself-vn" class="level4">
+<h4 class="anchored" data-anchor-id="get_lvn_varself-vn">get_lvn_var(self, vn)</h4>
+<ul>
+<li>This function generates a variable name for a given value number.</li>
+<li>Parameters: vn - a value number.</li>
+<li>Returns: A string representing the LVN variable name.</li>
+</ul>
+</section>
+<section id="process_blockself-block" class="level4">
+<h4 class="anchored" data-anchor-id="process_blockself-block">process_block(self, block)</h4>
+<ul>
+<li>This function performs Local Value Numbering (LVN) on a single block of instructions.</li>
+<li>Parameters: block - a list of instructions.</li>
+<li>Process:
+<ul>
+<li>Iterates through each instruction in the block.</li>
+<li>If the instruction has a destination (‘dest’), it processes the instruction:
+<ul>
+<li>Fetches value numbers for arguments.</li>
+<li>Creates a canonicalized value for the current instruction.</li>
+<li>Checks if the value is already computed:
+<ul>
+<li>If yes, it uses the previous result.</li>
+<li>If no, it assigns a fresh value number and updates mappings.</li>
+</ul></li>
+</ul></li>
+<li>Adds the processed instruction to the new block.</li>
+</ul></li>
+<li>Returns: A new block of optimized instructions.</li>
+</ul>
+</section>
+<section id="run_lvnself-bril_program" class="level4">
+<h4 class="anchored" data-anchor-id="run_lvnself-bril_program">run_lvn(self, bril_program)</h4>
+<ul>
+<li>This function runs LVN on the entire program.</li>
+<li>Parameters: bril_program - a dictionary representing the BRIL program.</li>
+<li>Process:
+<ul>
+<li>Iterates through each function in the program.</li>
+<li>Applies process_block to the instructions of each function.</li>
+</ul></li>
+<li>Returns: The optimized BRIL program.</li>
+</ul>
+</section>
+</section>
+<section id="example-1" class="level3">
+<h3 class="anchored" data-anchor-id="example-1">Example:</h3>
+<section id="with-a-b-no-permutted" class="level4">
+<h4 class="anchored" data-anchor-id="with-a-b-no-permutted">with <code>a b</code> no permutted</h4>
+<section id="input-bril-2" class="level5">
+<h5 class="anchored" data-anchor-id="input-bril-2">Input bril:</h5>
+<pre class="{bril}"><code>    @main {
+        a: int = const 4;
+        b: int = const 2;
+        sum1: int = div a b;
+        sum2: int = div a b;
+        prod: int = mul sum1 sum2;
+        sum2: int = div a b;
+        print prod;
+    }</code></pre>
+</section>
+<section id="output-bril-2" class="level5">
+<h5 class="anchored" data-anchor-id="output-bril-2">Output bril:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = div a b;
+    sum2 = id sum1;
+    prod: int = mul sum1 sum1;
+    sum2 = id sum1;
+    print prod;
+    }
+</code></pre>
+</section>
+<section id="pairing-with-dead-code-analysis" class="level5">
+<h5 class="anchored" data-anchor-id="pairing-with-dead-code-analysis">pairing with dead code analysis:</h5>
+<pre class="{bril}"><code>@main {
+  a: int = const 4;
+  b: int = const 2;
+  sum1: int = div a b;
+  prod: int = mul sum1 sum1;
+  sum2 = id sum1;
+  print prod;
+}
+</code></pre>
+</section>
+</section>
+<section id="with-a-b-with-permutted" class="level4">
+<h4 class="anchored" data-anchor-id="with-a-b-with-permutted">with <code>a b</code> with permutted</h4>
+<section id="input-bril-3" class="level5">
+<h5 class="anchored" data-anchor-id="input-bril-3">Input bril:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add b a;
+    prod: int = mul sum1 sum2;
+    sum2: int = add b a;
+    print prod;
+    }
+</code></pre>
+</section>
+<section id="output-bril-3" class="level5">
+<h5 class="anchored" data-anchor-id="output-bril-3">Output bril:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2 = id sum1;
+    prod: int = mul sum1 sum1;
+    sum2 = id sum1;
+    print prod;
+    }
+</code></pre>
+</section>
+<section id="pairing-with-dead-code-analysis-1" class="level5">
+<h5 class="anchored" data-anchor-id="pairing-with-dead-code-analysis-1">pairing with dead code analysis:</h5>
+<pre class="{bril}"><code>    @main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = div a b;
+    prod: int = mul sum1 sum1;
+    sum2 = id sum1;
+    print prod;
+    }
+</code></pre>
+<p>full code: https://github.com/gurusamyanandakuma-r/bril/tree/main/HW/HW2_Rohit</p>
 
 
+</section>
+</section>
+</section>
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -996,13 +1268,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../homework/4_hw.html" class="pagination-link" aria-label="homework dominance">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">homework dominance</span>
+      <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="pagination-link" aria-label="Homework 1">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 1</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../homework/6_extra_credit.html" class="pagination-link" aria-label="Homework 6 loop optimization">
-        <span class="nav-page-text">Homework 6 loop optimization</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="pagination-link" aria-label="Compiler Homework 01 - Trying Out Bril">
+        <span class="nav-page-text">Compiler Homework 01 - Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

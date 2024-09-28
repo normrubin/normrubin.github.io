@@ -416,7 +416,7 @@
 <section id="lets-look-at-a-bril-program." class="slide level2">
 <h2>Lets look at a bril program.</h2>
 <p>Bril is written in JSON format. Almost all programming languages have a way to read json.</p>
-<div id="b4455f1d" class="cell" data-execution_count="1">
+<div id="1a7455ce" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">import</span> json</span>
@@ -655,7 +655,7 @@ for each basic block
 </section>
 <section class="slide level2">
 
-<div id="72774dc6" class="cell" data-execution_count="2">
+<div id="9dc1899f" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a></a>    <span class="co">#Instructions that terminate a basic block.</span></span>
@@ -696,7 +696,7 @@ for each basic block
 
 </div></section><section id="as-a-test-lets-print-out-the-blocks" class="slide level2">
 <h2>as a test, lets print out the blocks</h2>
-<div id="d893ec39" class="cell" data-execution_count="3">
+<div id="7f2aafd6" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a></a><span class="kw">def</span> print_blocks(bril):</span>
@@ -748,7 +748,7 @@ for each basic block
 </section>
 <section class="slide level2">
 
-<div id="b762d736" class="cell" data-execution_count="4">
+<div id="035c6b7b" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a></a><span class="im">import</span> subprocess</span>
@@ -765,61 +765,61 @@ for each basic block
 <div class="cell fragment" data-execution_count="4">
 <div class="cell-output cell-output-stdout">
 <pre><code>total 716
--rw-r--r-- 1 runner docker 40847 Sep 27 14:04 010_compiler_overview.html
--rw-r--r-- 1 runner docker 11163 Sep 27 14:04 010_compiler_overview.qmd
--rw-r--r-- 1 runner docker  3000 Sep 27 14:04 01a1_performance_measurement.qmd
-drwxr-xr-x 3 runner docker  4096 Sep 27 14:03 01a1_performance_measurement_files
--rw-r--r-- 1 runner docker  3000 Sep 27 14:04 01a2_performance_measurement.qmd
--rw-r--r-- 1 runner docker  4134 Sep 27 14:04 01a_performance_measurement.qmd
-drwxr-xr-x 3 runner docker  4096 Sep 27 14:03 01a_performance_measurement_files
--rw-r--r-- 1 runner docker  7413 Sep 27 14:04 02a_representation.qmd
--rw-r--r-- 1 runner docker 73911 Sep 27 14:04 02b_bril.html
--rw-r--r-- 1 runner docker 13777 Sep 27 14:04 02b_bril.qmd
--rw-r--r-- 1 runner docker 23993 Sep 27 14:04 02b_bril.quarto_ipynb
-drwxr-xr-x 4 runner docker  4096 Sep 27 14:04 02b_bril_files
--rw-r--r-- 1 runner docker 12742 Sep 27 14:04 03_local.qmd
--rw-r--r-- 1 runner docker 13267 Sep 27 14:04 03b_local_value_numbering.qmd
--rw-r--r-- 1 runner docker  7508 Sep 27 14:04 04_data_flow.qmd
--rw-r--r-- 1 runner docker  9974 Sep 27 14:04 05_global.qmd
--rw-r--r-- 1 runner docker  4875 Sep 27 14:04 05b_licm.qmd
--rw-r--r-- 1 runner docker 33595 Sep 27 14:04 05c_pre.html
--rw-r--r-- 1 runner docker  3148 Sep 27 14:04 05c_pre.qmd
--rw-r--r-- 1 runner docker 16413 Sep 27 14:04 06_ssa.qmd
--rwxr-xr-x 1 runner docker 29710 Sep 27 14:03 07_llvm.ipynb
--rw-r--r-- 1 runner docker  5691 Sep 27 14:04 08_classic_loop_ops.qmd
--rwxr-xr-x 1 runner docker 32457 Sep 27 14:04 09_poly.qmd
-drwxr-xr-x 3 runner docker  4096 Sep 27 14:03 09_poly_files
--rw-r--r-- 1 runner docker   302 Sep 27 14:04 100_mlir.qmd
--rw-r--r-- 1 runner docker   320 Sep 27 14:04 110_whole_program.qmd
--rw-r--r-- 1 runner docker 21228 Sep 27 14:04 12_memory.html
--rw-r--r-- 1 runner docker   316 Sep 27 14:04 12_memory.qmd
--rw-r--r-- 1 runner docker 16077 Sep 27 14:04 13_dynamic_compilers.qmd
--rw-r--r-- 1 runner docker 10116 Sep 27 14:04 14_gpu_compilers.qmd
--rw-r--r-- 1 runner docker  4682 Sep 27 14:03 a.json
--rw-r--r-- 1 runner docker   248 Sep 27 14:03 a.ts
-drwxr-xr-x 2 runner docker  4096 Sep 27 14:03 df
--rw-r--r-- 1 runner docker  9019 Sep 27 14:04 diverg.qmd
--rw-r--r-- 1 runner docker  4595 Sep 27 14:03 errors
--rw-r--r-- 1 runner docker  3623 Sep 27 14:03 foo.ll
--rw-r--r-- 1 runner docker  2296 Sep 27 14:03 identity.bc
-drwxr-xr-x 2 runner docker  4096 Sep 27 14:03 images
--rw-r--r-- 1 runner docker 13221 Sep 27 14:04 mem_consistancy.qmd
--rw-r--r-- 1 runner docker  2260 Sep 27 14:04 mlir.qmd
-drwxr-xr-x 2 runner docker  4096 Sep 27 14:03 papers
-drwxr-xr-x 2 runner docker  4096 Sep 27 14:03 ra
--rw-r--r-- 1 runner docker  8226 Sep 27 14:04 ra-checking.qmd
--rw-r--r-- 1 runner docker  7965 Sep 27 14:04 register_allocation.qmd
--rw-r--r-- 1 runner docker 52254 Sep 27 14:04 revealjs_010_compiler_overview.qmd.html
--rw-r--r-- 1 runner docker 44624 Sep 27 14:04 revealjs_05c_pre.qmd.html
--rw-r--r-- 1 runner docker 33176 Sep 27 14:04 revealjs_12_memory.qmd.html
--rw-r--r-- 1 runner docker 22316 Sep 27 14:03 xx
+-rw-r--r-- 1 runner docker 40847 Sep 28 11:55 010_compiler_overview.html
+-rw-r--r-- 1 runner docker 11163 Sep 28 11:55 010_compiler_overview.qmd
+-rw-r--r-- 1 runner docker  3000 Sep 28 11:55 01a1_performance_measurement.qmd
+drwxr-xr-x 3 runner docker  4096 Sep 28 11:54 01a1_performance_measurement_files
+-rw-r--r-- 1 runner docker  3000 Sep 28 11:55 01a2_performance_measurement.qmd
+-rw-r--r-- 1 runner docker  4134 Sep 28 11:55 01a_performance_measurement.qmd
+drwxr-xr-x 3 runner docker  4096 Sep 28 11:54 01a_performance_measurement_files
+-rw-r--r-- 1 runner docker  7413 Sep 28 11:55 02a_representation.qmd
+-rw-r--r-- 1 runner docker 74289 Sep 28 11:55 02b_bril.html
+-rw-r--r-- 1 runner docker 13777 Sep 28 11:55 02b_bril.qmd
+-rw-r--r-- 1 runner docker 23993 Sep 28 11:55 02b_bril.quarto_ipynb
+drwxr-xr-x 4 runner docker  4096 Sep 28 11:55 02b_bril_files
+-rw-r--r-- 1 runner docker 12742 Sep 28 11:55 03_local.qmd
+-rw-r--r-- 1 runner docker 13267 Sep 28 11:55 03b_local_value_numbering.qmd
+-rw-r--r-- 1 runner docker  7508 Sep 28 11:55 04_data_flow.qmd
+-rw-r--r-- 1 runner docker  9974 Sep 28 11:55 05_global.qmd
+-rw-r--r-- 1 runner docker  4875 Sep 28 11:55 05b_licm.qmd
+-rw-r--r-- 1 runner docker 33595 Sep 28 11:55 05c_pre.html
+-rw-r--r-- 1 runner docker  3148 Sep 28 11:55 05c_pre.qmd
+-rw-r--r-- 1 runner docker 16413 Sep 28 11:55 06_ssa.qmd
+-rwxr-xr-x 1 runner docker 29710 Sep 28 11:54 07_llvm.ipynb
+-rw-r--r-- 1 runner docker  5691 Sep 28 11:55 08_classic_loop_ops.qmd
+-rwxr-xr-x 1 runner docker 32457 Sep 28 11:55 09_poly.qmd
+drwxr-xr-x 3 runner docker  4096 Sep 28 11:54 09_poly_files
+-rw-r--r-- 1 runner docker   302 Sep 28 11:55 100_mlir.qmd
+-rw-r--r-- 1 runner docker   320 Sep 28 11:55 110_whole_program.qmd
+-rw-r--r-- 1 runner docker 21228 Sep 28 11:55 12_memory.html
+-rw-r--r-- 1 runner docker   316 Sep 28 11:55 12_memory.qmd
+-rw-r--r-- 1 runner docker 16077 Sep 28 11:55 13_dynamic_compilers.qmd
+-rw-r--r-- 1 runner docker 10116 Sep 28 11:55 14_gpu_compilers.qmd
+-rw-r--r-- 1 runner docker  4682 Sep 28 11:54 a.json
+-rw-r--r-- 1 runner docker   248 Sep 28 11:54 a.ts
+drwxr-xr-x 2 runner docker  4096 Sep 28 11:54 df
+-rw-r--r-- 1 runner docker  9019 Sep 28 11:55 diverg.qmd
+-rw-r--r-- 1 runner docker  4595 Sep 28 11:54 errors
+-rw-r--r-- 1 runner docker  3623 Sep 28 11:54 foo.ll
+-rw-r--r-- 1 runner docker  2296 Sep 28 11:54 identity.bc
+drwxr-xr-x 2 runner docker  4096 Sep 28 11:54 images
+-rw-r--r-- 1 runner docker 13221 Sep 28 11:55 mem_consistancy.qmd
+-rw-r--r-- 1 runner docker  2260 Sep 28 11:55 mlir.qmd
+drwxr-xr-x 2 runner docker  4096 Sep 28 11:54 papers
+drwxr-xr-x 2 runner docker  4096 Sep 28 11:54 ra
+-rw-r--r-- 1 runner docker  8226 Sep 28 11:55 ra-checking.qmd
+-rw-r--r-- 1 runner docker  7965 Sep 28 11:55 register_allocation.qmd
+-rw-r--r-- 1 runner docker 52254 Sep 28 11:55 revealjs_010_compiler_overview.qmd.html
+-rw-r--r-- 1 runner docker 44624 Sep 28 11:55 revealjs_05c_pre.qmd.html
+-rw-r--r-- 1 runner docker 33176 Sep 28 11:55 revealjs_12_memory.qmd.html
+-rw-r--r-- 1 runner docker 22316 Sep 28 11:54 xx
 </code></pre>
 </div>
 </div>
 </section>
 <section id="print-the-blocks" class="slide level2">
 <h2>print the blocks</h2>
-<div id="f66854f8" class="cell" data-execution_count="5">
+<div id="896b51fa" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a></a><span class="im">import</span> json </span>
@@ -845,7 +845,7 @@ block somewhere
 </section>
 <section id="the-map-label-names-to-blocks" class="slide level2">
 <h2>the map (label names to blocks)</h2>
-<div id="0b57eee1" class="cell" data-execution_count="6">
+<div id="0762877e" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
@@ -910,7 +910,7 @@ somewhere [{'args': ['v'], 'op': 'print'}]</code></pre>
 </section>
 <section id="cfg" class="slide level2">
 <h2>cfg</h2>
-<div id="24be9b15" class="cell" data-execution_count="7">
+<div id="2cbe3161" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a></a><span class="kw">def</span> get_cfg(ordered_blocks):</span>
