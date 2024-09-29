@@ -269,7 +269,8 @@ llvmGetPassPluginInfo() {
 ~/llvm/llvm-pass-skeleton$ mkdir build
 cd build 
  cmake ..
-   ...
+
+```
 -- Registering SkeletonPass as a pass plugin (static build: OFF)
 -- Configuring done
 -- Generating done
@@ -282,20 +283,223 @@ to run this
 
 clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp
 
+creates a.out and prints out info from the pass
 
-to make this easier to use you might  create a bash script or a makefile 
+
+to make this easier to use you might create a bash script or a makefile 
+
+## look at the post on containers 
 
 ## getting more info 
 
+Some helpfull llvm operations
 
-# outs() << *(I.getOperand(0)) ; prints an instruction 
-# 
-# %% [markdown]
-# Given a Value* V, what kind of thing is V?
-# 
-# 1) isa<Argument>(V) true of V is a agument 
-# 1) cast<Argument>(V) casts to Argument, assert falure of not Argument 
-# 1) dyn_cast<Argument>(V) casts to Argument returns NULL if not an argument 
+```
+errs() << "function Body:\n";
+errs() << F << '\n"; '
+```
+
+output
+```
+I saw a function called main!
+function Body:
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  ret i32 %6
+}
+```
+
+## entering containers 
+```
+PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM)
+        {
+            for (auto &F : M)
+            {
+                errs() << "I saw a function called " << F.getName() << "!\n";
+                for (auto &B : F)
+                {
+                    errs() << "starting block\n";
+                    errs() << B << "\n";
+                    for (auto &I : B)
+                    {
+                        errs() << "instr:" << I << "\n";
+                    }
+                };
+            };
+            return PreservedAnalyses::all();
+        };
+
+```
+```
+I saw a function called main!
+starting block
+
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  ret i32 %6
+
+instr:  %3 = alloca i32, align 4
+instr:  %4 = alloca i32, align 4
+instr:  %5 = alloca i8**, align 8
+instr:  store i32 0, i32* %3, align 4
+instr:  store i32 %0, i32* %4, align 4
+instr:  store i8** %1, i8*** %5, align 8
+instr:  %6 = load i32, i32* %4, align 4
+instr:  ret i32 %6
+```
+
+
+## modify the program 
+
+find the first binary operator and change it to a multiply
+
+```
+#// temp.c
+int main(int argc, char **argv)
+{
+       return argc + 5;
+}
+```
+
+``` PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM)
+        {
+            for (auto &F : M)
+            {
+                errs() << "I saw a function called " << F.getName() << "!\n";
+                for (auto &B : F)
+                {
+                    for (auto &I : B)
+                    {
+                        if (isa<BinaryOperator>(&I))
+                        {
+                            errs() << "instr:" << I << "\n";
+                        }
+                        auto *op = dyn_cast<BinaryOperator>(&I);
+                        errs() << "from_op:" << op << "\n";
+                    }
+                };
+            };
+            return PreservedAnalyses::all();
+        }
+   
+```
+ output
+```
+I saw a function called main!
+I saw a function called main!
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+instr:  %7 = add nsw i32 %6, 5
+from_op:0xb58610
+from_op:0x0
+```
+
+## testing 
+
+1. isa<Argument>(V) true of V is a agument 
+1. cast<Argument>(V) casts to Argument, assert falure of not Argument 
+1. dyn_cast<Argument>(V) casts to Argument returns NULL if not an argument 
+
+## irbuilder 
+
+```
+
+ errs() << "I saw a function called " << F.getName() << "!\n";
+                for (auto &B : F)
+                {
+                    errs() << B << "\n";
+
+                    for (auto &I : B)
+                    {
+                        if (auto *op = dyn_cast<BinaryOperator>(&I))
+                        {
+                            errs() << "old inst " << *op << "\n";
+                            IRBuilder<> builder(op);
+                            Value *left = op->getOperand(0);  // first operand
+                            Value *right = op->getOperand(1); // second operad
+                            Value *mul = builder.CreateMul(left, right);
+
+                            errs() << "new inst:" << *mul << "\n";
+
+                            errs() << B << "\n";
+
+                            // replace uses of op with mul
+                            for (auto &U : op->uses())
+                            {
+                                int num = U.getOperandNo(); // which argument
+                                User *user = U.getUser();   // the instruction with the use
+                                errs() << " user:" << *user << "   ";
+                                user->setOperand(num, mul);
+                                errs() << *user << "\n";
+                            }
+                        }
+                    }
+                }
+            };
+ 
+             return PreservedAnalyses::none();
+```
+
+output 
+
+I saw a function called main!
+
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  %7 = add nsw i32 %6, 5
+  ret i32 %7
+
+old inst   %7 = add nsw i32 %6, 5
+new inst:  %7 = mul i32 %6, 5
+
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  %7 = mul i32 %6, 5
+  %8 = add nsw i32 %6, 5
+  ret i32 %8
+
+ user:  ret i32 %8     ret i32 %7
+
+```
+
+
+## more complex transforms -  for instrumentation  
+
+instrumentation code in c not using builder 
+
+insert calls to functions and link them in 
+
+
+
+also 
+
 # 
 # ```(C++)
 # Static bool isLoopInvariant(const Value *V, const Loop *L) { 
