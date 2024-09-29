@@ -981,7 +981,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#4012c0ff .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#78fcb065 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2513,11 +2513,11 @@
     ]
   },
   {
-    "objectID": "lectures/04_data_flow.html#implementation-notes",
-    "href": "lectures/04_data_flow.html#implementation-notes",
+    "objectID": "lectures/04_data_flow.html#frameworks",
+    "href": "lectures/04_data_flow.html#frameworks",
     "title": "Data Flow",
-    "section": "implementation notes",
-    "text": "implementation notes\n\nwe can represent these sets as bit vectors\nall these transfer functions look like \\[ f(x) = (x-K) \\bigcup(G) \\] We can summarize K and G over each basic block\n\nK is called the kill set, G is the Gen sets",
+    "section": "frameworks",
+    "text": "frameworks",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2525,11 +2525,131 @@
     ]
   },
   {
-    "objectID": "lectures/04_data_flow.html#section-80",
-    "href": "lectures/04_data_flow.html#section-80",
+    "objectID": "lectures/04_data_flow.html#common-properties-direction",
+    "href": "lectures/04_data_flow.html#common-properties-direction",
     "title": "Data Flow",
-    "section": "84",
-    "text": "84",
+    "section": "common properties Direction",
+    "text": "common properties Direction\nDirection\n\n\nbackward\n\nliveness\nvery busy expressions\n\nOUT is a function of the IN of successors\n\nforward\n\nreaching Defs\nAvailable Expressions\n\nIN is a function of the OUT of Preds",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#common-properties-operation",
+    "href": "lectures/04_data_flow.html#common-properties-operation",
+    "title": "Data Flow",
+    "section": "common properties Operation",
+    "text": "common properties Operation\n\n\nMay union\n\nLiveness\nReaching defs\n\nmerge using intersection\n\nmust\n\nvery busy expressions\nAvailable Expressions\n\nmerge using union",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#transfer-functions-with-a-block-or-for-one-statement",
+    "href": "lectures/04_data_flow.html#transfer-functions-with-a-block-or-for-one-statement",
+    "title": "Data Flow",
+    "section": "transfer functions with a block or for one statement",
+    "text": "transfer functions with a block or for one statement\nForward\n\\[ \\text{OUT}_b = f_b(\\text{IN}_b) \\]\nBackward\n\\[ \\text{IN}_b = f_b(\\text{OUT}_b) \\]\nliveness IN = (OUT-def) union (args)\nVery busy expressions IN = (OUT - exprs(def)) union (this expr)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#an-example-1",
+    "href": "lectures/04_data_flow.html#an-example-1",
+    "title": "Data Flow",
+    "section": "an example",
+    "text": "an example\nif b1 \n    while b2 { x = a1}\nelse \n    while b3 { x = a2}\nx = a3\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n\n\n\nreaching defs - a definition of a variable v at pv reaches a point p if there is a path from pv tp p and v is not redefined along the path",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#equations-2",
+    "href": "lectures/04_data_flow.html#equations-2",
+    "title": "Data Flow",
+    "section": "equations",
+    "text": "equations\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n\n\n\n\n\n\\[ \\small \\text{IN}_p = \\bigcup \\text{OUT}_{ps}, ps \\in pred(p)\\]\nIN[1] = empty\nIN[2] = OUT[1] union OUT[3]\nIN[3] = OUT[2]\nIN[4] = OUT[1] union OUT[5]\nIN[5] = OUT[4]\nIN[6] = OUT[2] union OUT[4]\n\n\n\\[ \\small \\text{OUT}_p = (\\text{IN)}_p - defs(v)) \\cup \\{ (p,v) \\}  \\]\nOUT[1] = IN[1]\nOUT[2] = IN[2]\nOUT[3] = (IN[3] -{3,5,6}) union {3}\nOUT[4] = IN[4]\nOUT[5] = (IN[5] - {3,5,6}) union {5}\nOUT[6] = (IN[6] - {3,5,6}) union {6}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#complexity",
+    "href": "lectures/04_data_flow.html#complexity",
+    "title": "Data Flow",
+    "section": "complexity",
+    "text": "complexity",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#graph-of-equations",
+    "href": "lectures/04_data_flow.html#graph-of-equations",
+    "title": "Data Flow",
+    "section": "graph of equations",
+    "text": "graph of equations\n\n\nIN[1] = empty\nIN[2] = OUT[1] union OUT[3]\nIN[3] = OUT[2]\nIN[4] = OUT[1] union OUT[5]\nIN[5] = OUT[4]\nIN[6] = OUT[2] union OUT[4]\nOUT[1] = IN[1]\nOUT[2] = IN[2]\nOUT[3] = (IN[3] -{3,5,6}) union {3}\nOUT[4] = IN[4]\nOUT[5] = (IN[5] - {3,5,6}) union {5}\nOUT[6] = (IN[6] - {3,5,6}) union {6}\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#reverse-postorder",
+    "href": "lectures/04_data_flow.html#reverse-postorder",
+    "title": "Data Flow",
+    "section": "Reverse Postorder",
+    "text": "Reverse Postorder\nvisit successors first (need an ordering)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#order",
+    "href": "lectures/04_data_flow.html#order",
+    "title": "Data Flow",
+    "section": "order",
+    "text": "order\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6\n\n\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[b1-1]--&gt; b4[b4-4]\nb1--&gt; b2[b2-2]\nb4--&gt; b6[b6-5]\nb4--&gt; b5[b5-6]\nb2--&gt; b3[b3-3]\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[b1-1]--&gt; b4[b4-4]\nb1--&gt; b2[b2-2]\nb4--&gt; b6[b6-5]\nb4--&gt; b5[b5-6]\nb2--&gt; b3[b3-3]\n\n\n\n\n\n\n\norder b5 b6 b3 b3 b2 b1",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#implement",
+    "href": "lectures/04_data_flow.html#implement",
+    "title": "Data Flow",
+    "section": "implement",
+    "text": "implement\nkeep two data structures\n\nC current list\nP set of pending lists\n\ninitially C is a reverse post order sort of the nodes\nprocess each element of C\nwhen we find a changed add it to P\nWhen C is empty, sort P in reverse post order and move to C",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Data Flow"
+    ]
+  },
+  {
+    "objectID": "lectures/04_data_flow.html#representing-sets",
+    "href": "lectures/04_data_flow.html#representing-sets",
+    "title": "Data Flow",
+    "section": "representing sets",
+    "text": "representing sets\nwe keep doing union and intersection for sets, which are sparse\ncompilers generally use bit vectors",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2561,23 +2681,11 @@
     ]
   },
   {
-    "objectID": "lectures/04_data_flow.html#partial-orders",
-    "href": "lectures/04_data_flow.html#partial-orders",
-    "title": "Data Flow",
-    "section": "partial orders",
-    "text": "partial orders\nThe domain of values you’re trying compute needs to form a partial order with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.\nIn terms of a partial order ⊑, the merge function is the meet (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so x ⊑ y implies f(x) ⊑ f(y).",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Data Flow"
-    ]
-  },
-  {
     "objectID": "lectures/04_data_flow.html#homework-3",
     "href": "lectures/04_data_flow.html#homework-3",
     "title": "Data Flow",
     "section": "homework 3",
-    "text": "homework 3\nImplement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it.",
+    "text": "homework 3\nImplement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it. use a simple ordering- Not necessary to use reverse post order\nas always think about testing",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2634,18 +2742,88 @@
     "text": "processing\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nb1--&gt; b2\nb1 --&gt; b3\nb2--&gt; b3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nb1--&gt; b2\nb1 --&gt; b3\nb2--&gt; b3\n\n\n\n\n\n\nGEN[b1] = []         kill[b1] = [a,b,d,x]\nGEN[b2] = [a,b]      kill[b2] = [c,d]\nGEN[b3] = [b,d]      Kill[b3] = [c]\nblock OUT       IN   Next IN        worklist  \nb3    []        []    [b,d]           b1,b2\nb1    [b,d]     []    []              b2\nb2    [b,d]     []    [a,b]           b1\nb1    [a,b,d]   []    []              empty"
   },
   {
-    "objectID": "lectures/revealjs_04_data_flow.qmd.html#implementation-notes",
-    "href": "lectures/revealjs_04_data_flow.qmd.html#implementation-notes",
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#frameworks",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#frameworks",
     "title": "Data Flow",
-    "section": "implementation notes",
-    "text": "implementation notes\n\nwe can represent these sets as bit vectors\nall these transfer functions look like \\[ f(x) = (x-K) \\bigcup(G) \\] We can summarize K and G over each basic block\n\nK is called the kill set, G is the Gen sets"
+    "section": "frameworks",
+    "text": "frameworks"
   },
   {
-    "objectID": "lectures/revealjs_04_data_flow.qmd.html#section-80",
-    "href": "lectures/revealjs_04_data_flow.qmd.html#section-80",
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#common-properties-direction",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#common-properties-direction",
     "title": "Data Flow",
-    "section": "84",
-    "text": "84"
+    "section": "common properties Direction",
+    "text": "common properties Direction\nDirection\n\n\nbackward\n\nliveness\nvery busy expressions\n\nOUT is a function of the IN of successors\n\nforward\n\nreaching Defs\nAvailable Expressions\n\nIN is a function of the OUT of Preds"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#common-properties-operation",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#common-properties-operation",
+    "title": "Data Flow",
+    "section": "common properties Operation",
+    "text": "common properties Operation\n\n\nMay union\n\nLiveness\nReaching defs\n\nmerge using intersection\n\nmust\n\nvery busy expressions\nAvailable Expressions\n\nmerge using union"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#transfer-functions-with-a-block-or-for-one-statement",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#transfer-functions-with-a-block-or-for-one-statement",
+    "title": "Data Flow",
+    "section": "transfer functions with a block or for one statement",
+    "text": "transfer functions with a block or for one statement\nForward\n\\[ \\text{OUT}_b = f_b(\\text{IN}_b) \\]\nBackward\n\\[ \\text{IN}_b = f_b(\\text{OUT}_b) \\]\nliveness IN = (OUT-def) union (args)\nVery busy expressions IN = (OUT - exprs(def)) union (this expr)"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#an-example-1",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#an-example-1",
+    "title": "Data Flow",
+    "section": "an example",
+    "text": "an example\nif b1 \n    while b2 { x = a1}\nelse \n    while b3 { x = a2}\nx = a3\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n\n\n\nreaching defs - a definition of a variable v at pv reaches a point p if there is a path from pv tp p and v is not redefined along the path"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#equations-2",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#equations-2",
+    "title": "Data Flow",
+    "section": "equations",
+    "text": "equations\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\n\ngraph TD;\nb1[\"p1: if b1\"]\nb2[\"p2: use b3\"]\nb3[\"p3: x = a2\"]\nb4[\"p4: use b2\"]\nb5[\"p5: x = a1\"]\nb6[\"p6: x = a3\"]\nb1--&gt; b4\nb1 --&gt; b2\n\n\nb2--&gt; b6\nb2--&gt; b3\n\nb3--&gt; b2\nb5--&gt; b4\n\nb4--&gt; b5\nb4--&gt; b6\n\n\n\n\n\n\n\n\n\n\\[ \\small \\text{IN}_p = \\bigcup \\text{OUT}_{ps}, ps \\in pred(p)\\]\nIN[1] = empty\nIN[2] = OUT[1] union OUT[3]\nIN[3] = OUT[2]\nIN[4] = OUT[1] union OUT[5]\nIN[5] = OUT[4]\nIN[6] = OUT[2] union OUT[4]\n\n\n\\[ \\small \\text{OUT}_p = (\\text{IN)}_p - defs(v)) \\cup \\{ (p,v) \\}  \\]\nOUT[1] = IN[1]\nOUT[2] = IN[2]\nOUT[3] = (IN[3] -{3,5,6}) union {3}\nOUT[4] = IN[4]\nOUT[5] = (IN[5] - {3,5,6}) union {5}\nOUT[6] = (IN[6] - {3,5,6}) union {6}"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#complexity",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#complexity",
+    "title": "Data Flow",
+    "section": "complexity",
+    "text": "complexity"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#graph-of-equations",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#graph-of-equations",
+    "title": "Data Flow",
+    "section": "graph of equations",
+    "text": "graph of equations\n\n\nIN[1] = empty\nIN[2] = OUT[1] union OUT[3]\nIN[3] = OUT[2]\nIN[4] = OUT[1] union OUT[5]\nIN[5] = OUT[4]\nIN[6] = OUT[2] union OUT[4]\nOUT[1] = IN[1]\nOUT[2] = IN[2]\nOUT[3] = (IN[3] -{3,5,6}) union {3}\nOUT[4] = IN[4]\nOUT[5] = (IN[5] - {3,5,6}) union {5}\nOUT[6] = (IN[6] - {3,5,6}) union {6}\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#reverse-postorder",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#reverse-postorder",
+    "title": "Data Flow",
+    "section": "Reverse Postorder",
+    "text": "Reverse Postorder\nvisit successors first (need an ordering)"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#order",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#order",
+    "title": "Data Flow",
+    "section": "order",
+    "text": "order\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB;\nIN1--&gt;OUT1\nOUT1--&gt;IN2\nOUT1--&gt;IN4\nOUT3--&gt; IN2\nOUT2--&gt; IN3\nOUT5--&gt; IN4\nOUT4--&gt; IN5\nOUT2--&gt; IN6\nOUT4--&gt; IN6\nIN2--&gt; OUT2\nIN3--&gt; OUT3\nIN4--&gt; OUT4\nIN5--&gt; OUT5\nIN6--&gt; OUT6\n\n\n\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[b1-1]--&gt; b4[b4-4]\nb1--&gt; b2[b2-2]\nb4--&gt; b6[b6-5]\nb4--&gt; b5[b5-6]\nb2--&gt; b3[b3-3]\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nb1[b1-1]--&gt; b4[b4-4]\nb1--&gt; b2[b2-2]\nb4--&gt; b6[b6-5]\nb4--&gt; b5[b5-6]\nb2--&gt; b3[b3-3]\n\n\n\n\n\n\n\norder b5 b6 b3 b3 b2 b1"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#implement",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#implement",
+    "title": "Data Flow",
+    "section": "implement",
+    "text": "implement\nkeep two data structures\n\nC current list\nP set of pending lists\n\ninitially C is a reverse post order sort of the nodes\nprocess each element of C\nwhen we find a changed add it to P\nWhen C is empty, sort P in reverse post order and move to C"
+  },
+  {
+    "objectID": "lectures/revealjs_04_data_flow.qmd.html#representing-sets",
+    "href": "lectures/revealjs_04_data_flow.qmd.html#representing-sets",
+    "title": "Data Flow",
+    "section": "representing sets",
+    "text": "representing sets\nwe keep doing union and intersection for sets, which are sparse\ncompilers generally use bit vectors"
   },
   {
     "objectID": "lectures/revealjs_04_data_flow.qmd.html#pseudo-code",
@@ -2662,18 +2840,11 @@
     "text": "loops\nThis algorithm has no problems with loops!"
   },
   {
-    "objectID": "lectures/revealjs_04_data_flow.qmd.html#partial-orders",
-    "href": "lectures/revealjs_04_data_flow.qmd.html#partial-orders",
-    "title": "Data Flow",
-    "section": "partial orders",
-    "text": "partial orders\nThe domain of values you’re trying compute needs to form a partial order with a unique lower bound. The rough idea is that the worklist algorithm should only “move” values monotonically in the order, so it’s guaranteed to eventually terminate.\nIn terms of a partial order ⊑, the merge function is the meet (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so x ⊑ y implies f(x) ⊑ f(y)."
-  },
-  {
     "objectID": "lectures/revealjs_04_data_flow.qmd.html#homework-3",
     "href": "lectures/revealjs_04_data_flow.qmd.html#homework-3",
     "title": "Data Flow",
     "section": "homework 3",
-    "text": "homework 3\nImplement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it."
+    "text": "homework 3\nImplement one data flow analysis - For Bonus points make it generic so that the same code supports multiple analysis. As always, think about how to test it. use a simple ordering- Not necessary to use reverse post order\nas always think about testing"
   },
   {
     "objectID": "lectures/03b_local_value_numbering.html",
@@ -4077,7 +4248,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 756\n-rw-r--r-- 1 runner docker 40847 Sep 28 12:40 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 28 12:39 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 28 12:39 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 28 12:38 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Sep 28 12:39 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 28 12:39 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 28 12:38 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 28 12:39 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 28 12:39 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 28 12:40 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 28 12:39 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Sep 28 12:39 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  7508 Sep 28 12:39 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 28 12:39 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 28 12:39 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 28 12:40 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 28 12:39 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 28 12:39 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25506 Sep 28 12:38 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 28 12:39 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 28 12:39 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 28 12:38 09_poly_files\n-rw-r--r-- 1 runner docker   302 Sep 28 12:39 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 28 12:39 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 28 12:40 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 28 12:39 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 28 12:39 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 28 12:39 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 28 12:38 a.json\n-rw-r--r-- 1 runner docker   248 Sep 28 12:38 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 28 12:38 df\n-rw-r--r-- 1 runner docker  9019 Sep 28 12:39 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 28 12:38 errors\n-rw-r--r-- 1 runner docker  3623 Sep 28 12:38 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 28 12:38 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 28 12:38 images\n-rw-r--r-- 1 runner docker 45429 Sep 28 12:40 llvm.html\n-rw-r--r-- 1 runner docker 13417 Sep 28 12:39 llvm.qmd\n-rw-r--r-- 1 runner docker 13221 Sep 28 12:39 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Sep 28 12:39 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 28 12:38 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 28 12:38 ra\n-rw-r--r-- 1 runner docker  8226 Sep 28 12:39 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 28 12:39 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 28 12:40 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 28 12:40 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 28 12:40 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 59654 Sep 28 12:40 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 28 12:38 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 772\n-rw-r--r-- 1 runner docker 40847 Sep 29 15:20 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Sep 29 15:20 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Sep 29 15:20 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 29 15:19 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Sep 29 15:20 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Sep 29 15:20 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 29 15:19 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Sep 29 15:20 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Sep 29 15:20 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Sep 29 15:20 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Sep 29 15:20 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Sep 29 15:20 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  9438 Sep 29 15:20 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Sep 29 15:20 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Sep 29 15:20 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Sep 29 15:20 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Sep 29 15:20 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Sep 29 15:20 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25506 Sep 29 15:19 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Sep 29 15:20 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Sep 29 15:20 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Sep 29 15:19 09_poly_files\n-rw-r--r-- 1 runner docker   302 Sep 29 15:20 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Sep 29 15:20 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Sep 29 15:20 12_memory.html\n-rw-r--r-- 1 runner docker   316 Sep 29 15:20 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Sep 29 15:20 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Sep 29 15:20 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Sep 29 15:19 a.json\n-rw-r--r-- 1 runner docker   248 Sep 29 15:19 a.ts\ndrwxr-xr-x 2 runner docker  4096 Sep 29 15:19 df\n-rw-r--r-- 1 runner docker  9019 Sep 29 15:20 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Sep 29 15:19 errors\n-rw-r--r-- 1 runner docker  3623 Sep 29 15:19 foo.ll\n-rw-r--r-- 1 runner docker  2296 Sep 29 15:19 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Sep 29 15:19 images\n-rw-r--r-- 1 runner docker 50443 Sep 29 15:20 llvm.html\n-rw-r--r-- 1 runner docker 18445 Sep 29 15:20 llvm.qmd\n-rw-r--r-- 1 runner docker 13221 Sep 29 15:20 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Sep 29 15:20 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Sep 29 15:19 papers\ndrwxr-xr-x 2 runner docker  4096 Sep 29 15:19 ra\n-rw-r--r-- 1 runner docker  8226 Sep 29 15:20 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Sep 29 15:20 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Sep 29 15:20 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Sep 29 15:20 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Sep 29 15:20 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 64361 Sep 29 15:20 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 22316 Sep 29 15:19 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4785,6 +4956,45 @@
     ]
   },
   {
+    "objectID": "blogs/matin/2024-09-20-HW1.html",
+    "href": "blogs/matin/2024-09-20-HW1.html",
+    "title": "Homework 1",
+    "section": "",
+    "text": "After looking at the example benchmarks and the BRIL documentation, I noticed that the example benchmarks had a pseudo random number generator, and BRIL had a floating point extension. Inspired by the other scientific-based floating-point benchmarks, I decided on writing a benchmark to calculate PI using Monte Carlo (explained here). What could possibly go wrong?\n\n\nProbably the main issue I encountered was that there was no way to convert floats to ints, meaning no matter how many random integers I was generating, I couldn’t use them to generate numbers inside a unit square (1x1). To get around this issue, I tried sampling integers inside a non-unit square instead (e.g. square is 10x10, and points come from an interval of [-10, 10] on both x and y). All I had to do was make sure the pseudo random number generator outputs had a lower bound that I specified instead of zero. Again, what could possibly go wrong?\n\n\n\nAfter some debugging, I noticed that either the random number generator didn’t work as advertised (I put print statements in other benchmarks, and the values certainly weren’t greater than zero), or I was using it wrong.\nTo get around both of these issues, instead I opted in to discretize the unit square into a set of grid points, and then query whether they are inside the unit circle or not. Increasing the number of points leads to the output of the BRIL program converging to PI, so it seems to work. The benchmark and its test files are added under the benchmarks folder.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Matin",
+      "Homework 1"
+    ]
+  },
+  {
+    "objectID": "blogs/matin/2024-09-20-HW1.html#problem-1-bril-doesnt-seem-to-convert-float-to-int-or-vice-versa",
+    "href": "blogs/matin/2024-09-20-HW1.html#problem-1-bril-doesnt-seem-to-convert-float-to-int-or-vice-versa",
+    "title": "Homework 1",
+    "section": "",
+    "text": "Probably the main issue I encountered was that there was no way to convert floats to ints, meaning no matter how many random integers I was generating, I couldn’t use them to generate numbers inside a unit square (1x1). To get around this issue, I tried sampling integers inside a non-unit square instead (e.g. square is 10x10, and points come from an interval of [-10, 10] on both x and y). All I had to do was make sure the pseudo random number generator outputs had a lower bound that I specified instead of zero. Again, what could possibly go wrong?",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Matin",
+      "Homework 1"
+    ]
+  },
+  {
+    "objectID": "blogs/matin/2024-09-20-HW1.html#problem-2-the-number-generator-didnt-have-a-lower-bound-or-plain-just-didnt-work-as-advertised.",
+    "href": "blogs/matin/2024-09-20-HW1.html#problem-2-the-number-generator-didnt-have-a-lower-bound-or-plain-just-didnt-work-as-advertised.",
+    "title": "Homework 1",
+    "section": "",
+    "text": "After some debugging, I noticed that either the random number generator didn’t work as advertised (I put print statements in other benchmarks, and the values certainly weren’t greater than zero), or I was using it wrong.\nTo get around both of these issues, instead I opted in to discretize the unit square into a set of grid points, and then query whether they are inside the unit circle or not. Increasing the number of points leads to the output of the BRIL program converging to PI, so it seems to work. The benchmark and its test files are added under the benchmarks folder.",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Matin",
+      "Homework 1"
+    ]
+  },
+  {
     "objectID": "blogs/sharmila/2024-09-20-Sharmila-HW01.html",
     "href": "blogs/sharmila/2024-09-20-Sharmila-HW01.html",
     "title": "Compiler Homework 01 - Trying Out Bril",
@@ -4970,7 +5180,7 @@
     "href": "weekly.html",
     "title": "EECS7398 Weekly Schedule fa 2024",
     "section": "",
-    "text": "Since the is the first time this course is offered.\nThis is a tentative schedule.\nThe papers listed here are suggestions, if there is a different paper you would like to present, send me a link so that I can approve it.\nEither 1 or 2 people can sign up for a paper. Once everyone has done so, I’ll schedule which paper gets which date.\n\n\n\n\n\n\n\n\n\n\nsession\nDate\ntopic\ndue\ndiscussions\n\n\n\n\n1\nFriday Sept 6\nCompiler Overview\n\ndiscussion\n\n\n\n\nPerformance Measurement-1\n\n\n\n\n2\nTuesday Sept 10\nPerformance Measurement-2\n\ndiscussion\n\n\n3\nFriday Sept 13\nRepresenting programs\nhw0\ndiscussion\n\n\n\n\nBril\n\ndiscussion\n\n\n4\nTuesday Sept 17\nLocal analysis and optimization\n\ndiscussion\n\n\n5\nFriday Sept 20\nLocal Value Numbering\nhw1\n\n\n\n6\nTuesday Sept 24\nlvn + data flow\n\n\n\n\n7\nFriday Sept 27\nData flow continued\n\n\n\n\n8\nTuesday Oct 1\ngraphs\n\n\n\n\n9\nFriday Oct 4\nStatic single assignment\n\n\n\n\n10\nTuesday Oct 8\nGPU Compilers\n\n\n\n\n11\nFriday Oct 11\nNorm unavailable - maybe guest lecture\n\n\n\n\n12\nTuesday Oct 15\nLoop invariant code motion + reading\n\n\n\n\n\nLeader: Aymane Jerari MLIR: A Compiler Infrastructure for the End of Moore’s Law\n\n\n\n\n\n\n\n\n\n\n13\nFriday Oct 18\ntypic\n\n\n\n\n14\nTuesday Oct 22\nGlobal value number + reading\n\n\n\n\n\nLeader: Oscar Kellner Retargeting and Respecializing GPU Workloads for Performance Portability\nproject proposal due\n\n\n\n\n\n\n\n\n\n\n15\nFriday Oct 25\nLLVM\n\n\n\n\n16\nTuesday Oct 29\ntypic + reading\n\n\n\n\n\nLeader Sana Anvari Large Language Models for Compiler Optimization\n\n\n\n\n\n\n\n\n\n\n17\nFriday Nov 1\nRegister Allocation\n\n\n\n\n18\nTuesday Nov 5\nDynamic compilers 1 + reading\n\n\n\n\n\nLeader: Qucheng Jiang An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration\n\n\n\n\n\n\n\n\n\n\n19\nFriday Nov 8\nDynamic compilers\n\n\n\n\n20\nTuesday Nov 12\ntypic + reading\n\n\n\n\n\nLeader: Yashaswini Makaram ProGraML: Graph-based Deep Learning for Program Optimization and Analysis\n\n\n\n\n\n\n\n\n\n\n21\nFriday Nov 15\ntypic\n\n\n\n\n22\nTuesday Nov 19\nra checking + reading\n\n\n\n\n\nLeaders: Rohit Anandakumar and Sharmila Sivalingam Generating GPU Compiler Heuristics using Reinforcement Learning\n\n\n\n\n\n\n\n\n\n\n23\nFriday Nov 22\npolyhedral part 1\n\n\n\n\n24\nTuesday Nov 26\nPolyhedral part 2 + reading\n\n\n\n\n\nLeader: Michael Maurer Energy-Aware Tile Size Selection for Affine Programs on GPUs\n\n\n\n\n\n\n\n\n\n\nNov 29\nThanksgiving\n\n\n\n\n\n26\nTuesday Dec 3\ntypic + reading\n\n\n\n\n\nLeader: Matin Raayai: Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers\n\n\n\n\n\n\n\n\n\n\n27\nFriday Dec 6\nai in compilers\n\n\n\n\n\nPapers\n\nTVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen) paper\nleader: SLaDe: A Portable Small Language Model Decompiler for Optimized Assembly\nLeader:ACPO: AI-Enabled Compiler-Driven Program Optimization\nleader: Adaptive Online Context-Sensitive Inlining\nleader: Threaded Code Variations and Optimizations\nleader:Learning Compiler Pass Orders using Coreset and Normalized Value Prediction\nleader: Learning to Optimize Tensor Programs\nleader: End-to-end Deep Learning of Optimization Heuristics\nleader: Compiler Fuzzing through Deep Learning\n\n\n\n Back to top",
+    "text": "Since the is the first time this course is offered.\nThis is a tentative schedule.\nThe papers listed here are suggestions, if there is a different paper you would like to present, send me a link so that I can approve it.\nEither 1 or 2 people can sign up for a paper. Once everyone has done so, I’ll schedule which paper gets which date.\n\n\n\n\n\n\n\n\n\n\nsession\nDate\ntopic\ndue\ndiscussions\n\n\n\n\n1\nFriday Sept 6\nCompiler Overview\n\ndiscussion\n\n\n\n\nPerformance Measurement-1\n\n\n\n\n2\nTuesday Sept 10\nPerformance Measurement-2\n\ndiscussion\n\n\n3\nFriday Sept 13\nRepresenting programs\nhw0\ndiscussion\n\n\n\n\nBril\n\ndiscussion\n\n\n4\nTuesday Sept 17\nLocal analysis and optimization\n\ndiscussion\n\n\n5\nFriday Sept 20\nLocal Value Numbering\nhw1\n\n\n\n6\nTuesday Sept 24\nlvn + data flow\n\n\n\n\n7\nFriday Sept 27\nData flow continued\n\n\n\n\n8\nTuesday Oct 1\nData flow continued\n\n\n\n\n9\nFriday Oct 4\ngraphs\n\n\n\n\n10\nTuesday Oct 8\nStatic single assignment\n\n\n\n\n11\nFriday Oct 11\nNorm unavailable - maybe guest lecture\n\n\n\n\n12\nTuesday Oct 15\nLoop invariant code motion + reading\n\n\n\n\n\nLeader: Aymane Jerari MLIR: A Compiler Infrastructure for the End of Moore’s Law\n\n\n\n\n\n\n\n\n\n\n13\nFriday Oct 18\nGPU Compilers\n\n\n\n\n14\nTuesday Oct 22\nGlobal value number + reading\n\n\n\n\n\nLeader: Oscar Kellner Retargeting and Respecializing GPU Workloads for Performance Portability\nproject proposal due\n\n\n\n\n\n\n\n\n\n\n15\nFriday Oct 25\nLLVM\n\n\n\n\n16\nTuesday Oct 29\ntypic + reading\n\n\n\n\n\nLeader Sana Anvari Large Language Models for Compiler Optimization\n\n\n\n\n\n\n\n\n\n\n17\nFriday Nov 1\nRegister Allocation\n\n\n\n\n18\nTuesday Nov 5\nDynamic compilers 1 + reading\n\n\n\n\n\nLeader: Qucheng Jiang An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration\n\n\n\n\n\n\n\n\n\n\n19\nFriday Nov 8\nDynamic compilers\n\n\n\n\n20\nTuesday Nov 12\ntypic + reading\n\n\n\n\n\nLeader: Yashaswini Makaram ProGraML: Graph-based Deep Learning for Program Optimization and Analysis\n\n\n\n\n\n\n\n\n\n\n21\nFriday Nov 15\ntypic\n\n\n\n\n22\nTuesday Nov 19\nra checking + reading\n\n\n\n\n\nLeaders: Rohit Anandakumar and Sharmila Sivalingam Generating GPU Compiler Heuristics using Reinforcement Learning\n\n\n\n\n\n\n\n\n\n\n23\nFriday Nov 22\npolyhedral part 1\n\n\n\n\n24\nTuesday Nov 26\nPolyhedral part 2 + reading\n\n\n\n\n\nLeader: Michael Maurer Energy-Aware Tile Size Selection for Affine Programs on GPUs\n\n\n\n\n\n\n\n\n\n\nNov 29\nThanksgiving\n\n\n\n\n\n26\nTuesday Dec 3\ntypic + reading\n\n\n\n\n\nLeader: Matin Raayai: Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers\n\n\n\n\n\n\n\n\n\n\n27\nFriday Dec 6\nai in compilers\n\n\n\n\n\nPapers\n\nTVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen) paper\nleader: SLaDe: A Portable Small Language Model Decompiler for Optimized Assembly\nLeader:ACPO: AI-Enabled Compiler-Driven Program Optimization\nleader: Adaptive Online Context-Sensitive Inlining\nleader: Threaded Code Variations and Optimizations\nleader:Learning Compiler Pass Orders using Coreset and Normalized Value Prediction\nleader: Learning to Optimize Tensor Programs\nleader: End-to-end Deep Learning of Optimization Heuristics\nleader: Compiler Fuzzing through Deep Learning\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Weekly Schedule"
@@ -5384,6 +5594,19 @@
     ]
   },
   {
+    "objectID": "blogs/matin/2024-09-28-HW2.html",
+    "href": "blogs/matin/2024-09-28-HW2.html",
+    "title": "Homework 2: Trivial Dead Code Elimination and Local Value Numbering Passes",
+    "section": "",
+    "text": "Part 1: Trivial Dead Code Elimination\nThe first part of homework 2 is implemented under the examples/tdce_matin.py file in my BRIL fork. It consists of two function passes that are run in the following order: 1. A pass which iteratively detects unused variables across the entire function and removes them. 2. A local version of the pass, which removes any re-definitions of a variable.\nThe test folder under examples/test/tdce under my BRIL fork contains the turnt script and test cases to test my TDCE implementation.\n\n\nPart 2: Local Value Numbering\nThe second part of homework 2 is implemented under the examples/lvn_matin.py file in my BRIL fork. It implements the vanilla LVN algorithm with support for renaming re-assigned variables.\nSimilar to TDCE, I updated the test folder under examples/test/lvn in my BRIL fork to run my LVN implementation with the existing test cases. As my implementation does not support constant folding and identity propogation, I had to update the expected result of some of the tests.\n\n\nCorrectness Evidence\nBesides the passing tests, I applied both my passes to the fizzbuzz benchmark in BRIL and found a decrease in the number of instructions executed as well as no change in the output of the benchmark, futher demonstrating the correctness of the implementation:\n\nWithout LVN + TDCE:\n\nbril2json &lt; ../benchmarks/core/fizz-buzz.bril | brili 10 -p\n1\n2\n-2\n4\n-3\n-2\n7\n8\n-2\ntotal_dyn_inst: 332\n\nWith LVN + TDCE:\n\nbril2json &lt; ../benchmarks/core/fizz-buzz.bril | python3 lvn_matin.py |\n python3 tdce_matin.py | brili 10 -p\n1\n2\n-2\n4\n-3\n-2\n7\n8\n-2\ntotal_dyn_inst: 278\n\n\nChallenges\nOverall, I found the hard part being working with BRIL.\n\n\n\n\n Back to top",
+    "crumbs": [
+      "EECS 7398",
+      "Blogs",
+      "Matin",
+      "Homework 2: Trivial Dead Code Elimination and Local Value Numbering Passes"
+    ]
+  },
+  {
     "objectID": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html",
     "href": "blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html",
     "title": "Homework1 - Yashaswini",
@@ -5671,14 +5894,28 @@
     "href": "lectures/revealjs_llvm.qmd.html#how-to-build-this",
     "title": "using llvm",
     "section": "how to build this",
-    "text": "how to build this\n~/llvm/llvm-pass-skeleton$ mkdir build\ncd build \n cmake ..\n   ...\n-- Registering SkeletonPass as a pass plugin (static build: OFF)\n-- Configuring done\n-- Generating done\n-- Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build\nThis generates build/skeleton/SkeletonPass.so\nto run this\nclang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp\nto make this easier to use you might create a bash script or a makefile"
+    "text": "how to build this\n~/llvm/llvm-pass-skeleton$ mkdir build\ncd build \n cmake ..\n\n– Registering SkeletonPass as a pass plugin (static build: OFF) – Configuring done – Generating done – Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build\n\nThis generates build/skeleton/SkeletonPass.so\n\nto run this \n\nclang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp\n\ncreates a.out and prints out info from the pass\n\n\nto make this easier to use you might create a bash script or a makefile \n\n## look at the post on containers \n\n## getting more info \n\nSome helpfull llvm operations\n\nerrs() &lt;&lt; “function Body:”; errs() &lt;&lt; F &lt;&lt; ‘“;’\n\noutput\nI saw a function called main! function Body: ; Function Attrs: noinline nounwind optnone uwtable define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 { %3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6 }\n\n## entering containers \nPreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) { for (auto &F : M) { errs() &lt;&lt; “I saw a function called” &lt;&lt; F.getName() &lt;&lt; “!”; for (auto &B : F) { errs() &lt;&lt; “starting block”; errs() &lt;&lt; B &lt;&lt; “”; for (auto &I : B) { errs() &lt;&lt; “instr:” &lt;&lt; I &lt;&lt; “”; } }; }; return PreservedAnalyses::all(); };\n\nI saw a function called main! starting block\n%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6\ninstr: %3 = alloca i32, align 4 instr: %4 = alloca i32, align 4 instr: %5 = alloca i8, align 8 instr: store i32 0, i32* %3, align 4 instr: store i32 %0, i32* %4, align 4 instr: store i8 %1, i8*** %5, align 8 instr: %6 = load i32, i32* %4, align 4 instr: ret i32 %6\n\n\n## modify the program \n\nfind the first binary operator and change it to a multiply\n\n#// temp.c int main(int argc, char **argv) { return argc + 5; }\n\n``` PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM)\n        {\n            for (auto &F : M)\n            {\n                errs() &lt;&lt; \"I saw a function called \" &lt;&lt; F.getName() &lt;&lt; \"!\\n\";\n                for (auto &B : F)\n                {\n                    for (auto &I : B)\n                    {\n                        if (isa&lt;BinaryOperator&gt;(&I))\n                        {\n                            errs() &lt;&lt; \"instr:\" &lt;&lt; I &lt;&lt; \"\\n\";\n                        }\n                        auto *op = dyn_cast&lt;BinaryOperator&gt;(&I);\n                        errs() &lt;&lt; \"from_op:\" &lt;&lt; op &lt;&lt; \"\\n\";\n                    }\n                };\n            };\n            return PreservedAnalyses::all();\n        }\n   \noutput\nI saw a function called main!\nI saw a function called main!\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\ninstr:  %7 = add nsw i32 %6, 5\nfrom_op:0xb58610\nfrom_op:0x0"
   },
   {
-    "objectID": "lectures/revealjs_llvm.qmd.html#getting-more-info",
-    "href": "lectures/revealjs_llvm.qmd.html#getting-more-info",
+    "objectID": "lectures/revealjs_llvm.qmd.html#testing",
+    "href": "lectures/revealjs_llvm.qmd.html#testing",
     "title": "using llvm",
-    "section": "getting more info",
-    "text": "getting more info"
+    "section": "testing",
+    "text": "testing\n\nisa(V) true of V is a agument\ncast(V) casts to Argument, assert falure of not Argument\ndyn_cast(V) casts to Argument returns NULL if not an argument"
+  },
+  {
+    "objectID": "lectures/revealjs_llvm.qmd.html#irbuilder",
+    "href": "lectures/revealjs_llvm.qmd.html#irbuilder",
+    "title": "using llvm",
+    "section": "irbuilder",
+    "text": "irbuilder\n\n errs() &lt;&lt; \"I saw a function called \" &lt;&lt; F.getName() &lt;&lt; \"!\\n\";\n                for (auto &B : F)\n                {\n                    errs() &lt;&lt; B &lt;&lt; \"\\n\";\n\n                    for (auto &I : B)\n                    {\n                        if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&I))\n                        {\n                            errs() &lt;&lt; \"old inst \" &lt;&lt; *op &lt;&lt; \"\\n\";\n                            IRBuilder&lt;&gt; builder(op);\n                            Value *left = op-&gt;getOperand(0);  // first operand\n                            Value *right = op-&gt;getOperand(1); // second operad\n                            Value *mul = builder.CreateMul(left, right);\n\n                            errs() &lt;&lt; \"new inst:\" &lt;&lt; *mul &lt;&lt; \"\\n\";\n\n                            errs() &lt;&lt; B &lt;&lt; \"\\n\";\n\n                            // replace uses of op with mul\n                            for (auto &U : op-&gt;uses())\n                            {\n                                int num = U.getOperandNo(); // which argument\n                                User *user = U.getUser();   // the instruction with the use\n                                errs() &lt;&lt; \" user:\" &lt;&lt; *user &lt;&lt; \"   \";\n                                user-&gt;setOperand(num, mul);\n                                errs() &lt;&lt; *user &lt;&lt; \"\\n\";\n                            }\n                        }\n                    }\n                }\n            };\n \n             return PreservedAnalyses::none();\noutput\nI saw a function called main!\n%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = add nsw i32 %6, 5 ret i32 %7\nold inst %7 = add nsw i32 %6, 5 new inst: %7 = mul i32 %6, 5\n%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = mul i32 %6, 5 %8 = add nsw i32 %6, 5 ret i32 %8\nuser: ret i32 %8 ret i32 %7\n```"
+  },
+  {
+    "objectID": "lectures/revealjs_llvm.qmd.html#more-complex-transforms---for-instrumentation",
+    "href": "lectures/revealjs_llvm.qmd.html#more-complex-transforms---for-instrumentation",
+    "title": "using llvm",
+    "section": "more complex transforms - for instrumentation",
+    "text": "more complex transforms - for instrumentation\ninstrumentation code in c not using builder\ninsert calls to functions and link them in\nalso"
   },
   {
     "objectID": "lectures/llvm.html",
@@ -5805,7 +6042,7 @@
     "href": "lectures/llvm.html#how-to-build-this",
     "title": "using llvm",
     "section": "how to build this",
-    "text": "how to build this\n~/llvm/llvm-pass-skeleton$ mkdir build\ncd build \n cmake ..\n   ...\n-- Registering SkeletonPass as a pass plugin (static build: OFF)\n-- Configuring done\n-- Generating done\n-- Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build\nThis generates build/skeleton/SkeletonPass.so\nto run this\nclang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp\nto make this easier to use you might create a bash script or a makefile",
+    "text": "how to build this\n~/llvm/llvm-pass-skeleton$ mkdir build\ncd build \n cmake ..\n\n– Registering SkeletonPass as a pass plugin (static build: OFF) – Configuring done – Generating done – Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build\n\nThis generates build/skeleton/SkeletonPass.so\n\nto run this \n\nclang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp\n\ncreates a.out and prints out info from the pass\n\n\nto make this easier to use you might create a bash script or a makefile \n\n## look at the post on containers \n\n## getting more info \n\nSome helpfull llvm operations\n\nerrs() &lt;&lt; “function Body:”; errs() &lt;&lt; F &lt;&lt; ‘“;’\n\noutput\nI saw a function called main! function Body: ; Function Attrs: noinline nounwind optnone uwtable define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 { %3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6 }\n\n## entering containers \nPreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) { for (auto &F : M) { errs() &lt;&lt; “I saw a function called” &lt;&lt; F.getName() &lt;&lt; “!”; for (auto &B : F) { errs() &lt;&lt; “starting block”; errs() &lt;&lt; B &lt;&lt; “”; for (auto &I : B) { errs() &lt;&lt; “instr:” &lt;&lt; I &lt;&lt; “”; } }; }; return PreservedAnalyses::all(); };\n\nI saw a function called main! starting block\n%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6\ninstr: %3 = alloca i32, align 4 instr: %4 = alloca i32, align 4 instr: %5 = alloca i8, align 8 instr: store i32 0, i32* %3, align 4 instr: store i32 %0, i32* %4, align 4 instr: store i8 %1, i8*** %5, align 8 instr: %6 = load i32, i32* %4, align 4 instr: ret i32 %6\n\n\n## modify the program \n\nfind the first binary operator and change it to a multiply\n\n#// temp.c int main(int argc, char **argv) { return argc + 5; }\n\n``` PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM)\n        {\n            for (auto &F : M)\n            {\n                errs() &lt;&lt; \"I saw a function called \" &lt;&lt; F.getName() &lt;&lt; \"!\\n\";\n                for (auto &B : F)\n                {\n                    for (auto &I : B)\n                    {\n                        if (isa&lt;BinaryOperator&gt;(&I))\n                        {\n                            errs() &lt;&lt; \"instr:\" &lt;&lt; I &lt;&lt; \"\\n\";\n                        }\n                        auto *op = dyn_cast&lt;BinaryOperator&gt;(&I);\n                        errs() &lt;&lt; \"from_op:\" &lt;&lt; op &lt;&lt; \"\\n\";\n                    }\n                };\n            };\n            return PreservedAnalyses::all();\n        }\n   \noutput\nI saw a function called main!\nI saw a function called main!\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\nfrom_op:0x0\ninstr:  %7 = add nsw i32 %6, 5\nfrom_op:0xb58610\nfrom_op:0x0",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5813,11 +6050,35 @@
     ]
   },
   {
-    "objectID": "lectures/llvm.html#getting-more-info",
-    "href": "lectures/llvm.html#getting-more-info",
+    "objectID": "lectures/llvm.html#testing",
+    "href": "lectures/llvm.html#testing",
     "title": "using llvm",
-    "section": "getting more info",
-    "text": "getting more info",
+    "section": "testing",
+    "text": "testing\n\nisa(V) true of V is a agument\ncast(V) casts to Argument, assert falure of not Argument\ndyn_cast(V) casts to Argument returns NULL if not an argument",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "using llvm"
+    ]
+  },
+  {
+    "objectID": "lectures/llvm.html#irbuilder",
+    "href": "lectures/llvm.html#irbuilder",
+    "title": "using llvm",
+    "section": "irbuilder",
+    "text": "irbuilder\n\n errs() &lt;&lt; \"I saw a function called \" &lt;&lt; F.getName() &lt;&lt; \"!\\n\";\n                for (auto &B : F)\n                {\n                    errs() &lt;&lt; B &lt;&lt; \"\\n\";\n\n                    for (auto &I : B)\n                    {\n                        if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&I))\n                        {\n                            errs() &lt;&lt; \"old inst \" &lt;&lt; *op &lt;&lt; \"\\n\";\n                            IRBuilder&lt;&gt; builder(op);\n                            Value *left = op-&gt;getOperand(0);  // first operand\n                            Value *right = op-&gt;getOperand(1); // second operad\n                            Value *mul = builder.CreateMul(left, right);\n\n                            errs() &lt;&lt; \"new inst:\" &lt;&lt; *mul &lt;&lt; \"\\n\";\n\n                            errs() &lt;&lt; B &lt;&lt; \"\\n\";\n\n                            // replace uses of op with mul\n                            for (auto &U : op-&gt;uses())\n                            {\n                                int num = U.getOperandNo(); // which argument\n                                User *user = U.getUser();   // the instruction with the use\n                                errs() &lt;&lt; \" user:\" &lt;&lt; *user &lt;&lt; \"   \";\n                                user-&gt;setOperand(num, mul);\n                                errs() &lt;&lt; *user &lt;&lt; \"\\n\";\n                            }\n                        }\n                    }\n                }\n            };\n \n             return PreservedAnalyses::none();\noutput\nI saw a function called main!\n%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = add nsw i32 %6, 5 ret i32 %7\nold inst %7 = add nsw i32 %6, 5 new inst: %7 = mul i32 %6, 5\n%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8 %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = mul i32 %6, 5 %8 = add nsw i32 %6, 5 ret i32 %8\nuser: ret i32 %8 ret i32 %7\n```",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "using llvm"
+    ]
+  },
+  {
+    "objectID": "lectures/llvm.html#more-complex-transforms---for-instrumentation",
+    "href": "lectures/llvm.html#more-complex-transforms---for-instrumentation",
+    "title": "using llvm",
+    "section": "more complex transforms - for instrumentation",
+    "text": "more complex transforms - for instrumentation\ninstrumentation code in c not using builder\ninsert calls to functions and link them in\nalso",
     "crumbs": [
       "EECS 7398",
       "Lectures",

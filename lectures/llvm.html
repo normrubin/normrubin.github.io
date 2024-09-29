@@ -372,57 +372,153 @@ llvmGetPassPluginInfo() {
 <pre><code>~/llvm/llvm-pass-skeleton$ mkdir build
 cd build 
  cmake ..
-   ...
--- Registering SkeletonPass as a pass plugin (static build: OFF)
--- Configuring done
--- Generating done
--- Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build</code></pre>
-<p>This generates build/skeleton/SkeletonPass.so</p>
-<p>to run this</p>
-<p>clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp</p>
-<p>to make this easier to use you might create a bash script or a makefile</p>
+</code></pre>
+<p>– Registering SkeletonPass as a pass plugin (static build: OFF) – Configuring done – Generating done – Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build</p>
+<pre><code>
+This generates build/skeleton/SkeletonPass.so
+
+to run this 
+
+clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp
+
+creates a.out and prints out info from the pass
+
+
+to make this easier to use you might create a bash script or a makefile 
+
+## look at the post on containers 
+
+## getting more info 
+
+Some helpfull llvm operations
+</code></pre>
+<p>errs() &lt;&lt; “function Body:”; errs() &lt;&lt; F &lt;&lt; ‘“;’</p>
+<pre><code>
+output</code></pre>
+<p>I saw a function called main! function Body: ; Function Attrs: noinline nounwind optnone uwtable define dso_local i32 <span class="citation" data-cites="main">@main</span>(i32 noundef %0, i8** noundef %1) #0 { %3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6 }</p>
+<pre><code>
+## entering containers </code></pre>
+<p>PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM) { for (auto &amp;F : M) { errs() &lt;&lt; “I saw a function called” &lt;&lt; F.getName() &lt;&lt; “!”; for (auto &amp;B : F) { errs() &lt;&lt; “starting block”; errs() &lt;&lt; B &lt;&lt; “”; for (auto &amp;I : B) { errs() &lt;&lt; “instr:” &lt;&lt; I &lt;&lt; “”; } }; }; return PreservedAnalyses::all(); };</p>
+<pre><code></code></pre>
+<p>I saw a function called main! starting block</p>
+<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6</p>
+<p>instr: %3 = alloca i32, align 4 instr: %4 = alloca i32, align 4 instr: %5 = alloca i8<strong>, align 8 instr: store i32 0, i32* %3, align 4 instr: store i32 %0, i32* %4, align 4 instr: store i8</strong> %1, i8*** %5, align 8 instr: %6 = load i32, i32* %4, align 4 instr: ret i32 %6</p>
+<pre><code>
+
+## modify the program 
+
+find the first binary operator and change it to a multiply
+</code></pre>
+<p>#// temp.c int main(int argc, char **argv) { return argc + 5; }</p>
+<pre><code>
+``` PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM)
+        {
+            for (auto &amp;F : M)
+            {
+                errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
+                for (auto &amp;B : F)
+                {
+                    for (auto &amp;I : B)
+                    {
+                        if (isa&lt;BinaryOperator&gt;(&amp;I))
+                        {
+                            errs() &lt;&lt; "instr:" &lt;&lt; I &lt;&lt; "\n";
+                        }
+                        auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I);
+                        errs() &lt;&lt; "from_op:" &lt;&lt; op &lt;&lt; "\n";
+                    }
+                };
+            };
+            return PreservedAnalyses::all();
+        }
+   </code></pre>
+<p>output</p>
+<pre><code>I saw a function called main!
+I saw a function called main!
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+instr:  %7 = add nsw i32 %6, 5
+from_op:0xb58610
+from_op:0x0</code></pre>
 </section>
-<section id="getting-more-info" class="level2">
-<h2 class="anchored" data-anchor-id="getting-more-info">getting more info</h2>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">testing</h2>
+<ol type="1">
+<li>isa<argument>(V) true of V is a agument</argument></li>
+<li>cast<argument>(V) casts to Argument, assert falure of not Argument</argument></li>
+<li>dyn_cast<argument>(V) casts to Argument returns NULL if not an argument</argument></li>
+</ol>
 </section>
+<section id="irbuilder" class="level2">
+<h2 class="anchored" data-anchor-id="irbuilder">irbuilder</h2>
+<pre><code>
+ errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
+                for (auto &amp;B : F)
+                {
+                    errs() &lt;&lt; B &lt;&lt; "\n";
+
+                    for (auto &amp;I : B)
+                    {
+                        if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I))
+                        {
+                            errs() &lt;&lt; "old inst " &lt;&lt; *op &lt;&lt; "\n";
+                            IRBuilder&lt;&gt; builder(op);
+                            Value *left = op-&gt;getOperand(0);  // first operand
+                            Value *right = op-&gt;getOperand(1); // second operad
+                            Value *mul = builder.CreateMul(left, right);
+
+                            errs() &lt;&lt; "new inst:" &lt;&lt; *mul &lt;&lt; "\n";
+
+                            errs() &lt;&lt; B &lt;&lt; "\n";
+
+                            // replace uses of op with mul
+                            for (auto &amp;U : op-&gt;uses())
+                            {
+                                int num = U.getOperandNo(); // which argument
+                                User *user = U.getUser();   // the instruction with the use
+                                errs() &lt;&lt; " user:" &lt;&lt; *user &lt;&lt; "   ";
+                                user-&gt;setOperand(num, mul);
+                                errs() &lt;&lt; *user &lt;&lt; "\n";
+                            }
+                        }
+                    }
+                }
+            };
+ 
+             return PreservedAnalyses::none();</code></pre>
+<p>output</p>
+<p>I saw a function called main!</p>
+<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = add nsw i32 %6, 5 ret i32 %7</p>
+<p>old inst %7 = add nsw i32 %6, 5 new inst: %7 = mul i32 %6, 5</p>
+<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = mul i32 %6, 5 %8 = add nsw i32 %6, 5 ret i32 %8</p>
+<p>user: ret i32 %8 ret i32 %7</p>
+<p>```</p>
 </section>
-<section id="outs-i.getoperand0-prints-an-instruction" class="level1">
-<h1>outs() &lt;&lt; *(I.getOperand(0)) ; prints an instruction</h1>
+<section id="more-complex-transforms---for-instrumentation" class="level2">
+<h2 class="anchored" data-anchor-id="more-complex-transforms---for-instrumentation">more complex transforms - for instrumentation</h2>
+<p>instrumentation code in c not using builder</p>
+<p>insert calls to functions and link them in</p>
+<p>also</p>
+</section>
 </section>
 <section id="section" class="level1">
-<h1></h1>
-</section>
-<section id="markdown" class="level1">
-<h1>%% [markdown]</h1>
-</section>
-<section id="given-a-value-v-what-kind-of-thing-is-v" class="level1">
-<h1>Given a Value* V, what kind of thing is V?</h1>
-</section>
-<section id="section-1" class="level1">
-<h1></h1>
-</section>
-<section id="isav-true-of-v-is-a-agument" class="level1">
-<h1>1) isa<argument>(V) true of V is a agument</argument></h1>
-</section>
-<section id="castv-casts-to-argument-assert-falure-of-not-argument" class="level1">
-<h1>1) cast<argument>(V) casts to Argument, assert falure of not Argument</argument></h1>
-</section>
-<section id="dyn_castv-casts-to-argument-returns-null-if-not-an-argument" class="level1">
-<h1>1) dyn_cast<argument>(V) casts to Argument returns NULL if not an argument</argument></h1>
-</section>
-<section id="section-2" class="level1">
 <h1></h1>
 </section>
 <section id="c-static-bool-isloopinvariantconst-value-v-const-loop-l-if-isaconstantv-isaargumentv-isaglobalvaluev-return-true-otherwise-it-must-be-an-instruction-return-l-containscastinstructionv-getparent" class="level1">
 <h1><code>(C++) # Static bool isLoopInvariant(const Value *V, const Loop *L) {  #     if (isa&lt;Constant&gt;(V) || isa&lt;Argument&gt;(V) || isa&lt;GlobalValue&lt;(V)) { #          return true; }  #     //otherwise it must be an instruction…     #     return !L-&gt;contains(cast&lt;Instruction&gt;(V)-&gt;getParent()); #      …  # } #</code></h1>
 </section>
-<section id="markdown-1" class="level1">
+<section id="markdown" class="level1">
 <h1>%% [markdown]</h1>
 </section>
 <section id="navigating-llvm-ir---it-containers" class="level1">
 <h1>Navigating llvm IR - IT Containers</h1>
 </section>
-<section id="section-3" class="level1">
+<section id="section-1" class="level1">
 <h1></h1>
 </section>
 <section id="module---two-way-linked-list-of-functions" class="level1">
@@ -434,142 +530,142 @@ cd build
 <section id="basic-block---two-way-linked-list-of-instructions" class="level1">
 <h1>1) Basic Block - two way linked list of Instructions</h1>
 </section>
-<section id="markdown-2" class="level1">
+<section id="markdown-1" class="level1">
 <h1>%% [markdown]</h1>
 </section>
 <section id="add-i32-42" class="level1">
 <h1>%5 = add i32 %4,2</h1>
 </section>
-<section id="section-4" class="level1">
+<section id="section-2" class="level1">
 <h1></h1>
 </section>
 <section id="this-instruction-adds-two-32-bit-ints-input-is-in-register-4-and-the-constant-2-result-goes-into-register-5" class="level1">
 <h1>this instruction adds two 32 bit ints, input is in register %4 and the constant 2, result goes into register %5</h1>
 </section>
-<section id="section-5" class="level1">
+<section id="section-3" class="level1">
 <h1></h1>
 </section>
-<section id="markdown-3" class="level1">
+<section id="markdown-2" class="level1">
 <h1>%% [markdown]</h1>
 </section>
 <section id="blog-post-why-would-a-grad-student-care-about-llvm" class="level1">
 <h1>blog post: <a href="https://www.cs.cornell.edu/~asampson/blog/llvm.html">Why would a grad student care about llvm</a></h1>
 </section>
-<section id="section-6" class="level1">
+<section id="section-4" class="level1">
 <h1>%%</h1>
 </section>
-<section id="section-7" class="level1">
+<section id="section-5" class="level1">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’rm -r llvm-pass-skeleton/clone https://github.com/sampsyo/llvm-pass-skeleton.gitllvm-pass-skeleton/-p build build ..# look at llvm-pass-skeleton/skeleton/Skeleton.cpp’)</p>
 </section>
-<section id="markdown-4" class="level1">
+<section id="markdown-3" class="level1">
 <h1>%% [markdown]</h1>
 </section>
 <section id="the-function-returns-preservedanalysesall-to-indicate-that-it-didnt-modify-m.-later-when-we-actually-transform-the-program-well-need-to-return-something-like-preservedanalysesnone." class="level1">
 <h1>The function returns PreservedAnalyses::all() to indicate that it didn’t modify M. Later, when we actually transform the program, we’ll need to return something like PreservedAnalyses::none().</h1>
 </section>
-<section id="section-8" class="level1">
+<section id="section-6" class="level1">
 <h1></h1>
 </section>
 <section id="the-moduleanalysismanager-is-responsible-for-managing-the-analysis-results-for-module-passes." class="level1">
 <h1>The ModuleAnalysisManager is responsible for managing the analysis results for Module passes.</h1>
 </section>
-<section id="section-9" class="level1">
+<section id="section-7" class="level1">
 <h1></h1>
 </section>
 <section id="when-a-pass-requests-an-analysis-the-moduleanalysismanager-checks-if-the-analysis-result-is-already-available.-if-it-is-the-moduleanalysismanager-returns-the-cached-result.-if-its-not-the-moduleanalysismanager-runs-the-analysis-pass-caches-the-result-and-then-returns-it." class="level1">
 <h1>When a pass requests an analysis, the ModuleAnalysisManager checks if the analysis result is already available. If it is, the ModuleAnalysisManager returns the cached result. If it’s not, the ModuleAnalysisManager runs the analysis pass, caches the result, and then returns it.</h1>
 </section>
-<section id="section-10" class="level1">
+<section id="section-8" class="level1">
 <h1></h1>
 </section>
 <section id="this-allows-llvm-to-avoid-recomputing-analysis-results-unnecessarily-which-can-significantly-improve-the-performance-of-the-compiler." class="level1">
 <h1>This allows LLVM to avoid recomputing analysis results unnecessarily, which can significantly improve the performance of the compiler.</h1>
 </section>
-<section id="section-11" class="level1">
+<section id="section-9" class="level1">
 <h1></h1>
 </section>
 <section id="heres-an-example-of-how-you-might-use-it" class="level1">
 <h1>Here’s an example of how you might use it:</h1>
 </section>
-<section id="section-12" class="level1">
+<section id="section-10" class="level1">
 <h1></h1>
 </section>
 <section id="preservedanalyses-mypassrunmodule-m-moduleanalysismanager-mam-request-an-analysis-result.-const-auto-result-mam.getresultsomeanalysism-use-the-analysis-result.-...-return-preservedanalysesall" class="level1">
 <h1><code># PreservedAnalyses MyPass::run(Module &amp;M, ModuleAnalysisManager &amp;MAM) { #     // Request an analysis result. #     const auto &amp;Result = MAM.getResult&lt;SomeAnalysis&gt;(M); #  #     // Use the analysis result. #     // ... #  #     return PreservedAnalyses::all(); # } #</code></h1>
 </section>
-<section id="section-13" class="level1">
+<section id="section-11" class="level1">
 <h1></h1>
 </section>
 <section id="here-is-a-second-example-getting-the-dominator-tree" class="level1">
 <h1>Here is a second example getting the dominator tree</h1>
 </section>
-<section id="section-14" class="level1">
+<section id="section-12" class="level1">
 <h1></h1>
 </section>
-<section id="section-15" class="level1">
+<section id="section-13" class="level1">
 <h1></h1>
 </section>
 <section id="preservedanalyses-runmodule-m-moduleanalysismanager-mam-get-the-functionanalysismanager.-functionanalysismanager-fam-mam.getresultfunctionanalysismanagermoduleproxym.getmanager-for-function-f-m-skip-external-functions.-if-f.isdeclaration-continue-request-the-dominator-tree-of-the-function.-const-dominatortree-dt-fam.getresultdominatortreeanalysisf-use-the-dominator-tree.-...-return-preservedanalysesall" class="level1">
 <h1><code>#     PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;MAM) { #         // Get the FunctionAnalysisManager. #         FunctionAnalysisManager &amp;FAM = MAM.getResult&lt;FunctionAnalysisManagerModuleProxy&gt;(M).getManager(); #  #         for (Function &amp;F : M) { #             // Skip external functions. #             if (F.isDeclaration()) continue; #  #             // Request the dominator tree of the function. #             const DominatorTree &amp;DT = FAM.getResult&lt;DominatorTreeAnalysis&gt;(F); #  #             // Use the dominator tree. #             // ... #         } #  #         return PreservedAnalyses::all(); #     } #</code></h1>
 </section>
-<section id="markdown-5" class="level1">
+<section id="markdown-4" class="level1">
 <h1>%% [markdown]</h1>
 </section>
 <section id="now-let-look-at-the-containers" class="level1">
 <h1>now let look at the containers</h1>
 </section>
-<section id="section-16" class="level1">
+<section id="section-14" class="level1">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’rm -r llvm-pass-skeleton/clone -b containers https://github.com/sampsyo/llvm-pass-skeleton.gitllvm-pass-skeleton/-p build build ..’)</p>
 </section>
-<section id="section-17" class="level1">
+<section id="section-15" class="level1">
 <h1>%%</h1>
 </section>
 <section id="run-the-plugin" class="level1">
 <h1>run the plugin</h1>
 </section>
-<section id="section-18" class="level1">
+<section id="section-16" class="level1">
 <h1></h1>
 <p>get_ipython().system(‘clang -fpass-plugin=<code>echo llvm-pass-skeleton/build/skeleton/SkeletonPass.so</code> temp.c’)</p>
 </section>
-<section id="section-19" class="level1">
+<section id="section-17" class="level1">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘writefile’, ‘temp1.c’, ‘int main(int argc, char** argv){if (argc &gt;2 )return argc;return 0;}’)</p>
 </section>
-<section id="section-20" class="level1">
+<section id="section-18" class="level1">
 <h1>%%</h1>
 <p>get_ipython().system(‘clang -fpass-plugin=<code>echo llvm-pass-skeleton/build/skeleton/SkeletonPass.*</code> temp1.c’)</p>
 </section>
-<section id="markdown-6" class="level1">
+<section id="markdown-5" class="level1">
 <h1>%% [markdown]</h1>
 </section>
-<section id="section-21" class="level1">
+<section id="section-19" class="level1">
 <h1><embed src="dot.pdf" class="img-fluid"></h1>
 </section>
-<section id="markdown-7" class="level1">
+<section id="markdown-6" class="level1">
 <h1>%% [markdown]</h1>
 </section>
 <section id="using-irbuilder-is-a-mess-so-im-going-to-show-a-trick-that-makes-it-much-simpler" class="level1">
 <h1>using IRBuilder is a mess, So I’m going to show a trick that makes it much simpler</h1>
 </section>
-<section id="section-22" class="level1">
+<section id="section-20" class="level1">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’rm -r llvm-pass-skeleton/clone -b rtlib https://github.com/sampsyo/llvm-pass-skeleton.gitllvm-pass-skeleton/-p build build ..’)</p>
 </section>
-<section id="section-23" class="level1">
+<section id="section-21" class="level1">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’cat ls ~/llvm/llvm-pass-skeleton/skeleton/Skeleton.cpp done’)</p>
 </section>
-<section id="section-24" class="level1">
+<section id="section-22" class="level1">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’cat /home/norm/llvm/llvm-pass-skeleton/rtlib.c’)</p>
 </section>
-<section id="section-25" class="level1">
+<section id="section-23" class="level1">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘writefile’, ‘llvm-pass-skeleton/test_r.cpp’, ‘#include &lt;stdio.h&gt;main (int argc, char** argv) {printf(“%d %d”, argc, (argc + 2) * (argc +3));}’)</p>
 </section>
-<section id="section-26" class="level1">
+<section id="section-24" class="level1">
 <h1>%%</h1>
 <p>bash cd llvm-pass-skeleton cc -c rtlib.c clang -fpass-plugin=build/skeleton/SkeletonPass.so -c test_r.cpp cc test_r.o rtlib.o ./a.out 1 2 3 4 echo</p>
 

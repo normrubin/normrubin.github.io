@@ -639,60 +639,140 @@ llvmGetPassPluginInfo() {
 <pre><code>~/llvm/llvm-pass-skeleton$ mkdir build
 cd build 
  cmake ..
-   ...
--- Registering SkeletonPass as a pass plugin (static build: OFF)
--- Configuring done
--- Generating done
--- Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build</code></pre>
-<p>This generates build/skeleton/SkeletonPass.so</p>
-<p>to run this</p>
-<p>clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp</p>
-<p>to make this easier to use you might create a bash script or a makefile</p>
+</code></pre>
+<p>– Registering SkeletonPass as a pass plugin (static build: OFF) – Configuring done – Generating done – Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build</p>
+<pre><code>
+This generates build/skeleton/SkeletonPass.so
+
+to run this 
+
+clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp
+
+creates a.out and prints out info from the pass
+
+
+to make this easier to use you might create a bash script or a makefile 
+
+## look at the post on containers 
+
+## getting more info 
+
+Some helpfull llvm operations
+</code></pre>
+<p>errs() &lt;&lt; “function Body:”; errs() &lt;&lt; F &lt;&lt; ‘“;’</p>
+<pre><code>
+output</code></pre>
+<p>I saw a function called main! function Body: ; Function Attrs: noinline nounwind optnone uwtable define dso_local i32 <span class="citation" data-cites="main">@main</span>(i32 noundef %0, i8** noundef %1) #0 { %3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6 }</p>
+<pre><code>
+## entering containers </code></pre>
+<p>PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM) { for (auto &amp;F : M) { errs() &lt;&lt; “I saw a function called” &lt;&lt; F.getName() &lt;&lt; “!”; for (auto &amp;B : F) { errs() &lt;&lt; “starting block”; errs() &lt;&lt; B &lt;&lt; “”; for (auto &amp;I : B) { errs() &lt;&lt; “instr:” &lt;&lt; I &lt;&lt; “”; } }; }; return PreservedAnalyses::all(); };</p>
+<pre><code></code></pre>
+<p>I saw a function called main! starting block</p>
+<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6</p>
+<p>instr: %3 = alloca i32, align 4 instr: %4 = alloca i32, align 4 instr: %5 = alloca i8<strong>, align 8 instr: store i32 0, i32* %3, align 4 instr: store i32 %0, i32* %4, align 4 instr: store i8</strong> %1, i8*** %5, align 8 instr: %6 = load i32, i32* %4, align 4 instr: ret i32 %6</p>
+<pre><code>
+
+## modify the program 
+
+find the first binary operator and change it to a multiply
+</code></pre>
+<p>#// temp.c int main(int argc, char **argv) { return argc + 5; }</p>
+<pre><code>
+``` PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM)
+        {
+            for (auto &amp;F : M)
+            {
+                errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
+                for (auto &amp;B : F)
+                {
+                    for (auto &amp;I : B)
+                    {
+                        if (isa&lt;BinaryOperator&gt;(&amp;I))
+                        {
+                            errs() &lt;&lt; "instr:" &lt;&lt; I &lt;&lt; "\n";
+                        }
+                        auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I);
+                        errs() &lt;&lt; "from_op:" &lt;&lt; op &lt;&lt; "\n";
+                    }
+                };
+            };
+            return PreservedAnalyses::all();
+        }
+   </code></pre>
+<p>output</p>
+<pre><code>I saw a function called main!
+I saw a function called main!
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+instr:  %7 = add nsw i32 %6, 5
+from_op:0xb58610
+from_op:0x0</code></pre>
 </section>
-<section id="getting-more-info" class="slide level2">
-<h2>getting more info</h2>
+<section id="testing" class="slide level2 scrollable">
+<h2>testing</h2>
+<ol type="1">
+<li>isa<argument>(V) true of V is a agument</argument></li>
+<li>cast<argument>(V) casts to Argument, assert falure of not Argument</argument></li>
+<li>dyn_cast<argument>(V) casts to Argument returns NULL if not an argument</argument></li>
+</ol>
+</section>
+<section id="irbuilder" class="slide level2">
+<h2>irbuilder</h2>
+<pre><code>
+ errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
+                for (auto &amp;B : F)
+                {
+                    errs() &lt;&lt; B &lt;&lt; "\n";
+
+                    for (auto &amp;I : B)
+                    {
+                        if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I))
+                        {
+                            errs() &lt;&lt; "old inst " &lt;&lt; *op &lt;&lt; "\n";
+                            IRBuilder&lt;&gt; builder(op);
+                            Value *left = op-&gt;getOperand(0);  // first operand
+                            Value *right = op-&gt;getOperand(1); // second operad
+                            Value *mul = builder.CreateMul(left, right);
+
+                            errs() &lt;&lt; "new inst:" &lt;&lt; *mul &lt;&lt; "\n";
+
+                            errs() &lt;&lt; B &lt;&lt; "\n";
+
+                            // replace uses of op with mul
+                            for (auto &amp;U : op-&gt;uses())
+                            {
+                                int num = U.getOperandNo(); // which argument
+                                User *user = U.getUser();   // the instruction with the use
+                                errs() &lt;&lt; " user:" &lt;&lt; *user &lt;&lt; "   ";
+                                user-&gt;setOperand(num, mul);
+                                errs() &lt;&lt; *user &lt;&lt; "\n";
+                            }
+                        }
+                    }
+                }
+            };
+ 
+             return PreservedAnalyses::none();</code></pre>
+<p>output</p>
+<p>I saw a function called main!</p>
+<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = add nsw i32 %6, 5 ret i32 %7</p>
+<p>old inst %7 = add nsw i32 %6, 5 new inst: %7 = mul i32 %6, 5</p>
+<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = mul i32 %6, 5 %8 = add nsw i32 %6, 5 ret i32 %8</p>
+<p>user: ret i32 %8 ret i32 %7</p>
+<p>```</p>
+</section>
+<section id="more-complex-transforms---for-instrumentation" class="slide level2">
+<h2>more complex transforms - for instrumentation</h2>
+<p>instrumentation code in c not using builder</p>
+<p>insert calls to functions and link them in</p>
+<p>also</p>
 </section></section>
-<section id="outs-i.getoperand0-prints-an-instruction" class="title-slide slide level1 center">
-<h1>outs() &lt;&lt; *(I.getOperand(0)) ; prints an instruction</h1>
-
-</section>
-
 <section id="section" class="title-slide slide level1 center">
-<h1></h1>
-
-</section>
-
-<section id="markdown" class="title-slide slide level1 center">
-<h1>%% [markdown]</h1>
-
-</section>
-
-<section id="given-a-value-v-what-kind-of-thing-is-v" class="title-slide slide level1 center">
-<h1>Given a Value* V, what kind of thing is V?</h1>
-
-</section>
-
-<section id="section-1" class="title-slide slide level1 center">
-<h1></h1>
-
-</section>
-
-<section id="isav-true-of-v-is-a-agument" class="title-slide slide level1 center">
-<h1>1) isa<argument>(V) true of V is a agument</argument></h1>
-
-</section>
-
-<section id="castv-casts-to-argument-assert-falure-of-not-argument" class="title-slide slide level1 center">
-<h1>1) cast<argument>(V) casts to Argument, assert falure of not Argument</argument></h1>
-
-</section>
-
-<section id="dyn_castv-casts-to-argument-returns-null-if-not-an-argument" class="title-slide slide level1 center">
-<h1>1) dyn_cast<argument>(V) casts to Argument returns NULL if not an argument</argument></h1>
-
-</section>
-
-<section id="section-2" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -702,7 +782,7 @@ cd build
 
 </section>
 
-<section id="markdown-1" class="title-slide slide level1 center">
+<section id="markdown" class="title-slide slide level1 center">
 <h1>%% [markdown]</h1>
 
 </section>
@@ -712,7 +792,7 @@ cd build
 
 </section>
 
-<section id="section-3" class="title-slide slide level1 center">
+<section id="section-1" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -732,7 +812,7 @@ cd build
 
 </section>
 
-<section id="markdown-2" class="title-slide slide level1 center">
+<section id="markdown-1" class="title-slide slide level1 center">
 <h1>%% [markdown]</h1>
 
 </section>
@@ -742,7 +822,7 @@ cd build
 
 </section>
 
-<section id="section-4" class="title-slide slide level1 center">
+<section id="section-2" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -752,12 +832,12 @@ cd build
 
 </section>
 
-<section id="section-5" class="title-slide slide level1 center">
+<section id="section-3" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
 
-<section id="markdown-3" class="title-slide slide level1 center">
+<section id="markdown-2" class="title-slide slide level1 center">
 <h1>%% [markdown]</h1>
 
 </section>
@@ -767,17 +847,17 @@ cd build
 
 </section>
 
-<section id="section-6" class="title-slide slide level1 center">
+<section id="section-4" class="title-slide slide level1 center">
 <h1>%%</h1>
 
 </section>
 
-<section id="section-7" class="title-slide slide level1 center">
+<section id="section-5" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’rm -r llvm-pass-skeleton/clone https://github.com/sampsyo/llvm-pass-skeleton.gitllvm-pass-skeleton/-p build build ..# look at llvm-pass-skeleton/skeleton/Skeleton.cpp’)</p>
 </section>
 
-<section id="markdown-4" class="title-slide slide level1 center">
+<section id="markdown-3" class="title-slide slide level1 center">
 <h1>%% [markdown]</h1>
 
 </section>
@@ -787,7 +867,7 @@ cd build
 
 </section>
 
-<section id="section-8" class="title-slide slide level1 center">
+<section id="section-6" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -797,7 +877,7 @@ cd build
 
 </section>
 
-<section id="section-9" class="title-slide slide level1 center">
+<section id="section-7" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -807,7 +887,7 @@ cd build
 
 </section>
 
-<section id="section-10" class="title-slide slide level1 center">
+<section id="section-8" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -817,7 +897,7 @@ cd build
 
 </section>
 
-<section id="section-11" class="title-slide slide level1 center">
+<section id="section-9" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -827,7 +907,7 @@ cd build
 
 </section>
 
-<section id="section-12" class="title-slide slide level1 center">
+<section id="section-10" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -837,7 +917,7 @@ cd build
 
 </section>
 
-<section id="section-13" class="title-slide slide level1 center">
+<section id="section-11" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -847,12 +927,12 @@ cd build
 
 </section>
 
-<section id="section-14" class="title-slide slide level1 center">
+<section id="section-12" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
 
-<section id="section-15" class="title-slide slide level1 center">
+<section id="section-13" class="title-slide slide level1 center">
 <h1></h1>
 
 </section>
@@ -862,7 +942,7 @@ cd build
 
 </section>
 
-<section id="markdown-5" class="title-slide slide level1 center">
+<section id="markdown-4" class="title-slide slide level1 center">
 <h1>%% [markdown]</h1>
 
 </section>
@@ -872,12 +952,12 @@ cd build
 
 </section>
 
-<section id="section-16" class="title-slide slide level1 center">
+<section id="section-14" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’rm -r llvm-pass-skeleton/clone -b containers https://github.com/sampsyo/llvm-pass-skeleton.gitllvm-pass-skeleton/-p build build ..’)</p>
 </section>
 
-<section id="section-17" class="title-slide slide level1 center">
+<section id="section-15" class="title-slide slide level1 center">
 <h1>%%</h1>
 
 </section>
@@ -887,32 +967,32 @@ cd build
 
 </section>
 
-<section id="section-18" class="title-slide slide level1 center">
+<section id="section-16" class="title-slide slide level1 center">
 <h1></h1>
 <p>get_ipython().system(‘clang -fpass-plugin=<code>echo llvm-pass-skeleton/build/skeleton/SkeletonPass.so</code> temp.c’)</p>
 </section>
 
-<section id="section-19" class="title-slide slide level1 center">
+<section id="section-17" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘writefile’, ‘temp1.c’, ‘int main(int argc, char** argv){if (argc &gt;2 )return argc;return 0;}’)</p>
 </section>
 
-<section id="section-20" class="title-slide slide level1 center">
+<section id="section-18" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().system(‘clang -fpass-plugin=<code>echo llvm-pass-skeleton/build/skeleton/SkeletonPass.*</code> temp1.c’)</p>
 </section>
 
-<section id="markdown-6" class="title-slide slide level1 center">
+<section id="markdown-5" class="title-slide slide level1 center">
 <h1>%% [markdown]</h1>
 
 </section>
 
-<section id="section-21" class="title-slide slide level1 center">
+<section id="section-19" class="title-slide slide level1 center">
 <h1><embed data-src="dot.pdf"></h1>
 
 </section>
 
-<section id="markdown-7" class="title-slide slide level1 center">
+<section id="markdown-6" class="title-slide slide level1 center">
 <h1>%% [markdown]</h1>
 
 </section>
@@ -922,27 +1002,27 @@ cd build
 
 </section>
 
-<section id="section-22" class="title-slide slide level1 center">
+<section id="section-20" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’rm -r llvm-pass-skeleton/clone -b rtlib https://github.com/sampsyo/llvm-pass-skeleton.gitllvm-pass-skeleton/-p build build ..’)</p>
 </section>
 
-<section id="section-23" class="title-slide slide level1 center">
+<section id="section-21" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’cat ls ~/llvm/llvm-pass-skeleton/skeleton/Skeleton.cpp done’)</p>
 </section>
 
-<section id="section-24" class="title-slide slide level1 center">
+<section id="section-22" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘bash’, ’‘, ’cat /home/norm/llvm/llvm-pass-skeleton/rtlib.c’)</p>
 </section>
 
-<section id="section-25" class="title-slide slide level1 center">
+<section id="section-23" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>get_ipython().run_cell_magic(‘writefile’, ‘llvm-pass-skeleton/test_r.cpp’, ‘#include &lt;stdio.h&gt;main (int argc, char** argv) {printf(“%d %d”, argc, (argc + 2) * (argc +3));}’)</p>
 </section>
 
-<section id="section-26" class="title-slide slide level1 center">
+<section id="section-24" class="title-slide slide level1 center">
 <h1>%%</h1>
 <p>bash cd llvm-pass-skeleton cc -c rtlib.c clang -fpass-plugin=build/skeleton/SkeletonPass.so -c test_r.cpp cc test_r.o rtlib.o ./a.out 1 2 3 4 echo</p>
 
