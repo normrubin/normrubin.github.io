@@ -1,0 +1,38 @@
+---
+author: matinraayai
+format:
+ html: default
+title: Homework 1
+---
+# Part 1: Calculating PI using Monte Carlo In BRIL
+After looking at the example benchmarks and the BRIL documentation, I noticed that the example benchmarks had a 
+pseudo random number generator, and BRIL had a floating point extension. Inspired by the other scientific-based 
+floating-point benchmarks, I decided on writing a benchmark to calculate PI using Monte Carlo (explained 
+[here](https://medium.com/the-modern-scientist/estimating-pi-using-monte-carlo-methods-dbdf26c888d6)). What could possibly go wrong?
+
+## Problem 1: BRIL Doesn't Seem to Convert `float` to `int`, Or Vice Versa
+Probably the main issue I encountered was that there was no way to convert `float`s to `int`s, meaning no matter how
+many random integers I was generating, I couldn't use them to generate numbers inside a unit square (1x1). 
+To get around this issue, I tried sampling integers inside a non-unit square instead (e.g. square is 10x10, and points come from
+an interval of [-10, 10] on both x and y). All I had to do was make sure the pseudo random number generator outputs
+had a lower bound that I specified instead of zero. Again, what could possibly go wrong?
+
+## Problem 2: The Number Generator Didn't Have a Lower-bound, Or Plain Just Didn't Work As Advertised.
+After some debugging, I noticed that either the random number generator didn't work as advertised (I put print 
+statements in other benchmarks, and the values certainly weren't greater than zero), or I was using it wrong.
+
+To get around both of these issues, instead I opted in to discretize the unit square into a set of grid points, and then
+query whether they are inside the unit circle or not. Increasing the number of points leads to the output of the BRIL
+program converging to PI, so it seems to work. The benchmark and its test files are added under the `benchmarks` folder.
+
+# Part 2: Writing A Tool That Converts All `int` values to `float`s, Changing Any Instructions Operating On them To Their Floating Point Counterparts
+To continue the trend of studying floats in BRIL, I decided to write a tool that would change any usage of `int` values
+to `float`. This would also mean that any opcode that operated on an `int` must be changed to its `float` variant. 
+
+I decided to test the tool on the following test cases:
+- argwrite: The tool must detect if an argument to the function is an `int` or not, and change it to `float`.
+- loop: The tool must detect all `int`s and their operations, and change them to their `float` variants. This involves 
+the arithmetic (`add`, `sub`, etc.) and logical operations (`le`, `ge`, etc).
+- all-float: The tool must keep a program that already only uses `float`s intact.
+
+The tool and the tests can be found under the `examples/` folder.
