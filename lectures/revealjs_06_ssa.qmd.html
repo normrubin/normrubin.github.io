@@ -496,13 +496,13 @@ rename_basic_block(B):
     for each instruction S in block B:
         for each use of a argument x in S: 
             i = top(Stack[x]) 
-            replace the use of x with $x_i$
+            replace the use of x with x_i
             
         for each variable a that S defines (a dest)
             count[a] = Count[a] + 1 
             i = Count[a]             
             push i onto Stack[a]             
-            replace definition of a with $a_i$ </code></pre>
+            replace definition of a with a_i</code></pre>
 <p>We don’t need the stack here but we will need it later.</p>
 </section>
 <section class="slide level2">
@@ -565,12 +565,57 @@ right --&gt; exit
 <section id="phi-nodes-in-bril" class="slide level2">
 <h2>phi nodes in Bril</h2>
 <p>In Bril, a phi-node appears as a <code>phi</code> instruction:</p>
-<pre><code>a.4: int = phi .left a.2 .right a.3;</code></pre>
+<p>a.4: int = phi .left a.2 .right a.3;</p>
 <p>The <code>phi</code> instruction chooses between any number of variables, and it picks between them based on labels. If the program most recently executed a basic block with the given label, then the <code>phi</code> instruction takes its value from the corresponding variable.</p>
 </section>
 <section id="back-to-the-example" class="slide level2">
 <h2>back to the example</h2>
 <p>You can write the above program in SSA like this:</p>
+<div class="columns">
+<div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb6-2"><a></a>graph TD</span>
+<span id="cb6-3"><a></a>B0[".b0</span>
+<span id="cb6-4"><a></a>    a: int = const 47;</span>
+<span id="cb6-5"><a></a>    br cond .left .right;"]</span>
+<span id="cb6-6"><a></a>left["a: int = add a a;</span>
+<span id="cb6-7"><a></a>    jmp .exit;"]</span>
+<span id="cb6-8"><a></a>right["a: int = mul a a;</span>
+<span id="cb6-9"><a></a>        jmp .exit;"]</span>
+<span id="cb6-10"><a></a>exit["print a;"]</span>
+<span id="cb6-11"><a></a>B0 --&gt; left</span>
+<span id="cb6-12"><a></a>B0 --&gt; right</span>
+<span id="cb6-13"><a></a>left --&gt; exit</span>
+<span id="cb6-14"><a></a>right --&gt; exit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+B0[".b0
+    a: int = const 47;
+    br cond .left .right;"]
+left["a: int = add a a;
+    jmp .exit;"]
+right["a: int = mul a a;
+        jmp .exit;"]
+exit["print a;"]
+B0 --&gt; left
+B0 --&gt; right
+left --&gt; exit
+right --&gt; exit
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column">
 <pre><code>    @main(cond: bool) {
     .entry:
         a.1: int = const 47;
@@ -585,195 +630,31 @@ right --&gt; exit
         a.4: int = phi .left a.2 .right a.3;
         print a.4;
     }</code></pre>
+</div></div>
 </section>
 <section id="bril-in-ssa" class="slide level2">
 <h2>Bril in SSA</h2>
 <p>Bril has an SSA extension It adds support for a <code>phi</code> instruction. Beyond that, SSA form is just a restriction on the normal expressiveness of Bril—if you solemnly promise never to assign statically to the same variable twice, you are writing “SSA Bril.”</p>
 <p>The reference interpreter has built-in support for <code>phi</code>, so you can execute your SSA-form Bril programs without fuss.</p>
 </section>
-<section id="getting-out-of-ssa" class="slide level2">
-<h2>Getting out of ssa</h2>
-<p>Compilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies.</p>
-</section>
-<section id="an-example-1" class="slide level2">
-<h2>an example</h2>
-<div class="columns">
-<div class="column">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb8-2"><a></a>graph TD</span>
-<span id="cb8-3"><a></a> A0["io =</span>
-<span id="cb8-4"><a></a>     j0 = </span>
-<span id="cb8-5"><a></a>     k0 ="]</span>
-<span id="cb8-6"><a></a>A1["i1 =</span>
-<span id="cb8-7"><a></a>   j1 =</span>
-<span id="cb8-8"><a></a>   k1 = "]</span>
-<span id="cb8-9"><a></a>A2["i2 = phi(i0, i1)</span>
-<span id="cb8-10"><a></a>   j2 = phi(j0, j1)</span>
-<span id="cb8-11"><a></a>   k2 = phi(k0, k1)</span>
-<span id="cb8-12"><a></a>   ...</span>
-<span id="cb8-13"><a></a>    = i2</span>
-<span id="cb8-14"><a></a>    = j2 </span>
-<span id="cb8-15"><a></a>    = k2"]</span>
-<span id="cb8-16"><a></a></span>
-<span id="cb8-17"><a></a>    A0 --&gt; A2</span>
-<span id="cb8-18"><a></a>    A1--&gt; A2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
- A0["io =
-     j0 = 
-     k0 ="]
-A1["i1 =
-   j1 =
-   k1 = "]
-A2["i2 = phi(i0, i1)
-   j2 = phi(j0, j1)
-   k2 = phi(k0, k1)
-   ...
-    = i2
-    = j2 
-    = k2"]
-
-    A0 --&gt; A2
-    A1--&gt; A2
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div><div class="column">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb9-2"><a></a>graph TD</span>
-<span id="cb9-3"><a></a> B0["io =</span>
-<span id="cb9-4"><a></a>     j0 = </span>
-<span id="cb9-5"><a></a>     k0 ="]</span>
-<span id="cb9-6"><a></a>B1["i1 =</span>
-<span id="cb9-7"><a></a>   j1 =</span>
-<span id="cb9-8"><a></a>   k1 = "]</span>
-<span id="cb9-9"><a></a>B2["</span>
-<span id="cb9-10"><a></a>   ...</span>
-<span id="cb9-11"><a></a>    = i2</span>
-<span id="cb9-12"><a></a>    = j2 </span>
-<span id="cb9-13"><a></a>    = k2"]</span>
-<span id="cb9-14"><a></a>    B0 --"i2 = i0</span>
-<span id="cb9-15"><a></a>       j2 = j0</span>
-<span id="cb9-16"><a></a>       k2 = k0"--&gt; B2</span>
-<span id="cb9-17"><a></a>    B1 --"i2 = i1</span>
-<span id="cb9-18"><a></a>          j2 = j1</span>
-<span id="cb9-19"><a></a>          k2 = k1"--&gt; B2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
- B0["io =
-     j0 = 
-     k0 ="]
-B1["i1 =
-   j1 =
-   k1 = "]
-B2["
-   ...
-    = i2
-    = j2 
-    = k2"]
-    B0 --"i2 = i0
-       j2 = j0
-       k2 = k0"--&gt; B2
-    B1 --"i2 = i1
-          j2 = j1
-          k2 = k1"--&gt; B2
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div></div>
-<p>we cannot put instructions on edges, but we can add to prev block</p>
-</section>
-<section id="critical-edges" class="slide level2">
-<h2>critical edges</h2>
-<div class="columns">
-<div class="column">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb10-2"><a></a>graph TB</span>
-<span id="cb10-3"><a></a>A0["L1:</span>
-<span id="cb10-4"><a></a>   a0 =</span>
-<span id="cb10-5"><a></a>   b0 =</span>
-<span id="cb10-6"><a></a>   if A0 &gt; b0"]</span>
-<span id="cb10-7"><a></a>A1["b1 = a0"]</span>
-<span id="cb10-8"><a></a>A2["l2:</span>
-<span id="cb10-9"><a></a>b2 = phi(b1,b0)"]</span>
-<span id="cb10-10"><a></a>A0 --&gt; A1</span>
-<span id="cb10-11"><a></a>A1 --&gt; A2</span>
-<span id="cb10-12"><a></a>A0 --&gt; A2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TB
-A0["L1:
-   a0 =
-   b0 =
-   if A0 &gt; b0"]
-A1["b1 = a0"]
-A2["l2:
-b2 = phi(b1,b0)"]
-A0 --&gt; A1
-A1 --&gt; A2
-A0 --&gt; A2
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div><div class="column">
-<p>b2 = b0?</p>
-</div></div>
-<p>The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop</p>
-</section>
-<section id="critical-edge-splitting" class="slide level2">
-<h2>critical edge splitting</h2>
-<p>We can solve this problem by doing <strong><em>critical edge splitting</em></strong>. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge.</p>
-</section>
 <section id="converting-to-ssa---very-simple-scheme" class="slide level2">
 <h2>Converting to SSA - Very simple scheme</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb11-2"><a></a>graph LR</span>
-<span id="cb11-3"><a></a>X["Block X</span>
-<span id="cb11-4"><a></a>   a = </span>
-<span id="cb11-5"><a></a>   b = </span>
-<span id="cb11-6"><a></a>   if s &gt; b"]</span>
-<span id="cb11-7"><a></a>Y["Block Y</span>
-<span id="cb11-8"><a></a>  b = a"]</span>
-<span id="cb11-9"><a></a>Z["Block Z</span>
-<span id="cb11-10"><a></a>ret b"]</span>
-<span id="cb11-11"><a></a>X --&gt; Y</span>
-<span id="cb11-12"><a></a>Y--&gt; Z</span>
-<span id="cb11-13"><a></a>X --&gt; Z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb8-2"><a></a>graph LR</span>
+<span id="cb8-3"><a></a>X["Block X</span>
+<span id="cb8-4"><a></a>   a = </span>
+<span id="cb8-5"><a></a>   b = </span>
+<span id="cb8-6"><a></a>   if s &gt; b"]</span>
+<span id="cb8-7"><a></a>Y["Block Y</span>
+<span id="cb8-8"><a></a>  b = a"]</span>
+<span id="cb8-9"><a></a>Z["Block Z</span>
+<span id="cb8-10"><a></a>ret b"]</span>
+<span id="cb8-11"><a></a>X --&gt; Y</span>
+<span id="cb8-12"><a></a>Y--&gt; Z</span>
+<span id="cb8-13"><a></a>X --&gt; Z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -801,12 +682,12 @@ X --&gt; Z
 <p>Where do we need phi-functions?</p>
 <p>Which variables</p>
 <div class="fragment">
-<p>At the merge (join) node</p>
-<p>b</p>
+<p>phi At the merge (join) node</p>
+<p>variable b</p>
 </div>
 </section>
-<section id="scheme" class="slide level2 scrollable">
-<h2>scheme</h2>
+<section id="conditions" class="slide level2 scrollable">
+<h2>conditions</h2>
 <p>conditions: phi-function for variable b at node z</p>
 <ol type="1">
 <li>There is a block x containing a definition of b</li>
@@ -823,10 +704,178 @@ X --&gt; Z
 <p>When we find nodes X,Y,Z that match these steps and z does not contain a phi function for b, insert a phi</p>
 <p>While really expensive this will work</p>
 </section>
-<section id="fast-methods" class="slide level2">
+<section id="diagram" class="slide level2">
+<h2>diagram</h2>
+<p>using dash for path</p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb9-2"><a></a></span>
+<span id="cb9-3"><a></a>graph TB</span>
+<span id="cb9-4"><a></a>a["x:x="]</span>
+<span id="cb9-5"><a></a>b["y:x="]</span>
+<span id="cb9-6"><a></a>c[join]</span>
+<span id="cb9-7"><a></a>d</span>
+<span id="cb9-8"><a></a>a-.-&gt; c</span>
+<span id="cb9-9"><a></a>b-.-&gt; c</span>
+<span id="cb9-10"><a></a>c-.-&gt;d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+a["x:x="]
+b["y:x="]
+c[join]
+d
+a-.-&gt; c
+b-.-&gt; c
+c-.-&gt;d 
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>We could have complex flow - including loops on the paths</p>
+</section>
+<section id="fast-methods" class="slide level2 scrollable">
 <h2>fast methods</h2>
+<p>The method for this has two steps</p>
+<ol type="1">
+<li>insert phi instructions where needed (do not add subscripts yet)</li>
+<li>in a second pass insert all the numbers</li>
+</ol>
+</section>
+<section id="to-ssa" class="slide level2">
+<h2>to ssa</h2>
 <p>To convert to SSA, we want to insert phi-nodes whenever there are distinct paths containing distinct definitions of a variable. We <em>don’t</em> need phi-nodes in places that are dominated by a definition of the variable. So what’s a way to know when control reachable from a definition is <em>not dominated</em> by that definition?</p>
 <p>The dominance frontier!</p>
+</section>
+<section id="recall-the-dominance-frontier" class="slide level2">
+<h2>recall the dominance frontier</h2>
+<div class="columns">
+<div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb10-2"><a></a></span>
+<span id="cb10-3"><a></a>graph TB</span>
+<span id="cb10-4"><a></a>A--&gt;B </span>
+<span id="cb10-5"><a></a>A--&gt; F</span>
+<span id="cb10-6"><a></a>B--&gt;C</span>
+<span id="cb10-7"><a></a>B--&gt; D</span>
+<span id="cb10-8"><a></a>C--&gt; E</span>
+<span id="cb10-9"><a></a>D--&gt; E</span>
+<span id="cb10-10"><a></a>E--&gt; F</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A--&gt;B 
+A--&gt; F
+B--&gt;C
+B--&gt; D
+C--&gt; E
+D--&gt; E
+E--&gt; F
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb11-2"><a></a></span>
+<span id="cb11-3"><a></a>graph TD</span>
+<span id="cb11-4"><a></a>A--&gt; B</span>
+<span id="cb11-5"><a></a>A--&gt; F</span>
+<span id="cb11-6"><a></a>B--&gt; C</span>
+<span id="cb11-7"><a></a>B--&gt;D</span>
+<span id="cb11-8"><a></a>B--&gt; E</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+A--&gt; B
+A--&gt; F
+B--&gt; C
+B--&gt;D
+B--&gt; E
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div></div>
+<table class="caption-top">
+<tbody>
+<tr class="odd">
+<td>block</td>
+<td>A</td>
+<td>B</td>
+<td>C</td>
+<td>D</td>
+<td>E</td>
+</tr>
+<tr class="even">
+<td>frontier</td>
+<td>empty</td>
+<td>F</td>
+<td>E</td>
+<td>E</td>
+<td>F</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="a-block-can-be-in-its-own-dom-frontier" class="slide level2">
+<h2>a block can be in its own dom frontier</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb12-2"><a></a></span>
+<span id="cb12-3"><a></a>graph TB</span>
+<span id="cb12-4"><a></a>A--&gt; B</span>
+<span id="cb12-5"><a></a>B--&gt; A</span>
+<span id="cb12-6"><a></a>B--&gt; C</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A--&gt; B
+B--&gt; A
+B--&gt; C
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>why: A dom B, but B does not dom A. so A is in the dom frontier of A</p>
 </section>
 <section id="an-almost-linear-method" class="slide level2 scrollable">
 <h2>an almost linear method</h2>
@@ -836,65 +885,46 @@ X --&gt; Z
 <li>rename variables:</li>
 </ol>
 </section>
-<section class="slide level2">
-
+<section id="placing-phi-functions" class="slide level2">
+<h2>placing Phi functions</h2>
+<p>let b be a block with a def of a variable v, if b has multiple defs of v, use the last one</p>
+<p>What is the first block following v that can be reached by a different def of v</p>
+<p>in blocks dominated by b, b’s def must have been executed, (other defs of v in a dominated block may overwrite it)</p>
+<p>we need to place a phi function for b at the start of all blocks in the dom frontier of b.</p>
+<p>after we add phi functions to S where S = df(b) we have more defs, so we need to add phi’s in the dom frontier of all the blocks in S</p>
+</section>
+<section id="example-1" class="slide level2">
+<h2>example 1</h2>
 <div class="columns">
 <div class="column">
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb12-2"><a></a>graph TB</span>
-<span id="cb12-3"><a></a>a[x=]</span>
-<span id="cb12-4"><a></a>a--&gt;b</span>
-<span id="cb12-5"><a></a>a--&gt; e</span>
-<span id="cb12-6"><a></a>a--&gt; i</span>
-<span id="cb12-7"><a></a></span>
-<span id="cb12-8"><a></a>b--&gt;c</span>
-<span id="cb12-9"><a></a>c--- c</span>
-<span id="cb12-10"><a></a>c--&gt; d</span>
-<span id="cb12-11"><a></a>e--&gt; f["f</span>
-<span id="cb12-12"><a></a>  x = "]</span>
-<span id="cb12-13"><a></a>e--&gt; g</span>
-<span id="cb12-14"><a></a>g--&gt; h</span>
-<span id="cb12-15"><a></a>f--&gt; h</span>
-<span id="cb12-16"><a></a>h--&gt;l</span>
-<span id="cb12-17"><a></a>f--&gt; d</span>
-<span id="cb12-18"><a></a>h--&gt; e</span>
-<span id="cb12-19"><a></a>i--&gt; k</span>
-<span id="cb12-20"><a></a>i--&gt; j</span>
-<span id="cb12-21"><a></a>j--&gt; k</span>
-<span id="cb12-22"><a></a>k--&gt; l</span>
-<span id="cb12-23"><a></a>d--&gt; l</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb13-2"><a></a></span>
+<span id="cb13-3"><a></a>graph TB</span>
+<span id="cb13-4"><a></a>N["v=1"]</span>
+<span id="cb13-5"><a></a>M</span>
+<span id="cb13-6"><a></a>M2["v=2"]</span>
+<span id="cb13-7"><a></a>Z["M"]</span>
+<span id="cb13-8"><a></a>N--&gt; M</span>
+<span id="cb13-9"><a></a>M--&gt;Z</span>
+<span id="cb13-10"><a></a>M2--&gt; Z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <p></p><figure class=""><p></p>
 <div>
 <pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TB
-a[x=]
-a--&gt;b
-a--&gt; e
-a--&gt; i
-
-b--&gt;c
-c--- c
-c--&gt; d
-e--&gt; f["f
-  x = "]
-e--&gt; g
-g--&gt; h
-f--&gt; h
-h--&gt;l
-f--&gt; d
-h--&gt; e
-i--&gt; k
-i--&gt; j
-j--&gt; k
-k--&gt; l
-d--&gt; l
-
+N["v=1"]
+M
+M2["v=2"]
+Z["M"]
+N--&gt; M
+M--&gt;Z
+M2--&gt; Z
 </pre>
 </div>
 <p></p></figure><p></p>
@@ -902,20 +932,189 @@ d--&gt; l
 </div>
 </div>
 </div><div class="column">
-<p>We need phi functions for this def of x in d and h, where else? 3 more</p>
-</div></div>
-<div class="fragment">
-<p>we need to iterate and keep adding phi nodes</p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb14-2"><a></a></span>
+<span id="cb14-3"><a></a>graph TB</span>
+<span id="cb14-4"><a></a>N["v1=1"]</span>
+<span id="cb14-5"><a></a>M</span>
+<span id="cb14-6"><a></a>M2["v2=2"]</span>
+<span id="cb14-7"><a></a>Z["M:v3= phi(v1,v2)"]</span>
+<span id="cb14-8"><a></a>N--&gt; M</span>
+<span id="cb14-9"><a></a>M--&gt;Z</span>
+<span id="cb14-10"><a></a>M2--&gt; Z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+N["v1=1"]
+M
+M2["v2=2"]
+Z["M:v3= phi(v1,v2)"]
+N--&gt; M
+M--&gt;Z
+M2--&gt; Z
+</pre>
 </div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div></div>
 </section>
-<section class="slide level2">
+<section id="a-loop" class="slide level2">
+<h2>a loop</h2>
+<p>::: {.columns}</p>
+<p>::: {.column}</p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a></a>graph TD</span>
+<span id="cb15-2"><a></a> V["v=init"]</span>
+<span id="cb15-3"><a></a> Z{"z:v = v+1"}</span>
+<span id="cb15-4"><a></a> V --&gt; Z</span>
+<span id="cb15-5"><a></a> Z --&gt;Z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js"> graph TD
+ V["v=init"]
+ Z{"z:v = v+1"}
+ V --&gt; Z
+ Z --&gt;Z
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>:::</p>
+<p>::: {.column}</p>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a></a>graph TD</span>
+<span id="cb16-2"><a></a> V["v1=init"]</span>
+<span id="cb16-3"><a></a> Z{"z:v2 = phi(v1,v3)\nv3 = v2+1"}</span>
+<span id="cb16-4"><a></a> V --&gt; Z</span>
+<span id="cb16-5"><a></a> Z --&gt;Z</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js"> graph TD
+ V["v1=init"]
+ Z{"z:v2 = phi(v1,v3)\nv3 = v2+1"}
+ V --&gt; Z
+ Z --&gt;Z
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>:::</p>
+<p>:::</p>
+</section>
+<section id="iterative-placement" class="slide level2">
+<h2>iterative placement</h2>
+<div class="columns">
+<div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb17-2"><a></a></span>
+<span id="cb17-3"><a></a>graph TD</span>
+<span id="cb17-4"><a></a>B1[v=1]</span>
+<span id="cb17-5"><a></a>B2[v=2]</span>
+<span id="cb17-6"><a></a>B3</span>
+<span id="cb17-7"><a></a>B4[v=3]</span>
+<span id="cb17-8"><a></a>B5</span>
+<span id="cb17-9"><a></a>B1--&gt; B3</span>
+<span id="cb17-10"><a></a>B2--&gt; B3</span>
+<span id="cb17-11"><a></a>B3--&gt; B5</span>
+<span id="cb17-12"><a></a>B4--&gt; B5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
 
-<pre><code>for each node in the cfg 
-   for each variable with a dest in node
-     add node to Defs[v]   # Blocks where v is assigned.
+graph TD
+B1[v=1]
+B2[v=2]
+B3
+B4[v=3]
+B5
+B1--&gt; B3
+B2--&gt; B3
+B3--&gt; B5
+B4--&gt; B5
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb18-2"><a></a></span>
+<span id="cb18-3"><a></a>graph TD</span>
+<span id="cb18-4"><a></a>B1[v1=1]</span>
+<span id="cb18-5"><a></a>B2[v2=2]</span>
+<span id="cb18-6"><a></a>B3["v3=phi(v1,v2)"]</span>
+<span id="cb18-7"><a></a>B4[v4=3]</span>
+<span id="cb18-8"><a></a>B5["v5=phi(v3,v4)"]</span>
+<span id="cb18-9"><a></a>B1--&gt; B3</span>
+<span id="cb18-10"><a></a>B2--&gt; B3</span>
+<span id="cb18-11"><a></a>B3--&gt; B5</span>
+<span id="cb18-12"><a></a>B4--&gt; B5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
 
-for each v in vars:
-    W = Defs[v]
+graph TD
+B1[v1=1]
+B2[v2=2]
+B3["v3=phi(v1,v2)"]
+B4[v4=3]
+B5["v5=phi(v3,v4)"]
+B1--&gt; B3
+B2--&gt; B3
+B3--&gt; B5
+B4--&gt; B5
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div></div>
+</section>
+<section id="phi-placement" class="slide level2">
+<h2>phi placement</h2>
+<pre><code>for each block b in the cfg 
+  for each var v defined in b
+    add block to the set defs(v)  ## blocks that contain an assignment to v 
+
+  W = Defs[v]
     while W is not empty
       remove a node n from w
          for block in DF[n]:  # Dominance frontier.
@@ -923,61 +1122,139 @@ for each v in vars:
              unless we have done so already.
            Add block to W (because it now writes to v),
              unless it's already in there.</code></pre>
-<div class="fragment">
-<p>Since we keep adding nodes to W how do we know this terminates?</p>
-</div>
 </section>
-<section id="rename-variables" class="slide level2">
-<h2>rename variables:</h2>
-<pre><code>rename(n):
-  rename_basic_block(n)  # from before 
-  for each successor Y of n, where n is the jth pred of Y
-    for each phi-function f in Y where the operand of f is 'a'
-      i = top(stack[a])
-      replace jth operand wit a_i
-  for each child of X of n (in the dominator tree)
-    rename(X)
-    for each instruction S in n
-       pop stack(S.dest)
-</code></pre>
-</section>
-<section class="slide level2">
-
+<section id="an-example-1" class="slide level2 scrollable">
+<h2>an example</h2>
+<div class="columns">
+<div class="column">
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb15-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb15-2"><a></a>graph TB</span>
-<span id="cb15-3"><a></a>L0["L0: i = 1</span>
-<span id="cb15-4"><a></a>   L1: j = 1</span>
-<span id="cb15-5"><a></a>   L2: k = 0"]</span>
-<span id="cb15-6"><a></a></span>
-<span id="cb15-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
-<span id="cb15-8"><a></a></span>
-<span id="cb15-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
-<span id="cb15-10"><a></a></span>
-<span id="cb15-11"><a></a>L5["l5: j = i</span>
-<span id="cb15-12"><a></a>   l6: k = k +1"]</span>
-<span id="cb15-13"><a></a></span>
-<span id="cb15-14"><a></a></span>
-<span id="cb15-15"><a></a>L7["l7: j = k</span>
-<span id="cb15-16"><a></a>  l8: k = k +2"]</span>
-<span id="cb15-17"><a></a></span>
-<span id="cb15-18"><a></a>L9[L9: goto l3]</span>
-<span id="cb15-19"><a></a></span>
-<span id="cb15-20"><a></a>L10["l10: ret j"]</span>
-<span id="cb15-21"><a></a></span>
-<span id="cb15-22"><a></a>L0--&gt; L3</span>
-<span id="cb15-23"><a></a></span>
-<span id="cb15-24"><a></a>L3--&gt; L4</span>
-<span id="cb15-25"><a></a>L3 --&gt; L10</span>
-<span id="cb15-26"><a></a></span>
-<span id="cb15-27"><a></a>L4 --&gt; L5</span>
-<span id="cb15-28"><a></a>L4 --&gt; L7</span>
-<span id="cb15-29"><a></a></span>
-<span id="cb15-30"><a></a>L5--&gt; L9</span>
-<span id="cb15-31"><a></a>L7 --&gt; L9</span>
-<span id="cb15-32"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb20-2"><a></a></span>
+<span id="cb20-3"><a></a>graph TB</span>
+<span id="cb20-4"><a></a>N1["1:x = 1"]</span>
+<span id="cb20-5"><a></a>N2["2:"]</span>
+<span id="cb20-6"><a></a>N3["3:x= 2"]</span>
+<span id="cb20-7"><a></a>N4["4:"]</span>
+<span id="cb20-8"><a></a>N5["5:x=3"]</span>
+<span id="cb20-9"><a></a>N6[6:x=4]</span>
+<span id="cb20-10"><a></a>N7[7:]</span>
+<span id="cb20-11"><a></a>N1--&gt; N2</span>
+<span id="cb20-12"><a></a>N1--&gt; N3</span>
+<span id="cb20-13"><a></a>N2--&gt; N4</span>
+<span id="cb20-14"><a></a>N3--&gt; N4</span>
+<span id="cb20-15"><a></a>N4--&gt; N5</span>
+<span id="cb20-16"><a></a>N5--&gt;  N4</span>
+<span id="cb20-17"><a></a>N5--&gt; N6</span>
+<span id="cb20-18"><a></a>N6--&gt; N7</span>
+<span id="cb20-19"><a></a>N6--&gt; N5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+N1["1:x = 1"]
+N2["2:"]
+N3["3:x= 2"]
+N4["4:"]
+N5["5:x=3"]
+N6[6:x=4]
+N7[7:]
+N1--&gt; N2
+N1--&gt; N3
+N2--&gt; N4
+N3--&gt; N4
+N4--&gt; N5
+N5--&gt;  N4
+N5--&gt; N6
+N6--&gt; N7
+N6--&gt; N5
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column">
+<ol type="1">
+<li>initially w = {1,3,5,6}</li>
+<li>process DF(1) = empty</li>
+<li>process DF(3) = 4, add 4 to w and add a phi function for x to 4</li>
+<li>process DF(5) = 4,5 no need to add 5 to w, add phi for x to 5</li>
+<li>process DF(6) = 5</li>
+<li>process DF(4) = 4</li>
+</ol>
+</div></div>
+<p>add phi’s to blocks 4 and 5</p>
+</section>
+<section id="rename-variables" class="slide level2">
+<h2>rename variables:</h2>
+<pre><code># allocate a stack and a counter for each variable
+for each V a variable 
+  c[v] = 0
+  s[v] = empty stack
+  search(entry)
+
+search(n):
+  for each instr i in n:
+     if instr is not a phi
+         replace every variable in the rhs of instr by vi where i = top(s[v])
+         if instr has a dest v
+           i = C(v)
+            replace v by new vi, push i onto s[v]
+            increment c[v]
+
+  for each y a successor of n
+     j = which pred (y,n)
+     for each phi function pinstr in Y replace the jth opernmad of pinstr by vi where 
+        i = top(s(v)
+  
+  for each Y a child of n in the dominator tree 
+      call search(Y)
+
+</code></pre>
+</section>
+<section id="an-example-2" class="slide level2">
+<h2>an example</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb22-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb22-2"><a></a>graph TB</span>
+<span id="cb22-3"><a></a>L0["L0: i = 1</span>
+<span id="cb22-4"><a></a>   L1: j = 1</span>
+<span id="cb22-5"><a></a>   L2: k = 0"]</span>
+<span id="cb22-6"><a></a></span>
+<span id="cb22-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
+<span id="cb22-8"><a></a></span>
+<span id="cb22-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
+<span id="cb22-10"><a></a></span>
+<span id="cb22-11"><a></a>L5["l5: j = i</span>
+<span id="cb22-12"><a></a>   l6: k = k +1"]</span>
+<span id="cb22-13"><a></a></span>
+<span id="cb22-14"><a></a></span>
+<span id="cb22-15"><a></a>L7["l7: j = k</span>
+<span id="cb22-16"><a></a>  l8: k = k +2"]</span>
+<span id="cb22-17"><a></a></span>
+<span id="cb22-18"><a></a>L9[L9: goto l3]</span>
+<span id="cb22-19"><a></a></span>
+<span id="cb22-20"><a></a>L10["l10: ret j"]</span>
+<span id="cb22-21"><a></a></span>
+<span id="cb22-22"><a></a>L0--&gt; L3</span>
+<span id="cb22-23"><a></a></span>
+<span id="cb22-24"><a></a>L3--&gt; L4</span>
+<span id="cb22-25"><a></a>L3 --&gt; L10</span>
+<span id="cb22-26"><a></a></span>
+<span id="cb22-27"><a></a>L4 --&gt; L5</span>
+<span id="cb22-28"><a></a>L4 --&gt; L7</span>
+<span id="cb22-29"><a></a></span>
+<span id="cb22-30"><a></a>L5--&gt; L9</span>
+<span id="cb22-31"><a></a>L7 --&gt; L9</span>
+<span id="cb22-32"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1029,37 +1306,37 @@ L9 --&gt; L3
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb16-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb16-2"><a></a>graph TB</span>
-<span id="cb16-3"><a></a>L0["L0: i = 1</span>
-<span id="cb16-4"><a></a>   L1: j = 1</span>
-<span id="cb16-5"><a></a>   L2: k = 0"]</span>
-<span id="cb16-6"><a></a></span>
-<span id="cb16-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
-<span id="cb16-8"><a></a></span>
-<span id="cb16-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
-<span id="cb16-10"><a></a></span>
-<span id="cb16-11"><a></a>L5["l5: j = i</span>
-<span id="cb16-12"><a></a>   l6: k = k +1"]</span>
-<span id="cb16-13"><a></a></span>
-<span id="cb16-14"><a></a></span>
-<span id="cb16-15"><a></a>L7["l7: j = k</span>
-<span id="cb16-16"><a></a>  l8: k = k +2"]</span>
-<span id="cb16-17"><a></a></span>
-<span id="cb16-18"><a></a>L9[L9: goto l3]</span>
-<span id="cb16-19"><a></a></span>
-<span id="cb16-20"><a></a>L10["l10: ret j"]</span>
-<span id="cb16-21"><a></a></span>
-<span id="cb16-22"><a></a>L0--&gt; L3</span>
-<span id="cb16-23"><a></a></span>
-<span id="cb16-24"><a></a>L3--&gt; L4</span>
-<span id="cb16-25"><a></a>L3 --&gt; L10</span>
-<span id="cb16-26"><a></a></span>
-<span id="cb16-27"><a></a>L4 --&gt; L5</span>
-<span id="cb16-28"><a></a>L4 --&gt; L7</span>
-<span id="cb16-29"><a></a>L5 --&gt; L9</span>
-<span id="cb16-30"><a></a>L7 -.-&gt; L9</span>
-<span id="cb16-31"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb23-2"><a></a>graph TB</span>
+<span id="cb23-3"><a></a>L0["L0: i = 1</span>
+<span id="cb23-4"><a></a>   L1: j = 1</span>
+<span id="cb23-5"><a></a>   L2: k = 0"]</span>
+<span id="cb23-6"><a></a></span>
+<span id="cb23-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
+<span id="cb23-8"><a></a></span>
+<span id="cb23-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
+<span id="cb23-10"><a></a></span>
+<span id="cb23-11"><a></a>L5["l5: j = i</span>
+<span id="cb23-12"><a></a>   l6: k = k +1"]</span>
+<span id="cb23-13"><a></a></span>
+<span id="cb23-14"><a></a></span>
+<span id="cb23-15"><a></a>L7["l7: j = k</span>
+<span id="cb23-16"><a></a>  l8: k = k +2"]</span>
+<span id="cb23-17"><a></a></span>
+<span id="cb23-18"><a></a>L9[L9: goto l3]</span>
+<span id="cb23-19"><a></a></span>
+<span id="cb23-20"><a></a>L10["l10: ret j"]</span>
+<span id="cb23-21"><a></a></span>
+<span id="cb23-22"><a></a>L0--&gt; L3</span>
+<span id="cb23-23"><a></a></span>
+<span id="cb23-24"><a></a>L3--&gt; L4</span>
+<span id="cb23-25"><a></a>L3 --&gt; L10</span>
+<span id="cb23-26"><a></a></span>
+<span id="cb23-27"><a></a>L4 --&gt; L5</span>
+<span id="cb23-28"><a></a>L4 --&gt; L7</span>
+<span id="cb23-29"><a></a>L5 --&gt; L9</span>
+<span id="cb23-30"><a></a>L7 -.-&gt; L9</span>
+<span id="cb23-31"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1106,15 +1383,15 @@ L9 --&gt; L3
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb17-2"><a></a></span>
-<span id="cb17-3"><a></a>graph TB </span>
-<span id="cb17-4"><a></a>L0 --&gt; L3 </span>
-<span id="cb17-5"><a></a>L3--&gt; L4</span>
-<span id="cb17-6"><a></a>L3 --&gt; L10</span>
-<span id="cb17-7"><a></a>L4--&gt; L5 </span>
-<span id="cb17-8"><a></a>L4 --&gt; L9</span>
-<span id="cb17-9"><a></a>L4 --&gt; L7</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb24-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb24-2"><a></a></span>
+<span id="cb24-3"><a></a>graph TB </span>
+<span id="cb24-4"><a></a>L0 --&gt; L3 </span>
+<span id="cb24-5"><a></a>L3--&gt; L4</span>
+<span id="cb24-6"><a></a>L3 --&gt; L10</span>
+<span id="cb24-7"><a></a>L4--&gt; L5 </span>
+<span id="cb24-8"><a></a>L4 --&gt; L9</span>
+<span id="cb24-9"><a></a>L4 --&gt; L7</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1144,37 +1421,37 @@ L4 --&gt; L7
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb18-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb18-2"><a></a>graph TB</span>
-<span id="cb18-3"><a></a>L0["L0: i = 1</span>
-<span id="cb18-4"><a></a>   L1: j = 1</span>
-<span id="cb18-5"><a></a>   L2: k = 0"]</span>
-<span id="cb18-6"><a></a></span>
-<span id="cb18-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
-<span id="cb18-8"><a></a></span>
-<span id="cb18-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
-<span id="cb18-10"><a></a></span>
-<span id="cb18-11"><a></a>L5["l5: j = i</span>
-<span id="cb18-12"><a></a>   l6: k = k +1"]</span>
-<span id="cb18-13"><a></a></span>
-<span id="cb18-14"><a></a></span>
-<span id="cb18-15"><a></a>L7["l7: j = k</span>
-<span id="cb18-16"><a></a>  l8: k = k +2"]</span>
-<span id="cb18-17"><a></a></span>
-<span id="cb18-18"><a></a>L9[L9: goto l3]</span>
-<span id="cb18-19"><a></a></span>
-<span id="cb18-20"><a></a>L10["l10: ret j"]</span>
-<span id="cb18-21"><a></a></span>
-<span id="cb18-22"><a></a>L0--&gt; L3 </span>
-<span id="cb18-23"><a></a></span>
-<span id="cb18-24"><a></a>L3--&gt; L4</span>
-<span id="cb18-25"><a></a>L3 --&gt; L10</span>
-<span id="cb18-26"><a></a></span>
-<span id="cb18-27"><a></a>L4 --&gt; L5</span>
-<span id="cb18-28"><a></a>L4 --&gt; L7</span>
-<span id="cb18-29"><a></a>L5 --&gt; L9</span>
-<span id="cb18-30"><a></a>L7 -.-&gt; L9</span>
-<span id="cb18-31"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb25-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb25-2"><a></a>graph TB</span>
+<span id="cb25-3"><a></a>L0["L0: i = 1</span>
+<span id="cb25-4"><a></a>   L1: j = 1</span>
+<span id="cb25-5"><a></a>   L2: k = 0"]</span>
+<span id="cb25-6"><a></a></span>
+<span id="cb25-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
+<span id="cb25-8"><a></a></span>
+<span id="cb25-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
+<span id="cb25-10"><a></a></span>
+<span id="cb25-11"><a></a>L5["l5: j = i</span>
+<span id="cb25-12"><a></a>   l6: k = k +1"]</span>
+<span id="cb25-13"><a></a></span>
+<span id="cb25-14"><a></a></span>
+<span id="cb25-15"><a></a>L7["l7: j = k</span>
+<span id="cb25-16"><a></a>  l8: k = k +2"]</span>
+<span id="cb25-17"><a></a></span>
+<span id="cb25-18"><a></a>L9[L9: goto l3]</span>
+<span id="cb25-19"><a></a></span>
+<span id="cb25-20"><a></a>L10["l10: ret j"]</span>
+<span id="cb25-21"><a></a></span>
+<span id="cb25-22"><a></a>L0--&gt; L3 </span>
+<span id="cb25-23"><a></a></span>
+<span id="cb25-24"><a></a>L3--&gt; L4</span>
+<span id="cb25-25"><a></a>L3 --&gt; L10</span>
+<span id="cb25-26"><a></a></span>
+<span id="cb25-27"><a></a>L4 --&gt; L5</span>
+<span id="cb25-28"><a></a>L4 --&gt; L7</span>
+<span id="cb25-29"><a></a>L5 --&gt; L9</span>
+<span id="cb25-30"><a></a>L7 -.-&gt; L9</span>
+<span id="cb25-31"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1221,15 +1498,15 @@ L9 --&gt; L3
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb19-2"><a></a></span>
-<span id="cb19-3"><a></a>graph TB </span>
-<span id="cb19-4"><a></a>L0 --&gt; L3 </span>
-<span id="cb19-5"><a></a>L3--&gt; L4</span>
-<span id="cb19-6"><a></a>L3 --&gt; L10</span>
-<span id="cb19-7"><a></a>L4--&gt; L5 </span>
-<span id="cb19-8"><a></a>L4 --&gt; L9</span>
-<span id="cb19-9"><a></a>L4 --&gt; L7</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb26-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb26-2"><a></a></span>
+<span id="cb26-3"><a></a>graph TB </span>
+<span id="cb26-4"><a></a>L0 --&gt; L3 </span>
+<span id="cb26-5"><a></a>L3--&gt; L4</span>
+<span id="cb26-6"><a></a>L3 --&gt; L10</span>
+<span id="cb26-7"><a></a>L4--&gt; L5 </span>
+<span id="cb26-8"><a></a>L4 --&gt; L9</span>
+<span id="cb26-9"><a></a>L4 --&gt; L7</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1259,37 +1536,37 @@ L4 --&gt; L7
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb20-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb20-2"><a></a>graph TB</span>
-<span id="cb20-3"><a></a>L0["L0: i = 1</span>
-<span id="cb20-4"><a></a>   L1: j = 1</span>
-<span id="cb20-5"><a></a>   L2: k = 0"]</span>
-<span id="cb20-6"><a></a></span>
-<span id="cb20-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
-<span id="cb20-8"><a></a></span>
-<span id="cb20-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
-<span id="cb20-10"><a></a></span>
-<span id="cb20-11"><a></a>L5["l5: j = i</span>
-<span id="cb20-12"><a></a>   l6: k = k +1"]</span>
-<span id="cb20-13"><a></a></span>
-<span id="cb20-14"><a></a></span>
-<span id="cb20-15"><a></a>L7["l7: j = k</span>
-<span id="cb20-16"><a></a>  l8: k = k +2"]</span>
-<span id="cb20-17"><a></a></span>
-<span id="cb20-18"><a></a>L9[L9: goto l3]</span>
-<span id="cb20-19"><a></a></span>
-<span id="cb20-20"><a></a>L10["l10: ret j"]</span>
-<span id="cb20-21"><a></a></span>
-<span id="cb20-22"><a></a>L0--&gt; L3</span>
-<span id="cb20-23"><a></a></span>
-<span id="cb20-24"><a></a>L3--&gt; L4</span>
-<span id="cb20-25"><a></a>L3 --&gt; L10</span>
-<span id="cb20-26"><a></a></span>
-<span id="cb20-27"><a></a>L4 --&gt; L5</span>
-<span id="cb20-28"><a></a>L4 --&gt; L7</span>
-<span id="cb20-29"><a></a>L5 --&gt; L9</span>
-<span id="cb20-30"><a></a>L7 --&gt; L9</span>
-<span id="cb20-31"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb27-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb27-2"><a></a>graph TB</span>
+<span id="cb27-3"><a></a>L0["L0: i = 1</span>
+<span id="cb27-4"><a></a>   L1: j = 1</span>
+<span id="cb27-5"><a></a>   L2: k = 0"]</span>
+<span id="cb27-6"><a></a></span>
+<span id="cb27-7"><a></a>L3["L3: if j &lt;20 go to l4 else l10"]</span>
+<span id="cb27-8"><a></a></span>
+<span id="cb27-9"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
+<span id="cb27-10"><a></a></span>
+<span id="cb27-11"><a></a>L5["l5: j = i</span>
+<span id="cb27-12"><a></a>   l6: k = k +1"]</span>
+<span id="cb27-13"><a></a></span>
+<span id="cb27-14"><a></a></span>
+<span id="cb27-15"><a></a>L7["l7: j = k</span>
+<span id="cb27-16"><a></a>  l8: k = k +2"]</span>
+<span id="cb27-17"><a></a></span>
+<span id="cb27-18"><a></a>L9[L9: goto l3]</span>
+<span id="cb27-19"><a></a></span>
+<span id="cb27-20"><a></a>L10["l10: ret j"]</span>
+<span id="cb27-21"><a></a></span>
+<span id="cb27-22"><a></a>L0--&gt; L3</span>
+<span id="cb27-23"><a></a></span>
+<span id="cb27-24"><a></a>L3--&gt; L4</span>
+<span id="cb27-25"><a></a>L3 --&gt; L10</span>
+<span id="cb27-26"><a></a></span>
+<span id="cb27-27"><a></a>L4 --&gt; L5</span>
+<span id="cb27-28"><a></a>L4 --&gt; L7</span>
+<span id="cb27-29"><a></a>L5 --&gt; L9</span>
+<span id="cb27-30"><a></a>L7 --&gt; L9</span>
+<span id="cb27-31"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1336,41 +1613,41 @@ L9 --&gt; L3
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb21-2"><a></a>graph TB</span>
-<span id="cb21-3"><a></a>L0["L0: i = 1</span>
-<span id="cb21-4"><a></a>   L1: j = 1</span>
-<span id="cb21-5"><a></a>   L2: k = 0"]</span>
-<span id="cb21-6"><a></a></span>
-<span id="cb21-7"><a></a>L3["j = phi(j,j) </span>
-<span id="cb21-8"><a></a>    k = phi(k,k) </span>
-<span id="cb21-9"><a></a>   L3: if j &lt;20 go to l4 else l10"]</span>
-<span id="cb21-10"><a></a></span>
-<span id="cb21-11"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
-<span id="cb21-12"><a></a></span>
-<span id="cb21-13"><a></a>L5["l5: j = i</span>
-<span id="cb21-14"><a></a>   l6: k = k +1"]</span>
-<span id="cb21-15"><a></a></span>
-<span id="cb21-16"><a></a></span>
-<span id="cb21-17"><a></a>L7["l7: j = k</span>
-<span id="cb21-18"><a></a>  l8: k = k +2"]</span>
-<span id="cb21-19"><a></a></span>
-<span id="cb21-20"><a></a>L9["j = phi(j,j)</span>
-<span id="cb21-21"><a></a>   k = phi(k,k)</span>
-<span id="cb21-22"><a></a>  L9: goto l3"]</span>
-<span id="cb21-23"><a></a></span>
-<span id="cb21-24"><a></a>L10["l10: ret j"]</span>
-<span id="cb21-25"><a></a></span>
-<span id="cb21-26"><a></a>L0--&gt; L3</span>
-<span id="cb21-27"><a></a></span>
-<span id="cb21-28"><a></a>L3--&gt; L4</span>
-<span id="cb21-29"><a></a>L3 --&gt; L10</span>
-<span id="cb21-30"><a></a></span>
-<span id="cb21-31"><a></a>L4 --&gt; L5</span>
-<span id="cb21-32"><a></a>L4 --&gt; L7</span>
-<span id="cb21-33"><a></a>L5 --&gt; L9</span>
-<span id="cb21-34"><a></a>L7 --&gt; L9</span>
-<span id="cb21-35"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb28-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb28-2"><a></a>graph TB</span>
+<span id="cb28-3"><a></a>L0["L0: i = 1</span>
+<span id="cb28-4"><a></a>   L1: j = 1</span>
+<span id="cb28-5"><a></a>   L2: k = 0"]</span>
+<span id="cb28-6"><a></a></span>
+<span id="cb28-7"><a></a>L3["j = phi(j,j) </span>
+<span id="cb28-8"><a></a>    k = phi(k,k) </span>
+<span id="cb28-9"><a></a>   L3: if j &lt;20 go to l4 else l10"]</span>
+<span id="cb28-10"><a></a></span>
+<span id="cb28-11"><a></a>L4["l4: if j &lt; 20 goto l7 else l5"]</span>
+<span id="cb28-12"><a></a></span>
+<span id="cb28-13"><a></a>L5["l5: j = i</span>
+<span id="cb28-14"><a></a>   l6: k = k +1"]</span>
+<span id="cb28-15"><a></a></span>
+<span id="cb28-16"><a></a></span>
+<span id="cb28-17"><a></a>L7["l7: j = k</span>
+<span id="cb28-18"><a></a>  l8: k = k +2"]</span>
+<span id="cb28-19"><a></a></span>
+<span id="cb28-20"><a></a>L9["j = phi(j,j)</span>
+<span id="cb28-21"><a></a>   k = phi(k,k)</span>
+<span id="cb28-22"><a></a>  L9: goto l3"]</span>
+<span id="cb28-23"><a></a></span>
+<span id="cb28-24"><a></a>L10["l10: ret j"]</span>
+<span id="cb28-25"><a></a></span>
+<span id="cb28-26"><a></a>L0--&gt; L3</span>
+<span id="cb28-27"><a></a></span>
+<span id="cb28-28"><a></a>L3--&gt; L4</span>
+<span id="cb28-29"><a></a>L3 --&gt; L10</span>
+<span id="cb28-30"><a></a></span>
+<span id="cb28-31"><a></a>L4 --&gt; L5</span>
+<span id="cb28-32"><a></a>L4 --&gt; L7</span>
+<span id="cb28-33"><a></a>L5 --&gt; L9</span>
+<span id="cb28-34"><a></a>L7 --&gt; L9</span>
+<span id="cb28-35"><a></a>L9 --&gt; L3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1425,6 +1702,171 @@ L9 --&gt; L3
 <p>could we have a phi-function wit more then two arguments?</p>
 <p>This algorithm computes what is called <strong><em>minimal SSA form</em></strong> which is not so mimimal since it can leave dead assignments</p>
 <p>doing dead code elimination <strong><em>pruned ssa form</em></strong></p>
+</section>
+<section id="getting-out-of-ssa" class="slide level2">
+<h2>Getting out of ssa</h2>
+<p>Compilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies.</p>
+</section>
+<section id="an-example-3" class="slide level2">
+<h2>an example</h2>
+<div class="columns">
+<div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb29-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb29-2"><a></a>graph TD</span>
+<span id="cb29-3"><a></a> A0["io =</span>
+<span id="cb29-4"><a></a>     j0 = </span>
+<span id="cb29-5"><a></a>     k0 ="]</span>
+<span id="cb29-6"><a></a>A1["i1 =</span>
+<span id="cb29-7"><a></a>   j1 =</span>
+<span id="cb29-8"><a></a>   k1 = "]</span>
+<span id="cb29-9"><a></a>A2["i2 = phi(i0, i1)</span>
+<span id="cb29-10"><a></a>   j2 = phi(j0, j1)</span>
+<span id="cb29-11"><a></a>   k2 = phi(k0, k1)</span>
+<span id="cb29-12"><a></a>   ...</span>
+<span id="cb29-13"><a></a>    = i2</span>
+<span id="cb29-14"><a></a>    = j2 </span>
+<span id="cb29-15"><a></a>    = k2"]</span>
+<span id="cb29-16"><a></a></span>
+<span id="cb29-17"><a></a>    A0 --&gt; A2</span>
+<span id="cb29-18"><a></a>    A1--&gt; A2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+ A0["io =
+     j0 = 
+     k0 ="]
+A1["i1 =
+   j1 =
+   k1 = "]
+A2["i2 = phi(i0, i1)
+   j2 = phi(j0, j1)
+   k2 = phi(k0, k1)
+   ...
+    = i2
+    = j2 
+    = k2"]
+
+    A0 --&gt; A2
+    A1--&gt; A2
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb30-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb30-2"><a></a>graph TD</span>
+<span id="cb30-3"><a></a> B0["io =</span>
+<span id="cb30-4"><a></a>     j0 = </span>
+<span id="cb30-5"><a></a>     k0 ="]</span>
+<span id="cb30-6"><a></a>B1["i1 =</span>
+<span id="cb30-7"><a></a>   j1 =</span>
+<span id="cb30-8"><a></a>   k1 = "]</span>
+<span id="cb30-9"><a></a>B2["</span>
+<span id="cb30-10"><a></a>   ...</span>
+<span id="cb30-11"><a></a>    = i2</span>
+<span id="cb30-12"><a></a>    = j2 </span>
+<span id="cb30-13"><a></a>    = k2"]</span>
+<span id="cb30-14"><a></a>    B0 --"i2 = i0</span>
+<span id="cb30-15"><a></a>       j2 = j0</span>
+<span id="cb30-16"><a></a>       k2 = k0"--&gt; B2</span>
+<span id="cb30-17"><a></a>    B1 --"i2 = i1</span>
+<span id="cb30-18"><a></a>          j2 = j1</span>
+<span id="cb30-19"><a></a>          k2 = k1"--&gt; B2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+ B0["io =
+     j0 = 
+     k0 ="]
+B1["i1 =
+   j1 =
+   k1 = "]
+B2["
+   ...
+    = i2
+    = j2 
+    = k2"]
+    B0 --"i2 = i0
+       j2 = j0
+       k2 = k0"--&gt; B2
+    B1 --"i2 = i1
+          j2 = j1
+          k2 = k1"--&gt; B2
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div></div>
+<p>we cannot put instructions on edges, but we can add to prev block</p>
+</section>
+<section id="critical-edges" class="slide level2">
+<h2>critical edges</h2>
+<div class="columns">
+<div class="column">
+<div class="cell" data-reveal="true" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb31-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb31-2"><a></a>graph TB</span>
+<span id="cb31-3"><a></a>A0["L1:</span>
+<span id="cb31-4"><a></a>   a0 =</span>
+<span id="cb31-5"><a></a>   b0 =</span>
+<span id="cb31-6"><a></a>   if A0 &gt; b0"]</span>
+<span id="cb31-7"><a></a>A1["b1 = a0"]</span>
+<span id="cb31-8"><a></a>A2["l2:</span>
+<span id="cb31-9"><a></a>b2 = phi(b1,b0)"]</span>
+<span id="cb31-10"><a></a>A0 --&gt; A1</span>
+<span id="cb31-11"><a></a>A1 --&gt; A2</span>
+<span id="cb31-12"><a></a>A0 --&gt; A2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+A0["L1:
+   a0 =
+   b0 =
+   if A0 &gt; b0"]
+A1["b1 = a0"]
+A2["l2:
+b2 = phi(b1,b0)"]
+A0 --&gt; A1
+A1 --&gt; A2
+A0 --&gt; A2
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div><div class="column">
+<p>b2 = b0?</p>
+</div></div>
+<p>The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop</p>
+</section>
+<section id="critical-edge-splitting" class="slide level2">
+<h2>critical edge splitting</h2>
+<p>We can solve this problem by doing <strong><em>critical edge splitting</em></strong>. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge.</p>
 </section>
 <section id="making-use-of-ssa-form" class="slide level2">
 <h2>making use of ssa form</h2>

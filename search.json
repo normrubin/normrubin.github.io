@@ -153,7 +153,7 @@
     "href": "lectures/06_ssa.html#pseudo-code-for-one-basic-block",
     "title": "Static Single Assignment",
     "section": "pseudo code for one basic block",
-    "text": "pseudo code for one basic block\nfor each variable a: \n    Count[a] = 0 \n    Stack[a] = [0]\n\nrename_basic_block(B): \n    for each instruction S in block B:\n        for each use of a argument x in S: \n            i = top(Stack[x]) \n            replace the use of x with $x_i$\n            \n        for each variable a that S defines (a dest)\n            count[a] = Count[a] + 1 \n            i = Count[a]             \n            push i onto Stack[a]             \n            replace definition of a with $a_i$ \nWe don’t need the stack here but we will need it later.\n\nOf course, things will get a little more complicated when there is control flow. And because real machines are not SSA, using separate variables (i.e., memory locations and registers) for everything is bound to be inefficient.\nThe idea in SSA is to convert general programs into SSA form, do all our optimization there, and then convert back to a standard mutating form before we generate backend code.",
+    "text": "pseudo code for one basic block\nfor each variable a: \n    Count[a] = 0 \n    Stack[a] = [0]\n\nrename_basic_block(B): \n    for each instruction S in block B:\n        for each use of a argument x in S: \n            i = top(Stack[x]) \n            replace the use of x with x_i\n            \n        for each variable a that S defines (a dest)\n            count[a] = Count[a] + 1 \n            i = Count[a]             \n            push i onto Stack[a]             \n            replace definition of a with a_i\nWe don’t need the stack here but we will need it later.\n\nOf course, things will get a little more complicated when there is control flow. And because real machines are not SSA, using separate variables (i.e., memory locations and registers) for everything is bound to be inefficient.\nThe idea in SSA is to convert general programs into SSA form, do all our optimization there, and then convert back to a standard mutating form before we generate backend code.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -201,7 +201,7 @@
     "href": "lectures/06_ssa.html#back-to-the-example",
     "title": "Static Single Assignment",
     "section": "back to the example",
-    "text": "back to the example\nYou can write the above program in SSA like this:\n    @main(cond: bool) {\n    .entry:\n        a.1: int = const 47;\n        br cond .left .right;\n    .left:\n        a.2: int = add a.1 a.1;\n        jmp .exit;\n    .right:\n        a.3: int = mul a.1 a.1;\n        jmp .exit;\n    .exit:\n        a.4: int = phi .left a.2 .right a.3;\n        print a.4;\n    }",
+    "text": "back to the example\nYou can write the above program in SSA like this:\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\".b0\n    a: int = const 47;\n    br cond .left .right;\"]\nleft[\"a: int = add a a;\n    jmp .exit;\"]\nright[\"a: int = mul a a;\n        jmp .exit;\"]\nexit[\"print a;\"]\nB0 --&gt; left\nB0 --&gt; right\nleft --&gt; exit\nright --&gt; exit\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\".b0\n    a: int = const 47;\n    br cond .left .right;\"]\nleft[\"a: int = add a a;\n    jmp .exit;\"]\nright[\"a: int = mul a a;\n        jmp .exit;\"]\nexit[\"print a;\"]\nB0 --&gt; left\nB0 --&gt; right\nleft --&gt; exit\nright --&gt; exit\n\n\n\n\n\n\n\n    @main(cond: bool) {\n    .entry:\n        a.1: int = const 47;\n        br cond .left .right;\n    .left:\n        a.2: int = add a.1 a.1;\n        jmp .exit;\n    .right:\n        a.3: int = mul a.1 a.1;\n        jmp .exit;\n    .exit:\n        a.4: int = phi .left a.2 .right a.3;\n        print a.4;\n    }",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -221,59 +221,11 @@
     ]
   },
   {
-    "objectID": "lectures/06_ssa.html#getting-out-of-ssa",
-    "href": "lectures/06_ssa.html#getting-out-of-ssa",
-    "title": "Static Single Assignment",
-    "section": "Getting out of ssa",
-    "text": "Getting out of ssa\nCompilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Static Single Assignment"
-    ]
-  },
-  {
-    "objectID": "lectures/06_ssa.html#an-example-1",
-    "href": "lectures/06_ssa.html#an-example-1",
-    "title": "Static Single Assignment",
-    "section": "an example",
-    "text": "an example\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n\n\n\nwe cannot put instructions on edges, but we can add to prev block",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Static Single Assignment"
-    ]
-  },
-  {
-    "objectID": "lectures/06_ssa.html#critical-edges",
-    "href": "lectures/06_ssa.html#critical-edges",
-    "title": "Static Single Assignment",
-    "section": "critical edges",
-    "text": "critical edges\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n\n\nb2 = b0?\n\n\nThe placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Static Single Assignment"
-    ]
-  },
-  {
-    "objectID": "lectures/06_ssa.html#critical-edge-splitting",
-    "href": "lectures/06_ssa.html#critical-edge-splitting",
-    "title": "Static Single Assignment",
-    "section": "critical edge splitting",
-    "text": "critical edge splitting\nWe can solve this problem by doing critical edge splitting. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Static Single Assignment"
-    ]
-  },
-  {
     "objectID": "lectures/06_ssa.html#converting-to-ssa---very-simple-scheme",
     "href": "lectures/06_ssa.html#converting-to-ssa---very-simple-scheme",
     "title": "Static Single Assignment",
     "section": "Converting to SSA - Very simple scheme",
-    "text": "Converting to SSA - Very simple scheme\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n\nWhere do we need phi-functions?\nWhich variables\n. . .\nAt the merge (join) node\nb",
+    "text": "Converting to SSA - Very simple scheme\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n\nWhere do we need phi-functions?\nWhich variables\n. . .\nphi At the merge (join) node\nvariable b",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -281,11 +233,11 @@
     ]
   },
   {
-    "objectID": "lectures/06_ssa.html#scheme",
-    "href": "lectures/06_ssa.html#scheme",
+    "objectID": "lectures/06_ssa.html#conditions",
+    "href": "lectures/06_ssa.html#conditions",
     "title": "Static Single Assignment",
-    "section": "scheme",
-    "text": "scheme\nconditions: phi-function for variable b at node z\n\nThere is a block x containing a definition of b\nThere is a block y (with y ≠ x) containing a definition of b\nThere is a nonempty path Pxz of edges from x to z\nThere is a nonempty path Pyz of edges from y to z\nPaths Pxz and Pyz do not have any node in common other than z, and…\nThe node z does not appear within both Pxz and Pyz prior to the end, though it may appear in one or the other.",
+    "section": "conditions",
+    "text": "conditions\nconditions: phi-function for variable b at node z\n\nThere is a block x containing a definition of b\nThere is a block y (with y ≠ x) containing a definition of b\nThere is a nonempty path Pxz of edges from x to z\nThere is a nonempty path Pyz of edges from y to z\nPaths Pxz and Pyz do not have any node in common other than z, and…\nThe node z does not appear within both Pxz and Pyz prior to the end, though it may appear in one or the other.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -305,11 +257,59 @@
     ]
   },
   {
+    "objectID": "lectures/06_ssa.html#diagram",
+    "href": "lectures/06_ssa.html#diagram",
+    "title": "Static Single Assignment",
+    "section": "diagram",
+    "text": "diagram\nusing dash for path\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\na[\"x:x=\"]\nb[\"y:x=\"]\nc[join]\nd\na-.-&gt; c\nb-.-&gt; c\nc-.-&gt;d\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\na[\"x:x=\"]\nb[\"y:x=\"]\nc[join]\nd\na-.-&gt; c\nb-.-&gt; c\nc-.-&gt;d \n\n\n\n\n\n\nWe could have complex flow - including loops on the paths",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
     "objectID": "lectures/06_ssa.html#fast-methods",
     "href": "lectures/06_ssa.html#fast-methods",
     "title": "Static Single Assignment",
     "section": "fast methods",
-    "text": "fast methods\nTo convert to SSA, we want to insert phi-nodes whenever there are distinct paths containing distinct definitions of a variable. We don’t need phi-nodes in places that are dominated by a definition of the variable. So what’s a way to know when control reachable from a definition is not dominated by that definition?\nThe dominance frontier!",
+    "text": "fast methods\nThe method for this has two steps\n\ninsert phi instructions where needed (do not add subscripts yet)\nin a second pass insert all the numbers",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#to-ssa",
+    "href": "lectures/06_ssa.html#to-ssa",
+    "title": "Static Single Assignment",
+    "section": "to ssa",
+    "text": "to ssa\nTo convert to SSA, we want to insert phi-nodes whenever there are distinct paths containing distinct definitions of a variable. We don’t need phi-nodes in places that are dominated by a definition of the variable. So what’s a way to know when control reachable from a definition is not dominated by that definition?\nThe dominance frontier!",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#recall-the-dominance-frontier",
+    "href": "lectures/06_ssa.html#recall-the-dominance-frontier",
+    "title": "Static Single Assignment",
+    "section": "recall the dominance frontier",
+    "text": "recall the dominance frontier\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;B \nA--&gt; F\nB--&gt;C\nB--&gt; D\nC--&gt; E\nD--&gt; E\nE--&gt; F\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;B \nA--&gt; F\nB--&gt;C\nB--&gt; D\nC--&gt; E\nD--&gt; E\nE--&gt; F\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA--&gt; B\nA--&gt; F\nB--&gt; C\nB--&gt;D\nB--&gt; E\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA--&gt; B\nA--&gt; F\nB--&gt; C\nB--&gt;D\nB--&gt; E\n\n\n\n\n\n\n\n\n\n\n\nblock\nA\nB\nC\nD\nE\n\n\nfrontier\nempty\nF\nE\nE\nF",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#a-block-can-be-in-its-own-dom-frontier",
+    "href": "lectures/06_ssa.html#a-block-can-be-in-its-own-dom-frontier",
+    "title": "Static Single Assignment",
+    "section": "a block can be in its own dom frontier",
+    "text": "a block can be in its own dom frontier\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt; B\nB--&gt; A\nB--&gt; C\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt; B\nB--&gt; A\nB--&gt; C\n\n\n\n\n\n\nwhy: A dom B, but B does not dom A. so A is in the dom frontier of A",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -321,7 +321,79 @@
     "href": "lectures/06_ssa.html#an-almost-linear-method",
     "title": "Static Single Assignment",
     "section": "an almost linear method",
-    "text": "an almost linear method\nWe do it in two steps.\n\ninsert phi-nodes:\nrename variables:\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\na[x=]\na--&gt;b\na--&gt; e\na--&gt; i\n\nb--&gt;c\nc--- c\nc--&gt; d\ne--&gt; f[\"f\n  x = \"]\ne--&gt; g\ng--&gt; h\nf--&gt; h\nh--&gt;l\nf--&gt; d\nh--&gt; e\ni--&gt; k\ni--&gt; j\nj--&gt; k\nk--&gt; l\nd--&gt; l\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\na[x=]\na--&gt;b\na--&gt; e\na--&gt; i\n\nb--&gt;c\nc--- c\nc--&gt; d\ne--&gt; f[\"f\n  x = \"]\ne--&gt; g\ng--&gt; h\nf--&gt; h\nh--&gt;l\nf--&gt; d\nh--&gt; e\ni--&gt; k\ni--&gt; j\nj--&gt; k\nk--&gt; l\nd--&gt; l\n\n\n\n\n\n\n\n\nWe need phi functions for this def of x in d and h, where else? 3 more\n\n\n. . .\nwe need to iterate and keep adding phi nodes\n\nfor each node in the cfg \n   for each variable with a dest in node\n     add node to Defs[v]   # Blocks where v is assigned.\n\nfor each v in vars:\n    W = Defs[v]\n    while W is not empty\n      remove a node n from w\n         for block in DF[n]:  # Dominance frontier.\n           Add a phi-node to block,\n             unless we have done so already.\n           Add block to W (because it now writes to v),\n             unless it's already in there.\n. . .\nSince we keep adding nodes to W how do we know this terminates?",
+    "text": "an almost linear method\nWe do it in two steps.\n\ninsert phi-nodes:\nrename variables:",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#placing-phi-functions",
+    "href": "lectures/06_ssa.html#placing-phi-functions",
+    "title": "Static Single Assignment",
+    "section": "placing Phi functions",
+    "text": "placing Phi functions\nlet b be a block with a def of a variable v, if b has multiple defs of v, use the last one\nWhat is the first block following v that can be reached by a different def of v\nin blocks dominated by b, b’s def must have been executed, (other defs of v in a dominated block may overwrite it)\nwe need to place a phi function for b at the start of all blocks in the dom frontier of b.\nafter we add phi functions to S where S = df(b) we have more defs, so we need to add phi’s in the dom frontier of all the blocks in S",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#example-1",
+    "href": "lectures/06_ssa.html#example-1",
+    "title": "Static Single Assignment",
+    "section": "example 1",
+    "text": "example 1\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v=1\"]\nM\nM2[\"v=2\"]\nZ[\"M\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v=1\"]\nM\nM2[\"v=2\"]\nZ[\"M\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v1=1\"]\nM\nM2[\"v2=2\"]\nZ[\"M:v3= phi(v1,v2)\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v1=1\"]\nM\nM2[\"v2=2\"]\nZ[\"M:v3= phi(v1,v2)\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#a-loop",
+    "href": "lectures/06_ssa.html#a-loop",
+    "title": "Static Single Assignment",
+    "section": "a loop",
+    "text": "a loop\n::: {.columns}\n::: {.column}\n\ngraph TD\n V[\"v=init\"]\n Z{\"z:v = v+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n graph TD\n V[\"v=init\"]\n Z{\"z:v = v+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n\n\n:::\n::: {.column}\n\ngraph TD\n V[\"v1=init\"]\n Z{\"z:v2 = phi(v1,v3)\\nv3 = v2+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n graph TD\n V[\"v1=init\"]\n Z{\"z:v2 = phi(v1,v3)\\nv3 = v2+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n\n\n:::\n:::",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#iterative-placement",
+    "href": "lectures/06_ssa.html#iterative-placement",
+    "title": "Static Single Assignment",
+    "section": "iterative placement",
+    "text": "iterative placement\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v=1]\nB2[v=2]\nB3\nB4[v=3]\nB5\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v=1]\nB2[v=2]\nB3\nB4[v=3]\nB5\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v1=1]\nB2[v2=2]\nB3[\"v3=phi(v1,v2)\"]\nB4[v4=3]\nB5[\"v5=phi(v3,v4)\"]\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v1=1]\nB2[v2=2]\nB3[\"v3=phi(v1,v2)\"]\nB4[v4=3]\nB5[\"v5=phi(v3,v4)\"]\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#phi-placement",
+    "href": "lectures/06_ssa.html#phi-placement",
+    "title": "Static Single Assignment",
+    "section": "phi placement",
+    "text": "phi placement\nfor each block b in the cfg \n  for each var v defined in b\n    add block to the set defs(v)  ## blocks that contain an assignment to v \n\n  W = Defs[v]\n    while W is not empty\n      remove a node n from w\n         for block in DF[n]:  # Dominance frontier.\n           Add a phi-node to block,\n             unless we have done so already.\n           Add block to W (because it now writes to v),\n             unless it's already in there.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#an-example-1",
+    "href": "lectures/06_ssa.html#an-example-1",
+    "title": "Static Single Assignment",
+    "section": "an example",
+    "text": "an example\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN1[\"1:x = 1\"]\nN2[\"2:\"]\nN3[\"3:x= 2\"]\nN4[\"4:\"]\nN5[\"5:x=3\"]\nN6[6:x=4]\nN7[7:]\nN1--&gt; N2\nN1--&gt; N3\nN2--&gt; N4\nN3--&gt; N4\nN4--&gt; N5\nN5--&gt;  N4\nN5--&gt; N6\nN6--&gt; N7\nN6--&gt; N5\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN1[\"1:x = 1\"]\nN2[\"2:\"]\nN3[\"3:x= 2\"]\nN4[\"4:\"]\nN5[\"5:x=3\"]\nN6[6:x=4]\nN7[7:]\nN1--&gt; N2\nN1--&gt; N3\nN2--&gt; N4\nN3--&gt; N4\nN4--&gt; N5\nN5--&gt;  N4\nN5--&gt; N6\nN6--&gt; N7\nN6--&gt; N5\n\n\n\n\n\n\n\n\ninitially w = {1,3,5,6}\nprocess DF(1) = empty\nprocess DF(3) = 4, add 4 to w and add a phi function for x to 4\nprocess DF(5) = 4,5 no need to add 5 to w, add phi for x to 5\nprocess DF(6) = 5\nprocess DF(4) = 4\n\n\n\nadd phi’s to blocks 4 and 5",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -333,7 +405,19 @@
     "href": "lectures/06_ssa.html#rename-variables",
     "title": "Static Single Assignment",
     "section": "rename variables:",
-    "text": "rename variables:\nrename(n):\n  rename_basic_block(n)  # from before \n  for each successor Y of n, where n is the jth pred of Y\n    for each phi-function f in Y where the operand of f is 'a'\n      i = top(stack[a])\n      replace jth operand wit a_i\n  for each child of X of n (in the dominator tree)\n    rename(X)\n    for each instruction S in n\n       pop stack(S.dest)\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\n\nL5--&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\n\nL5--&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3",
+    "text": "rename variables:\n# allocate a stack and a counter for each variable\nfor each V a variable \n  c[v] = 0\n  s[v] = empty stack\n  search(entry)\n\nsearch(n):\n  for each instr i in n:\n     if instr is not a phi\n         replace every variable in the rhs of instr by vi where i = top(s[v])\n         if instr has a dest v\n           i = C(v)\n            replace v by new vi, push i onto s[v]\n            increment c[v]\n\n  for each y a successor of n\n     j = which pred (y,n)\n     for each phi function pinstr in Y replace the jth opernmad of pinstr by vi where \n        i = top(s(v)\n  \n  for each Y a child of n in the dominator tree \n      call search(Y)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#an-example-2",
+    "href": "lectures/06_ssa.html#an-example-2",
+    "title": "Static Single Assignment",
+    "section": "an example",
+    "text": "an example\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\n\nL5--&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\n\nL5--&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -382,6 +466,54 @@
     "title": "Static Single Assignment",
     "section": "The arity of phi-functions",
     "text": "The arity of phi-functions\nCould we have a phi-function in a node with only one predecessor?\ncould we have a phi-function wit more then two arguments?\nThis algorithm computes what is called minimal SSA form which is not so mimimal since it can leave dead assignments\ndoing dead code elimination pruned ssa form",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#getting-out-of-ssa",
+    "href": "lectures/06_ssa.html#getting-out-of-ssa",
+    "title": "Static Single Assignment",
+    "section": "Getting out of ssa",
+    "text": "Getting out of ssa\nCompilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#an-example-3",
+    "href": "lectures/06_ssa.html#an-example-3",
+    "title": "Static Single Assignment",
+    "section": "an example",
+    "text": "an example\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n\n\n\nwe cannot put instructions on edges, but we can add to prev block",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#critical-edges",
+    "href": "lectures/06_ssa.html#critical-edges",
+    "title": "Static Single Assignment",
+    "section": "critical edges",
+    "text": "critical edges\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n\n\nb2 = b0?\n\n\nThe placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Static Single Assignment"
+    ]
+  },
+  {
+    "objectID": "lectures/06_ssa.html#critical-edge-splitting",
+    "href": "lectures/06_ssa.html#critical-edge-splitting",
+    "title": "Static Single Assignment",
+    "section": "critical edge splitting",
+    "text": "critical edge splitting\nWe can solve this problem by doing critical edge splitting. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge.",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -560,7 +692,7 @@
     "href": "lectures/revealjs_06_ssa.qmd.html#pseudo-code-for-one-basic-block",
     "title": "Static Single Assignment",
     "section": "pseudo code for one basic block",
-    "text": "pseudo code for one basic block\nfor each variable a: \n    Count[a] = 0 \n    Stack[a] = [0]\n\nrename_basic_block(B): \n    for each instruction S in block B:\n        for each use of a argument x in S: \n            i = top(Stack[x]) \n            replace the use of x with $x_i$\n            \n        for each variable a that S defines (a dest)\n            count[a] = Count[a] + 1 \n            i = Count[a]             \n            push i onto Stack[a]             \n            replace definition of a with $a_i$ \nWe don’t need the stack here but we will need it later."
+    "text": "pseudo code for one basic block\nfor each variable a: \n    Count[a] = 0 \n    Stack[a] = [0]\n\nrename_basic_block(B): \n    for each instruction S in block B:\n        for each use of a argument x in S: \n            i = top(Stack[x]) \n            replace the use of x with x_i\n            \n        for each variable a that S defines (a dest)\n            count[a] = Count[a] + 1 \n            i = Count[a]             \n            push i onto Stack[a]             \n            replace definition of a with a_i\nWe don’t need the stack here but we will need it later."
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#phi-nodes",
@@ -588,7 +720,7 @@
     "href": "lectures/revealjs_06_ssa.qmd.html#back-to-the-example",
     "title": "Static Single Assignment",
     "section": "back to the example",
-    "text": "back to the example\nYou can write the above program in SSA like this:\n    @main(cond: bool) {\n    .entry:\n        a.1: int = const 47;\n        br cond .left .right;\n    .left:\n        a.2: int = add a.1 a.1;\n        jmp .exit;\n    .right:\n        a.3: int = mul a.1 a.1;\n        jmp .exit;\n    .exit:\n        a.4: int = phi .left a.2 .right a.3;\n        print a.4;\n    }"
+    "text": "back to the example\nYou can write the above program in SSA like this:\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\".b0\n    a: int = const 47;\n    br cond .left .right;\"]\nleft[\"a: int = add a a;\n    jmp .exit;\"]\nright[\"a: int = mul a a;\n        jmp .exit;\"]\nexit[\"print a;\"]\nB0 --&gt; left\nB0 --&gt; right\nleft --&gt; exit\nright --&gt; exit\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nB0[\".b0\n    a: int = const 47;\n    br cond .left .right;\"]\nleft[\"a: int = add a a;\n    jmp .exit;\"]\nright[\"a: int = mul a a;\n        jmp .exit;\"]\nexit[\"print a;\"]\nB0 --&gt; left\nB0 --&gt; right\nleft --&gt; exit\nright --&gt; exit\n\n\n\n\n\n\n\n    @main(cond: bool) {\n    .entry:\n        a.1: int = const 47;\n        br cond .left .right;\n    .left:\n        a.2: int = add a.1 a.1;\n        jmp .exit;\n    .right:\n        a.3: int = mul a.1 a.1;\n        jmp .exit;\n    .exit:\n        a.4: int = phi .left a.2 .right a.3;\n        print a.4;\n    }"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#bril-in-ssa",
@@ -598,46 +730,18 @@
     "text": "Bril in SSA\nBril has an SSA extension It adds support for a phi instruction. Beyond that, SSA form is just a restriction on the normal expressiveness of Bril—if you solemnly promise never to assign statically to the same variable twice, you are writing “SSA Bril.”\nThe reference interpreter has built-in support for phi, so you can execute your SSA-form Bril programs without fuss."
   },
   {
-    "objectID": "lectures/revealjs_06_ssa.qmd.html#getting-out-of-ssa",
-    "href": "lectures/revealjs_06_ssa.qmd.html#getting-out-of-ssa",
-    "title": "Static Single Assignment",
-    "section": "Getting out of ssa",
-    "text": "Getting out of ssa\nCompilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies."
-  },
-  {
-    "objectID": "lectures/revealjs_06_ssa.qmd.html#an-example-1",
-    "href": "lectures/revealjs_06_ssa.qmd.html#an-example-1",
-    "title": "Static Single Assignment",
-    "section": "an example",
-    "text": "an example\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n\n\nwe cannot put instructions on edges, but we can add to prev block"
-  },
-  {
-    "objectID": "lectures/revealjs_06_ssa.qmd.html#critical-edges",
-    "href": "lectures/revealjs_06_ssa.qmd.html#critical-edges",
-    "title": "Static Single Assignment",
-    "section": "critical edges",
-    "text": "critical edges\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n\n\nb2 = b0?\n\nThe placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop"
-  },
-  {
-    "objectID": "lectures/revealjs_06_ssa.qmd.html#critical-edge-splitting",
-    "href": "lectures/revealjs_06_ssa.qmd.html#critical-edge-splitting",
-    "title": "Static Single Assignment",
-    "section": "critical edge splitting",
-    "text": "critical edge splitting\nWe can solve this problem by doing critical edge splitting. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge."
-  },
-  {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#converting-to-ssa---very-simple-scheme",
     "href": "lectures/revealjs_06_ssa.qmd.html#converting-to-ssa---very-simple-scheme",
     "title": "Static Single Assignment",
     "section": "Converting to SSA - Very simple scheme",
-    "text": "Converting to SSA - Very simple scheme\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n\nWhere do we need phi-functions?\nWhich variables\n\nAt the merge (join) node\nb"
+    "text": "Converting to SSA - Very simple scheme\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph LR\nX[\"Block X\n   a = \n   b = \n   if s &gt; b\"]\nY[\"Block Y\n  b = a\"]\nZ[\"Block Z\nret b\"]\nX --&gt; Y\nY--&gt; Z\nX --&gt; Z\n\n\n\n\n\n\nWhere do we need phi-functions?\nWhich variables\n\nphi At the merge (join) node\nvariable b"
   },
   {
-    "objectID": "lectures/revealjs_06_ssa.qmd.html#scheme",
-    "href": "lectures/revealjs_06_ssa.qmd.html#scheme",
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#conditions",
+    "href": "lectures/revealjs_06_ssa.qmd.html#conditions",
     "title": "Static Single Assignment",
-    "section": "scheme",
-    "text": "scheme\nconditions: phi-function for variable b at node z\n\nThere is a block x containing a definition of b\nThere is a block y (with y ≠ x) containing a definition of b\nThere is a nonempty path Pxz of edges from x to z\nThere is a nonempty path Pyz of edges from y to z\nPaths Pxz and Pyz do not have any node in common other than z, and…\nThe node z does not appear within both Pxz and Pyz prior to the end, though it may appear in one or the other."
+    "section": "conditions",
+    "text": "conditions\nconditions: phi-function for variable b at node z\n\nThere is a block x containing a definition of b\nThere is a block y (with y ≠ x) containing a definition of b\nThere is a nonempty path Pxz of edges from x to z\nThere is a nonempty path Pyz of edges from y to z\nPaths Pxz and Pyz do not have any node in common other than z, and…\nThe node z does not appear within both Pxz and Pyz prior to the end, though it may appear in one or the other."
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#scheme-part-2",
@@ -647,11 +751,39 @@
     "text": "scheme part 2\nthis is iterative since when we add a phi, we are creating a new defintion, which may add new phi-functions\nWhen we find nodes X,Y,Z that match these steps and z does not contain a phi function for b, insert a phi\nWhile really expensive this will work"
   },
   {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#diagram",
+    "href": "lectures/revealjs_06_ssa.qmd.html#diagram",
+    "title": "Static Single Assignment",
+    "section": "diagram",
+    "text": "diagram\nusing dash for path\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\na[\"x:x=\"]\nb[\"y:x=\"]\nc[join]\nd\na-.-&gt; c\nb-.-&gt; c\nc-.-&gt;d\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\na[\"x:x=\"]\nb[\"y:x=\"]\nc[join]\nd\na-.-&gt; c\nb-.-&gt; c\nc-.-&gt;d \n\n\n\n\n\n\nWe could have complex flow - including loops on the paths"
+  },
+  {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#fast-methods",
     "href": "lectures/revealjs_06_ssa.qmd.html#fast-methods",
     "title": "Static Single Assignment",
     "section": "fast methods",
-    "text": "fast methods\nTo convert to SSA, we want to insert phi-nodes whenever there are distinct paths containing distinct definitions of a variable. We don’t need phi-nodes in places that are dominated by a definition of the variable. So what’s a way to know when control reachable from a definition is not dominated by that definition?\nThe dominance frontier!"
+    "text": "fast methods\nThe method for this has two steps\n\ninsert phi instructions where needed (do not add subscripts yet)\nin a second pass insert all the numbers"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#to-ssa",
+    "href": "lectures/revealjs_06_ssa.qmd.html#to-ssa",
+    "title": "Static Single Assignment",
+    "section": "to ssa",
+    "text": "to ssa\nTo convert to SSA, we want to insert phi-nodes whenever there are distinct paths containing distinct definitions of a variable. We don’t need phi-nodes in places that are dominated by a definition of the variable. So what’s a way to know when control reachable from a definition is not dominated by that definition?\nThe dominance frontier!"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#recall-the-dominance-frontier",
+    "href": "lectures/revealjs_06_ssa.qmd.html#recall-the-dominance-frontier",
+    "title": "Static Single Assignment",
+    "section": "recall the dominance frontier",
+    "text": "recall the dominance frontier\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;B \nA--&gt; F\nB--&gt;C\nB--&gt; D\nC--&gt; E\nD--&gt; E\nE--&gt; F\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt;B \nA--&gt; F\nB--&gt;C\nB--&gt; D\nC--&gt; E\nD--&gt; E\nE--&gt; F\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA--&gt; B\nA--&gt; F\nB--&gt; C\nB--&gt;D\nB--&gt; E\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA--&gt; B\nA--&gt; F\nB--&gt; C\nB--&gt;D\nB--&gt; E\n\n\n\n\n\n\n\n\n\n\nblock\nA\nB\nC\nD\nE\n\n\nfrontier\nempty\nF\nE\nE\nF"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#a-block-can-be-in-its-own-dom-frontier",
+    "href": "lectures/revealjs_06_ssa.qmd.html#a-block-can-be-in-its-own-dom-frontier",
+    "title": "Static Single Assignment",
+    "section": "a block can be in its own dom frontier",
+    "text": "a block can be in its own dom frontier\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt; B\nB--&gt; A\nB--&gt; C\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA--&gt; B\nB--&gt; A\nB--&gt; C\n\n\n\n\n\n\nwhy: A dom B, but B does not dom A. so A is in the dom frontier of A"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#an-almost-linear-method",
@@ -661,11 +793,60 @@
     "text": "an almost linear method\nWe do it in two steps.\n\ninsert phi-nodes:\nrename variables:"
   },
   {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#placing-phi-functions",
+    "href": "lectures/revealjs_06_ssa.qmd.html#placing-phi-functions",
+    "title": "Static Single Assignment",
+    "section": "placing Phi functions",
+    "text": "placing Phi functions\nlet b be a block with a def of a variable v, if b has multiple defs of v, use the last one\nWhat is the first block following v that can be reached by a different def of v\nin blocks dominated by b, b’s def must have been executed, (other defs of v in a dominated block may overwrite it)\nwe need to place a phi function for b at the start of all blocks in the dom frontier of b.\nafter we add phi functions to S where S = df(b) we have more defs, so we need to add phi’s in the dom frontier of all the blocks in S"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#example-1",
+    "href": "lectures/revealjs_06_ssa.qmd.html#example-1",
+    "title": "Static Single Assignment",
+    "section": "example 1",
+    "text": "example 1\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v=1\"]\nM\nM2[\"v=2\"]\nZ[\"M\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v=1\"]\nM\nM2[\"v=2\"]\nZ[\"M\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v1=1\"]\nM\nM2[\"v2=2\"]\nZ[\"M:v3= phi(v1,v2)\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN[\"v1=1\"]\nM\nM2[\"v2=2\"]\nZ[\"M:v3= phi(v1,v2)\"]\nN--&gt; M\nM--&gt;Z\nM2--&gt; Z"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#a-loop",
+    "href": "lectures/revealjs_06_ssa.qmd.html#a-loop",
+    "title": "Static Single Assignment",
+    "section": "a loop",
+    "text": "a loop\n::: {.columns}\n::: {.column}\n\n\nCode\ngraph TD\n V[\"v=init\"]\n Z{\"z:v = v+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n\n graph TD\n V[\"v=init\"]\n Z{\"z:v = v+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n\n\n:::\n::: {.column}\n\n\nCode\ngraph TD\n V[\"v1=init\"]\n Z{\"z:v2 = phi(v1,v3)\\nv3 = v2+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n\n graph TD\n V[\"v1=init\"]\n Z{\"z:v2 = phi(v1,v3)\\nv3 = v2+1\"}\n V --&gt; Z\n Z --&gt;Z\n\n\n\n\n\n\n:::\n:::"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#iterative-placement",
+    "href": "lectures/revealjs_06_ssa.qmd.html#iterative-placement",
+    "title": "Static Single Assignment",
+    "section": "iterative placement",
+    "text": "iterative placement\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v=1]\nB2[v=2]\nB3\nB4[v=3]\nB5\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v=1]\nB2[v=2]\nB3\nB4[v=3]\nB5\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v1=1]\nB2[v2=2]\nB3[\"v3=phi(v1,v2)\"]\nB4[v4=3]\nB5[\"v5=phi(v3,v4)\"]\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nB1[v1=1]\nB2[v2=2]\nB3[\"v3=phi(v1,v2)\"]\nB4[v4=3]\nB5[\"v5=phi(v3,v4)\"]\nB1--&gt; B3\nB2--&gt; B3\nB3--&gt; B5\nB4--&gt; B5"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#phi-placement",
+    "href": "lectures/revealjs_06_ssa.qmd.html#phi-placement",
+    "title": "Static Single Assignment",
+    "section": "phi placement",
+    "text": "phi placement\nfor each block b in the cfg \n  for each var v defined in b\n    add block to the set defs(v)  ## blocks that contain an assignment to v \n\n  W = Defs[v]\n    while W is not empty\n      remove a node n from w\n         for block in DF[n]:  # Dominance frontier.\n           Add a phi-node to block,\n             unless we have done so already.\n           Add block to W (because it now writes to v),\n             unless it's already in there."
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#an-example-1",
+    "href": "lectures/revealjs_06_ssa.qmd.html#an-example-1",
+    "title": "Static Single Assignment",
+    "section": "an example",
+    "text": "an example\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN1[\"1:x = 1\"]\nN2[\"2:\"]\nN3[\"3:x= 2\"]\nN4[\"4:\"]\nN5[\"5:x=3\"]\nN6[6:x=4]\nN7[7:]\nN1--&gt; N2\nN1--&gt; N3\nN2--&gt; N4\nN3--&gt; N4\nN4--&gt; N5\nN5--&gt;  N4\nN5--&gt; N6\nN6--&gt; N7\nN6--&gt; N5\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nN1[\"1:x = 1\"]\nN2[\"2:\"]\nN3[\"3:x= 2\"]\nN4[\"4:\"]\nN5[\"5:x=3\"]\nN6[6:x=4]\nN7[7:]\nN1--&gt; N2\nN1--&gt; N3\nN2--&gt; N4\nN3--&gt; N4\nN4--&gt; N5\nN5--&gt;  N4\nN5--&gt; N6\nN6--&gt; N7\nN6--&gt; N5\n\n\n\n\n\n\n\n\ninitially w = {1,3,5,6}\nprocess DF(1) = empty\nprocess DF(3) = 4, add 4 to w and add a phi function for x to 4\nprocess DF(5) = 4,5 no need to add 5 to w, add phi for x to 5\nprocess DF(6) = 5\nprocess DF(4) = 4\n\n\nadd phi’s to blocks 4 and 5"
+  },
+  {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#rename-variables",
     "href": "lectures/revealjs_06_ssa.qmd.html#rename-variables",
     "title": "Static Single Assignment",
     "section": "rename variables:",
-    "text": "rename variables:\nrename(n):\n  rename_basic_block(n)  # from before \n  for each successor Y of n, where n is the jth pred of Y\n    for each phi-function f in Y where the operand of f is 'a'\n      i = top(stack[a])\n      replace jth operand wit a_i\n  for each child of X of n (in the dominator tree)\n    rename(X)\n    for each instruction S in n\n       pop stack(S.dest)"
+    "text": "rename variables:\n# allocate a stack and a counter for each variable\nfor each V a variable \n  c[v] = 0\n  s[v] = empty stack\n  search(entry)\n\nsearch(n):\n  for each instr i in n:\n     if instr is not a phi\n         replace every variable in the rhs of instr by vi where i = top(s[v])\n         if instr has a dest v\n           i = C(v)\n            replace v by new vi, push i onto s[v]\n            increment c[v]\n\n  for each y a successor of n\n     j = which pred (y,n)\n     for each phi function pinstr in Y replace the jth opernmad of pinstr by vi where \n        i = top(s(v)\n  \n  for each Y a child of n in the dominator tree \n      call search(Y)"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#an-example-2",
+    "href": "lectures/revealjs_06_ssa.qmd.html#an-example-2",
+    "title": "Static Single Assignment",
+    "section": "an example",
+    "text": "an example\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\n\nL5--&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nL0[\"L0: i = 1\n   L1: j = 1\n   L2: k = 0\"]\n\nL3[\"L3: if j &lt;20 go to l4 else l10\"]\n\nL4[\"l4: if j &lt; 20 goto l7 else l5\"]\n\nL5[\"l5: j = i\n   l6: k = k +1\"]\n\n\nL7[\"l7: j = k\n  l8: k = k +2\"]\n\nL9[L9: goto l3]\n\nL10[\"l10: ret j\"]\n\nL0--&gt; L3\n\nL3--&gt; L4\nL3 --&gt; L10\n\nL4 --&gt; L5\nL4 --&gt; L7\n\nL5--&gt; L9\nL7 --&gt; L9\nL9 --&gt; L3"
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#what-is-the-dominator-tree",
@@ -694,6 +875,34 @@
     "title": "Static Single Assignment",
     "section": "The arity of phi-functions",
     "text": "The arity of phi-functions\nCould we have a phi-function in a node with only one predecessor?\ncould we have a phi-function wit more then two arguments?\nThis algorithm computes what is called minimal SSA form which is not so mimimal since it can leave dead assignments\ndoing dead code elimination pruned ssa form"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#getting-out-of-ssa",
+    "href": "lectures/revealjs_06_ssa.qmd.html#getting-out-of-ssa",
+    "title": "Static Single Assignment",
+    "section": "Getting out of ssa",
+    "text": "Getting out of ssa\nCompilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies."
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#an-example-3",
+    "href": "lectures/revealjs_06_ssa.qmd.html#an-example-3",
+    "title": "Static Single Assignment",
+    "section": "an example",
+    "text": "an example\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n A0[\"io =\n     j0 = \n     k0 =\"]\nA1[\"i1 =\n   j1 =\n   k1 = \"]\nA2[\"i2 = phi(i0, i1)\n   j2 = phi(j0, j1)\n   k2 = phi(k0, k1)\n   ...\n    = i2\n    = j2 \n    = k2\"]\n\n    A0 --&gt; A2\n    A1--&gt; A2\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n B0[\"io =\n     j0 = \n     k0 =\"]\nB1[\"i1 =\n   j1 =\n   k1 = \"]\nB2[\"\n   ...\n    = i2\n    = j2 \n    = k2\"]\n    B0 --\"i2 = i0\n       j2 = j0\n       k2 = k0\"--&gt; B2\n    B1 --\"i2 = i1\n          j2 = j1\n          k2 = k1\"--&gt; B2\n\n\n\n\n\n\n\nwe cannot put instructions on edges, but we can add to prev block"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#critical-edges",
+    "href": "lectures/revealjs_06_ssa.qmd.html#critical-edges",
+    "title": "Static Single Assignment",
+    "section": "critical edges",
+    "text": "critical edges\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA0[\"L1:\n   a0 =\n   b0 =\n   if A0 &gt; b0\"]\nA1[\"b1 = a0\"]\nA2[\"l2:\nb2 = phi(b1,b0)\"]\nA0 --&gt; A1\nA1 --&gt; A2\nA0 --&gt; A2\n\n\n\n\n\n\n\nb2 = b0?\n\nThe placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors. This should remind you of adding a preheader to a loop"
+  },
+  {
+    "objectID": "lectures/revealjs_06_ssa.qmd.html#critical-edge-splitting",
+    "href": "lectures/revealjs_06_ssa.qmd.html#critical-edge-splitting",
+    "title": "Static Single Assignment",
+    "section": "critical edge splitting",
+    "text": "critical edge splitting\nWe can solve this problem by doing critical edge splitting. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge."
   },
   {
     "objectID": "lectures/revealjs_06_ssa.qmd.html#making-use-of-ssa-form",
@@ -981,7 +1190,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#eeb63e8d .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#a2322915 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4248,7 +4457,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 764\n-rw-r--r-- 1 runner docker 40847 Oct  2 00:49 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Oct  2 00:48 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Oct  2 00:48 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct  2 00:47 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Oct  2 00:48 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Oct  2 00:48 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct  2 00:47 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Oct  2 00:48 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Oct  2 00:48 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Oct  2 00:49 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Oct  2 00:48 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Oct  2 00:48 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  9438 Oct  2 00:48 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Oct  2 00:48 05_global.qmd\n-rw-r--r-- 1 runner docker  4875 Oct  2 00:48 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Oct  2 00:49 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Oct  2 00:48 05c_pre.qmd\n-rw-r--r-- 1 runner docker 16413 Oct  2 00:48 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25506 Oct  2 00:47 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Oct  2 00:48 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Oct  2 00:48 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct  2 00:47 09_poly_files\n-rw-r--r-- 1 runner docker   302 Oct  2 00:48 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Oct  2 00:48 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Oct  2 00:49 12_memory.html\n-rw-r--r-- 1 runner docker   316 Oct  2 00:48 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Oct  2 00:48 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Oct  2 00:48 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Oct  2 00:47 a.json\n-rw-r--r-- 1 runner docker   248 Oct  2 00:47 a.ts\ndrwxr-xr-x 2 runner docker  4096 Oct  2 00:47 df\n-rw-r--r-- 1 runner docker  9019 Oct  2 00:48 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Oct  2 00:47 errors\n-rw-r--r-- 1 runner docker  3623 Oct  2 00:47 foo.ll\n-rw-r--r-- 1 runner docker  2296 Oct  2 00:47 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Oct  2 00:47 images\n-rw-r--r-- 1 runner docker 45294 Oct  2 00:49 llvm.html\n-rw-r--r-- 1 runner docker 18081 Oct  2 00:48 llvm.qmd\n-rw-r--r-- 1 runner docker 13221 Oct  2 00:48 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Oct  2 00:48 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Oct  2 00:47 papers\ndrwxr-xr-x 2 runner docker  4096 Oct  2 00:47 ra\n-rw-r--r-- 1 runner docker  8226 Oct  2 00:48 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Oct  2 00:48 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Oct  2 00:49 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Oct  2 00:49 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Oct  2 00:49 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 57841 Oct  2 00:49 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 22316 Oct  2 00:47 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 764\n-rw-r--r-- 1 runner docker 40847 Oct  3 18:38 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Oct  3 18:37 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Oct  3 18:37 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct  3 18:37 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Oct  3 18:37 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  4134 Oct  3 18:37 01a_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct  3 18:37 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Oct  3 18:37 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Oct  3 18:37 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23797 Oct  3 18:38 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 12742 Oct  3 18:37 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Oct  3 18:37 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  9438 Oct  3 18:37 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Oct  3 18:37 05_global.qmd\n-rw-r--r-- 1 runner docker  4513 Oct  3 18:37 05b_licm.qmd\n-rw-r--r-- 1 runner docker 33595 Oct  3 18:38 05c_pre.html\n-rw-r--r-- 1 runner docker  3148 Oct  3 18:37 05c_pre.qmd\n-rw-r--r-- 1 runner docker 19782 Oct  3 18:37 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25506 Oct  3 18:37 07_llvm.ipynb\n-rw-r--r-- 1 runner docker  5691 Oct  3 18:37 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Oct  3 18:37 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct  3 18:37 09_poly_files\n-rw-r--r-- 1 runner docker   302 Oct  3 18:37 100_mlir.qmd\n-rw-r--r-- 1 runner docker   320 Oct  3 18:37 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Oct  3 18:38 12_memory.html\n-rw-r--r-- 1 runner docker   316 Oct  3 18:37 12_memory.qmd\n-rw-r--r-- 1 runner docker 16077 Oct  3 18:37 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10116 Oct  3 18:37 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Oct  3 18:37 a.json\n-rw-r--r-- 1 runner docker   248 Oct  3 18:37 a.ts\ndrwxr-xr-x 2 runner docker  4096 Oct  3 18:37 df\n-rw-r--r-- 1 runner docker  9019 Oct  3 18:37 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Oct  3 18:37 errors\n-rw-r--r-- 1 runner docker  3623 Oct  3 18:37 foo.ll\n-rw-r--r-- 1 runner docker  2296 Oct  3 18:37 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Oct  3 18:37 images\n-rw-r--r-- 1 runner docker 45294 Oct  3 18:38 llvm.html\n-rw-r--r-- 1 runner docker 18081 Oct  3 18:37 llvm.qmd\n-rw-r--r-- 1 runner docker 13221 Oct  3 18:37 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Oct  3 18:37 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Oct  3 18:37 papers\ndrwxr-xr-x 2 runner docker  4096 Oct  3 18:37 ra\n-rw-r--r-- 1 runner docker  8226 Oct  3 18:37 ra-checking.qmd\n-rw-r--r-- 1 runner docker  7965 Oct  3 18:37 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Oct  3 18:38 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 44624 Oct  3 18:38 revealjs_05c_pre.qmd.html\n-rw-r--r-- 1 runner docker 33176 Oct  3 18:38 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 57841 Oct  3 18:38 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 22316 Oct  3 18:37 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -5419,7 +5628,7 @@
     "href": "weekly.html",
     "title": "EECS7398 Weekly Schedule fa 2024",
     "section": "",
-    "text": "Since the is the first time this course is offered.\nThis is a tentative schedule.\nThe papers listed here are suggestions, if there is a different paper you would like to present, send me a link so that I can approve it.\nEither 1 or 2 people can sign up for a paper. Once everyone has done so, I’ll schedule which paper gets which date.\n\n\n\n\n\n\n\n\n\n\nsession\nDate\ntopic\ndue\ndiscussions\n\n\n\n\n1\nFriday Sept 6\nCompiler Overview\n\ndiscussion\n\n\n\n\nPerformance Measurement-1\n\n\n\n\n2\nTuesday Sept 10\nPerformance Measurement-2\n\ndiscussion\n\n\n3\nFriday Sept 13\nRepresenting programs\nhw0\ndiscussion\n\n\n\n\nBril\n\ndiscussion\n\n\n4\nTuesday Sept 17\nLocal analysis and optimization\n\ndiscussion\n\n\n5\nFriday Sept 20\nLocal Value Numbering\nhw1\n\n\n\n6\nTuesday Sept 24\nlvn + data flow\n\n\n\n\n7\nFriday Sept 27\nData flow continued\n\n\n\n\n8\nTuesday Oct 1\nData flow continued\n\n\n\n\n9\nFriday Oct 4\ngraphs\n\n\n\n\n10\nTuesday Oct 8\nStatic single assignment\n\n\n\n\n11\nFriday Oct 11\nNorm unavailable - guest lecture over zoom\n\n\n\n\n\nLink in canvas\n\n\n\n\n\n\n\n\n\n\n12\nTuesday Oct 15\nLoop invariant code motion + reading\n\n\n\n\n\nLeader: Aymane Jerari MLIR: A Compiler Infrastructure for the End of Moore’s Law\n\n\n\n\n\n\n\n\n\n\n13\nFriday Oct 18\nGPU Compilers\n\n\n\n\n14\nTuesday Oct 22\nGlobal value number + reading\n\n\n\n\n\nLeader: Oscar Kellner Retargeting and Respecializing GPU Workloads for Performance Portability\nproject proposal due\n\n\n\n\n\n\n\n\n\n\n15\nFriday Oct 25\nLLVM\n\n\n\n\n16\nTuesday Oct 29\ntypic + reading\n\n\n\n\n\nLeader Sana Anvari Large Language Models for Compiler Optimization\n\n\n\n\n\n\n\n\n\n\n17\nFriday Nov 1\nRegister Allocation\n\n\n\n\n18\nTuesday Nov 5\nDynamic compilers 1 + reading\n\n\n\n\n\nLeader: Qucheng Jiang An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration\n\n\n\n\n\n\n\n\n\n\n19\nFriday Nov 8\nDynamic compilers\n\n\n\n\n20\nTuesday Nov 12\ntypic + reading\n\n\n\n\n\nLeader: Yashaswini Makaram ProGraML: Graph-based Deep Learning for Program Optimization and Analysis\n\n\n\n\n\n\n\n\n\n\n21\nFriday Nov 15\ntypic\n\n\n\n\n22\nTuesday Nov 19\nra checking + reading\n\n\n\n\n\nLeaders: Rohit Anandakumar and Sharmila Sivalingam Generating GPU Compiler Heuristics using Reinforcement Learning\n\n\n\n\n\n\n\n\n\n\n23\nFriday Nov 22\npolyhedral part 1\n\n\n\n\n24\nTuesday Nov 26\nPolyhedral part 2 + reading\n\n\n\n\n\nLeader: Michael Maurer Energy-Aware Tile Size Selection for Affine Programs on GPUs\n\n\n\n\n\n\n\n\n\n\nNov 29\nThanksgiving\n\n\n\n\n\n26\nTuesday Dec 3\ntypic + reading\n\n\n\n\n\nLeader: Matin Raayai: Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers\n\n\n\n\n\n\n\n\n\n\n27\nFriday Dec 6\nai in compilers\n\n\n\n\n\nPapers\n\nTVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen) paper\nleader: SLaDe: A Portable Small Language Model Decompiler for Optimized Assembly\nLeader:ACPO: AI-Enabled Compiler-Driven Program Optimization\nleader: Adaptive Online Context-Sensitive Inlining\nleader: Threaded Code Variations and Optimizations\nleader:Learning Compiler Pass Orders using Coreset and Normalized Value Prediction\nleader: Learning to Optimize Tensor Programs\nleader: End-to-end Deep Learning of Optimization Heuristics\nleader: Compiler Fuzzing through Deep Learning\n\n\n\n Back to top",
+    "text": "Since the is the first time this course is offered.\nThis is a tentative schedule.\nThe papers listed here are suggestions, if there is a different paper you would like to present, send me a link so that I can approve it.\nEither 1 or 2 people can sign up for a paper. Once everyone has done so, I’ll schedule which paper gets which date.\n\n\n\n\n\n\n\n\n\n\nsession\nDate\ntopic\ndue\ndiscussions\n\n\n\n\n1\nFriday Sept 6\nCompiler Overview\n\ndiscussion\n\n\n\n\nPerformance Measurement-1\n\n\n\n\n2\nTuesday Sept 10\nPerformance Measurement-2\n\ndiscussion\n\n\n3\nFriday Sept 13\nRepresenting programs\nhw0\ndiscussion\n\n\n\n\nBril\n\ndiscussion\n\n\n4\nTuesday Sept 17\nLocal analysis and optimization\n\ndiscussion\n\n\n5\nFriday Sept 20\nLocal Value Numbering\nhw1\n\n\n\n6\nTuesday Sept 24\nlvn + data flow\n\n\n\n\n7\nFriday Sept 27\nData flow continued\n\n\n\n\n8\nTuesday Oct 1\nData flow + graphs\n\n\n\n\n9\nFriday Oct 4\nStatic single assignment\n\n\n\n\n10\nTuesday Oct 8\nGPU Compilers\n\n\n\n\n11\nFriday Oct 11\nNorm unavailable - guest lecture over zoom\nhw3\n\n\n\n\nLink in canvas\n\n\n\n\n\n\n\n\n\n\n12\nTuesday Oct 15\nLoop invariant code motion + reading\n\n\n\n\n\nLeader: Aymane Jerari MLIR: A Compiler Infrastructure for the End of Moore’s Law\n\n\n\n\n\n\n\n\n\n\n13\nFriday Oct 18\n\n\n\n\n\n14\nTuesday Oct 22\nGlobal value number + reading\n\n\n\n\n\nLeader: Oscar Kellner Retargeting and Respecializing GPU Workloads for Performance Portability\nproject proposal due\n\n\n\n\n\n\n\n\n\n\n15\nFriday Oct 25\nLLVM\n\n\n\n\n16\nTuesday Oct 29\ntypic + reading\n\n\n\n\n\nLeader Sana Anvari Large Language Models for Compiler Optimization\n\n\n\n\n\n\n\n\n\n\n17\nFriday Nov 1\nRegister Allocation\n\n\n\n\n18\nTuesday Nov 5\nDynamic compilers 1 + reading\n\n\n\n\n\nLeader: Qucheng Jiang An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration\n\n\n\n\n\n\n\n\n\n\n19\nFriday Nov 8\nDynamic compilers\n\n\n\n\n20\nTuesday Nov 12\ntypic + reading\n\n\n\n\n\nLeader: Yashaswini Makaram ProGraML: Graph-based Deep Learning for Program Optimization and Analysis\n\n\n\n\n\n\n\n\n\n\n21\nFriday Nov 15\ntypic\n\n\n\n\n22\nTuesday Nov 19\nra checking + reading\n\n\n\n\n\nLeaders: Rohit Anandakumar and Sharmila Sivalingam Generating GPU Compiler Heuristics using Reinforcement Learning\n\n\n\n\n\n\n\n\n\n\n23\nFriday Nov 22\npolyhedral part 1\n\n\n\n\n24\nTuesday Nov 26\nPolyhedral part 2 + reading\n\n\n\n\n\nLeader: Michael Maurer Energy-Aware Tile Size Selection for Affine Programs on GPUs\n\n\n\n\n\n\n\n\n\n\nNov 29\nThanksgiving\n\n\n\n\n\n26\nTuesday Dec 3\ntypic + reading\n\n\n\n\n\nLeader: Matin Raayai: Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers\n\n\n\n\n\n\n\n\n\n\n27\nFriday Dec 6\nai in compilers\n\n\n\n\n\nPapers\n\nTVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen) paper\nleader: SLaDe: A Portable Small Language Model Decompiler for Optimized Assembly\nLeader:ACPO: AI-Enabled Compiler-Driven Program Optimization\nleader: Adaptive Online Context-Sensitive Inlining\nleader: Threaded Code Variations and Optimizations\nleader:Learning Compiler Pass Orders using Coreset and Normalized Value Prediction\nleader: Learning to Optimize Tensor Programs\nleader: End-to-end Deep Learning of Optimization Heuristics\nleader: Compiler Fuzzing through Deep Learning\n\n\n\n Back to top",
     "crumbs": [
       "EECS 7398",
       "Weekly Schedule"
@@ -8040,53 +8249,60 @@
     "text": "A very common case for this is matrix addressing\na[i,j] might expand to to \\(i*4*\\operatorname{stride_{a}} + j *4\\)\nfor j \n  a[i,j] = f(a[i,j+1])\nturns into\na = \nb = \nresult = 0\nfor (){\n    result += a*b\n}"
   },
   {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#pre-steps",
-    "href": "lectures/revealjs_05b_licm.qmd.html#pre-steps",
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant",
+    "href": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant",
     "title": "loop invariant code motion",
-    "section": "pre steps",
-    "text": "pre steps\n\nfind the natural loops\nadd pre-header\n\nif we are going to move code we often need to add a special basic block which is called a landing pad or a a pre-header create a new block b. change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header\n\nneed reaching definitions"
+    "section": "when is a computation loop invariant",
+    "text": "when is a computation loop invariant\nf(a,b)\n\na,b are constants\na,b are defined outside the loop,\na,b are loop invariant\n\nif in ssa there is only one reaching def\nfor non ssa, we need\n\nall reaching defs of a,b defined outside of the loop\nonly one def of a,b reaches the computation and that def is loop invariant"
   },
   {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#licm-steps",
-    "href": "lectures/revealjs_05b_licm.qmd.html#licm-steps",
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant-1",
+    "href": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant-1",
     "title": "loop invariant code motion",
-    "section": "licm steps",
-    "text": "licm steps\n\nfind loop invariant instructions,\nmove some of the loop invariant instructions to the pre-header"
+    "section": "when is a computation loop invariant",
+    "text": "when is a computation loop invariant\na defined outside of the loop (need one definition or ssa )\nb = a*2\nd = 5 + b is loop invariant of b\n\nIn ssa a variable is loop invariant if it does not have a phi function at the loop of the \nloop, or its a phi function and its inputs come from outside of the loop\n\n\nSSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed \n\n\n\n## pre steps - reshape the cfg \n\n1. find the natural loops \n2. add pre-header \n\nif we are going to move code we often need to add a special basic block which is called a  ***landing pad*** or a a ***pre-header***\ncreate a new block b.  change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header\n\n\n## pre-header can change phi nodes\n\n::: {.columns}\n\n::: {.column}\n\n```{mermaid}\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nC[\"x2=phi(x1,x3)\\ny3=phi(y1,y2,y3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt; C\nB2--&gt; C\nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n:::\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n\n\n:::"
   },
   {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#step-1",
-    "href": "lectures/revealjs_05b_licm.qmd.html#step-1",
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#while-loop-may-not-execute-sometimes-need-extra-basic-blocks",
+    "href": "lectures/revealjs_05b_licm.qmd.html#while-loop-may-not-execute-sometimes-need-extra-basic-blocks",
     "title": "loop invariant code motion",
-    "section": "step 1",
-    "text": "step 1\nAn instruction instr in a loop is loop invariant of:\nevery operand is:\n\nconstant or\nall reaching definitions of this operand are outside of the loop\nthere is exactly one def in loop reaching this operand and that def is loop invariant"
+    "section": "while loop may not execute sometimes need extra basic blocks",
+    "text": "while loop may not execute sometimes need extra basic blocks\n\n\nwhile(e) {\n  s(j) \n}\n\nif (e) {\n  t  = j loopinv \n  do {\n    s\n  } while(e)\n}"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#check-for-zero-trip-count",
+    "href": "lectures/revealjs_05b_licm.qmd.html#check-for-zero-trip-count",
+    "title": "loop invariant code motion",
+    "section": "check for zero trip count",
+    "text": "check for zero trip count\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n\n\n\n\nwe could also guess that the loop will run more then once"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#when-is-ok-to-move-a-computation",
+    "href": "lectures/revealjs_05b_licm.qmd.html#when-is-ok-to-move-a-computation",
+    "title": "loop invariant code motion",
+    "section": "when is ok to move a computation",
+    "text": "when is ok to move a computation\n\nno side effects - cannot move alloc 10;\nin non ssa, computation d dominates all loop exits where d is live\nin non ssa only one def of d in the loop\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#find-loop-invariant-instructions",
+    "href": "lectures/revealjs_05b_licm.qmd.html#find-loop-invariant-instructions",
+    "title": "loop invariant code motion",
+    "section": "find loop invariant instructions,",
+    "text": "find loop invariant instructions,"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#naturally-iterative",
     "href": "lectures/revealjs_05b_licm.qmd.html#naturally-iterative",
     "title": "loop invariant code motion",
     "section": "naturally iterative",
-    "text": "naturally iterative\niterate to convergence\n for each instr in  the loop\n  mark it as loop invar  iff \n     for all arguments x either\n         all reaching defs of x are outside of the loop (this covers constants)\n         or there is exactly one def of instr in the loop and that def is loop invar, and there are no uses of the dest before instr on any path in the loop"
+    "text": "naturally iterative\niterate to convergence\n for each instr in  the loop\n   see if it is loop invar \n   if it is - move it"
   },
   {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#step-2",
-    "href": "lectures/revealjs_05b_licm.qmd.html#step-2",
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#nested-loops",
+    "href": "lectures/revealjs_05b_licm.qmd.html#nested-loops",
     "title": "loop invariant code motion",
-    "section": "step 2",
-    "text": "step 2\nwhen is ok to move an instr? We call this safe to move.\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\ncan we move n = 2\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\n\nall uses of the variable dest in the loop, must come from this instr The basic block containing instr must execute every time around the loop\nmore formally\n\nthe def must dominate all the uses\nno other defs of the same variable\ndef dominates all the loop exits"
-  },
-  {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#zero-trip-count-loops",
-    "href": "lectures/revealjs_05b_licm.qmd.html#zero-trip-count-loops",
-    "title": "loop invariant code motion",
-    "section": "zero trip count loops",
-    "text": "zero trip count loops\n   loop {\n     if cond goto exit\n     x = a*b \n       = x\n   }\nFor cond 3\nif the loop runs zero times, a*b is never executed\nWe can remove this condition if the dest variable is dead after the loop or the instruction can not cause a exception, this is called speculative exceptions."
-  },
-  {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#how-about-an-example",
-    "href": "lectures/revealjs_05b_licm.qmd.html#how-about-an-example",
-    "title": "loop invariant code motion",
-    "section": "How about an example:",
-    "text": "How about an example:\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n    graph  LR;\nB1[\"B1:\n     1: b = 2\n     2: i = 1\"]\n\nB2[\"b2:\n   i lessthen 100\"]\nB3[\"B3:\n   3: a = b+1\n   4: c = 2\n   i mod 2 == 0\"]\nB4[\"b4: \n    5: d = a + d \n    6: e = 1 +d\"]\nB5[\"B5:\n    7: d= -c\n    8: f = 1+a\"]\nB6[\"B6:\n  9: i = i + 1\n     a lessthen 2\"]\nEntry --&gt; B1\nB1--&gt; B2\nB2 -- y --&gt;exit;\nB2 --n --&gt; B3\nB3 --y --&gt; B4\nB3 --n --&gt; B5\nB4--&gt; B6\nB5 --&gt; B6\nB6 --y --&gt; exit\nB6 --n --&gt; B2\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n    graph  LR;\nB1[\"B1:\n     1: b = 2\n     2: i = 1\"]\n\nB2[\"b2:\n   i lessthen 100\"]\nB3[\"B3:\n   3: a = b+1\n   4: c = 2\n   i mod 2 == 0\"]\nB4[\"b4: \n    5: d = a + d \n    6: e = 1 +d\"]\nB5[\"B5:\n    7: d= -c\n    8: f = 1+a\"]\nB6[\"B6:\n  9: i = i + 1\n     a lessthen 2\"]\nEntry --&gt; B1\nB1--&gt; B2\nB2 -- y --&gt;exit;\nB2 --n --&gt; B3\nB3 --y --&gt; B4\nB3 --n --&gt; B5\nB4--&gt; B6\nB5 --&gt; B6\nB6 --y --&gt; exit\nB6 --n --&gt; B2\n\n\n\n\n\n\nsteps\n\n\n\ncreate pre header\n\n\n\n\nb2.1 not loop invar (i &lt; 100) i reached by def outside of loop\n\n\n\n\nb3.3 loop inv ( a = b+1) b only def outside of the loop\n\n\n\n\nb3.4 loop inv (c =2) 2 is a constant\n\n\n\n\nb3.cond (i mod 2 ==0 ) not loop inv\n\n\n\n\nb4.5 (d = a +d ) not loop inv a is but not d\n\n\n\n\nb4.6 (e = 1 + d ) not loop inver\n\n\n\n\nb5.7 (d = -c ) not loop inv other def of d\n\n\n\n\nb5.8 (f = 1 +a) loop invar\n\n\n\n\nb6.9 not loop inv\n\n\n\n\nb6.cond loop inv\n\n\n\nchanged two instructions to loop invar\n\n\nrepeat"
+    "section": "nested loops",
+    "text": "nested loops\nwe want to process inner loops first\n\nadd all the pre-headers\nwalk the dominator tree in reverse post order - saving all the loop headers"
   },
   {
     "objectID": "lectures/05b_licm.html",
@@ -8125,11 +8341,11 @@
     ]
   },
   {
-    "objectID": "lectures/05b_licm.html#pre-steps",
-    "href": "lectures/05b_licm.html#pre-steps",
+    "objectID": "lectures/05b_licm.html#when-is-a-computation-loop-invariant",
+    "href": "lectures/05b_licm.html#when-is-a-computation-loop-invariant",
     "title": "loop invariant code motion",
-    "section": "pre steps",
-    "text": "pre steps\n\nfind the natural loops\nadd pre-header\n\nif we are going to move code we often need to add a special basic block which is called a landing pad or a a pre-header create a new block b. change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header\n\nneed reaching definitions",
+    "section": "when is a computation loop invariant",
+    "text": "when is a computation loop invariant\nf(a,b)\n\na,b are constants\na,b are defined outside the loop,\na,b are loop invariant\n\nif in ssa there is only one reaching def\nfor non ssa, we need\n\nall reaching defs of a,b defined outside of the loop\nonly one def of a,b reaches the computation and that def is loop invariant",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -8137,11 +8353,11 @@
     ]
   },
   {
-    "objectID": "lectures/05b_licm.html#licm-steps",
-    "href": "lectures/05b_licm.html#licm-steps",
+    "objectID": "lectures/05b_licm.html#when-is-a-computation-loop-invariant-1",
+    "href": "lectures/05b_licm.html#when-is-a-computation-loop-invariant-1",
     "title": "loop invariant code motion",
-    "section": "licm steps",
-    "text": "licm steps\n\nfind loop invariant instructions,\nmove some of the loop invariant instructions to the pre-header",
+    "section": "when is a computation loop invariant",
+    "text": "when is a computation loop invariant\na defined outside of the loop (need one definition or ssa )\nb = a*2\nd = 5 + b is loop invariant of b\n\nIn ssa a variable is loop invariant if it does not have a phi function at the loop of the \nloop, or its a phi function and its inputs come from outside of the loop\n\n\nSSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed \n\n\n\n## pre steps - reshape the cfg \n\n1. find the natural loops \n2. add pre-header \n\nif we are going to move code we often need to add a special basic block which is called a  ***landing pad*** or a a ***pre-header***\ncreate a new block b.  change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header\n\n\n## pre-header can change phi nodes\n\n::: {.columns}\n\n::: {.column}\n\n```{mermaid}\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nC[\"x2=phi(x1,x3)\\ny3=phi(y1,y2,y3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt; C\nB2--&gt; C\nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n:::\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n\n\n\n:::",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -8149,11 +8365,47 @@
     ]
   },
   {
-    "objectID": "lectures/05b_licm.html#step-1",
-    "href": "lectures/05b_licm.html#step-1",
+    "objectID": "lectures/05b_licm.html#while-loop-may-not-execute-sometimes-need-extra-basic-blocks",
+    "href": "lectures/05b_licm.html#while-loop-may-not-execute-sometimes-need-extra-basic-blocks",
     "title": "loop invariant code motion",
-    "section": "step 1",
-    "text": "step 1\nAn instruction instr in a loop is loop invariant of:\nevery operand is:\n\nconstant or\nall reaching definitions of this operand are outside of the loop\nthere is exactly one def in loop reaching this operand and that def is loop invariant",
+    "section": "while loop may not execute sometimes need extra basic blocks",
+    "text": "while loop may not execute sometimes need extra basic blocks\n\n\nwhile(e) {\n  s(j) \n}\n\nif (e) {\n  t  = j loopinv \n  do {\n    s\n  } while(e)\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "loop invariant code motion"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#check-for-zero-trip-count",
+    "href": "lectures/05b_licm.html#check-for-zero-trip-count",
+    "title": "loop invariant code motion",
+    "section": "check for zero trip count",
+    "text": "check for zero trip count\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n\n\n\n\n\nwe could also guess that the loop will run more then once",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "loop invariant code motion"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#when-is-ok-to-move-a-computation",
+    "href": "lectures/05b_licm.html#when-is-ok-to-move-a-computation",
+    "title": "loop invariant code motion",
+    "section": "when is ok to move a computation",
+    "text": "when is ok to move a computation\n\nno side effects - cannot move alloc 10;\nin non ssa, computation d dominates all loop exits where d is live\nin non ssa only one def of d in the loop\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "loop invariant code motion"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#find-loop-invariant-instructions",
+    "href": "lectures/05b_licm.html#find-loop-invariant-instructions",
+    "title": "loop invariant code motion",
+    "section": "find loop invariant instructions,",
+    "text": "find loop invariant instructions,",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -8165,7 +8417,7 @@
     "href": "lectures/05b_licm.html#naturally-iterative",
     "title": "loop invariant code motion",
     "section": "naturally iterative",
-    "text": "naturally iterative\niterate to convergence\n for each instr in  the loop\n  mark it as loop invar  iff \n     for all arguments x either\n         all reaching defs of x are outside of the loop (this covers constants)\n         or there is exactly one def of instr in the loop and that def is loop invar, and there are no uses of the dest before instr on any path in the loop",
+    "text": "naturally iterative\niterate to convergence\n for each instr in  the loop\n   see if it is loop invar \n   if it is - move it",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -8173,35 +8425,11 @@
     ]
   },
   {
-    "objectID": "lectures/05b_licm.html#step-2",
-    "href": "lectures/05b_licm.html#step-2",
+    "objectID": "lectures/05b_licm.html#nested-loops",
+    "href": "lectures/05b_licm.html#nested-loops",
     "title": "loop invariant code motion",
-    "section": "step 2",
-    "text": "step 2\nwhen is ok to move an instr? We call this safe to move.\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n   b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5[\"m = n *2\"]\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\ncan we move n = 2\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\n  b1[\" n= 0\"]\n   p[\"preheader\"]\n   b3\n   b4[\"n = 2\"]\n   b5\n   b6\n   b1--&gt;p\n   p--&gt; b3\n   b3--&gt; b4\n   b4--&gt; b5\n   b3--&gt; b5\n   b5--&gt; b3\n   b5--&gt; b6\n\n\n\n\n\n\n\n\nall uses of the variable dest in the loop, must come from this instr The basic block containing instr must execute every time around the loop\nmore formally\n\nthe def must dominate all the uses\nno other defs of the same variable\ndef dominates all the loop exits",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "loop invariant code motion"
-    ]
-  },
-  {
-    "objectID": "lectures/05b_licm.html#zero-trip-count-loops",
-    "href": "lectures/05b_licm.html#zero-trip-count-loops",
-    "title": "loop invariant code motion",
-    "section": "zero trip count loops",
-    "text": "zero trip count loops\n   loop {\n     if cond goto exit\n     x = a*b \n       = x\n   }\nFor cond 3\nif the loop runs zero times, a*b is never executed\nWe can remove this condition if the dest variable is dead after the loop or the instruction can not cause a exception, this is called speculative exceptions.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "loop invariant code motion"
-    ]
-  },
-  {
-    "objectID": "lectures/05b_licm.html#how-about-an-example",
-    "href": "lectures/05b_licm.html#how-about-an-example",
-    "title": "loop invariant code motion",
-    "section": "How about an example:",
-    "text": "How about an example:\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n    graph  LR;\nB1[\"B1:\n     1: b = 2\n     2: i = 1\"]\n\nB2[\"b2:\n   i lessthen 100\"]\nB3[\"B3:\n   3: a = b+1\n   4: c = 2\n   i mod 2 == 0\"]\nB4[\"b4: \n    5: d = a + d \n    6: e = 1 +d\"]\nB5[\"B5:\n    7: d= -c\n    8: f = 1+a\"]\nB6[\"B6:\n  9: i = i + 1\n     a lessthen 2\"]\nEntry --&gt; B1\nB1--&gt; B2\nB2 -- y --&gt;exit;\nB2 --n --&gt; B3\nB3 --y --&gt; B4\nB3 --n --&gt; B5\nB4--&gt; B6\nB5 --&gt; B6\nB6 --y --&gt; exit\nB6 --n --&gt; B2\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n    graph  LR;\nB1[\"B1:\n     1: b = 2\n     2: i = 1\"]\n\nB2[\"b2:\n   i lessthen 100\"]\nB3[\"B3:\n   3: a = b+1\n   4: c = 2\n   i mod 2 == 0\"]\nB4[\"b4: \n    5: d = a + d \n    6: e = 1 +d\"]\nB5[\"B5:\n    7: d= -c\n    8: f = 1+a\"]\nB6[\"B6:\n  9: i = i + 1\n     a lessthen 2\"]\nEntry --&gt; B1\nB1--&gt; B2\nB2 -- y --&gt;exit;\nB2 --n --&gt; B3\nB3 --y --&gt; B4\nB3 --n --&gt; B5\nB4--&gt; B6\nB5 --&gt; B6\nB6 --y --&gt; exit\nB6 --n --&gt; B2\n\n\n\n\n\n\nsteps\n\n\n\ncreate pre header\n\n\n\n\nb2.1 not loop invar (i &lt; 100) i reached by def outside of loop\n\n\n\n\nb3.3 loop inv ( a = b+1) b only def outside of the loop\n\n\n\n\nb3.4 loop inv (c =2) 2 is a constant\n\n\n\n\nb3.cond (i mod 2 ==0 ) not loop inv\n\n\n\n\nb4.5 (d = a +d ) not loop inv a is but not d\n\n\n\n\nb4.6 (e = 1 + d ) not loop inver\n\n\n\n\nb5.7 (d = -c ) not loop inv other def of d\n\n\n\n\nb5.8 (f = 1 +a) loop invar\n\n\n\n\nb6.9 not loop inv\n\n\n\n\nb6.cond loop inv\n\n\n\nchanged two instructions to loop invar\n\n\nrepeat",
+    "section": "nested loops",
+    "text": "nested loops\nwe want to process inner loops first\n\nadd all the pre-headers\nwalk the dominator tree in reverse post order - saving all the loop headers",
     "crumbs": [
       "EECS 7398",
       "Lectures",
