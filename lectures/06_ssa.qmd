@@ -291,8 +291,36 @@ c-.->d
 
 We could have complex flow - including loops on the paths
 
+## reminder dominators 
 
-## fast methods 
+```
+while dom is changing 
+for vertex in cfg 
+   dom[vertex] =
+```
+
+- - - 
+
+
+```
+while dom is changing 
+for vertex in cfg 
+   dom[vertex] =  {vertex} + ...
+```
+
+- - -
+
+if b has multiple preds, and a dominates all of them, a dom b 
+
+
+```
+while dom is changing 
+for vertex in cfg 
+   dom[vertex] =  {vertex} + Intersection( dom(p) for p a pred of vertex)
+```
+
+
+## fast methods for inserting phi's
 
 The method for this has two steps 
 

@@ -58,16 +58,16 @@ for non ssa, we need
 
 ##  when is a computation loop invariant 
 
-
+```
 a defined outside of the loop (need one definition or ssa )
 
 b = a*2 
 
-d = 5 + b is loop invariant of b
+d = 5 + b is loop invariant if b
 ```
 
 In ssa a variable is loop invariant if it does not have a phi function at the loop of the 
-loop, or its a phi function and its inputs come from outside of the loop
+loop, or it is defined by a phi function and all the inputs come from outside of the loop
 
 
 SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed 
@@ -81,7 +81,6 @@ SSA If we find a loop-invariant computation in SSA form, then we just move it ou
 
 if we are going to move code we often need to add a special basic block which is called a  ***landing pad*** or a a ***pre-header***
 create a new block b.  change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header
-
 
 ## pre-header can change phi nodes
 
@@ -145,7 +144,7 @@ E--> After
 
 
 
-## while loop may not execute sometimes need extra basic blocks 
+## while loop may not execute, we can restructure into a do-while 
 
 ::: {.columns}
 
@@ -228,13 +227,16 @@ posttest --> next
 
 ::: 
 
-we could also guess that the loop will run more then once 
 
 ## when is ok to move a computation 
 
-1. no side effects - cannot move  alloc 10;
+1. no side effects - cannot move  alloc 10 outside of loop;
 1. in non ssa, computation d dominates all loop exits where d is live
 1. in non ssa only one def of d in the loop
+
+::: {.columns}
+
+::: {.column}
 
 ```{mermaid}
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
@@ -256,6 +258,9 @@ L1 --> next
 ```
 
 
+:::
+
+::: {.column}
 ```{mermaid}
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 
@@ -272,6 +277,10 @@ L3 --> L1
 
 ```
 
+
+:::
+
+::: 
 
 
 ## find loop invariant instructions, 
