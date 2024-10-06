@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -408,7 +407,7 @@
 <h2>Graph Properties</h2>
 <p>We are going to define assorted graph properties, that can be calculated on cfgs.</p>
 </section>
-<section id="dominators" class="slide level2 scrollable">
+<section id="dominators" class="slide level2">
 <h2>dominators</h2>
 <p>We first define a binary relation on cfg nodes, called <strong><em>dominance</em></strong>. a node d dominates a node i (d dom i) if every possible execution path in the cfg that goes from the entry to i goes through d.&nbsp;</p>
 <ol type="1">
@@ -417,7 +416,7 @@
 <li>Dom is anti-symmetric if a dom b, and b dom a then b = a</li>
 </ol>
 </section>
-<section id="dominator-trees" class="slide level2 scrollable">
+<section id="dominator-trees" class="slide level2">
 <h2>dominator trees</h2>
 <p>We next define <strong><em>immediate dominators</em></strong> a idom b, a != b and there is no c != a and c != b where a dom c and c dom b.</p>
 <ol type="1">
@@ -753,7 +752,7 @@ n1 --&gt; n3
 <p>A node A has a <strong><em>dominance frontier</em></strong> which are set of nodes b where A does not dominate b but A dominates a pred of b. Lets see n5 dominance frontier</p>
 <p>Finally we have a <strong><em>post dominates</em></strong> b if all paths from b to the exit go through a. for instance n4 post dominates n6.</p>
 </section>
-<section id="natural-loops" class="slide level2 scrollable">
+<section id="natural-loops" class="slide level2">
 <h2>natural loops</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
@@ -823,7 +822,7 @@ loop1 --&gt; loop2
 </div>
 <p>This loop has two entry points.</p>
 </section>
-<section id="natural-loops-1" class="slide level2 scrollable">
+<section id="natural-loops-1" class="slide level2">
 <h2>natural loops</h2>
 <p>A <strong><em>back-edge</em></strong> is an edge A-&gt;B, where B dominates A</p>
 <p>other edges are forward edges</p>
@@ -833,7 +832,7 @@ loop1 --&gt; loop2
 <li>the smallest set of vertices L including A and B, such that for all v in L either preds(v) are in L or v == B</li>
 </ol>
 </section>
-<section id="example" class="slide level2 scrollable">
+<section id="example" class="slide level2">
 <h2>example</h2>
 <div class="columns">
 <div class="column">

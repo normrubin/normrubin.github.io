@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -421,7 +420,7 @@ for (){
     result += a*b
 }</code></pre>
 </section>
-<section id="when-is-a-computation-loop-invariant" class="slide level2 scrollable">
+<section id="when-is-a-computation-loop-invariant" class="slide level2">
 <h2>when is a computation loop invariant</h2>
 <p>f(a,b)</p>
 <ol type="1">
@@ -446,7 +445,7 @@ d = 5 + b is loop invariant if b</code></pre>
 <p>In ssa a variable is loop invariant if it does not have a phi function at the loop of the loop, or it is defined by a phi function and all the inputs come from outside of the loop</p>
 <p>SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed</p>
 </section>
-<section id="pre-steps---reshape-the-cfg" class="slide level2 scrollable">
+<section id="pre-steps---reshape-the-cfg" class="slide level2">
 <h2>pre steps - reshape the cfg</h2>
 <ol type="1">
 <li>find the natural loops</li>
@@ -672,7 +671,7 @@ posttest --&gt; next
 </div>
 </div></div>
 </section>
-<section id="when-is-ok-to-move-a-computation" class="slide level2 scrollable">
+<section id="when-is-ok-to-move-a-computation" class="slide level2">
 <h2>when is ok to move a computation</h2>
 <ol type="1">
 <li>no side effects - cannot move alloc 10 outside of loop;</li>
@@ -779,7 +778,7 @@ L3 --&gt; L1
    see if it is loop invar 
    if it is - move it </code></pre>
 </section>
-<section id="nested-loops" class="slide level2 scrollable">
+<section id="nested-loops" class="slide level2">
 <h2>nested loops</h2>
 <p>we want to process inner loops first</p>
 <ol type="1">

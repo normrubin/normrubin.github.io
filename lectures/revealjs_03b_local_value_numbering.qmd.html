@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -479,7 +478,7 @@ a:  int b c;  </code></pre>
 <p>to execute&nbsp;</p>
 <p>(.venv) (base) norm@norm-ubuntu:~/bril/examples/test/tdce$ turnt *.bril 1..8 ok 1 - combo.bril ok 2 - diamond.bril ok 3 - double.bril ok 4 - double-pass.bril ok 5 - reassign.bril ok 6 - reassign-dkp.bril ok 7 - simple.bril ok 8 - skipped.bril</p>
 </section>
-<section id="redundancy-elimination" class="slide level2 scrollable">
+<section id="redundancy-elimination" class="slide level2">
 <h2>redundancy elimination</h2>
 <p>an expression x+y is redundant if and only if</p>
 <ol type="1">
@@ -492,7 +491,7 @@ a:  int b c;  </code></pre>
 <li>replace the redundant expression with a use of the preserved value</li>
 </ol>
 </section>
-<section id="key-idea" class="slide level2 scrollable">
+<section id="key-idea" class="slide level2">
 <h2>key idea</h2>
 <p>assign a number (value number) to each expression</p>
 <ol type="1">
@@ -505,7 +504,7 @@ a:  int b c;  </code></pre>
 <p>walk each block, assign a distinct value number to each value the block computes.</p>
 <p><span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> have the same value number if and only if <span class="math inline">\(e_i\)</span> and <span class="math inline">\(e_j\)</span> are provably equal for all possible operands of the expressions.</p>
 </section>
-<section id="pseudo-code-vn-version-1" class="slide level2 scrollable">
+<section id="pseudo-code-vn-version-1" class="slide level2">
 <h2>pseudo code vn version 1</h2>
 <p>we have two tables - hash_table: expression to vn, variable holding the value variable to vn</p>
 <pre><code>for each instr in the block
@@ -538,7 +537,7 @@ d      3
 <li><p>reverse map from variables to value numbers</p></li>
 </ol>
 </section>
-<section class="slide level2 scrollable">
+<section class="slide level2">
 
 <div class="columns">
 <div class="column">
@@ -701,7 +700,7 @@ b[k] =
 <p>You can see one implementation in <code>lvn.py</code> in the Bril repository. But seriously, don’t be tempted! You want to write your implementation without looking at mine!</p>
 <p><a href="https://github.com/normrubin/bril/tree/main/examples">examples</a></p>
 </section>
-<section id="testing-your-optimizations" class="slide level2 scrollable">
+<section id="testing-your-optimizations" class="slide level2">
 <h2>Testing Your Optimizations</h2>
 <p>As part of your tasks for this lesson, you will implement your first two optimizations. The two main things you want your optimizations to do are:</p>
 <ol type="1">
@@ -722,7 +721,7 @@ b[k] =
 
 <p>While there are many ways to be convincing, a pretty good way might be to run your optimization on *every single available <a href="https://capra.cs.cornell.edu/bril/tools/bench.html">Bril benchmark</a>, systematically check that it still produces the right output for at least one input, and collect aggregate statistics about some metric you’re interested in. This is a nice way to check for unexpected behavior in programs that you didn’t carefully write yourself to test the cases you’re thinking of.</p>
 </section>
-<section class="slide level2 scrollable">
+<section class="slide level2">
 
 <p>If this is the route you choose, you can do it however you like, There is a simple tool that you can consider using, called Brench. Brench is not very fancy; it does three things:</p>
 <ol type="1">
@@ -857,7 +856,7 @@ evn(b, stack)
      else add s to worklist 
    dealocate t</code></pre>
 </section>
-<section id="safety" class="slide level2 scrollable">
+<section id="safety" class="slide level2">
 <h2>safety</h2>
 <p>if the result of evaluating E1 cannot be distinguished from evaluating E the compiler is free to replace E with E1</p>
 <p>Some compilers assume it is ok if E1 produces less errors than E</p>

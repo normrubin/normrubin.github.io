@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -404,7 +403,7 @@
 </div>
 
 </section>
-<section id="register-allocation" class="slide level2 scrollable">
+<section id="register-allocation" class="slide level2">
 <h2>Register Allocation</h2>
 <ol type="1">
 <li>Register allocation is the process of determining storage locations to the values used in a program.</li>
@@ -413,7 +412,7 @@
 <li>Memory has much higher latency and slower access speeds.</li>
 <li>A good register allocation strategy keeps frequently accessed variables in registers to maximize performance.</li>
 </ol>
-<p>much of the material for these slides comes from <a href="https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/">fernaod</a></p>
+<p>much of the material for these slides comes from <a href="https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/">fernando</a></p>
 </section>
 <section id="aspects" class="slide level2 scrollable">
 <h2>Aspects</h2>
@@ -438,9 +437,9 @@
 <p>Approximate this by ignoring “have different values” - Different registers if alive at the same point.</p>
 <p><strong><em>MaxLive</em></strong> is the max number of values live at the same point</p>
 <p><strong><em>MinReg</em></strong> is the min number of registers we need</p>
-<p>minReg &lt;= MaxLive</p>
+<p>minReg &gt;= MaxLive</p>
 </section>
-<section id="an-example" class="slide level2 scrollable">
+<section id="an-example" class="slide level2">
 <h2>an example</h2>
 <ol type="1">
 <li>What is the maximum number of variables alive at any program point?</li>
@@ -485,7 +484,7 @@
 <h2>final code</h2>
 
 <img data-src="ra/final_code.svg" class="r-stretch"></section>
-<section id="ssa-based-register-allocation" class="slide level2 scrollable">
+<section id="ssa-based-register-allocation" class="slide level2">
 <h2>ssa based register allocation</h2>
 <p>We have been able to compile the SSA-form program with less registers than the minimum that the original program requires.</p>
 <p>Two claims</p>
@@ -512,11 +511,11 @@
 <h1>interference graph</h1>
 
 <img data-src="ra/dominterfer.svg" class="r-stretch"></section>
-<section id="chordal-graphs-triangular-graphs" class="slide level2 scrollable">
+<section id="chordal-graphs-triangular-graphs" class="slide level2">
 <h2>Chordal Graphs (triangular graphs)</h2>
 <ol type="1">
 <li>intersection graph of subtrees</li>
-<li>a graph that has no induced subgraph isomorphic to <span class="math inline">\(c_N\)</span> where $c_N” is a cycle with N nodes and N is greater then 3.</li>
+<li>a graph that has no induced subgraph isomorphic to <span class="math inline">\(c_N\)</span> where <span class="math inline">\(c_N\)</span> is a cycle with N nodes and N is greater then 3.</li>
 <li>A graph is chordal (or triangulated) if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chordless cycles have at most three nodes. if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chord free cycles have at most three nodes.</li>
 </ol>
 </section>
@@ -531,9 +530,10 @@
 <section id="dominance-and-interference-thm-1" class="slide level2">
 <h2>dominance and interference Thm 1</h2>
 
-<img data-src="ra/thm1.svg" class="r-stretch"><div class="fragment">
+<img data-src="ra/thm1.svg" class="r-stretch"></section>
+<section id="proof" class="slide level2">
+<h2>proof</h2>
 <p>proof: suppose not. Then there exists a program point l in the CFG where v is alive, but that is not dominated by v. Thus, there exists a path from l to a usage of v. Therefore, there exists a path from the beginning of the program to a use of v that does not go across the unique definition of v, and the program is not strict.</p>
-</div>
 </section>
 <section id="lemma-1" class="slide level2">
 <h2>lemma 1</h2>
@@ -549,7 +549,7 @@
 <img data-src="ra/lem2proof.svg" class="r-stretch"></section>
 <section id="transitivity-of-dominance" class="slide level2">
 <h2>transitivity of dominance</h2>
-<p>lemma 3 if u,v, and ware variables, u,v interfere and v,w interfere but u,w do not if Du &lt; Dv then Dv &lt; DW</p>
+<p>lemma 3 if u,v, and w are variables, u,v interfere and v,w interfere but u,w do not if Du &lt; Dv then Dv &lt; DW</p>
 <div class="columns">
 <div class="column" style="width:70%;">
 <p>• We know that either Dv &lt; Dw, or Dw &lt; Dv. This is true because v and w are simultaneously alive, and we have the result of Lemma 1 • If we assume Dw &lt; Dv, then, by Lemma 2, we have that w is alive at Dv • Because u and v also interfere, and Du &lt; Dv, we know, also from Lemma 2, that u is also live at Dv • (by hypothesis u and w do not interfere), we know that Dv &lt; Dw</p>

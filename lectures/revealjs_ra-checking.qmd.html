@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -426,7 +425,7 @@
 }
 </code></pre>
 </section>
-<section id="storing-variables" class="slide level2 scrollable">
+<section id="storing-variables" class="slide level2">
 <h2>storing variables</h2>
 <p>one option</p>
 <p>Allocate a memory location for each local variable. All of the <span class="math inline">\(x_N\)</span> variables above semantically live in memory. When the function is called, it allocates a nwe area on the stack called the stack frame and uses it to store local variables.</p>
@@ -549,7 +548,7 @@ A --&gt; D
 <p>for instruction v and p, check that the arguments are equal, if not fail add the pair dest of v == dest of p</p>
 <p>does not matter what the original op code was, just need register names</p>
 </section>
-<section id="more-general" class="slide level2 scrollable">
+<section id="more-general" class="slide level2">
 <h2>more general</h2>
 <p>Treat the allocated program as containing:</p>
 <ol type="1">

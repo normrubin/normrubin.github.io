@@ -180,10 +180,10 @@ window.Quarto = {
 <li>Memory has much higher latency and slower access speeds.</li>
 <li>A good register allocation strategy keeps frequently accessed variables in registers to maximize performance.</li>
 </ol>
-<p>much of the material for these slides comes from <a href="https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/">fernaod</a></p>
+<p>much of the material for these slides comes from <a href="https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/">fernando</a></p>
 </section>
-<section id="aspects" class="level2">
-<h2 class="anchored" data-anchor-id="aspects">Aspects</h2>
+<section id="aspects" class="level2 scrollable">
+<h2 class="scrollable anchored" data-anchor-id="aspects">Aspects</h2>
 <ol type="1">
 <li>The task of determining the register in which each variable will be stored is known as <strong><em>register assignment</em></strong>.</li>
 <li>If a variable must be stored in memory, it is referred to as a <strong><em>spill</em></strong>. Spilling involves identifying which variables need to be mapped to memory.</li>
@@ -205,7 +205,7 @@ window.Quarto = {
 <p>Approximate this by ignoring “have different values” - Different registers if alive at the same point.</p>
 <p><strong><em>MaxLive</em></strong> is the max number of values live at the same point</p>
 <p><strong><em>MinReg</em></strong> is the min number of registers we need</p>
-<p>minReg &lt;= MaxLive</p>
+<p>minReg &gt;= MaxLive</p>
 </section>
 <section id="an-example" class="level2">
 <h2 class="anchored" data-anchor-id="an-example">an example</h2>
@@ -280,7 +280,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="chordal-graphs-triangular-graphs">Chordal Graphs (triangular graphs)</h2>
 <ol type="1">
 <li>intersection graph of subtrees</li>
-<li>a graph that has no induced subgraph isomorphic to <span class="math inline">\(c_N\)</span> where $c_N” is a cycle with N nodes and N is greater then 3.</li>
+<li>a graph that has no induced subgraph isomorphic to <span class="math inline">\(c_N\)</span> where <span class="math inline">\(c_N\)</span> is a cycle with N nodes and N is greater then 3.</li>
 <li>A graph is chordal (or triangulated) if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chordless cycles have at most three nodes. if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chord free cycles have at most three nodes.</li>
 </ol>
 </section>
@@ -295,7 +295,9 @@ window.Quarto = {
 <section id="dominance-and-interference-thm-1" class="level2">
 <h2 class="anchored" data-anchor-id="dominance-and-interference-thm-1">dominance and interference Thm 1</h2>
 <p><img src="ra/thm1.svg" class="img-fluid"></p>
-<p>. . .</p>
+</section>
+<section id="proof" class="level2">
+<h2 class="anchored" data-anchor-id="proof">proof</h2>
 <p>proof: suppose not. Then there exists a program point l in the CFG where v is alive, but that is not dominated by v. Thus, there exists a path from l to a usage of v. Therefore, there exists a path from the beginning of the program to a use of v that does not go across the unique definition of v, and the program is not strict.</p>
 </section>
 <section id="lemma-1" class="level2">
@@ -312,7 +314,7 @@ window.Quarto = {
 </section>
 <section id="transitivity-of-dominance" class="level2">
 <h2 class="anchored" data-anchor-id="transitivity-of-dominance">transitivity of dominance</h2>
-<p>lemma 3 if u,v, and ware variables, u,v interfere and v,w interfere but u,w do not if Du &lt; Dv then Dv &lt; DW</p>
+<p>lemma 3 if u,v, and w are variables, u,v interfere and v,w interfere but u,w do not if Du &lt; Dv then Dv &lt; DW</p>
 <div class="columns">
 <div class="column" style="width:70%;">
 <p>• We know that either Dv &lt; Dw, or Dw &lt; Dv. This is true because v and w are simultaneously alive, and we have the result of Lemma 1 • If we assume Dw &lt; Dv, then, by Lemma 2, we have that w is alive at Dv • Because u and v also interfere, and Du &lt; Dv, we know, also from Lemma 2, that u is also live at Dv • (by hypothesis u and w do not interfere), we know that Dv &lt; Dw</p>

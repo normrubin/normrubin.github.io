@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -401,7 +400,7 @@
 </div>
 
 </section>
-<section id="what-is-the-cost-of-divergence" class="slide level2 scrollable">
+<section id="what-is-the-cost-of-divergence" class="slide level2">
 <h2>What is the cost of divergence</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource {cuda} number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a></a>__global__ void dec2zero(int* v, int N) { </span>
 <span id="cb1-2"><a></a>    int xIndex = blockIdx.x*blockDim.x+threadIdx.x;   </span>
@@ -494,7 +493,7 @@ a:                        r  r  r  r      a: 1111
 <p>some code deadlocks:</p>
 <p>1: *mutex = 0; 2: 3 while(!atomicCAS(mutex,0,1)); 3: // Critical Section 4: atomicExch(mutex,0);</p>
 </section>
-<section id="volta-and-newer" class="slide level2 scrollable">
+<section id="volta-and-newer" class="slide level2">
 <h2>volta and newer</h2>
 <p><a href="https://arxiv.org/pdf/2407.02944">possible structure</a></p>
 <p>Handles unstructured code nicely always makes forward progress</p>
@@ -542,7 +541,7 @@ a:                        r  r  r  r
 <p>can we determine which branches may cause divergences and which branches are uniform?</p>
 <p>at a dirergent branch some threads go one way, some the other, we will need to insert instructions for reconvergence at a uniform branch all threads go the same way</p>
 </section>
-<section id="divergent-and-uniform-variables" class="slide level2 scrollable">
+<section id="divergent-and-uniform-variables" class="slide level2">
 <h2>divergent and uniform variables</h2>
 <p>A program variable is divergent if different threads see different values.</p>
 <p>If different threads always see that variable with the same value, then the variable is uniform</p>
@@ -632,7 +631,7 @@ a:                        r  r  r  r
 <h2></h2>
 
 <img data-src="images/da23.svg" class="r-stretch"></section>
-<section id="finding-control-dependences" class="slide level2 scrollable">
+<section id="finding-control-dependences" class="slide level2">
 <h2>finding control dependences</h2>
 <p>let branch p, label be a branch instruction and <span class="math inline">\(I_p\)</span> be its post dominator. A varable v is control dependent on p if</p>
 <ol type="1">
@@ -660,7 +659,7 @@ a:                        r  r  r  r
 <h2></h2>
 
 <img data-src="images/da30.svg" class="r-stretch"></section>
-<section id="some-optimizations" class="slide level2 scrollable">
+<section id="some-optimizations" class="slide level2">
 <h2>some optimizations</h2>
 <ol type="1">
 <li>on AMD use scalar processor</li>

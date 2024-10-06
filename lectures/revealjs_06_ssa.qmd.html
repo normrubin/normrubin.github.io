@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -686,7 +685,7 @@ X --&gt; Z
 <p>variable b</p>
 </div>
 </section>
-<section id="conditions" class="slide level2 scrollable">
+<section id="conditions" class="slide level2">
 <h2>conditions</h2>
 <p>conditions: phi-function for variable b at node z</p>
 <ol type="1">
@@ -762,7 +761,7 @@ for vertex in cfg
 for vertex in cfg 
    dom[vertex] =  {vertex} + Intersection( dom(p) for p a pred of vertex)</code></pre>
 </section>
-<section id="fast-methods-for-inserting-phis" class="slide level2 scrollable">
+<section id="fast-methods-for-inserting-phis" class="slide level2">
 <h2>fast methods for inserting phi’s</h2>
 <p>The method for this has two steps</p>
 <ol type="1">
@@ -896,7 +895,7 @@ B--&gt; C
 </div>
 <p>why: A dom B, but B does not dom A. so A is in the dom frontier of A</p>
 </section>
-<section id="an-almost-linear-method" class="slide level2 scrollable">
+<section id="an-almost-linear-method" class="slide level2">
 <h2>an almost linear method</h2>
 <p>We do it in two steps.</p>
 <ol type="1">
@@ -1142,7 +1141,7 @@ B4--&gt; B5
            Add block to W (because it now writes to v),
              unless it's already in there.</code></pre>
 </section>
-<section id="an-example-1" class="slide level2 scrollable">
+<section id="an-example-1" class="slide level2">
 <h2>an example</h2>
 <div class="columns">
 <div class="column">

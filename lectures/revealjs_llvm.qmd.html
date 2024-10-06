@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -420,7 +419,7 @@
 <pre><code>sudo apt install clang cmake </code></pre>
 </section></section>
 <section>
-<section id="lets-take-a-look-at-llvm-ir" class="title-slide slide level1 center scrollable">
+<section id="lets-take-a-look-at-llvm-ir" class="title-slide slide level1 center">
 <h1>lets take a look at llvm ir</h1>
 <pre><code>// temp.c
 int main(int argc, char** argv){
@@ -511,7 +510,7 @@ llvm::Constant: Represents a constant value, such as an integer or floating-poin
 llvm::Argument: Represents an argument to a function.
 llvm::GlobalVariable: Represents a global variable.</code></pre>
 </section>
-<section id="llvm-classes-llvm-is-c-but-does-not-use-standard-library" class="slide level2 scrollable">
+<section id="llvm-classes-llvm-is-c-but-does-not-use-standard-library" class="slide level2">
 <h2>llvm classes (llvm is c++ but does not use standard library)</h2>
 <ol type="1">
 <li>llvm does not use char* or std::string, it has something else called a StringRef.</li>
@@ -731,7 +730,7 @@ from_op:0x0</code></pre>
             DT.print(errs());
         }</code></pre>
 </section>
-<section id="testing" class="slide level2 scrollable">
+<section id="testing" class="slide level2">
 <h2>testing</h2>
 <ol type="1">
 <li>isa<argument>(V) true of V is a agument</argument></li>

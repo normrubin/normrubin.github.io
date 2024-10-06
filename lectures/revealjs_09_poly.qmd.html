@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -401,7 +400,7 @@
 </div>
 
 </section>
-<section id="intro-to-polyhedral-techniques" class="slide level2 scrollable">
+<section id="intro-to-polyhedral-techniques" class="slide level2">
 <h2>intro to polyhedral techniques</h2>
 <p>There are two kinds of polyhedral problems:</p>
 <ol type="1">
@@ -409,7 +408,7 @@
 <li>polyhedral scheduling - find a transform that maximizes/minimizes some property</li>
 </ol>
 </section>
-<section id="base-idea" class="slide level2 scrollable">
+<section id="base-idea" class="slide level2">
 <h2>Base Idea</h2>
 <p>The base ideas -</p>
 <ol type="1">
@@ -417,7 +416,7 @@
 <li><p>We can think of a program as having two parts: An algorithm, like <span class="math display">\[ a[i] = 3, i \in \{1,2,3\}\]</span> and a schedule like: execute the instances in reverse order.</p></li>
 </ol>
 </section>
-<section id="poly-steps" class="slide level2 scrollable">
+<section id="poly-steps" class="slide level2">
 <h2>poly steps</h2>
 <ol type="1">
 <li>change the program into a polyhedral notations (a set like notation)</li>
@@ -476,7 +475,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 <section id="a-graphical-view" class="slide level2">
 <h2>a graphical view</h2>
 <p>(not legal if there is a pair where the arrows go in opposite directions)</p>
-<div id="5510e57e" class="cell" data-execution_count="1">
+<div id="05fb7307" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -536,7 +535,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section class="slide level2">
 
-<div id="2adbd35b" class="cell" data-execution_count="2">
+<div id="f32df1a7" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -713,7 +712,7 @@ j - k == 0</code></pre>
      a[i,j] = 
 </code></pre>
 <p>There is no dependence so we can reorder the loops but what are the new bounds</p>
-<div id="6bb5bb1e" class="cell" data-execution_count="3">
+<div id="482f9973" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -772,7 +771,7 @@ j - k == 0</code></pre>
 <p>inner loop bounds can depend on j</p>
 <p>We can read off j as a proection, for each value of j, i is a convex polygon (if the bounds were not convex this would be false)</p>
 </section>
-<section id="fourier-motzkin-method" class="slide level2 scrollable">
+<section id="fourier-motzkin-method" class="slide level2">
 <h2>fourier-motzkin method</h2>
 <p>input:</p>
 <ol type="1">
@@ -791,7 +790,7 @@ j - k == 0</code></pre>
 <p>99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.</p>
 <p>over 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al.&nbsp;2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.</p>
 </section>
-<section class="slide level2 scrollable">
+<section class="slide level2">
 
 <p>Over the course of this, I’ll use 3 pieces of math</p>
 <ol type="1">
@@ -802,7 +801,7 @@ j - k == 0</code></pre>
 <pre><code>
 Here is a graph showing the data flow 
 
-::: {#e6242413 .cell execution_count=4}
+::: {#61929fbb .cell execution_count=4}
 ``` {.python .cell-code}
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -942,7 +941,7 @@ dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
 <pre><code>for (i=1; i&lt;=n; i++)
 for (j=1; j&lt;=n; j++)
 S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
-<div id="510a5047" class="cell" data-execution_count="5">
+<div id="0707054b" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -1003,7 +1002,7 @@ S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
 
 <p>The schedule actually goes up each column (the j values) going over the columns left to right (the i column)</p>
 <p>notice that this does not execute in parallel, but it could if pick a different schedule</p>
-<div id="d8108fc7" class="cell" data-execution_count="6">
+<div id="b70b4e47" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -1485,7 +1484,7 @@ What does this mean and how does it help?
 
 
 </code></pre>
-<div id="7d1080f7" class="cell" data-execution_count="7">
+<div id="0200558c" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>

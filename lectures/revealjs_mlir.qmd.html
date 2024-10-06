@@ -310,7 +310,6 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
-      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -434,7 +433,7 @@
 <span id="cb3-2"><a></a>%v3 = addf %v1, %v2 : vector&lt;16xf32&gt;</span>
 <span id="cb3-3"><a></a>store %v3, %d[%i2, %i3] : memref&lt;256x64xvector&lt;16xf32&gt;&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="design-principles" class="slide level2 scrollable">
+<section id="design-principles" class="slide level2">
 <h2>Design principles</h2>
 <ol type="1">
 <li>Textual format</li>
@@ -444,7 +443,7 @@
 <li>Very ﬂexible, extensible</li>
 </ol>
 </section>
-<section id="concepts" class="slide level2 scrollable">
+<section id="concepts" class="slide level2">
 <h2>concepts</h2>
 <ol type="1">
 <li>SSA, typed</li>
@@ -457,7 +456,7 @@
 <p>^bb2(%y : i64): %z = “abc”(%y) : (i64) -&gt; i32 return %z : i32</p>
 <p>} ~~~</p>
 </section>
-<section id="operations" class="slide level2 scrollable">
+<section id="operations" class="slide level2">
 <h2>operations</h2>
 <ol type="1">
 <li>always have a name and source location</li>
