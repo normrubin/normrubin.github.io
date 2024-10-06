@@ -9,7 +9,7 @@ format:
     code-line-numbers: true
     echo: true
     output-file: revealjs_register_allocation.qmd
-    scrollable: true
+    scrollable: false
     slideNumber: c/t
 sidebar: false
 title: Register Allocation
@@ -26,9 +26,9 @@ title: Register Allocation
 1. Memory has much higher latency and slower access speeds.
 1. A good register allocation strategy keeps frequently accessed variables in registers to maximize performance.
 
-much of the material for these slides comes from [fernaod](https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/)
+much of the material for these slides comes from [fernando](https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/)
 
-## Aspects 
+## Aspects {.scrollable}
 
 1. The task of determining the register in which each variable will be stored is known as ***register assignment***.
 1. If a variable must be stored in memory, it is referred to as a ***spill***. Spilling involves identifying which variables need to be mapped to memory.
@@ -57,7 +57,7 @@ Approximate this by ignoring "have different values" - Different registers if al
 
 ***MinReg*** is the min number of registers we need
 
-minReg <= MaxLive 
+minReg >= MaxLive 
 
 
 
@@ -140,7 +140,7 @@ What is the dominance tree of this program?
 ## Chordal Graphs (triangular graphs)
 
 1. intersection graph of subtrees
-1. a graph that has no induced subgraph isomorphic to $c_N$ where $c_N" is a cycle with N nodes and N is greater then 3.
+1. a graph that has no induced subgraph isomorphic to $c_N$ where $c_N$ is a cycle with N nodes and N is greater then 3.
 1. A graph is chordal (or triangulated) if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chordless cycles have at most three nodes. if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chord free cycles have at most three nodes.
 
 ## what is an induced subgraph
@@ -156,7 +156,7 @@ if $G=(V,E)$ is a graph then the induced subgraph is a subset of the nodes of G 
 
 ![](ra/thm1.svg)
 
-. . .
+## proof
 
 
 proof: suppose not. Then there exists a program point  l in the CFG where v is alive, but that is not dominated by v. Thus, there exists a path from l to a usage of v. Therefore, there exists a path from the beginning of the program to a use of v that does not go across the unique definition of v, and the program is not strict. 
@@ -175,7 +175,7 @@ proof: suppose not. Then there exists a program point  l in the CFG where v is a
 
 ## transitivity of dominance 
 
-lemma 3  if u,v, and ware variables, u,v interfere and v,w interfere but u,w do not 
+lemma 3  if u,v, and w are variables, u,v interfere and v,w interfere but u,w do not 
 if Du < Dv then Dv < DW
 
 ::: {.columns}
