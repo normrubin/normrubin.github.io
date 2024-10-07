@@ -9,15 +9,12 @@ format:
     code-line-numbers: true
     echo: true
     output-file: revealjs_register_allocation.qmd
-    scrollable: false
+    scrollable: true
     slideNumber: c/t
 sidebar: false
 title: Register Allocation
 
 ---
-
-## Register Allocation
-
 
 
 1. Register allocation is the process of determining storage locations to  the values used in  a program.
@@ -28,30 +25,36 @@ title: Register Allocation
 
 much of the material for these slides comes from [fernando](https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/)
 
-## Aspects {.scrollable}
+## terms  {.scrollable}
 
 1. The task of determining the register in which each variable will be stored is known as ***register assignment***.
 1. If a variable must be stored in memory, it is referred to as a ***spill***. Spilling involves identifying which variables need to be mapped to memory.
 1. If the same register can be assigned to two variables related by a move instruction, the move can be eliminated. This optimization is called ***coalescing***.
+
+## more terms 
 1. GPU performance often improves when fewer registers are used.
 1. Variables in Bril are ***virtual registers***. After assignment, they become ***physical registers***.
 
 Register allocators often have to manage constraints. For example, a function argument may need to be placed in a specific physical register.
 
 
-## formal limits 
+## Formal Limits 
 
 Register allocation is NP complete. Given a program P and K registers, is there an assignment where each variable gets a register and all simultaneously live variables get different registers 
 
 Gregory Chaitin showed that if we have a graph that we want to paint with K colors, such that adjacent  vertices get different colors we can construct a program where the program can be allocated with K registers iff the graph can be colored with K colors 
 
+## Interference Graph 
+
 Chaitin used the ***interference graph***. One vertex for each variable, and edge between variables that are simultaneously live.
+
+Two variables that interfere cannot be in the same register 
 
 ## Allocation and Liveness
 
 If two variables are alive at the same point, and they have different values, they have to be assigned different registers 
 
-Approximate this by ignoring "have different values" - Different registers if alive at the same point. 
+Approximate this by ignoring "have different values" - Different registers if alive at the same point. (id is special)
 
 ***MaxLive*** is the max number of values live at the same point
 
@@ -64,7 +67,9 @@ minReg >= MaxLive
 ## an example
 
 1)	What is the maximum number of variables alive at any program point?
-2)	How is the interference graph of this program?
+2)	What  is the interference graph of this program?
+
+draw it? 
 
 
 ![](ra/ra_example.svg)
@@ -75,6 +80,8 @@ minReg >= MaxLive
 ![](ra/interfer.svg)
 
 MaxLive = 2 Can we compile this with 2 registers? - Need 3
+
+draw it? 
 
 The interference graph is a pentagon, needed 3 registers.
 
@@ -118,6 +125,50 @@ Two claims
 1.	The SSA-form program will never require more registers than the original program.
 2.	And we can find the minimum number of registers that the SSA-form program needs in polynomial time.
 
+
+## setting up the colors 
+
+suppose we have an ordering of the vertices, where the neighbors of a node to the left of the node  in the ordering from a clique.  If there are K such neighbors we need K+1 colors 
+
+
+
+
+## an example 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD;
+n1--> n2 --> n3 -->  n4 --> n5 --> n6--> n1
+```
+
+draw it 
+
+given this  order - it is simple to pick the colors 
+
+once we have an order , we can greedy color the nodes. When we get to the n’th node, all the neighbors are in a clique and are colored, so just pick one 
+
+maybe try not to clobber a copy 
+
+all nodes in the clique need different colors
+
+In a chordal graph the size of the largest clique equals the chromatic number
+
+if we find the point in the program with max live variables, we know the chromatic number
+
+
+
+## how do we get the order 
+
+1. give each node number 
+1. initially each node gets count of zero 
+1  pick an unordered node with max count
+1. put that node in the front of the list, mark that node ordered 
+1. increment each neighbor by 1 
+
+# draw the example 
+
+
 ## dominance trees 
 
 What is the dominance tree of this program?
@@ -140,81 +191,26 @@ What is the dominance tree of this program?
 ## Chordal Graphs (triangular graphs)
 
 1. intersection graph of subtrees
-1. a graph that has no induced subgraph isomorphic to $c_N$ where $c_N$ is a cycle with N nodes and N is greater then 3.
-1. A graph is chordal (or triangulated) if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chordless cycles have at most three nodes. if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chord free cycles have at most three nodes.
+1. A graph is chordal if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle.
+1. if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chord free cycles have at most three nodes.
 
-## what is an induced subgraph
-
-if $G=(V,E)$ is a graph then the induced subgraph is a subset of the nodes of G plus the edges in G that connect those node 
 
 ## examples of chordal graphs 
 
-![](ra/cord.svg)
-
-## dominance and interference  Thm 1 
+draw am example of a cord graph
 
 
-![](ra/thm1.svg)
-
-## proof
 
 
-proof: suppose not. Then there exists a program point  l in the CFG where v is alive, but that is not dominated by v. Thus, there exists a path from l to a usage of v. Therefore, there exists a path from the beginning of the program to a use of v that does not go across the unique definition of v, and the program is not strict. 
+## orderings  
 
-## lemma 1 
-![](ra/lem1.svg)
+we number the vertices of G 
 
+v0,v1,v2,...., vi, ...
 
-## lemma 2 
-
-![](ra/lem2.svg)
-
-## lemma 2 proof 
-
-![](ra/lem2proof.svg)
-
-## transitivity of dominance 
-
-lemma 3  if u,v, and w are variables, u,v interfere and v,w interfere but u,w do not 
-if Du < Dv then Dv < DW
-
-::: {.columns}
-
-::: {.column width="70%"}
-
-•	We know that either Dv < Dw, or Dw < Dv. This is true because v and w are simultaneously alive, and we have the result of Lemma 1
-•	If we assume Dw < Dv, then, by Lemma 2, we have that w is alive at Dv
-•	Because u and v also interfere, and Du < Dv, we know, also from Lemma 2, that u is also live at Dv
-•	(by hypothesis u and w do not interfere), we know that Dv < Dw
-
-lemma 1: if two variables, u and v, interfere, in a strict 
-SSA-form program, then either Du < Dv, or Dv < Du. Lemma 2: in a strict program, if two variables, u and v, interfere, Du < Dv, then u is alive at Dv.
-
-:::
-
-::: {.column width="30%"}
+consider vi all the neighbors to the left are a clique (all connected )
 
 
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%|echo: false
-graph TD;
-def_U  --> Def_V --> useU --> Def_W --> useV --> useW
-```
-:::
-::: 
-
-## 
-![](ra/cordproof.svg)
-
-##
-![](ra/cordproof1.svg)
-
-![](ra/cordproof2.svg)
-
-## orderings 
-
-![](ra/ordering.svg)
 
 
 ## running example 
@@ -253,6 +249,10 @@ In a chordal graph the size of the largest clique equals the chromatic number
 if we find the point in the program with max live variables, we know the chromatic number 
 
 ## spilling 
+
+if we ever have a program point where the number of live variables is > MaxRegs 
+we will have to spill - so do it here 
+
 
 ![](ra/spilling.svg)
 
@@ -299,3 +299,20 @@ for all x=y in L
 ```
 
 xy is a merge of x and y 
+
+## how do we know that ssa graphs are chordal  
+
+## dominance and interference  Thm 1 
+
+In a strict ssa form the definition of a variable dominates all the uses 
+
+
+lemma1 : if two variables interfere then the def of one dominates the def of the other
+
+lemma2 if two variables a and b interfere and Da < Db, then a is live at Db 
+
+lemma3 if u,v,w are variables  u-v interfere and v-w interfere and u-w do not 
+if Du < Dv then Dv < Dw 
+
+
+thm: the interference graph of an ssa form program is chordal 

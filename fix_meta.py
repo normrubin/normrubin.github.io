@@ -106,7 +106,7 @@ format:
         echo: true 
         chalkboard: true
         output-file: xxxx
-        scrollable: false
+        scrollable: true
         code-line-numbers: true
         slideNumber: "c/t"
 sidebar: false 
