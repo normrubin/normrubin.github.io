@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -468,7 +469,7 @@ b2--&gt; b3
 </div>
 </div></div>
 </section>
-<section id="simplifications" class="slide level2">
+<section id="simplifications" class="slide level2 scrollable">
 <h2>simplifications</h2>
 <ol type="1">
 <li>only going to look at one expression <span class="math inline">\(b + c\)</span></li>
@@ -542,7 +543,7 @@ b6 --&gt; exit
 </section>
 
 <section>
-<section id="data-flow-for-down-safe" class="title-slide slide level1 center">
+<section id="data-flow-for-down-safe" class="title-slide slide level1 center scrollable">
 <h1>data flow for down-safe</h1>
 <ol type="1">
 <li>local operations:
@@ -571,7 +572,7 @@ U_{\text{safe}}(\text{entry}) = \text{false}
 U_{\text{safe}}(n)=  \text{trans}(n) \cap_{p \in \text{preds}(n)} \text{used}(p) \cup \text{U}_{\text{safwe}}(p)
 \]</span></p>
 </section>
-<section id="placement" class="slide level2">
+<section id="placement" class="slide level2 scrollable">
 <h2>placement</h2>
 <p>want a down-safe node, that is not up-safe</p>
 <ol type="1">

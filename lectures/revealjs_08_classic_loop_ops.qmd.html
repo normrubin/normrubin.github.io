@@ -245,6 +245,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -335,7 +336,7 @@
 </div>
 
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>Loops optimizations are important because</p>
 <ol type="1">
@@ -425,7 +426,7 @@ can be converted into </code></pre>
 <p>if (e) { j = loopinv // may never execute while (e) { S }</p>
 <p>} ````</p>
 </section>
-<section id="induction-variable-elimination" class="slide level2">
+<section id="induction-variable-elimination" class="slide level2 scrollable">
 <h2>induction variable elimination</h2>
 <pre><code>for (int i = 0; i &lt; 100; ++1){
     f(a[i])
@@ -513,7 +514,7 @@ L: sum1 = phi(sum0, sum2)
    t52 = t50 + 4
    if (t52 &lt;= 396 + &amp;a )go to l</code></pre>
 </section>
-<section id="loop-un-switching" class="slide level2">
+<section id="loop-un-switching" class="slide level2 scrollable">
 <h2>loop un-switching</h2>
 <pre><code>for (int i = 0 ; i &lt; 100; ++1){
     if (c) {  // c is loop invariant 

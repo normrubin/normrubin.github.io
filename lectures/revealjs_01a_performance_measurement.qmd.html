@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -410,7 +411,7 @@
 <p><a href="papers/wrong_data.pdf">Producing Wrong Data Without Doing Anything Obviously Wrong!</a> Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.</p>
 <p>445 references</p>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <ol type="1">
 <li>Measurement bias is significant</li>
@@ -435,7 +436,7 @@
 <h2>violin plots</h2>
 <p><a href="https://www.kaggle.com/datasets/michaelbryantds/cpu-and-gpu-product-data">data</a></p>
 <p>A dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle</p>
-<div id="da31858c" class="cell" data-execution_count="1">
+<div id="a2a39d1e" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="co"># library &amp; dataset</span></span>
@@ -487,7 +488,7 @@
 <p>Data Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.</p>
 <p>I might want to take date into account in these plots</p>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>A violin plot shows density curves. The width is the approximate frequency of data points at that value</p>
 <p>Best for comparing distributions</p>
@@ -502,7 +503,7 @@
 </section>
 <section id="error-bars" class="slide level2">
 <h2>error bars</h2>
-<div id="72ecc601" class="cell" data-execution_count="2">
+<div id="14b5a25b" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a></a><span class="bu">print</span>(df.describe())</span>

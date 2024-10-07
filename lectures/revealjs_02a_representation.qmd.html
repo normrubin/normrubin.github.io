@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -409,7 +410,7 @@
 <p>What we read in and read out when transforming a program.</p>
 <p>What kind of properties make a good representation?</p>
 <p>This lecture explores different representations and their implications.</p>
-<div id="5da3477d" class="cell" data-execution_count="1">
+<div id="5275561d" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
@@ -454,7 +455,7 @@ print(result)</code></pre>
 <p>What is the level of abstraction?</p>
 <p>How do you understand the semantics.</p>
 </section>
-<section id="abstract-syntax" class="slide level2">
+<section id="abstract-syntax" class="slide level2 scrollable">
 <h2>Abstract syntax</h2>
 <p>Abstract syntax represents programs as tree structures, focusing on the nodes and their connections.</p>
 <ol type="1">
@@ -474,7 +475,7 @@ print(result)</code></pre>
 <p><img data-src="images/abst.png"></p>
 </div></div>
 </section>
-<section id="ast-tree-representation" class="slide level2">
+<section id="ast-tree-representation" class="slide level2 scrollable">
 <h2>AST tree representation</h2>
 <p>An AST is a tree structure, nodes like ‘if’, ‘test’, ‘body’, assign’.</p>
 <p>Each node is one concept from the program</p>
@@ -534,7 +535,7 @@ print(result)</code></pre>
 </code></pre>
 </div></div>
 </section>
-<section id="bril" class="slide level2">
+<section id="bril" class="slide level2 scrollable">
 <h2>bril</h2>
 <ol type="1">
 <li><p>Looks like assembly</p></li>
@@ -545,7 +546,7 @@ print(result)</code></pre>
 <li><p>easy to extend</p></li>
 </ol>
 </section>
-<section id="bril-syntax" class="slide level2">
+<section id="bril-syntax" class="slide level2 scrollable">
 <h2>Bril syntax</h2>
 <p>Declare functions, labels, instructions</p>
 <p>instruction:</p>
@@ -562,7 +563,7 @@ print(result)</code></pre>
 <h1>Using Bril - Control Flow Graph</h1>
 <p>extract info from this representation.</p>
 </section>
-<section id="control-flow-graph-cfg-version-1" class="slide level2">
+<section id="control-flow-graph-cfg-version-1" class="slide level2 scrollable">
 <h2>control flow graph (CFG) (version 1)</h2>
 <p>Representation is a directed graph.</p>
 <ol type="1">
@@ -703,7 +704,7 @@ flowchart LR
 <p>There is a long chain of instructions entered at the top, exit at the bottom, no branches inside.</p>
 </div>
 </section>
-<section id="cfg-cfg-form-2" class="slide level2">
+<section id="cfg-cfg-form-2" class="slide level2 scrollable">
 <h2>CFG (cfg form 2)</h2>
 <ol type="1">
 <li>nodes ares sequences of instructions.</li>
@@ -719,7 +720,7 @@ flowchart LR
 <p>Option: do all blocks end in a terminator or not?</p>
 <p>given a block b, the <strong><em>predecessors</em></strong> of <span class="math inline">\(b\)</span> are the blocks <span class="math inline">\(b_{in}\)</span> where there is an edge <span class="math inline">\(b_{in}-&gt;b\)</span>. And the <strong><em>successors</em></strong> of <span class="math inline">\(b\)</span> are the <span class="math inline">\(b_{out}\)</span> where <span class="math inline">\(b-&gt;b_{out}\)</span> is an edge.</p>
 </section>
-<section id="what-is-an-algorithm-that-forms-a-cfg" class="slide level2">
+<section id="what-is-an-algorithm-that-forms-a-cfg" class="slide level2 scrollable">
 <h2>What is an algorithm that forms a cfg</h2>
 <div class="fragment">
 <ol type="1">
@@ -728,7 +729,7 @@ flowchart LR
 </ol>
 </div>
 </section>
-<section id="pseudo-code-to-construct-cfg" class="slide level2">
+<section id="pseudo-code-to-construct-cfg" class="slide level2 scrollable">
 <h2>pseudo code to construct cfg</h2>
 <ol type="1">
 <li>in: instructions - list of instructions</li>
@@ -742,7 +743,7 @@ for i in instructions:
         blocks.append(current_block)
         current_block = []</code></pre>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>step 2 we need a map from labels to basic blocks</p>
 <ol type="1">

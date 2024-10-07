@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -458,7 +459,7 @@
 </tbody>
 </table>
 </section>
-<section id="tradeoffs" class="slide level2">
+<section id="tradeoffs" class="slide level2 scrollable">
 <h2>Tradeoffs</h2>
 <ol type="1">
 <li>The time to compile is part of the total execution time</li>
@@ -477,7 +478,7 @@
 <li>the next is the base line compiler</li>
 </ul>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <ol type="1">
 <li>start interpreting the code</li>
@@ -559,7 +560,7 @@ interpreter -- already_compiled --&gt; compiled_code
 <p>how does that effect the cost?</p>
 </div>
 </section>
-<section id="first-c-virtual-tables" class="slide level2">
+<section id="first-c-virtual-tables" class="slide level2 scrollable">
 <h2>first C++ virtual tables</h2>
 <p>in C++ a method call takes two dereferences</p>
 <ol type="1">
@@ -1512,7 +1513,7 @@ function f(a){
 </ul>
 </div></div>
 </section>
-<section id="how-do-this-in-bril" class="slide level2">
+<section id="how-do-this-in-bril" class="slide level2 scrollable">
 <h2>how do this in Bril?</h2>
 <p>3 new operations (sort of like out-of-order instructions)</p>
 <ol type="1">

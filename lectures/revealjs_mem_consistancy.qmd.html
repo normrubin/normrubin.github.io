@@ -245,6 +245,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -339,7 +340,7 @@
 <h2>multi-threaded programs</h2>
 <p>Compilers started out assuming targets are single threaded. What optimizations change for multi-threaded code? How do users tell compiler that the target is multi-threaded?</p>
 </section>
-<section id="shared-memory-multi-threading" class="slide level2">
+<section id="shared-memory-multi-threading" class="slide level2 scrollable">
 <h2>shared memory multi-threading</h2>
 <p>The most common parallel system is</p>
 <ol type="1">
@@ -494,7 +495,7 @@ y = 2;
 <p>Some optimizations might reorder instructions in a way that is incompatible with multithreading, introducing subtle bugs or performance regressions.</p>
 <p>Caching, prefetching, or other memory optimizations need to account for the fact that multiple threads may be accessing the same memory, which a simple thread library does not handle.</p>
 </section>
-<section id="using-libraries" class="slide level2">
+<section id="using-libraries" class="slide level2 scrollable">
 <h2>using libraries</h2>
 <ol type="1">
 <li><p>Functions such as pthread mutex lock() that are guaranteed by the standard to “synchronize memory” include hardware instructions (“memory barriers”) that prevent hardware reordering of memory operations around the call</p></li>
@@ -572,7 +573,7 @@ store.release </code></pre>
 <p>All operations appear to occur in a single total order that is consistent across all threads. This means that the results of operations are predictable and consistent as if all operations were executed in some sequential order.</p>
 <p>limits the hardware and compiler because it prevents reordering</p>
 </section>
-<section id="data-race-free" class="slide level2">
+<section id="data-race-free" class="slide level2 scrollable">
 <h2>Data Race Free</h2>
 <p>Data Race Free (DRF) means that a program is free from data races, which occur when:</p>
 <ol type="1">

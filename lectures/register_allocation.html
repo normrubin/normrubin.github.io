@@ -104,35 +104,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
 <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <meta property="og:title" content="Register Allocation – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
@@ -171,8 +142,6 @@ window.Quarto = {
 </header>
 
 
-<section id="register-allocation" class="level2">
-<h2 class="anchored" data-anchor-id="register-allocation">Register Allocation</h2>
 <ol type="1">
 <li>Register allocation is the process of determining storage locations to the values used in a program.</li>
 <li>These values can either be stored in registers or in memory.</li>
@@ -181,28 +150,36 @@ window.Quarto = {
 <li>A good register allocation strategy keeps frequently accessed variables in registers to maximize performance.</li>
 </ol>
 <p>much of the material for these slides comes from <a href="https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/">fernando</a></p>
-</section>
-<section id="aspects" class="level2 scrollable">
-<h2 class="scrollable anchored" data-anchor-id="aspects">Aspects</h2>
+<section id="terms" class="level2 scrollable">
+<h2 class="scrollable anchored" data-anchor-id="terms">terms</h2>
 <ol type="1">
 <li>The task of determining the register in which each variable will be stored is known as <strong><em>register assignment</em></strong>.</li>
 <li>If a variable must be stored in memory, it is referred to as a <strong><em>spill</em></strong>. Spilling involves identifying which variables need to be mapped to memory.</li>
 <li>If the same register can be assigned to two variables related by a move instruction, the move can be eliminated. This optimization is called <strong><em>coalescing</em></strong>.</li>
+</ol>
+</section>
+<section id="more-terms" class="level2">
+<h2 class="anchored" data-anchor-id="more-terms">more terms</h2>
+<ol type="1">
 <li>GPU performance often improves when fewer registers are used.</li>
 <li>Variables in Bril are <strong><em>virtual registers</em></strong>. After assignment, they become <strong><em>physical registers</em></strong>.</li>
 </ol>
 <p>Register allocators often have to manage constraints. For example, a function argument may need to be placed in a specific physical register.</p>
 </section>
 <section id="formal-limits" class="level2">
-<h2 class="anchored" data-anchor-id="formal-limits">formal limits</h2>
+<h2 class="anchored" data-anchor-id="formal-limits">Formal Limits</h2>
 <p>Register allocation is NP complete. Given a program P and K registers, is there an assignment where each variable gets a register and all simultaneously live variables get different registers</p>
 <p>Gregory Chaitin showed that if we have a graph that we want to paint with K colors, such that adjacent vertices get different colors we can construct a program where the program can be allocated with K registers iff the graph can be colored with K colors</p>
+</section>
+<section id="interference-graph" class="level2">
+<h2 class="anchored" data-anchor-id="interference-graph">Interference Graph</h2>
 <p>Chaitin used the <strong><em>interference graph</em></strong>. One vertex for each variable, and edge between variables that are simultaneously live.</p>
+<p>Two variables that interfere cannot be in the same register</p>
 </section>
 <section id="allocation-and-liveness" class="level2">
 <h2 class="anchored" data-anchor-id="allocation-and-liveness">Allocation and Liveness</h2>
 <p>If two variables are alive at the same point, and they have different values, they have to be assigned different registers</p>
-<p>Approximate this by ignoring “have different values” - Different registers if alive at the same point.</p>
+<p>Approximate this by ignoring “have different values” - Different registers if alive at the same point. (id is special)</p>
 <p><strong><em>MaxLive</em></strong> is the max number of values live at the same point</p>
 <p><strong><em>MinReg</em></strong> is the min number of registers we need</p>
 <p>minReg &gt;= MaxLive</p>
@@ -211,14 +188,16 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="an-example">an example</h2>
 <ol type="1">
 <li>What is the maximum number of variables alive at any program point?</li>
-<li>How is the interference graph of this program?</li>
+<li>What is the interference graph of this program?</li>
 </ol>
+<p>draw it?</p>
 <p><img src="ra/ra_example.svg" class="img-fluid"></p>
 </section>
-<section id="interference-graph" class="level2">
-<h2 class="anchored" data-anchor-id="interference-graph">interference graph</h2>
+<section id="interference-graph-1" class="level2">
+<h2 class="anchored" data-anchor-id="interference-graph-1">interference graph</h2>
 <p><img src="ra/interfer.svg" class="img-fluid"></p>
 <p>MaxLive = 2 Can we compile this with 2 registers? - Need 3</p>
+<p>draw it?</p>
 <p>The interference graph is a pentagon, needed 3 registers.</p>
 <p>A pentagon is the smallest graph whose chromatic number (number of colors needed 3 ) is less the maximum clique (2)</p>
 </section>
@@ -234,8 +213,8 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="ssa-with-interference-graph">ssa with interference graph</h2>
 <p><img src="ra/ssa_form_live_inter.svg" class="img-fluid"></p>
 </section>
-<section id="register-allocation-1" class="level2">
-<h2 class="anchored" data-anchor-id="register-allocation-1">register allocation</h2>
+<section id="register-allocation" class="level2">
+<h2 class="anchored" data-anchor-id="register-allocation">register allocation</h2>
 <p><img src="ra/ra_ssa.svg" class="img-fluid"></p>
 </section>
 <section id="swaps" class="level1">
@@ -259,6 +238,51 @@ window.Quarto = {
 <li>And we can find the minimum number of registers that the SSA-form program needs in polynomial time.</li>
 </ol>
 </section>
+<section id="setting-up-the-colors" class="level2">
+<h2 class="anchored" data-anchor-id="setting-up-the-colors">setting up the colors</h2>
+<p>suppose we have an ordering of the vertices, where the neighbors of a node to the left of the node in the ordering from a clique. If there are K such neighbors we need K+1 colors</p>
+</section>
+<section id="an-example-1" class="level2">
+<h2 class="anchored" data-anchor-id="an-example-1">an example</h2>
+<div class="cell" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>graph TD;</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n1--&gt; n2 --&gt; n3 --&gt;  n4 --&gt; n5 --&gt; n6--&gt; n1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD;
+n1--&gt; n2 --&gt; n3 --&gt;  n4 --&gt; n5 --&gt; n6--&gt; n1
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>draw it</p>
+<p>given this order - it is simple to pick the colors</p>
+<p>once we have an order , we can greedy color the nodes. When we get to the n’th node, all the neighbors are in a clique and are colored, so just pick one</p>
+<p>maybe try not to clobber a copy</p>
+<p>all nodes in the clique need different colors</p>
+<p>In a chordal graph the size of the largest clique equals the chromatic number</p>
+<p>if we find the point in the program with max live variables, we know the chromatic number</p>
+</section>
+<section id="how-do-we-get-the-order" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-we-get-the-order">how do we get the order</h2>
+<ol type="1">
+<li>give each node number</li>
+<li>initially each node gets count of zero 1 pick an unordered node with max count</li>
+<li>put that node in the front of the list, mark that node ordered</li>
+<li>increment each neighbor by 1</li>
+</ol>
+</section>
+</section>
+<section id="draw-the-example" class="level1">
+<h1>draw the example</h1>
 <section id="dominance-trees" class="level2">
 <h2 class="anchored" data-anchor-id="dominance-trees">dominance trees</h2>
 <p>What is the dominance tree of this program?</p>
@@ -273,87 +297,26 @@ window.Quarto = {
 <p><img src="ra/domsubtree.svg" class="img-fluid"></p>
 </section>
 </section>
-<section id="interference-graph-1" class="level1">
+<section id="interference-graph-2" class="level1">
 <h1>interference graph</h1>
 <p><img src="ra/dominterfer.svg" class="img-fluid"></p>
 <section id="chordal-graphs-triangular-graphs" class="level2">
 <h2 class="anchored" data-anchor-id="chordal-graphs-triangular-graphs">Chordal Graphs (triangular graphs)</h2>
 <ol type="1">
 <li>intersection graph of subtrees</li>
-<li>a graph that has no induced subgraph isomorphic to <span class="math inline">\(c_N\)</span> where <span class="math inline">\(c_N\)</span> is a cycle with N nodes and N is greater then 3.</li>
-<li>A graph is chordal (or triangulated) if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chordless cycles have at most three nodes. if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chord free cycles have at most three nodes.</li>
+<li>A graph is chordal if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle.</li>
+<li>if each of its cycles of four or more nodes has a chord, which is an edge joining two nodes that are not adjacent in the cycle. An equivalent definition is that any chord free cycles have at most three nodes.</li>
 </ol>
-</section>
-<section id="what-is-an-induced-subgraph" class="level2">
-<h2 class="anchored" data-anchor-id="what-is-an-induced-subgraph">what is an induced subgraph</h2>
-<p>if <span class="math inline">\(G=(V,E)\)</span> is a graph then the induced subgraph is a subset of the nodes of G plus the edges in G that connect those node</p>
 </section>
 <section id="examples-of-chordal-graphs" class="level2">
 <h2 class="anchored" data-anchor-id="examples-of-chordal-graphs">examples of chordal graphs</h2>
-<p><img src="ra/cord.svg" class="img-fluid"></p>
-</section>
-<section id="dominance-and-interference-thm-1" class="level2">
-<h2 class="anchored" data-anchor-id="dominance-and-interference-thm-1">dominance and interference Thm 1</h2>
-<p><img src="ra/thm1.svg" class="img-fluid"></p>
-</section>
-<section id="proof" class="level2">
-<h2 class="anchored" data-anchor-id="proof">proof</h2>
-<p>proof: suppose not. Then there exists a program point l in the CFG where v is alive, but that is not dominated by v. Thus, there exists a path from l to a usage of v. Therefore, there exists a path from the beginning of the program to a use of v that does not go across the unique definition of v, and the program is not strict.</p>
-</section>
-<section id="lemma-1" class="level2">
-<h2 class="anchored" data-anchor-id="lemma-1">lemma 1</h2>
-<p><img src="ra/lem1.svg" class="img-fluid"></p>
-</section>
-<section id="lemma-2" class="level2">
-<h2 class="anchored" data-anchor-id="lemma-2">lemma 2</h2>
-<p><img src="ra/lem2.svg" class="img-fluid"></p>
-</section>
-<section id="lemma-2-proof" class="level2">
-<h2 class="anchored" data-anchor-id="lemma-2-proof">lemma 2 proof</h2>
-<p><img src="ra/lem2proof.svg" class="img-fluid"></p>
-</section>
-<section id="transitivity-of-dominance" class="level2">
-<h2 class="anchored" data-anchor-id="transitivity-of-dominance">transitivity of dominance</h2>
-<p>lemma 3 if u,v, and w are variables, u,v interfere and v,w interfere but u,w do not if Du &lt; Dv then Dv &lt; DW</p>
-<div class="columns">
-<div class="column" style="width:70%;">
-<p>• We know that either Dv &lt; Dw, or Dw &lt; Dv. This is true because v and w are simultaneously alive, and we have the result of Lemma 1 • If we assume Dw &lt; Dv, then, by Lemma 2, we have that w is alive at Dv • Because u and v also interfere, and Du &lt; Dv, we know, also from Lemma 2, that u is also live at Dv • (by hypothesis u and w do not interfere), we know that Dv &lt; Dw</p>
-<p>lemma 1: if two variables, u and v, interfere, in a strict SSA-form program, then either Du &lt; Dv, or Dv &lt; Du. Lemma 2: in a strict program, if two variables, u and v, interfere, Du &lt; Dv, then u is alive at Dv.</p>
-</div><div class="column" style="width:30%;">
-<div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>%%|echo: false</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>graph TD;</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>def_U  --&gt; Def_V --&gt; useU --&gt; Def_W --&gt; useV --&gt; useW</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-%%|echo: false
-graph TD;
-def_U  --&gt; Def_V --&gt; useU --&gt; Def_W --&gt; useV --&gt; useW
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section"></h2>
-<p><img src="ra/cordproof.svg" class="img-fluid"></p>
-</section>
-<section id="section-1" class="level2">
-<h2 class="anchored" data-anchor-id="section-1"></h2>
-<p><img src="ra/cordproof1.svg" class="img-fluid"></p>
-<p><img src="ra/cordproof2.svg" class="img-fluid"></p>
+<p>draw am example of a cord graph</p>
 </section>
 <section id="orderings" class="level2">
 <h2 class="anchored" data-anchor-id="orderings">orderings</h2>
-<p><img src="ra/ordering.svg" class="img-fluid"></p>
+<p>we number the vertices of G</p>
+<p>v0,v1,v2,…., vi, …</p>
+<p>consider vi all the neighbors to the left are a clique (all connected )</p>
 </section>
 <section id="running-example" class="level2">
 <h2 class="anchored" data-anchor-id="running-example">running example</h2>
@@ -396,6 +359,7 @@ def_U  --&gt; Def_V --&gt; useU --&gt; Def_W --&gt; useV --&gt; useW
 </section>
 <section id="spilling" class="level2">
 <h2 class="anchored" data-anchor-id="spilling">spilling</h2>
+<p>if we ever have a program point where the number of live variables is &gt; MaxRegs we will have to spill - so do it here</p>
 <p><img src="ra/spilling.svg" class="img-fluid"></p>
 </section>
 <section id="spilling-1" class="level2">
@@ -426,6 +390,17 @@ for all x=y in L
    add xy a new node xy is ajacent to all node in the union of neighborhoods 
    remove x and y from G'</code></pre>
 <p>xy is a merge of x and y</p>
+</section>
+<section id="how-do-we-know-that-ssa-graphs-are-chordal" class="level2">
+<h2 class="anchored" data-anchor-id="how-do-we-know-that-ssa-graphs-are-chordal">how do we know that ssa graphs are chordal</h2>
+</section>
+<section id="dominance-and-interference-thm-1" class="level2">
+<h2 class="anchored" data-anchor-id="dominance-and-interference-thm-1">dominance and interference Thm 1</h2>
+<p>In a strict ssa form the definition of a variable dominates all the uses</p>
+<p>lemma1 : if two variables interfere then the def of one dominates the def of the other</p>
+<p>lemma2 if two variables a and b interfere and Da &lt; Db, then a is live at Db</p>
+<p>lemma3 if u,v,w are variables u-v interfere and v-w interfere and u-w do not if Du &lt; Dv then Dv &lt; Dw</p>
+<p>thm: the interference graph of an ssa form program is chordal</p>
 
 
 </section>

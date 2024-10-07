@@ -245,6 +245,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -335,7 +336,7 @@
 </div>
 
 </section>
-<section id="challenges-in-learning-about-gpus" class="slide level2">
+<section id="challenges-in-learning-about-gpus" class="slide level2 scrollable">
 <h2>Challenges in Learning About GPUs</h2>
 <ol type="1">
 <li><strong>Architectural Variations</strong>
@@ -364,7 +365,7 @@
 </ul></li>
 </ol>
 </section>
-<section id="hardware-styles-nvidia-model" class="slide level2">
+<section id="hardware-styles-nvidia-model" class="slide level2 scrollable">
 <h2>hardware styles NVIDIA model</h2>
 <ol type="1">
 <li>compute and graphics parts have same programmable parts, compute leaves out non-programmable features</li>
@@ -373,7 +374,7 @@
 <li>one big die</li>
 </ol>
 </section>
-<section id="hardware-styles-amd-model" class="slide level2">
+<section id="hardware-styles-amd-model" class="slide level2 scrollable">
 <h2>hardware styles AMD model</h2>
 <ol type="1">
 <li>compute has extra instructions (no tax on graphics customers to support compute)</li>
@@ -396,7 +397,7 @@
 <section id="threading-model" class="slide level2">
 <h2>threading model</h2>
 </section>
-<section id="warps-waveswavefronts" class="slide level2">
+<section id="warps-waveswavefronts" class="slide level2 scrollable">
 <h2><strong><em>warps/ waves/wavefronts</em></strong></h2>
 <ol type="1">
 <li>threads are grouped together into <strong><em>warps</em></strong>.</li>
@@ -405,7 +406,7 @@
 <li>there are a few instructions that work across a warp, - which break the model and give the compiler problems</li>
 </ol>
 </section>
-<section id="thread-blocks-groups-of-warps" class="slide level2">
+<section id="thread-blocks-groups-of-warps" class="slide level2 scrollable">
 <h2><strong><em>thread blocks</em></strong> groups of warps,</h2>
 <ol type="1">
 <li>threads within a block can access a fast scratchpad memory (called shared or LDS) - Violates the C memory model.<br>
@@ -416,7 +417,7 @@
 <li>hardware schedules each block into execution units. Max block size is limited by the size of a execution unit.</li>
 </ol>
 </section>
-<section id="grid-groups-of-blocks" class="slide level2">
+<section id="grid-groups-of-blocks" class="slide level2 scrollable">
 <h2><strong><em>grid</em></strong> groups of blocks,</h2>
 <ol type="1">
 <li>3d collection of blocks,</li>
@@ -433,7 +434,7 @@
 <p>cpu launches grids and kernels to gpu</p>
 <p>Computations launched on the device execute asynchronously with respect to the host, and it is the user’s responsibility to synchronize</p>
 </section>
-<section id="memory-spaces" class="slide level2">
+<section id="memory-spaces" class="slide level2 scrollable">
 <h2>memory spaces</h2>
 <ol type="1">
 <li>cpu and gpu have different memory spaces (cpu can copy from one to the other). Some amount of combined memory (slower the not combined)</li>
@@ -473,7 +474,7 @@
 <section id="amd" class="slide level2">
 <h2>AMD</h2>
 </section>
-<section id="and" class="slide level2">
+<section id="and" class="slide level2 scrollable">
 <h2>and</h2>
 
 <img data-src="images/amd-compute-unit.svg" class="r-stretch"><p>AMD has a similar block with some important differences</p>
@@ -492,7 +493,7 @@
 <h2>packing sms</h2>
 
 <img data-src="images/cdna2_gcd.png" class="r-stretch"></section>
-<section id="simd-and-control-flow" class="slide level2">
+<section id="simd-and-control-flow" class="slide level2 scrollable">
 <h2>simd and control flow</h2>
 <p>to execute an if then else</p>
 <ol type="1">
@@ -509,7 +510,7 @@
 <p>since an entire block has to fit on one compute unit/sm, the resources used in the block limit the number of warps on a sm,</p>
 <p>if a warp needs 100 registers and there are 256 vector registers on the compute unit, then two warps can run at once, compiler controls number of registers</p>
 </section>
-<section id="latency" class="slide level2">
+<section id="latency" class="slide level2 scrollable">
 <h2>latency</h2>
 <p>gpu is a throughput machine- how many threads finish in a unit of time not how long a single thread takes to finish</p>
 <p>unlike the cpu, gpu can have lots of loads in flight, time for these loads overlap so compiler tries to group loads together, but this needs extra registers</p>
@@ -520,7 +521,7 @@
 </ol>
 </section>
 <section>
-<section id="differences" class="title-slide slide level1 center">
+<section id="differences" class="title-slide slide level1 center scrollable">
 <h1>differences</h1>
 <ol type="1">
 <li>NVIDA committed to AI, and cut down on the non-tensor operations, AND did not</li>
@@ -530,7 +531,7 @@
 <li>NVIDIA has 1 architecture for the compiler, AMD has two</li>
 </ol>
 </section>
-<section id="compiler-model" class="slide level2">
+<section id="compiler-model" class="slide level2 scrollable">
 <h2>compiler model</h2>
 <ol type="1">
 <li>like a regular compiler for a scalar machine</li>
@@ -547,7 +548,7 @@
 <p>we have a lot of reuse (redundant loads of data )</p>
 <p>we could say each thread writes 4 results, so we need 1/4 of the threads each thread reads a raw and 4 columns</p>
 </section>
-<section id="technique" class="slide level2">
+<section id="technique" class="slide level2 scrollable">
 <h2>technique</h2>
 <ol type="1">
 <li>merge multiple threads so each resulting thread writes multiple outputs</li>

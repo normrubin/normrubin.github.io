@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -404,7 +405,7 @@
 
 </section>
 <section>
-<section id="introduction" class="title-slide slide level1 center">
+<section id="introduction" class="title-slide slide level1 center scrollable">
 <h1>Introduction</h1>
 <p>A compiler writer builds bridges between people and machines, and every day this task becomes more challenging.</p>
 <ol type="a">
@@ -414,7 +415,7 @@
 </ol>
 
 <img data-src="../images/compiler.jpg" class="r-stretch quarto-figure-center"><p class="caption">A compiler</p></section>
-<section id="homework" class="slide level2">
+<section id="homework" class="slide level2 scrollable">
 <h2>Homework</h2>
 <p>Most homework</p>
 <ol type="1">
@@ -425,7 +426,7 @@
 </ol>
 <p>Since most programming languages have a json library, you can do homework in any language you like.</p>
 </section>
-<section id="readings" class="slide level2">
+<section id="readings" class="slide level2 scrollable">
 <h2>Readings</h2>
 <p>we are going to critically read current research papers</p>
 <ol type="1">
@@ -437,7 +438,7 @@
 <li>I listed a lot of papers, but if there is a different paper you want to present let me know</li>
 </ol>
 </section>
-<section id="project" class="slide level2">
+<section id="project" class="slide level2 scrollable">
 <h2>Project</h2>
 <p>Everybody gets to do a project, which is compiler related</p>
 <ol type="1">
@@ -446,7 +447,7 @@
 <li>If you like up to 3 people can submit a project</li>
 </ol>
 </section>
-<section id="homework-0" class="slide level2">
+<section id="homework-0" class="slide level2 scrollable">
 <h2>homework 0</h2>
 <p>Write a paragraph to introduce yourself in a reply to the canvas introductions topic. Add a picture of you can. Mention a compilers topic you’d like to learn about someday, either in this class or beyond. Add your info to the canvas introductions discussion topic.</p>
 <p>Pick a paper from the <a href="../weekly.html">weekly schedule</a> whose discussion you will lead. Claim the paper by opening a pull request (at the class github) for the weekly.qmd file, fill in your name in the LEADER: line. (I encurage teams of two to sign up for the same paper)</p>
@@ -478,7 +479,7 @@
 <p>2/3 of the cost and 90% of the time for solving a problem was coding.</p>
 <p>FORTRAN was provided for the IBM 1401 computer by an innovative 63-phase compiler that ran entirely in its core memory of only 8000 (six-bit) characters.</p>
 </section>
-<section id="compiler-development-model" class="slide level2">
+<section id="compiler-development-model" class="slide level2 scrollable">
 <h2>Compiler Development Model</h2>
 <p>In these early years, the vendor development model was:</p>
 <ol type="1">
@@ -488,7 +489,7 @@
 </ol>
 <p>Vendors sometimes built compilers but often used small startup compiler companies.</p>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>Compilers stabilized on a classic structure (using an ir intermediate language). IR is machine independent.</p>
 <ol type="1">
@@ -528,7 +529,7 @@ A--IR--&gt; C;
 </div>
 </div>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>This course focuses on stage 2 (The middle end)</p>
 <p>A goal of this course is to explain how to transform a program automatically, while preserving its semantics, in such a way that the new program is more efficient according to a well-defined metric.</p>
@@ -682,7 +683,7 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 </table>
 <p><a href="https://chriscummins.cc/2019/llvm-cost">source</a></p>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>Some observations:</p>
 <ol type="1">
@@ -692,7 +693,7 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 <li>There is a vast difference between production and student projects.</li>
 </ol>
 </section>
-<section id="compiler-assumptions-how-many-are-still-true" class="slide level2">
+<section id="compiler-assumptions-how-many-are-still-true" class="slide level2 scrollable">
 <h2>Compiler Assumptions (How many are still true?)</h2>
 <ol type="1">
 <li>The time to compile a program should be roughly linear. So, non-linear algorithms can only be used if they work on a small part of a program.</li>
@@ -702,7 +703,7 @@ A[TEXT_Version of BRIL]--&gt; B0[BRIL in JSON] --&gt; B1["new pass"] --&gt; B2[B
 <li>Most targets are C-like.</li>
 </ol>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>Some changes since early 2000’s:</p>
 <ol type="1">
@@ -727,7 +728,7 @@ while hardware computing horsepower doubles every 18 months. How would you prove
 <p>Talk given by KAI’s Arch Robison</p>
 <p>Compile-time program optimizations are similar to poetry: more are written than actually published in commercial compilers. Hard economic reality is that many interesting optimizations have too narrow an audience to justify their cost in a general-purpose compiler and custom compilers are too expensive to write.</p>
 </section>
-<section id="effects-of-optimization" class="slide level2">
+<section id="effects-of-optimization" class="slide level2 scrollable">
 <h2>effects of optimization</h2>
 <p>Remove performance penalty for:</p>
 <ol type="1">

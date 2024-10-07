@@ -310,6 +310,7 @@
     }
     .reveal .slide:not(.center) {
       height: 100%;
+      overflow-y: auto;
     }
     .reveal .slide.scrollable {
       overflow-y: auto;
@@ -730,7 +731,7 @@
 </div>
 </div>
 </section>
-<section id="flavors-of-optimization" class="slide level2">
+<section id="flavors-of-optimization" class="slide level2 scrollable">
 <h2>flavors of optimization</h2>
 <p>I want to separate 3 flavors of optimization.</p>
 <ol type="1">
@@ -901,7 +902,7 @@ this is a mapping variables that have been defined but not used
 
 <p>Compilers often run dce more then once- why?</p>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>testing out dce</p>
 <ol type="1">
@@ -909,7 +910,7 @@ this is a mapping variables that have been defined but not used
 <li><p>program should run less instructions</p></li>
 </ol>
 </section>
-<section class="slide level2">
+<section class="slide level2 scrollable">
 
 <p>Some test cases:</p>
 <ol type="1">
@@ -934,7 +935,7 @@ this is a mapping variables that have been defined but not used
 
 bril2json &lt; bench.bril | python3 tdce.py | brili -p</code></pre>
 </section>
-<section id="using-trunt-golden-images" class="slide level2">
+<section id="using-trunt-golden-images" class="slide level2 scrollable">
 <h2>using trunt (golden images)</h2>
 <ol type="1">
 <li><p>Configure. Decide what command you want to test. Make a turnt.toml config file and put command = “mycmd {filename}” in it to pass each test file as an argument to mycmd.</p></li>
