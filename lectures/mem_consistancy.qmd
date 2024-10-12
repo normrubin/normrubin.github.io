@@ -17,6 +17,59 @@ title: memory consistancy
 ---
 
 
+## memory operations 
+
+The C semantics assume that (within a single thread) all loads and stores stay in order. That is is not allowed to re-order a store past a load of the same address.
+
+in ssa each argument of an instruction is a pointer to the source instruction.  These edges force  serialization of the code.
+
+We want to apply this to loads and stores this will make ordering explicit 
+
+In Static Single Assignment (SSA) form, memory tokens, representing stores or loads to memory, are typically handled by introducing memory state variables
+
+1) load:  dest = load addrs, memory_token
+1) store memory_token = store value, address, memory_token
+1) calls to functions that might modify memory also need to read and write memory tokens 
+
+treat a store as though it created a new copy of memory 
+
+we can use phi functions on memory tokens 
+
+Maintaining Correct Memory Order: By tracking memory states explicitly in SSA form (through these memory tokens and versioning), SSA ensures that memory operations respect the correct order, even if the control flow of the program is complex. This helps compilers optimize code by making memory dependencies explicit.
+
+```{mermaid}
+graph TD
+store1
+load1
+load2
+store2
+load4
+load3
+store1-->load1
+store1-->load2
+store1 --> store2
+store2 --> load3
+store2--> load4
+store2--> exit
+```
+
+Optimize  loads/stores 
+
+walk backwards - load from store 
+
+1) if we can prove the load address is the same as the store address-  remove the load 
+
+2) if we can prove the load address is different move the load up a store 
+
+3) otherwise go on
+
+
+
+
+
+
+
+
 
 ## multi-threaded programs
 
