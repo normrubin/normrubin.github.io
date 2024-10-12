@@ -368,6 +368,14 @@ b[k] =
    =b[k]
 ```
 
+indexed stores 
+
+when we see an assignment a[i] = exp
+
+we have 3 value numbers a, i, exp 
+
+give the array a new value number 
+give the array[i] operation the value number of the exp 
 
 
 ## Local value numbering.
@@ -437,18 +445,18 @@ remember that the result is a blog post
 
 ## crossing blocks 
 
-```{mermaid}le
+```{mermaid}
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 
 graph TB
-A["m = a + b<br/><span style='color:red'>n = a + b</span>"]
-B["p = c + d<br><span style='color:red'>r = c + d</span>"]
+A["m = a + b<br> n = a + b"]
+B["p = c + d<br>r = c + d"]
 
-C["<span style='color:blue'> q = a + b<br> </span> r = c + d"]
-D["e=b + 18<br> <span style='color:blue'> s = a + b </span> <br> u = e + f "]
-E["e=a + 17<br> <span style='color:blue'> t = c + d </span> <br> u = e + f "]
-F["<span style='color:blue'> v = a + b <br> w = c + d <br> x = e + f</span>"]
-G["<span style='color:blue'> y = a + b <br> z = c + d</span>"]
+C["q = a + b<br> r = c + d"]
+D["e = b + 18<br> s = a + b <br> u = e + f"]
+E["e = a + 17<br> t = c + d <br> u = e + f"]
+F["v = a + b <br> w = c + d <br> x = e + f"]
+G["y = a + b <br> z = c + d"]
 
 style A fill:#ffffff,stroke:#000000,stroke-width:1px
 style B fill:#ffffff,stroke:#000000,stroke-width:1px
@@ -494,7 +502,7 @@ while worklist is not empty
 
 evn(b, stack)
    t = new table for b  
-   link t to scope 
+   link t above stack  
    lvn(b,t) 
    for each s successor of b,
      if s has one pred then evn(s, t)
@@ -510,9 +518,9 @@ Some compilers assume it is ok if E1 produces less errors than E
 
 some compilers assume that safety is only required for "standard conforming" code and undefined behavior for other code.
 
-While is value numbering safe?
+Why is value numbering safe?
 
-1. if an expression is in the table, it must have occurred at least one in the block
+1. if an expression is in the hash table, it must have occurred at least one in the block
 1. Algorithm modified the code but does not invalidate the table 
 
 ## when is value numbering profitable

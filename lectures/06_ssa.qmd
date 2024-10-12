@@ -104,13 +104,13 @@ rename_basic_block(B):
     for each instruction S in block B:
         for each use of a argument x in S: 
             i = top(Stack[x]) 
-            replace the use of x with $x_i$
+            replace the use of x with x_i
             
         for each variable a that S defines (a dest)
             count[a] = Count[a] + 1 
             i = Count[a]             
             push i onto Stack[a]             
-            replace definition of a with $a_i$ 
+            replace definition of a with a_i
 ```
 We don't need the stack here but we will need it later.
 
@@ -158,7 +158,7 @@ phi-nodes are flow-sensitive copy instructions: they get a value from one of sev
 
 In Bril, a phi-node appears as a `phi` instruction:
 
-    a.4: int = phi .left a.2 .right a.3;
+a.4: int = phi .left a.2 .right a.3;
 
 The `phi` instruction chooses between any number of variables, and it picks between them based on labels.
 If the program most recently executed a basic block with the given label, then the `phi` instruction takes its value from the corresponding variable.
@@ -167,6 +167,29 @@ If the program most recently executed a basic block with the given label, then t
 
 You can write the above program in SSA like this:
 
+::: {.columns}
+
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+B0[".b0
+    a: int = const 47;
+    br cond .left .right;"]
+left["a: int = add a a;
+    jmp .exit;"]
+right["a: int = mul a a;
+        jmp .exit;"]
+exit["print a;"]
+B0 --> left
+B0 --> right
+left --> exit
+right --> exit
+```
+
+:::
+
+::: {.column}
 ```
     @main(cond: bool) {
     .entry:
@@ -184,6 +207,11 @@ You can write the above program in SSA like this:
     }
 ```
 
+:::
+::: 
+
+
+
 
 ##   Bril in SSA
 
@@ -192,111 +220,6 @@ It adds support for a `phi` instruction.
 Beyond that, SSA form is just a restriction on the normal expressiveness of Bril—if you solemnly promise never to assign statically to the same variable twice, you are writing "SSA Bril."
 
 The reference interpreter has built-in support for `phi`, so you can execute your SSA-form Bril programs without fuss.
-
-
-
-## Getting out of ssa
-
-Compilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies. 
-
-## an example 
-
-
-::: {.columns}
-
-::: {.column}
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
- A0["io =
-     j0 = 
-     k0 ="]
-A1["i1 =
-   j1 =
-   k1 = "]
-A2["i2 = phi(i0, i1)
-   j2 = phi(j0, j1)
-   k2 = phi(k0, k1)
-   ...
-    = i2
-    = j2 
-    = k2"]
-
-    A0 --> A2
-    A1--> A2
- ```
-
-:::
-
-::: {.column}
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TD
- B0["io =
-     j0 = 
-     k0 ="]
-B1["i1 =
-   j1 =
-   k1 = "]
-B2["
-   ...
-    = i2
-    = j2 
-    = k2"]
-    B0 --"i2 = i0
-       j2 = j0
-       k2 = k0"--> B2
-    B1 --"i2 = i1
-          j2 = j1
-          k2 = k1"--> B2
-```
-
-:::
-
-::: 
-
-we cannot put instructions on edges, but we can add to prev block
-
-## critical edges 
-
-
-::: {.columns}
-
-::: {.column}
-
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TB
-A0["L1:
-   a0 =
-   b0 =
-   if A0 > b0"]
-A1["b1 = a0"]
-A2["l2:
-b2 = phi(b1,b0)"]
-A0 --> A1
-A1 --> A2
-A0 --> A2
-```
-
-:::
-
-::: {.column}
-
-  b2 = b0?
-
-:::
-
-::: 
-
-The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors.  This should remind you of adding a preheader to a loop
-
-## critical edge splitting 
-
-
-We can solve this problem by doing ***critical edge splitting***. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge. 
 
 
 
@@ -324,14 +247,12 @@ Which variables
 
 . . .
 
-At the merge (join) node 
+phi  At the merge (join) node 
 
-b 
-
-
+variable b 
 
 
-## scheme 
+## conditions 
 
 conditions:  phi-function for variable b at node z 
 
@@ -350,13 +271,127 @@ When we find nodes X,Y,Z that match these steps and z does not contain a phi fun
 
 While really expensive this will work 
 
-## fast methods 
+
+## diagram
+
+using dash for path 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+a["x:x="]
+b["y:x="]
+c[join]
+d
+a-.-> c
+b-.-> c
+c-.->d 
+```
+
+We could have complex flow - including loops on the paths
+
+## reminder dominators 
+
+```
+while dom is changing 
+for vertex in cfg 
+   dom[vertex] =
+```
+
+- - - 
+
+
+```
+while dom is changing 
+for vertex in cfg 
+   dom[vertex] =  {vertex} + ...
+```
+
+- - -
+
+if b has multiple preds, and a dominates all of them, a dom b 
+
+
+```
+while dom is changing 
+for vertex in cfg 
+   dom[vertex] =  {vertex} + Intersection( dom(p) for p a pred of vertex)
+```
+
+
+## fast methods for inserting phi's
+
+The method for this has two steps 
+
+1. insert phi instructions where needed (do not add subscripts yet)
+2. in a second pass insert all the numbers 
+
+## to ssa 
 
 To convert to SSA, we want to insert phi-nodes whenever there are distinct paths containing distinct definitions of a variable.
 We *don't* need phi-nodes in places that are dominated by a definition of the variable.
 So what's a way to know when control reachable from a definition is *not dominated* by that definition?
 
 The dominance frontier!
+
+## recall the dominance frontier 
+
+::: {.columns}
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A-->B 
+A--> F
+B-->C
+B--> D
+C--> E
+D--> E
+E--> F
+```
+
+:::
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+A--> B
+A--> F
+B--> C
+B-->D
+B--> E
+```
+
+:::
+
+:::
+
+|  || |
+-----|---|---|--|----|----------
+|block| A |B |C |D |E |F
+frontier| empty| F| E|E|F| empty
+
+
+## a block can be in its own dom frontier 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A--> B
+B--> A
+B--> C
+```
+
+why: A dom B, but B does not dom A. so A is in the dom frontier of A
+
 
 ## an almost linear method 
 
@@ -366,8 +401,84 @@ We do it in two steps.
 1. insert phi-nodes:
 1. rename variables:
 
----
- 
+## placing Phi functions 
+
+let b be a block with a def of a variable v, if b has multiple defs of v, use the last one
+
+What is the first block following v that can be reached by a different def of v 
+
+in blocks dominated by b, b's def must have been executed, (other defs of v in a dominated block may overwrite it)
+
+we need to place a phi function for b at the start of all blocks in the dom frontier of b. 
+
+after we add phi functions to S where S = df(b) we have more defs, so we need to add phi's in the dom frontier of all the blocks in S
+
+
+## example 1
+
+::: {.columns}
+
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+N["v=1"]
+M
+M2["v=2"]
+Z["M"]
+N--> M
+M-->Z
+M2--> Z
+```
+:::
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+N["v1=1"]
+M
+M2["v2=2"]
+Z["M:v3= phi(v1,v2)"]
+N--> M
+M-->Z
+M2--> Z
+```
+:::
+::: 
+
+
+## a loop  
+
+ ::: {.columns}
+
+ ::: {.column}
+
+ ```{mermaid}
+ graph TD
+ V["v=init"]
+ Z{"z:v = v+1"}
+ V --> Z
+ Z -->Z
+ ```
+
+ :::
+
+ ::: {.column}
+
+ ```{mermaid}
+ graph TD
+ V["v1=init"]
+ Z{"z:v2 = phi(v1,v3)\nv3 = v2+1"}
+ V --> Z
+ Z -->Z
+ ```
+ :::
+
+ ::: 
+
+## iterative placement 
 
 ::: {.columns}
 
@@ -375,59 +486,52 @@ We do it in two steps.
 
 ```{mermaid}
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph TB
-a[x=]
-a-->b
-a--> e
-a--> i
 
-b-->c
-c--- c
-c--> d
-e--> f["f
-  x = "]
-e--> g
-g--> h
-f--> h
-h-->l
-f--> d
-h--> e
-i--> k
-i--> j
-j--> k
-k--> l
-d--> l
-
+graph TD
+B1[v=1]
+B2[v=2]
+B3
+B4[v=3]
+B5
+B1--> B3
+B2--> B3
+B3--> B5
+B4--> B5
 ```
+
 
 :::
 
 ::: {.column}
 
-We need phi functions for this def of x in d and h, where else?
-3 more 
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+B1[v1=1]
+B2[v2=2]
+B3["v3=phi(v1,v2)"]
+B4[v4=3]
+B5["v5=phi(v3,v4)"]
+B1--> B3
+B2--> B3
+B3--> B5
+B4--> B5
+```
+
 
 :::
 
 ::: 
 
-. . .
 
-
-
-we need to iterate  and keep adding phi nodes
-
----
-
-
-
+## phi placement 
 ```
-for each node in the cfg 
-   for each variable with a dest in node
-     add node to Defs[v]   # Blocks where v is assigned.
+for each block b in the cfg 
+  for each var v defined in b
+    add block to the set defs(v)  ## blocks that contain an assignment to v 
 
-for each v in vars:
-    W = Defs[v]
+  W = Defs[v]
     while W is not empty
       remove a node n from w
          for block in DF[n]:  # Dominance frontier.
@@ -437,29 +541,81 @@ for each v in vars:
              unless it's already in there.
 ```
 
-. . .
+## an example 
 
-Since we keep adding nodes to W how do we know this terminates?
+::: {.columns}
+::: {.column}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+N1["1:x = 1"]
+N2["2:"]
+N3["3:x= 2"]
+N4["4:"]
+N5["5:x=3"]
+N6[6:x=4]
+N7[7:]
+N1--> N2
+N1--> N3
+N2--> N4
+N3--> N4
+N4--> N5
+N5-->  N4
+N5--> N6
+N6--> N7
+N6--> N5
+```
+:::
+::: {.column}
+
+1. initially w = {1,3,5,6}
+1. process DF(1) = empty
+1. process DF(3) = 4, add 4 to w and add a phi function for x to 4
+1. process DF(5) = 4,5 no need to add 5 to w, add phi for x to 5
+1. process DF(6) = 5 
+1. process DF(4) = 4 
+
+:::
+
+:::
+add phi's to blocks 4 and 5
+
+
 
 
 ## rename variables:
 
 ```
-rename(n):
-  rename_basic_block(n)  # from before 
-  for each successor Y of n, where n is the jth pred of Y
-    for each phi-function f in Y where the operand of f is 'a'
-      i = top(stack[a])
-      replace jth operand wit a_i
-  for each child of X of n (in the dominator tree)
-    rename(X)
-    for each instruction S in n
-       pop stack(S.dest)
+# allocate a stack and a counter for each variable
+for each V a variable 
+  c[v] = 0
+  s[v] = empty stack
+  search(entry)
+
+search(n):
+  for each instr i in n:
+     if instr is not a phi
+         replace every variable in the rhs of instr by vi where i = top(s[v])
+         if instr has a dest v
+           i = C(v)
+            replace v by new vi, push i onto s[v]
+            increment c[v]
+
+  for each y a successor of n
+     j = which pred (y,n)
+     for each phi function pinstr in Y replace the jth opernmad of pinstr by vi where 
+        i = top(s(v)
+  
+  for each Y a child of n in the dominator tree 
+      call search(Y)
+
 
 ```
 
----
-
+## an example 
 
 ```{mermaid}
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
@@ -716,6 +872,114 @@ could we have a phi-function wit more then two arguments?
 This algorithm computes what is called ***minimal SSA form*** which is not so mimimal since it can leave dead assignments 
 
 doing dead code elimination   ***pruned ssa form***
+
+
+## Getting out of ssa
+
+Compilers that use the SSA form usually contain a step, before the generation of actual assembly code, in which phi functions are replaced by ordinary instructions. Normally these instructions are simple copies. 
+
+## an example 
+
+
+::: {.columns}
+
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+ A0["io =
+     j0 = 
+     k0 ="]
+A1["i1 =
+   j1 =
+   k1 = "]
+A2["i2 = phi(i0, i1)
+   j2 = phi(j0, j1)
+   k2 = phi(k0, k1)
+   ...
+    = i2
+    = j2 
+    = k2"]
+
+    A0 --> A2
+    A1--> A2
+ ```
+
+:::
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+ B0["io =
+     j0 = 
+     k0 ="]
+B1["i1 =
+   j1 =
+   k1 = "]
+B2["
+   ...
+    = i2
+    = j2 
+    = k2"]
+    B0 --"i2 = i0
+       j2 = j0
+       k2 = k0"--> B2
+    B1 --"i2 = i1
+          j2 = j1
+          k2 = k1"--> B2
+```
+
+:::
+
+::: 
+
+we cannot put instructions on edges, but we can add to prev block
+
+## critical edges 
+
+
+::: {.columns}
+
+::: {.column}
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+A0["L1:
+   a0 =
+   b0 =
+   if A0 > b0"]
+A1["b1 = a0"]
+A2["l2:
+b2 = phi(b1,b0)"]
+A0 --> A1
+A1 --> A2
+A0 --> A2
+```
+
+:::
+
+::: {.column}
+
+  b2 = b0?
+
+:::
+
+::: 
+
+The placement of the copy b2 = b0 is not simple, because the edge that links L2 to L5 is critical. A critical edge connects a block with multiple successors to a block with multiple predecessors.  This should remind you of adding a preheader to a loop
+
+## critical edge splitting 
+
+
+We can solve this problem by doing ***critical edge splitting***. This CFG transformation consists in adding an empty basic block (empty, except by – perhaps – a goto statement) between each pair of blocks connected by a critical edge. 
+
+--------------------------------------------
+
+
 
 ## making use of ssa form
 

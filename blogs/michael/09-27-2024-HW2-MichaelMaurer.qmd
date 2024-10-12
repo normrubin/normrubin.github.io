@@ -1,0 +1,143 @@
+---
+author: Michael Maurer
+execute:
+  enabled: false
+format:
+  html: default
+title: EECE7309 Homework 2 -- Local Optimizations
+
+---
+
+## Introduction
+
+This assignment introduces trivial dead code elimination, and local value numbering.
+Python code which performs these optimizations are available at the link provided
+in the Code section.
+
+## Part 1: Trivial Dead Code Elimination
+
+In the first part of this assignment, we implemented trivial dead code elimination.
+By this, we mean removing instructions which are not used before reassignment. 
+Another way to say this, is that an instruction is not dead if it is used, or if it reaches the end of the basic block, before it is reassigned.
+
+## Challenges Faced
+The primary challenge I faced here was in attempting to implement more sophisticated dead code elimination, such as at the global scope. I thought this would be interesting to explore, but abandoned it as it is out of scope for this assignment. 
+What proved particularly challenging on this front was handling the case where a variable is used across blocks, where the control flow forms cycles. 
+The code I wrote was considering certain instructions to be unused when there were possible paths in which the instructions were used. 
+When only performing local DCE, this task became much more achievable. 
+
+## Implementation
+
+To perform local DCE, first I wrote some code which could partition every function into blocks. With these blocks, we have all the code chunks which are candidates for local DCE. 
+Then, determining dead code was simply determining which instructions are not used by any later instructions in the block.
+This was done repetitively, as some instructions may on first pass not be considered dead, however they are only used by a dead instruction which will be eliminated.
+
+## Testing
+My initial line of testing was very curated, and used the following source code:
+
+```{bril}
+@main {
+    a: int = const 4;           # Will be eliminated
+    prod: int = id a;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add a b;        # Will be eliminated
+    prod: int = mul sum1 sum2;  # Will be eliminated
+    sum2: int = id a;
+    prod: int = id sum2;
+    print prod;
+}
+```
+
+Here, we would expect that the first two instructions assigning `prod` would be eliminated, and then as a follow-on effect, the first assignment of `sum2` also becomes dead code. What we observe aligns with these expectations, and is shown below:
+
+```{bril}
+@main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = id a;
+    prod: int = id sum2;
+    print prod;
+}
+```
+
+To further test my dead code elimination, I leveraged the `brench` tool provided by `bril`. This tool allows for a pipeline to be created, which source code is passed through. Then, using `turnt` the results of running the optimized code can be compared to what is expected. In the code repository, there is a `.csv` file containing the
+results of running `brench` against all benchmarks in the `bril` repository. 
+We observe that all tests pass (or timeout in the case of `function_call`, which times out with or without optimization). 
+Further, and perhaps dissapointingly, we notice that the number of instructions does not change after optimization for these benchmarks. However, this may be unsurprising, as these benchmarks are in a public code-base, and are less likely to have trivial dead code.
+
+
+## Part 2: Local Value Numbering
+
+For the second part of this assignment, we implemented local value numbering to optimize the number of dynamic instructions executed by a program.
+The strategy here is to identify where computations have happened before in the code, and where possible do not re-evaluate them, and instead favor a copy.
+
+## Implementation
+
+I used a very straightforward method of implementing LVN, as was discussed in our lectures as well as those from Cornell. 
+The primary difference that one may notice in the code is that there is more significant exception handling which must be done to achieve consistent results.
+
+## Challenges Faced
+
+My initial implementation appeared to work well on some programs, but
+returned incorrect results on others. This was quite puzzling, but looking at
+the code which was being produced, it quickly became clear what was going wrong.
+As a demonstration, consider the following code from `dot-product.bril`:
+
+```{bril}
+vectorA: ptr<int> = alloc size;
+...
+vectorB: ptr<int> = alloc size;
+```
+
+This particular benchmark was failing when testing my initial code, and investigating the results showed the following:
+
+```{bril}
+vectorA: ptr<int> = alloc size;
+...
+vectorB: ptr<int> = id vectorA;
+```
+
+This is not good! My hashing / replacement scheme was based entirely off of the instruction operation and the arguments involved, and so in this case, I registered the instruction `alloc size` as redundant and simply assigned `vectorB` to `vectorA`.
+For simpler instructions this makes sense, however as we are trying to have these
+vectors point at some dynamically allocated memory, this causes serious issues. 
+So, to handle this, I created a list of special instructions which were not to be optimized in this manner, including functions like `alloc`. 
+
+After this, all but one of the benchmarks was passing, with the lone failure being `riemann.bril`. Again, this appeared to be a result of the hash function I implemented. Consider the following code:
+
+```{bril}
+left: float = call @left_riemann a b n;
+print left;
+midpoint: float = call @midpoint_riemann a b n;
+print midpoint;
+right: float = call @right_riemann a b n;
+```
+
+My setup was optimizing this code to the following:
+
+```{bril}
+left: float = call @left_riemann a b n;
+print left;
+midpoint: float = id @midpoint_riemann left;
+print midpoint;
+right: float = id @right_riemann left;
+```
+
+This realization came much quicker, as it was clear I omitted certain important values in my hashing function, in this case being the function name which is called.
+Before this, my algorithm determined that `left`, `midpoint`, and `right` all hashed to `callabn`, indicating that they are the same value, when of course this is not the case.
+
+After these issues were resolved, everything worked quite well. I spent some time laying the groundwork for constant folding, however I was not able to finish this in reasonable time.
+
+## Testing
+
+The primary line of testing for the LVN code was using `brench`, and using the code which I have developed for this assignment, in the repository linked below, it can be verified that all `bril` benchmarks pass through a `brench` test. 
+
+What was interesting was that some benchmarks had a substantial decrease in number of dynamic instructions. One in particular was the `quadratic.bril` benchmark. What I noticed was that there were calls to `@sqrt` which took the same inputs, and then these were optimized out using local value numbering. This reduced the number of executed instructions from 785 to 412 (a 47.5% decrease!).
+
+## DCE and LVN
+
+In the code submitted with this assignment, the provided `brench` setup actually tests both optimizations, and passes the input code through `dce.py` first, followed by `lvn.py`. The results indicate that all tests still pass, and therefore we can say these optimizations work together!
+
+## Code
+The code for this assignment is contained in a [public GitHub repository](https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw2) which I set up. Notably, to run brench using the provided `brench_config.toml` file, `bril` is expected to be two directories above this one. This can be changed by modifying the benchmarks variable in `brench_config.toml`.

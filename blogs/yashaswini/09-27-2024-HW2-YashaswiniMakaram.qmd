@@ -1,0 +1,141 @@
+---
+author: Yashaswini Makaram
+execute:
+  enabled: false
+format:
+  html: default
+title: Homework2 - Yashaswini
+---
+
+# Part 1: Dead code elimination
+
+
+## About the Code:
+- starting from the end of the function, the optimzer keeps a record of the variables used.
+- if an instruction is assigning value to a variable that is not used later in the function, then  it is eliminated
+- once a used variable is defined in the code, it is removed form the list of used varibles.
+## Testing:
+
+test case:
+'''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v1", "value": 10 },
+        { "op": "const", "type": "int", "dest": "v2", "value": 2 },
+        { "op": "const", "type": "int", "dest": "v3", "value": 1 },
+        { "op": "add", "type": "int", "dest": "out", "args": ["v1", "v2"] },
+        { "op": "print", "args": ["out"] }
+      ]
+    }
+  ]
+}
+'''
+
+output:
+'''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v1", "value": 10 },
+        { "op": "const", "type": "int", "dest": "v2", "value": 2 },
+        { "op": "add", "type": "int", "dest": "out", "args": ["v1", "v2"] },
+        { "op": "print", "args": ["out"] }
+      ]
+    }
+  ]
+}
+'''
+
+As you can see above,  satrting with the last instruction,  out is the only variable used.
+Going backwards the instruction is assigning value to out which is used so this line stays and the inputs, v1 and v2 are added to used variables, and out is removed from used variables.
+the next instrction up is assigning value to v3, which is not used. there fore this instruction is eliminated and its inputs are not added to used variables.
+
+
+
+
+# Part 2: local value numbering 
+
+## About the Code
+
+- given a block of code the program starts from the top and assigns a vlaue number to each variable and computation.
+- if a variable is reasigned it's value number changes.  the value number of a computation is the same only if both the value numbers of the inputs and the operation is the same
+- if two instuctions have the same value number, then the instruction is changed by copying the previously computed value.
+- all subsiquent instructions that use that variable will check the value table, and choose the earliest variable that has that value
+
+##Testing
+
+test case:
+'''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v1", "value": 10 },
+        { "op": "const", "type": "int", "dest": "v2", "value": 5 },
+        { "op": "add", "type": "int", "dest": "sum1", "args": ["v1", "v2"] },
+        { "op": "add", "type": "int", "dest": "sum2", "args": ["v1", "v2"] },
+        { "op": "mul", "type": "int", "dest": "prod1", "args": ["sum1", "sum2"] },
+        { "op": "add", "type": "int", "dest": "sum3", "args": ["sum1", "prod1"] },
+        { "op": "add", "type": "int", "dest": "sum3", "args": ["sum3", "sum2"] },
+        { "op": "print", "args": ["sum3"] }
+      ]
+    }
+  ]
+}
+
+'''
+
+output:
+
+'''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v1", "value": 10 },
+        { "op": "const", "type": "int", "dest": "v2", "value": 5 },
+        { "op": "add", "type": "int", "dest": "sum1", "args": ["v1", "v2"] },
+        { "op": "copy", "type": "int", "dest": "sum2", "args": ["sum1"] },
+        { "op": "mul", "type": "int", "dest": "prod1", "args": ["sum1", "sum1"] },
+        { "op": "add", "type": "int", "dest": "sum3", "args": ["sum1", "prod1"] },
+        { "op": "add", "type": "int", "dest": "sum3", "args": ["sum3", "sum1"] },
+        { "op": "print", "args": ["sum3"] }
+      ]
+    }
+  ]
+}
+
+'''
+In this case, the local value numbering does not reducte the number of instructions, however it does reduce the number of computations.
+
+in order to remove the unused instructions, we can now run the dead code elimination.
+
+output:
+'''
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v1", "value": 10 },
+        { "op": "const", "type": "int", "dest": "v2", "value": 5 },
+        { "op": "add", "type": "int", "dest": "sum1", "args": ["v1", "v2"] },
+        { "op": "mul", "type": "int", "dest": "prod", "args": ["sum1", "sum1"] },
+        { "op": "add", "type": "int", "dest": "sum3", "args": ["sum1", "prod"] },
+        { "op": "add", "type": "int", "dest": "sum3", "args": ["sum3", "sum1"] },
+        { "op": "print", "args": ["sum3"] }
+      ]
+    }
+  ]
+}
+
+'''
+
+now the duplicated instuction is removed as sum2 is never used.

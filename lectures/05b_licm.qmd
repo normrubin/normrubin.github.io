@@ -41,30 +41,249 @@ for (){
 }
 ```
 
-## pre steps
+## when is a computation loop invariant 
+
+f(a,b)
+
+1. a,b are constants 
+1. a,b are defined outside the loop, 
+1. a,b are loop invariant 
+
+if in ssa there is only one reaching def
+
+for non ssa, we need 
+
+1. all reaching defs of a,b defined outside of the loop
+1. only one def of a,b reaches the computation and that def is loop invariant 
+
+##  when is a computation loop invariant 
+
+```
+a defined outside of the loop (need one definition or ssa )
+
+b = a*2 
+
+d = 5 + b is loop invariant if b
+```
+
+In ssa a variable is loop invariant if it does not have a phi function at the loop of the 
+loop, or it is defined by a phi function and all the inputs come from outside of the loop
+
+
+SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed 
+
+
+
+## pre steps - reshape the cfg 
 
 1. find the natural loops 
 2. add pre-header 
 
-if we are going to move code we often need to add a special basic block which is called a  landing pad or a a ***pre-header***
+if we are going to move code we often need to add a special basic block which is called a  ***landing pad*** or a a ***pre-header***
 create a new block b.  change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header
 
-3. need reaching definitions
+## pre-header can change phi nodes
 
-## licm steps 
+::: {.columns}
 
-1) find loop invariant instructions, 
-2) move some of the loop invariant instructions to the pre-header 
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+A["x1 = 3"]
+B1["y1 = 4"]
+B2["y2 = 5"]
+C["x2=phi(x1,x3)\ny3=phi(y1,y2,y3)\nz1=x2*x3\nq1=y3*y3\nw1=y3+2"]
+D["w2=w1+5"]
+E["w3=phi(w1,w2)\np1=w3+y3\nx3=x2+1\nq2=q1+1"]
+A--> B1
+A--> B2
+B1--> C
+B2--> C
+C-->D
+D--> E
+C--> E
+E--> C
+E--> After
+```
+
+:::
+
+::: {.column}
 
 
-## step 1 
-An instruction instr in a loop is loop invariant of:
 
-every operand is:
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 
-1) constant or 
-1) all reaching definitions of this operand are outside of the loop
-1) there is exactly one def in loop reaching this operand and that def is loop invariant 
+graph TB
+A["x1 = 3"]
+B1["y1 = 4"]
+B2["y2 = 5"]
+LP["y3=phi(y1,y2)"]
+C["x2=phi(x1,x3)\nz1=x2*x3\nq1=y3*y3\nw1=y3+2"]
+D["w2=w1+5"]
+E["w3=phi(w1,w2)\np1=w3+y3\nx3=x2+1\nq2=q1+1"]
+A--> B1
+A--> B2
+B1-->LP --> C
+B2-->LP 
+C-->D
+D--> E
+C--> E
+E--> C
+E--> After
+```
+
+:::
+
+::: 
+
+
+
+
+## while loop may not execute, we can restructure into a do-while 
+
+::: {.columns}
+
+::: {.column}
+
+```
+while(e) {
+  s(j) 
+}
+```
+
+:::
+
+::: {.column}
+
+
+```
+if (e) {
+  t  = j loopinv 
+  do {
+    s
+  } while(e)
+}
+```
+
+:::
+
+:::
+
+
+
+##  check for zero trip count 
+
+::: {.columns}
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+A;
+B["if e"]
+S
+endloop
+next
+A--> B
+B--> next
+B--> S
+S--> endloop
+endloop --> B
+
+```
+
+:::
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+pretest["if e"]
+pretest-->next 
+do
+s
+endloop
+posttest["if e"]
+next
+pretest-->do
+do --> s
+s--> endloop
+endloop--> posttest
+posttest --> do
+posttest --> next
+
+```
+
+
+:::
+
+::: 
+
+
+## when is ok to move a computation 
+
+1. no side effects - cannot move  alloc 10 outside of loop;
+1. in non ssa, computation d dominates all loop exits where d is live
+1. in non ssa only one def of d in the loop
+
+::: {.columns}
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+pre["d = 0"]
+L1["if i > n" ]
+loop1["i = i +1"]
+d["d = a op b"]
+use["  =d "]
+next[" = d"]
+
+pre--> L1
+L1--> loop1
+loop1--> d
+d--> use 
+use --> L1
+L1 --> next
+```
+
+
+:::
+
+::: {.column}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+pre["d = 0"]
+L1["i = i +1\n d= a op b\n use d"]
+L2["d = 2\n use d"]
+L3["if (i < n)"]
+pre--> L1
+L1--> L2
+L2--> L3
+L3--> after
+L3 --> L1
+
+```
+
+
+:::
+
+::: 
+
+
+## find loop invariant instructions, 
 
 
 ## naturally iterative 
@@ -72,208 +291,15 @@ every operand is:
 ```
 iterate to convergence
  for each instr in  the loop
-  mark it as loop invar  iff 
-     for all arguments x either
-         all reaching defs of x are outside of the loop (this covers constants)
-         or there is exactly one def of instr in the loop and that def is loop invar, and there are no uses of the dest before instr on any path in the loop
+   see if it is loop invar 
+   if it is - move it 
 ```
 
-## step 2 
 
-when is ok to move an instr? We call this ***safe*** to move.
-
-::: {.columns}
-::: {.column}
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-
-graph TD
-   b1[" n= 0"]
-   p["preheader"]
-   b3
-   b4["n = 2"]
-   b5["m = n *2"]
-   b6
-   b1-->p
-   p--> b3
-   b3--> b4
-   b4--> b5
-   b3--> b5
-   b5--> b3
-   b5--> b6
-```
-can we move n = 2
-
-:::
-
-::: {.column}
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-
-graph TD
-  b1[" n= 0"]
-   p["preheader"]
-   b3
-   b4["n = 2"]
-   b5
-   b6
-   b1-->p
-   p--> b3
-   b3--> b4
-   b4--> b5
-   b3--> b5
-   b5--> b3
-   b5--> b6
-```
-:::
-::: 
+##  nested loops 
 
 
-all uses of the variable dest in the loop, must come from this instr
-The basic block containing instr must execute every time around the loop
+we want to process inner loops first 
 
-
-more  formally
-
-1) the def must dominate all the uses 
-1) no other defs of the same variable
-1) def dominates all the loop exits 
-
-
-## zero trip count loops 
-
-```
-   loop {
-     if cond goto exit
-     x = a*b 
-       = x
-   }
-```
-
-For cond 3 
-
-if the loop runs zero times, a*b is never executed
-
-We can remove this condition if the dest variable is dead after the loop or the instruction can not cause a exception, this is called ***speculative*** exceptions.
-
-
-## How about an example:
-
-
-```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
-    graph  LR;
-B1["B1:
-     1: b = 2
-     2: i = 1"]
-
-B2["b2:
-   i lessthen 100"]
-B3["B3:
-   3: a = b+1
-   4: c = 2
-   i mod 2 == 0"]
-B4["b4: 
-    5: d = a + d 
-    6: e = 1 +d"]
-B5["B5:
-    7: d= -c
-    8: f = 1+a"]
-B6["B6:
-  9: i = i + 1
-     a lessthen 2"]
-Entry --> B1
-B1--> B2
-B2 -- y -->exit;
-B2 --n --> B3
-B3 --y --> B4
-B3 --n --> B5
-B4--> B6
-B5 --> B6
-B6 --y --> exit
-B6 --n --> B2
-```
-
-steps 
-
-:::{.r-stack}
-
-::: {.fragment .fade-in-then-out}
-1) create pre header 
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b2.1 not loop invar (i < 100) i reached by def outside of loop
-
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b3.3 loop inv ( a = b+1) b only def outside of the loop
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b3.4 loop inv (c =2) 2 is a constant 
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b3.cond (i mod 2 ==0 ) not loop inv
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b4.5 (d = a +d ) not loop inv a is but not d 
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b4.6 (e = 1 + d ) not loop inver
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b5.7 (d = -c ) not loop inv other def of d 
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b5.8 (f = 1 +a)  loop invar 
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b6.9 not loop inv 
-:::
-
-::: {.fragment  .fade-in-then-out }
-1) b6.cond  loop inv 
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-changed two instructions to loop invar
-
-:::
-
-::: {.fragment  .fade-in-then-out }
-repeat 
-
-:::
-
-:::
-
---- 
-
-# possible to move 
-
-1. a = b +1 
-1. f = 1 + a 
-1. a < 2 
-
-
-If we forward propagate values we could find a = 3, is a < 2 is always false and loop does not repeat  
-
-moving the instructions out of the loop reduces the number of instructions which is good, but it also extends life times and therefore register pressure which is bad. 
+1. add all the pre-headers 
+1. walk the dominator tree in reverse post order - saving all the  loop headers

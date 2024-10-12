@@ -36,6 +36,12 @@ import subprocess
 import os 
 import sys
 
+
+### temp 
+out = subprocess.check_output('which python', shell=True)
+print(out)
+print('***********************')
+
 # read from a file 
 with open("images/add.json","r") as f:
     bril_program = json.load(f)
@@ -128,7 +134,7 @@ flit install --symlink --user
  
 run json to text 
 
-```{bash}
+```
 bril2txt < images/add.json
 ```
 
@@ -136,7 +142,7 @@ bril2txt < images/add.json
 
 ## connect tools via pipes 
 
-```{bash}
+```
 cat images/add.json'
 bril2txt < images/add.json | bril2json
 ```

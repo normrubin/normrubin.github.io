@@ -1,0 +1,66 @@
+---
+author: matinraayai
+format:
+ html: default
+title: "Homework 2: Trivial Dead Code Elimination and Local Value Numbering Passes"
+---
+
+# Part 1: Trivial Dead Code Elimination
+
+The first part of homework 2 is implemented under the [examples/tdce_matin.py](https://github.com/matinraayai/bril/blob/main/examples/tdce_matin.py) file
+in my BRIL fork. It consists of two function passes that are run in the following order:
+1. A pass which iteratively detects unused variables across the entire function and 
+removes them.
+2. A local version of the pass, which removes any re-definitions of a variable.
+
+The test folder under [examples/test/tdce](https://github.com/matinraayai/bril/tree/main/examples/test/tdce)
+under my BRIL fork contains the turnt script and test cases to test my TDCE implementation.
+
+
+# Part 2: Local Value Numbering
+
+The second part of homework 2 is implemented under the [examples/lvn_matin.py](https://github.com/matinraayai/bril/blob/main/examples/lvn_matin.py) file
+in my BRIL fork. It implements the vanilla LVN algorithm with support for renaming re-assigned variables.
+
+Similar to TDCE, I updated the test folder under [examples/test/lvn](https://github.com/matinraayai/bril/tree/main/examples/test/lvn)
+in my BRIL fork to run my LVN implementation with the existing test cases. As my implementation does not support constant folding and identity propogation, 
+I had to update the expected result of some of the tests.
+
+# Correctness Evidence
+Besides the passing tests, I applied both my passes to the fizzbuzz benchmark in BRIL and found a decrease in the number of instructions executed as well
+as no change in the output of the benchmark, futher demonstrating the correctness of the implementation:
+
+- Without LVN + TDCE:
+```bash
+bril2json < ../benchmarks/core/fizz-buzz.bril | brili 10 -p
+1
+2
+-2
+4
+-3
+-2
+7
+8
+-2
+total_dyn_inst: 332
+```
+
+- With LVN + TDCE:
+```bash
+bril2json < ../benchmarks/core/fizz-buzz.bril | python3 lvn_matin.py |
+ python3 tdce_matin.py | brili 10 -p
+1
+2
+-2
+4
+-3
+-2
+7
+8
+-2
+total_dyn_inst: 278
+```
+
+# Challenges
+
+Overall, I found the hard part being working with BRIL.

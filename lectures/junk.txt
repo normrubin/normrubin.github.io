@@ -1,0 +1,40 @@
+``
+@main(op1: int, op2: int) {
+.b1:
+  vc0.0: int = const 0;
+  v0.0: int = id op1;
+  v1.0: int = id op2;
+  jmp .cmp.val;
+.cmp.val:
+  v4.0: bool = phi __undefined v4.1 .b1 .back;
+  v3.0: int = phi __undefined v3.3 .b1 .back;
+  v2.0: bool = phi __undefined v2.1 .b1 .back;
+  v1.1: int = phi v1.0 v1.2 .b1 .back;
+  v0.1: int = phi v0.0 v0.2 .b1 .back;
+  v2.1: bool = lt v0.1 v1.1;
+  br v2.1 .if.1 .else.1;
+.if.1:
+  v3.2: int = sub v1.1 v0.1;
+  jmp .loop.bound;
+.else.1:
+  v3.1: int = sub v0.1 v1.1;
+  jmp .loop.bound;
+.loop.bound:
+  v3.3: int = phi v3.1 v3.2 .else.1 .if.1;
+  v4.1: bool = eq v3.3 vc0.0;
+  br v4.1 .program.end .update.val;
+.update.val:
+  br v2.1 .if.2 .else.2;
+.if.2:
+  v1.3: int = id v3.3;
+  jmp .back;
+.else.2:
+  v0.3: int = id v3.3;
+  jmp .back;
+.back:
+  v1.2: int = phi v1.1 v1.3 .else.2 .if.2;
+  v0.2: int = phi v0.3 v0.1 .else.2 .if.2;
+  jmp .cmp.val;
+.program.end:
+  print v1.1;
+  ret;
