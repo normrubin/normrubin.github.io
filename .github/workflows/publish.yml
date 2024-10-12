@@ -42,8 +42,8 @@ jobs:
           echo "DENO_INSTALL=/home/codespace/.deno" >> $GITHUB_ENV
           echo "PATH=/home/codespace/.deno/bin:$PATH" >> $GITHUB_ENV
           source ~/.bashrc
-          /home/codespace/.deno/bin/deno install --global --allow-env --allow-read ts2bril.ts
-          /home/codespace/.deno/bin/deno install brili.ts 
+          /home/codespace/.deno/bin/deno install -f  --global --allow-env --allow-read ts2bril.ts
+          /home/codespace/.deno/bin/deno install -f -g brili.ts 
           cd bril-txt
           flit install --symlink --user
 
