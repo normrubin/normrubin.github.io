@@ -30,6 +30,8 @@ jobs:
 
       - name: Install deno and flit 
         run: |
+          cd 
+          pwd 
           curl -fsSL https://deno.land/install.sh | sh
           echo 'export DENO_INSTALL="/home/codespace/.deno"' >> ~/.bashrc
           echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
