@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Qucheng Jiang">
+<meta name="author" content="Sana Taghipour Anvari">
 
-<title>Homework 2: Optimizing with DCE and LVN – EECE7398 Fall 2024</title>
+<title>hw3-sanataghipouranvari – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,8 +65,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" rel="next">
-<link href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" rel="prev">
+<link href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" rel="next">
+<link href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -104,7 +104,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Homework 2: Optimizing with DCE and LVN – EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -118,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html">Homework 2: Optimizing with DCE and LVN</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html">Sana</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html">Homework3 - data flow</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -303,13 +303,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Qucheng</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
@@ -318,7 +318,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2: Optimizing with DCE and LVN</span></a>
   </div>
 </li>
@@ -355,13 +355,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
  <span class="menu-text">Sana</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
@@ -370,7 +370,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Homework3 - data flow</span></a>
   </div>
 </li>
@@ -703,9 +703,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html">Homework 2: Optimizing with DCE and LVN</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html">Sana</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html">Homework3 - data flow</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 2: Optimizing with DCE and LVN</h1>
+<h1 class="title">Homework3 - data flow</h1>
 </div>
 
 
@@ -715,7 +715,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Qucheng Jiang </p>
+             <p>Sana Taghipour Anvari </p>
           </div>
   </div>
     
@@ -728,212 +728,271 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This assignment aims to implement two key local optimizations for the Bril intermediate language: Trivial Dead Code Elimination (DCE) and Local Value Numbering (LVN). These optimizations enhance the efficiency of Bril programs by removing unnecessary instructions and consolidating equivalent expressions. This report outlines the development process, testing methodology, and analysis of the implemented optimizations.</p>
+<p>Link for the code: <a href="https://github.com/sanatgp/bril/tree/main/cfgnode_project">cfgnode</a></p>
+<section id="explanation-of-the-code" class="level2">
+<h2 class="anchored" data-anchor-id="explanation-of-the-code">Explanation of the code</h2>
+<p>I implemented a generic data flow analysis framework that supports multiple analyses by designing a reusable structure for different types of data flow problems. The code includes:</p>
+<p>This code implements a liveness analysis tool for Bril programs. It builds a control flow graph (CFG) from the program’s instructions, computes the <code>in</code> and <code>out</code> sets for each basic block based on variable usage (using the <code>gen</code> and <code>kill</code> sets), and then prints the liveness information for each block. The analysis helps track which variables are live at various points in the program.</p>
+<div id="91e3bd07" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BrilLivenessAnalyzer:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cfg <span class="op">=</span> defaultdict(<span class="kw">lambda</span>: {<span class="st">'instrs'</span>: [], <span class="st">'succ'</span>: <span class="bu">set</span>(), <span class="st">'pred'</span>: <span class="bu">set</span>()})</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.live_in <span class="op">=</span> defaultdict(<span class="bu">set</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.live_out <span class="op">=</span> defaultdict(<span class="bu">set</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> analyze(<span class="va">self</span>, program):</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> function <span class="kw">in</span> program[<span class="st">'functions'</span>]:</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.analyze_function(function)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> analyze_function(<span class="va">self</span>, function):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.build_cfg(function[<span class="st">'instrs'</span>])</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.compute_liveness()</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.print_results()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> build_cfg(<span class="va">self</span>, instrs):</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cfg.clear()</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        current_block <span class="op">=</span> <span class="st">'entry'</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, instr <span class="kw">in</span> <span class="bu">enumerate</span>(instrs):</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">'label'</span> <span class="kw">in</span> instr:</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                current_block <span class="op">=</span> instr[<span class="st">'label'</span>]</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.cfg[current_block][<span class="st">'instrs'</span>].append(instr)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> instr.get(<span class="st">'op'</span>) <span class="kw">in</span> [<span class="st">'jmp'</span>, <span class="st">'br'</span>]:</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> instr[<span class="st">'op'</span>] <span class="op">==</span> <span class="st">'jmp'</span>:</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                    target <span class="op">=</span> instr[<span class="st">'labels'</span>][<span class="dv">0</span>]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.cfg[current_block][<span class="st">'succ'</span>].add(target)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.cfg[target][<span class="st">'pred'</span>].add(current_block)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>                <span class="cf">elif</span> instr[<span class="st">'op'</span>] <span class="op">==</span> <span class="st">'br'</span>:</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">for</span> label <span class="kw">in</span> instr[<span class="st">'labels'</span>]:</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>                        <span class="va">self</span>.cfg[current_block][<span class="st">'succ'</span>].add(label)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>                        <span class="va">self</span>.cfg[label][<span class="st">'pred'</span>].add(current_block)</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> instr.get(<span class="st">'op'</span>) <span class="op">==</span> <span class="st">'ret'</span>:</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>                <span class="cf">pass</span> </span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> i <span class="op">+</span> <span class="dv">1</span> <span class="op">&lt;</span> <span class="bu">len</span>(instrs) <span class="kw">and</span> <span class="st">'label'</span> <span class="kw">in</span> instrs[i <span class="op">+</span> <span class="dv">1</span>]:</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>                    next_block <span class="op">=</span> instrs[i <span class="op">+</span> <span class="dv">1</span>][<span class="st">'label'</span>]</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.cfg[current_block][<span class="st">'succ'</span>].add(next_block)</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.cfg[next_block][<span class="st">'pred'</span>].add(current_block)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> compute_liveness(<span class="va">self</span>):</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>        changed <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> changed:</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>            changed <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.cfg:</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>                old_in <span class="op">=</span> <span class="va">self</span>.live_in[block].copy()</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>                old_out <span class="op">=</span> <span class="va">self</span>.live_out[block].copy()</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>                kill <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>                gen <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> instr <span class="kw">in</span> <span class="va">self</span>.cfg[block][<span class="st">'instrs'</span>]:</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> <span class="st">'dest'</span> <span class="kw">in</span> instr:</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>                        kill.add(instr[<span class="st">'dest'</span>])  </span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> <span class="st">'args'</span> <span class="kw">in</span> instr:</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">for</span> arg <span class="kw">in</span> instr[<span class="st">'args'</span>]:</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">if</span> arg <span class="kw">not</span> <span class="kw">in</span> kill:</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>                                gen.add(arg)  </span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>                <span class="co">#  OUT{P} = Union of IN{Psuccessor}</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.live_out[block] <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> succ <span class="kw">in</span> <span class="va">self</span>.cfg[block][<span class="st">'succ'</span>]:</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.live_out[block] <span class="op">|=</span> <span class="va">self</span>.live_in[succ]</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>                <span class="co">#  IN{P} = (OUT{P} - Kill{P}) U Gen{P}</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.live_in[block] <span class="op">=</span> (<span class="va">self</span>.live_out[block] <span class="op">-</span> kill) <span class="op">|</span> gen</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> old_in <span class="op">!=</span> <span class="va">self</span>.live_in[block] <span class="kw">or</span> old_out <span class="op">!=</span> <span class="va">self</span>.live_out[block]:</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>                    changed <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.live_in[<span class="st">'entry'</span>] <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> print_results(<span class="va">self</span>):</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.cfg:</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Block: </span><span class="sc">{</span>block<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  In:  </span><span class="sc">{</span><span class="bu">sorted</span>(<span class="va">self</span>.live_in[block])<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  Out: </span><span class="sc">{</span><span class="bu">sorted</span>(<span class="va">self</span>.live_out[block])<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>()</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    json_input <span class="op">=</span> <span class="st">'''</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="st">      "functions": [</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a><span class="st">        {</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="st">          "name": "main",</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="st">          "instrs": [</span></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "const", "type": "int", "dest": "a", "value": 3 },</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "const", "type": "int", "dest": "b", "value": 5 },</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "const", "type": "int", "dest": "d", "value": 4 },</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "const", "type": "int", "dest": "x", "value": 100 },</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "br", "args": ["gt", "a", "b"], "labels": ["b2", "b3"] },</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="st">            { "label": "b2" },</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "add", "type": "int", "dest": "c", "args": ["a", "b"] },</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "const", "type": "int", "dest": "d", "value": 2 },</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "jmp", "labels": ["done"] },</span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a><span class="st">            { "label": "b3" },</span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "const", "type": "int", "dest": "c", "value": 4 },</span></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="st">            { "label": "done" },</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "mul", "type": "int", "dest": "result", "args": ["b", "d"] },</span></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "add", "type": "int", "dest": "result", "args": ["result", "c"] },</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a><span class="st">            { "op": "ret", "args": ["result"] }</span></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a><span class="st">          ]</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a><span class="st">      ]</span></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a><span class="st">    '''</span></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>    program <span class="op">=</span> json.loads(json_input)</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>    analyzer <span class="op">=</span> BrilLivenessAnalyzer()</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>    analyzer.analyze(program)</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>    main()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Block: entry
+  In:  []
+  Out: ['a', 'b', 'd']
+
+Block: b2
+  In:  ['a', 'b']
+  Out: ['b', 'c', 'd']
+
+Block: b3
+  In:  ['b', 'd']
+  Out: ['b', 'c', 'd']
+
+Block: done
+  In:  ['b', 'c', 'd']
+  Out: []
+</code></pre>
+</div>
+</div>
 </section>
-<section id="detail-design" class="level2">
-<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
-<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW2"><strong>Code</strong></a>: For details, check the code repository.</p>
-<section id="abstraction-classes" class="level3">
-<h3 class="anchored" data-anchor-id="abstraction-classes">Abstraction Classes</h3>
-<p>The core of the Bril language representation in this project is implemented in the <code>bril_model/_bril_struct.py</code> file. This module provides a structured and object-oriented way to represent Bril programs (<code>BrilScript</code>), functions (<code>BrilFunction</code>), and instructions (<code>BrilInstruction</code>). Each Bril instruction is modeled as a Python object, enabling intuitive manipulation and transformation of the program during optimization.</p>
-<p>The primary classes include:</p>
-<p><strong>Bril Program</strong>: Represents the entire Bril program, containing multiple functions.</p>
-<p><strong>Bril Function</strong>: Encapsulates a sequence of instructions and metadata for a function within the program.</p>
-<p><strong>Bril Instruction</strong>: Models individual instructions, differentiating between operations (e.g., addition, multiplication) and effectful statements (e.g., print).</p>
-<p>First, the <code>BrilInstruction</code> class is the base class for all instructions. Its constructor accepts a dictionary <code>raw</code> and deeply copies its contents into the instance variable <code>_raw</code>. It also initializes a mark dictionary <code>_marks</code> to track whether the instruction has been deleted, modified, or replaced. The constructor also checks whether the key in the raw dictionary is in the allowed key set <code>AVAILABLE_KEYS</code>, and throws <code>NotImplementedError</code> if there is an unrecognized key. The class also defines a series of properties and methods for accessing and modifying various parts of the instruction, such as <code>dest</code>, <code>type</code>, <code>op</code>, <code>args</code>, etc.</p>
-<p>Next are several subclasses inherited from <code>BrilInstruction</code>, which handle different types of instructions. The <code>BrilInstruction_Const</code> class is used to handle constant instructions. It checks whether the opcode is const in the constructor and verifies whether the key in the dictionary is in the allowed set. The <code>BrilInstruction_Label</code> class is used to handle label instructions. It checks whether the label exists in the constructor and verifies the key in the dictionary. The <code>BrilInstruction_ValOp</code> class is used to handle operation instructions with a return value. It checks whether the opcode is in the allowed set and verifies the key in the dictionary in the constructor. The <code>BrilInstruction_EffOp</code> class is used to handle operation instructions without a return value. It performs similar checks and verifications in the constructor.</p>
-<p>The <code>BrilFunction</code> class is used to represent a Bril function. Its constructor accepts a dictionary raw and extracts the instruction list <code>instrs</code> from it, converting each instruction into a corresponding <code>BrilInstruction</code> subclass instance. It also checks whether the key in the dictionary is in the allowed set. The class also defines some properties and methods for accessing and modifying various parts of the function, such as <code>name</code>, <code>type</code>, <code>args</code>, etc.</p>
-<p>Finally, the <code>BrilScript</code> class is used to represent a Bril script. Its constructor accepts a dictionary <code>raw</code> and extracts the function list <code>functions</code> from it, converting each function into a <code>BrilFunction</code> instance. It also checks whether the key in the dictionary is in the allowed set. The class also defines some properties and methods for accessing and modifying various parts of the script, such as <code>functions</code>, etc.</p>
-<p>Together, these classes form a framework for processing Bril language instructions and scripts, providing a wealth of properties and methods to access and modify various parts of instructions and scripts.</p>
+<section id="how-we-testing-our-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="how-we-testing-our-implementation">How we testing our implementation</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="er">#</span> <span class="er">Bril</span> <span class="er">Code</span> <span class="er">(Block</span> <span class="er">by</span> <span class="er">Block)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="er">#</span> <span class="er">Block:</span> <span class="er">entry</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="er">const</span> <span class="er">a:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">3;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="er">const</span> <span class="er">b:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">5;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="er">const</span> <span class="er">d:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">4;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="er">const</span> <span class="er">x:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">100;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="er">br</span> <span class="er">gt</span> <span class="er">a</span> <span class="er">b</span> <span class="er">.b2</span> <span class="er">.b3;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="er">#</span> <span class="er">Block:</span> <span class="er">b2</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="er">b2:</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="er">add</span> <span class="er">c:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">a</span> <span class="er">+</span> <span class="er">b;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="er">const</span> <span class="er">d:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">2;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="er">jmp</span> <span class="er">.done;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="er">#</span> <span class="er">Block:</span> <span class="er">b3</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="er">b3:</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="er">const</span> <span class="er">c:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">4;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="er">#</span> <span class="er">Block:</span> <span class="er">done</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="er">done:</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="er">mul</span> <span class="er">result:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">b</span> <span class="er">*</span> <span class="er">d;</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="er">add</span> <span class="er">result:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">result</span> <span class="er">+</span> <span class="er">c;</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="er">ret</span> <span class="er">result;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="trivial-dead-code-elimination-dce" class="level3">
-<h3 class="anchored" data-anchor-id="trivial-dead-code-elimination-dce">Trivial Dead Code Elimination (DCE)</h3>
-<p>The Trivial-DCE implementation is encapsulated in <code>tdce.py</code>. This script scans through the instructions of a Bril function and removes any instructions whose results are not used before being overwritten. The optimization process involves:</p>
-<p>The <code>trivial_dce_once</code> function performs a dead code elimination operation. It traverses all instructions in the function, collects all used variables, and marks unused instructions for deletion. Then, it updates the function’s instruction list, deletes the instructions marked for deletion, and returns a Boolean value indicating whether the instruction is deleted.</p>
-<p>The <code>trivial_dce</code> function is a loop that repeatedly calls the <code>trivial_dce_once</code> function until no more instructions are deleted.</p>
-<p>The <code>_block_mark_reassign_before_use</code> function deletes instructions that are reassigned before use within a single basic block. It maintains a dictionary to track the most recent unused assignment instructions and deletes old assignment instructions before reassignment is found.</p>
-<p>The <code>rm_reassign_before_use</code> function traverses all basic blocks of the function, calls the _block_mark_reassign_before_use function to delete instructions that are reassigned before use, and updates the function’s instruction list.</p>
-<p>The <code>trivial_dce_plus</code> function combines function-level dead code elimination with instruction removal before reassignment until there are no more instructions to remove.</p>
-<p>This straightforward approach efficiently eliminates redundant calculations, contributing to a cleaner and faster program.</p>
+<section id="liveness-analysis-results" class="level1">
+<h1>Liveness Analysis Results</h1>
+<ul>
+<li>Block: entry
+<ul>
+<li>In: []</li>
+<li>Out: [‘a’, ‘b’, ‘d’]</li>
+</ul></li>
+<li>Block: b2
+<ul>
+<li>In: [‘a’, ‘b’]</li>
+<li>Out: [‘b’, ‘c’, ‘d’]</li>
+</ul></li>
+<li>Block: b3
+<ul>
+<li>In: [‘b’, ‘d’]</li>
+<li>Out: [‘b’, ‘c’, ‘d’]</li>
+</ul></li>
+<li>Block: done
+<ul>
+<li>In: [‘b’, ‘c’, ‘d’]</li>
+<li>Out: []</li>
+</ul></li>
+</ul>
 </section>
-<section id="local-value-numbering-lvn" class="level3">
-<h3 class="anchored" data-anchor-id="local-value-numbering-lvn">Local Value Numbering (LVN)</h3>
-<p>Local Value Numbering optimization is implemented in <code>lvn.py</code>, LVN assigns unique numbers to distinct computations to detect and eliminate redundant expressions within a single block. Key steps include:</p>
-<p><strong>Numbering Expressions</strong>: LVN assigns a unique identifier to each distinct computation. This identifier, or value number, is used to track expressions within a block. If an identical computation is encountered later, the existing value number is reused, eliminating the need to recompute the expression. For example, if the expression <code>a + b</code> is already computed and assigned a value number, any subsequent occurrence of <code>a + b</code> will directly use the same value number instead of recalculating the result.</p>
-<p><strong>Simplification and Substitution</strong>: The script replaces redundant operations with precomputed values or previously assigned variables, reducing the number of cpu-intense operations in the block. This is done by looking up the value number table for existing computations and substituting them wherever possible. By minimizing redundant calculations, LVN not only optimizes runtime performance but also simplifies the code.</p>
-<p><strong>Constant Folding</strong>: Constant folding is a compile-time optimization technique that evaluates expressions with known constant values. For instance, an expression like <code>const 2 + const 3</code> is directly replaced with <code>const 5</code>. In the script, a dictionary named <code>FOLDABLE_OPS</code> maps operation names (e.g., <code>add</code>, <code>mul</code>, <code>sub</code>) to their respective lambda functions that perform the computation. When the LVN process encounters an expression with constant arguments, it applies the corresponding function to compute the result immediately. <em>Credit: <a href="https://github.com/sampsyo/bril/blob/main/examples/lvn.py">Bril Official Example</a></em></p>
-<p><strong>Expression Tracking and Reuse</strong>: An <code>Expr</code> class is defined to uniquely represent computations in terms of operations and their arguments. This allows the LVN process to easily check if a computation has been previously performed and reuse the result if possible. The implementation also handles commutative operations (e.g., <code>add</code>, <code>mul</code>, <code>and</code>, <code>or</code>, <code>eq</code>) by normalizing the order of arguments, ensuring that expressions like <code>a + b</code> and <code>b + a</code> are recognized as identical.</p>
+<section id="expected-results-and-comparison" class="level1">
+<h1>Expected Results and Comparison</h1>
 </section>
+<section id="block-entry" class="level1">
+<h1>Block: entry</h1>
+<ul>
+<li>Expected:
+<ul>
+<li>In: []</li>
+<li>Out: [‘a’, ‘b’, ‘d’]</li>
+</ul></li>
+<li>Explanation: In the entry block, <code>a</code>, <code>b</code>, and <code>d</code> are live after the block because they are used later in the program. The variable <code>x</code> is defined but not used, so it is not live after <code>entry</code>.</li>
+</ul>
 </section>
-<section id="integration-and-testing" class="level2">
-<h2 class="anchored" data-anchor-id="integration-and-testing">Integration and Testing</h2>
-<p>The <code>brench</code> tool is used for batch testing both optimizations across a variety of Bril programs. The <code>brench_test_lvn.toml</code> and <code>brench_test_tdce.toml</code> configuration files specify the programs and expected results for LVN and DCE tests, respectively. This ensures that both optimizations work correctly and consistently.</p>
-<p>As defined in <code>brench_test_lvn.toml</code>, we specifies the path to the Bril benchmark programs to be tested, which are all the <code>*.bril</code> located in the <code>../bril/benchmarks/core/</code>.</p>
-<p>The configuration file defines multiple test run pipelines, each of which is defined in the <code>[runs.&lt;name&gt;]</code> section. Each pipeline contains a pipeline field that lists the sequence of commands to be executed.</p>
-<p>The <code>baseline</code> pipeline is a baseline test without any optimization. It first converts the Bril program to JSON format and then runs the program using the brili interpreter.</p>
-<p>The <code>hw2p1_s0</code> pipeline is used to test whether the input and output structures are correct, but it does not perform any optimization. The purpose of this pipeline is to test if the Bril Construction work has no bug in it.</p>
-<p>The <code>hw2p1_s1</code> pipeline tests simple dead code elimination optimization. It calls the <code>tdce.py</code> script and passes the <code>tdce</code> parameter to enable function-level dead code elimination.</p>
-<p>The <code>hw2p1_s2</code> pipeline tests the instruction removal optimization used before revalue. It calls the <code>tdce.py</code> script and passes the <code>raby</code> argument to enable the <code>rm_reassign_before_use</code> pass optimization.</p>
-<p>The <code>hw2p1_s3</code> pipeline combines function-level dead code elimination and instruction removal optimization used before revalue. It calls the <code>tdce.py</code> script and passes the <code>tdce+</code> argument to enable both optimizations.</p>
-<p>Each pipeline ultimately runs the optimized Bril program using the <code>brili</code> interpreter, passing arguments via the <code>-p {args}</code> option.</p>
+<section id="block-b2" class="level1">
+<h1>Block: b2</h1>
+<ul>
+<li>Expected:
+<ul>
+<li>In: [‘a’, ‘b’]</li>
+<li>Out: [‘b’, ‘c’, ‘d’]</li>
+</ul></li>
+<li>Explanation: In block <code>b2</code>, <code>a</code> and <code>b</code> are used to compute <code>c</code>. <code>d</code> is redefined within this block, but the new value of <code>d</code> is used later in the <code>done</code> block, so <code>d</code> is live after <code>b2</code>. Additionally, <code>b</code> is live after <code>b2</code> because it is used in the <code>done</code> block. <code>c</code> is defined in <code>b2</code> and used later, so it is also live after this block.</li>
+</ul>
 </section>
-<section id="results-and-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="results-and-analysis">Results and Analysis</h2>
-<p>The optimizations were tested using <code>brench</code> tool, which verifies the correctness and performance of the implemented passes. The tool checks the <code>brili</code> Standard Output (<code>STDOUT</code>) for each test specification to ensure that the optimized programs produce the same results as their unoptimized counterparts. This rigorous testing confirms that the optimization passes do not alter the semantics of the Bril programs.</p>
-<p>The testing demonstrated significant improvements in reducing the number of executed instructions for each Bril program. Programs with redundant calculations and unused instructions were simplified, leading to a reduced instruction count and faster execution times (based on Instructions Executed reported by <code>brili -p</code>).</p>
-<p>For example, in the original benchmark <code>check-primes</code>, the program required <em>8,468</em> instructions to complete its execution. After applying the <code>hw2p1_s3</code> optimization pipeline (DCE-only), the number of instructions executed was reduced to <em>8,419</em>. Furthermore, using the <code>hw2p2_s2</code> optimization pipeline (LVN+DCE), the total instructions executed dropped significantly to <em>4,238</em>, representing a reduction to <em>50.05%</em> of the original execution time. This demonstrates the substantial impact of combining LVN and DCE optimizations on program efficiency.</p>
-<section id="raw-test-log" class="level3">
-<h3 class="anchored" data-anchor-id="raw-test-log">Raw test log</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> brench brench_test_tdce.toml</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">benchmark,run,result</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,baseline,229</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s0,229</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s1,228</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s2,229</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s3,228</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,baseline,785</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s0,785</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s1,783</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s2,785</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s3,783</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,baseline,104</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s0,104</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s1,103</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s2,104</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s3,103</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,baseline,146</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s0,146</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s1,139</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s2,146</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s3,139</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,baseline,116</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s0,116</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s1,115</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s2,116</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s3,115</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,baseline,3038</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s0,3038</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s1,3036</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s2,3038</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s3,3036</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,baseline,484</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s0,484</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s1,483</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s2,484</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s3,483</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,baseline,558</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s0,558</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s1,555</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s2,558</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s3,555</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,baseline,8468</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s0,8468</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s1,8419</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s2,8468</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s3,8419</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,baseline,1690</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s0,1690</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s1,1689</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s2,1690</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s3,1689</span></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,baseline,1923</span></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s0,1923</span></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s1,1914</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s2,1923</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s3,1914</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,baseline,563</span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s0,563</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s1,562</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s2,563</span></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s3,562</span></span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,baseline,574100</span></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s0,574100</span></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s1,574100</span></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s2,574100</span></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s3,574100</span></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,baseline,5018</span></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s0,5018</span></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s1,5018</span></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s2,5018</span></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s3,5018</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,baseline,133</span></span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s0,133</span></span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s1,130</span></span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s2,133</span></span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s3,130</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> brench brench_test_lvn.toml</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">benchmark,run,result</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,baseline,229</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p2_s1,229</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p2_s2,167</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">is-decreasing,baseline,127</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">is-decreasing,hw2p2_s1,127</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">is-decreasing,hw2p2_s2,123</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,baseline,785</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p2_s1,785</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p2_s2,500</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,baseline,104</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p2_s1,104</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p2_s2,64</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">fizz-buzz,baseline,3652</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">fizz-buzz,hw2p2_s1,3652</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">fizz-buzz,hw2p2_s2,2103</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,baseline,146</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p2_s1,146</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p2_s2,68</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,baseline,116</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p2_s1,116</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p2_s2,78</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ex">reverse,baseline,46</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ex">reverse,hw2p2_s1,46</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="ex">reverse,hw2p2_s2,38</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,baseline,3038</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p2_s1,3038</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p2_s2,1717</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,baseline,484</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p2_s1,484</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p2_s2,278</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,baseline,558</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p2_s1,558</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p2_s2,304</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,baseline,8468</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p2_s1,8468</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p2_s2,4238</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,baseline,1690</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p2_s1,1690</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p2_s2,1689</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,baseline,1923</span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p2_s1,1923</span></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p2_s2,1207</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,baseline,563</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p2_s1,563</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p2_s2,272</span></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,baseline,574100</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p2_s1,574100</span></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p2_s2,571439</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="ex">perfect,baseline,232</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="ex">perfect,hw2p2_s1,232</span></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="ex">perfect,hw2p2_s2,231</span></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="ex">bitshift,baseline,167</span></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="ex">bitshift,hw2p2_s1,167</span></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="ex">bitshift,hw2p2_s2,104</span></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,baseline,5018</span></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p2_s1,5018</span></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p2_s2,5018</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,baseline,133</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p2_s1,133</span></span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p2_s2,130</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="block-b3" class="level1">
+<h1>Block: b3</h1>
+<ul>
+<li>Expected:
+<ul>
+<li>In: [‘b’, ‘d’]</li>
+<li>Out: [‘b’, ‘c’, ‘d’]</li>
+</ul></li>
+<li>Explanation: In block <code>b3</code>, <code>b</code> and <code>d</code> are live because they are used in the <code>done</code> block. <code>c</code> is redefined in <code>b3</code> and is used in the <code>done</code> block, so it is live after <code>b3</code>.</li>
+</ul>
 </section>
-</section>
+<section id="block-done" class="level1">
+<h1>Block: done</h1>
+<ul>
+<li>Expected:
+<ul>
+<li>In: [‘b’, ‘c’, ‘d’]</li>
+<li>Out: []</li>
+</ul></li>
+<li>Explanation: In the <code>done</code> block, the variables <code>b</code>, <code>c</code>, and <code>d</code> are used in the computation of <code>result</code>. After this block, there are no live variables because the function returns, so the <code>Out</code> set is empty.</li>
+</ul>
 <section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>The implementation successfully optimizes Bril programs through Trivial Dead Code Elimination and Local Value Numbering. Both techniques were integrated and tested using brench, confirming their effectiveness. Future work could focus on extending these optimizations to handle more complex cases, such as multi-block programs and interprocedural optimizations.</p>
-<p>This project demonstrates the power of local optimizations in streamlining intermediate representations and serves as a solid foundation for further exploration of compiler optimization techniques.</p>
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion:</h2>
+<p>The results generated by the liveness analysis are correct based on the Bril code provided. Each block correctly identifies the variables that are live before and after it, based on the definitions and uses of those variables within the block and across the program.</p>
+</section>
+<section id="hardest-part-of-the-task-and-how-we-addressed-it" class="level2">
+<h2 class="anchored" data-anchor-id="hardest-part-of-the-task-and-how-we-addressed-it">Hardest Part of the Task and How We Addressed It</h2>
+<p>The hardest part was ensuring that the liveness analysis results were correctly generalized without hardcoding specific variables. The challenge was to accurately compute the <code>gen</code> and <code>kill</code> sets for each block and propagate liveness across blocks.</p>
+<section id="how-we-addressed-it" class="level3">
+<h3 class="anchored" data-anchor-id="how-we-addressed-it">How We Addressed It:</h3>
+<ol type="1">
+<li><p><strong>Generalized Propagation</strong>: We avoided manual exclusions and relied on computing <code>gen</code> and <code>kill</code> sets to ensure only the necessary variables appeared in the <code>In</code> and <code>Out</code> sets.</p></li>
+<li><p><strong>Fixed-Point Iteration</strong>: Liveness information was iteratively propagated until no changes occurred, ensuring accurate results.</p></li>
+<li><p><strong>Validation</strong>: We compared the results for each block with expected outcomes to ensure correctness.</p></li>
+</ol>
+<p>This approach ensured a generalized and correct liveness analysis.</p>
 
 
+</section>
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -1359,13 +1418,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="pagination-link" aria-label="Homework 1: Exploring Bril">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 1: Exploring Bril</span>
+      <a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="pagination-link" aria-label="Homework2 - local optimizations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework2 - local optimizations</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" class="pagination-link" aria-label="Homework 3: Data Flow">
-        <span class="nav-page-text">Homework 3: Data Flow</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="pagination-link" aria-label="Compiler Homework 01 - Trying Out Bril">
+        <span class="nav-page-text">Compiler Homework 01 - Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

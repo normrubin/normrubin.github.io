@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Qucheng Jiang">
+
+<title>Homework 3: Data Flow – EECE7398 Fall 2024</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" rel="next">
+<link href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/videojs/video.min.js"></script>
+<link href="../../site_libs/quarto-contrib/videojs/video-js.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<meta property="og:title" content="Homework 3: Data Flow – EECE7398 Fall 2024">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
+<meta property="og:site_name" content="EECE7398 Fall 2024">
+</head>
+
+<body class="nav-sidebar docked fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html">Homework 3: Data Flow</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">EECE7398 Fall 2024</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true">
+ <span class="menu-text">EECS 7398</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../weekly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weekly Schedule</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to submit assignments</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Blogs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework1 - Sana</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sample blog with an image and a graph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/junk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sample blog</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Aymane</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2 – Implementing DCE and LVN</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3 – Implementing Liveness Dataflow Analysis</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Matin</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-09-28-HW2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2: Trivial Dead Code Elimination and Local Value Numbering Passes</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Michael</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 1 – Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 2 – Local Optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 3 – Data Flow</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Oscar</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HW1 - Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/oscar/2024-09-27-HW2-Kellner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HW2 - Minor Local Optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HW3 - Data Flow Analysis</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Qucheng</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1: Exploring Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2: Optimizing with DCE and LVN</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Homework 3: Data Flow</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Rohit</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-09-28-Rohit-HW2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sana</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework2 - local optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework3 - data flow</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sharmila</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 01 - Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 02 - Local Optimization</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Yashaswini</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework1 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/09-27-2024-HW2-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework2 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/10-11-2024-HW3-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework3 - Yashaswini</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Homework</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/1.hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1 trying out bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/2_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2 local optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/3_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4 data flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/4_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework - dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/5_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5 SSA</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 6 loop optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/dynamic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework 7 dynamic compile</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/hw0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework 0</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">project</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lectures</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance and Measurement</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance and Measurement part 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance and Measurement part 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Representation of programs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview of Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/03_local.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Local Analysis &amp; Optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">local value numbering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/05_global.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Global Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">loop invariant code motion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">_ partial_redundancy elimination</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Static Single Assignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/07_llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 LLVM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 classic loop optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polyhedral Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 MLIR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Whole program</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dynamic Memory Management</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dynamic Compilers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GPU Compilers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/diverg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">divergent flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/junk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">using llvm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/mem_consistancy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">memory consistancy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/mlir.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polyhedral Compilation Opportunities in MLIR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Testing Register allocators</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Register Allocation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bril Documentation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bril github</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://github.com/normrubin/normrubin.github.io" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">class github</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html">Homework 3: Data Flow</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Homework 3: Data Flow</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Qucheng Jiang </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This assignment focuses on implementing dataflow analysis for the Bril intermediate language to support three major analyses: liveness, availability, and busy expressions. These analyses play a crucial role in various compiler optimizations, including Trivial Dead Code Elimination (DCE) and Local Value Numbering (LVN) that we discussed and implemented in previous homework, <a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW2">HW2</a>. The goal is to analyze the flow of data within a program, identify redundant or unnecessary computations, and determine which values are still “live” or “in use” at various points in a program.</p>
+<p>The report details the design of a flexible framework for these analyses, the implementation strategy for each type of dataflow analysis, and the use of visualization to display the results. The integration and testing process ensures the framework’s correctness through various benchmark tests, and the results are analyzed to demonstrate its effectiveness.</p>
+</section>
+<section id="interactive-demo" class="level2">
+<h2 class="anchored" data-anchor-id="interactive-demo">Interactive Demo</h2>
+<iframe src="2024-10-11-Qucheng-HW3-index.html" style="width: 100%; aspect-ratio: 1.3; border: none;">
+</iframe>
+<p align="center">
+<a href="https://htmlpreview.github.io/?https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/main/HW3/index.html"> 🚧 Use the link HERE if not showing </a>
+</p>
+</section>
+<section id="detail-design" class="level2">
+<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
+<p>Check <a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW3">EECE7398_ST_Compiler/HW3</a> for source code.</p>
+<section id="abstraction-classes" class="level3">
+<h3 class="anchored" data-anchor-id="abstraction-classes">Abstraction Classes</h3>
+<p>The abstraction class remain the same structure as last homework submittion, see detail in <a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW2#abstraction-classes">HW2 - Abstraction Classes</a>.</p>
+<p>I add some additional features and fix something like <code>__repr__</code> for some of the classes, therefore use current <a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW3/bril_model"><code>./bril_model</code></a> for further development.</p>
+</section>
+<section id="graph-result-demonstration" class="level3">
+<h3 class="anchored" data-anchor-id="graph-result-demonstration">Graph Result Demonstration</h3>
+<p>Since this task is about analizing some properties of the data-flow graph, a better way to demonstrate it clear and straight forward is to show the computated result in visual format. I developed the framework to view analyze results using <code>vis.js</code> and <code>networkx</code>.</p>
+<details>
+<summary>
+🚧 Expand HERE for HD Video
+<p align="center">
+<img src="https://github.com/user-attachments/assets/754c3777-9e50-48cf-b29f-e96ad15e8e4e" width="100%">
+</p>
+</summary>
+<p>
+</p><div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="https://raw.githubusercontent.com/jiangqucheng/EECE7398_ST_Compiler/refs/heads/main/HW3/demo.webm"></video></div>
+<p></p>
+</details>
+</section>
+<section id="dataflow-analysis-implementation" class="level3">
+<h3 class="anchored" data-anchor-id="dataflow-analysis-implementation">Dataflow Analysis Implementation</h3>
+<p>The script <code>df_analysis.py</code> performs dataflow analysis on Bril programs, supporting three types of analysis: <code>liveness</code>, <code>availability</code>, and <code>busy</code> expressions. The implementation is designed to be <strong>generic</strong>, allowing for easy extension to other types of dataflow analysis with minimal code changes.</p>
+<hr>
+<section id="argument-parsing-and-setup" class="level4">
+<h4 class="anchored" data-anchor-id="argument-parsing-and-setup">1. Argument Parsing and Setup</h4>
+<p>The script begins by utilizing the <code>argparse</code> module to handle command-line argument parsing. This allows the user to specify three key arguments when running the script:</p>
+<ul>
+<li><code>ANALYSIS</code>: Specifies the type of dataflow analysis to perform. The valid options are <code>'liveness'</code>, <code>'availability'</code>, or <code>'busy'</code>. This argument is required and ensures the script knows what kind of analysis to perform on the Bril program.</li>
+<li><code>DEMO_BRIL_FILE</code>: This is the path to the Bril program that will be analyzed. The file contains the intermediate representation (IR) of the program.</li>
+<li><code>--save-dir</code>: An optional argument that specifies where to save the generated output HTML files (visualizations). If not provided, the default directory <code>./save</code> is used.</li>
+</ul>
+<p>By parsing these arguments, the script can dynamically handle different types of analysis and ensure the correct files are processed and results saved to the right locations.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L20-L25">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 20 to 25</a></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a> <span class="im">import</span> argparse </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a> parser <span class="op">=</span> argparse.ArgumentParser(description<span class="op">=</span><span class="st">'Generate data flow graph for a bril script'</span>) </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a> parser.add_argument(<span class="st">'ANALYSIS'</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, <span class="bu">help</span><span class="op">=</span><span class="st">'Analysis: [liveness, availability, busy]'</span>) </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a> parser.add_argument(<span class="st">'DEMO_BRIL_FILE'</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, <span class="bu">help</span><span class="op">=</span><span class="st">'Path to the bril file'</span>) </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a> parser.add_argument(<span class="st">'--save-dir'</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">str</span>, default<span class="op">=</span><span class="st">'./save'</span>, <span class="bu">help</span><span class="op">=</span><span class="st">'Path to save the generated html files'</span>) </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a> args <span class="op">=</span> parser.parse_args() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="validation-of-arguments" class="level4">
+<h4 class="anchored" data-anchor-id="validation-of-arguments">2. Validation of Arguments</h4>
+<p>Once the arguments are parsed, the script proceeds to validate them:</p>
+<ul>
+<li><code>ANALYSIS</code>: The provided value is converted to lowercase for consistency. The script checks whether the specified analysis type is one of the allowed options: <code>'liveness'</code>, <code>'availability'</code>, or <code>'busy'</code>. If the user specifies an unsupported analysis, the script prints an error message and exits.</li>
+<li><code>DEMO_BRIL_FILE</code>: The script checks if the provided file path exists on the system. If not, an error message is displayed, and the script terminates.</li>
+<li>If all validations pass, the script proceeds with the execution; otherwise, it prints the usage information (<code>parser.print_help()</code>) to guide the user on how to run the script correctly.</li>
+</ul>
+<p>This ensures that only valid input and analysis types are processed.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L27-L43">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 27 to 43</a></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a> ANALYSIS <span class="op">=</span> args.ANALYSIS.lower() </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a> DEMO_BRIL_FILE <span class="op">=</span> args.DEMO_BRIL_FILE </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a> <span class="co"># how to get the save-dir value </span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a> SAVE_DIR <span class="op">=</span> args.save_dir </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a> <span class="co"># make sure args are allowed </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a> correct <span class="op">=</span> <span class="va">True</span> </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a> <span class="cf">if</span> ANALYSIS <span class="kw">not</span> <span class="kw">in</span> [<span class="st">'liveness'</span>, <span class="st">'availability'</span>, <span class="st">'busy'</span>]: </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>     <span class="bu">print</span>(<span class="ss">f"Analysis &lt;</span><span class="sc">{</span>ANALYSIS<span class="sc">}</span><span class="ss">&gt; not supported"</span>) </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>     correct <span class="op">=</span> <span class="va">False</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a> <span class="cf">if</span> <span class="kw">not</span> os.path.exists(DEMO_BRIL_FILE): </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>     <span class="bu">print</span>(<span class="ss">f"File &lt;</span><span class="sc">{</span>DEMO_BRIL_FILE<span class="sc">}</span><span class="ss">&gt; not found"</span>) </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>     correct <span class="op">=</span> <span class="va">False</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a> <span class="cf">if</span> <span class="kw">not</span> correct: </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>     <span class="co"># print help and exit </span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>     parser.print_help() </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>     exit(<span class="dv">1</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="loading-the-bril-script" class="level4">
+<h4 class="anchored" data-anchor-id="loading-the-bril-script">3. Loading the Bril Script</h4>
+<p>The script loads the Bril program into a <code>BrilScript</code> object, which represents the structure of the input program. This object provides an abstraction over the Bril instructions and functions, making it easier to manipulate and analyze.</p>
+<ul>
+<li>The <code>BrilScript</code> object is initialized with the name of the file, and the control flow graph (CFG) for each function in the Bril script is constructed. The CFG represents how control flows between basic blocks (sequences of instructions without branches) in each function, which is crucial for performing dataflow analysis.</li>
+<li><code>app_graph</code> is a dictionary that maps each <code>BrilFunction</code> to a tuple consisting of a <code>networkx</code> directed graph (the CFG) and a mapping of labels to their corresponding instructions.</li>
+</ul>
+<p>The CFG provides the foundation for performing various types of dataflow analysis, as it organizes the program’s structure into a form that can be traversed and analyzed.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L135-L137">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 135 to 137</a></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a> bbs <span class="op">=</span> bm.BrilScript(script_name<span class="op">=</span>os.path.basename(DEMO_BRIL_FILE), file_dir<span class="op">=</span>os.path.dirname(DEMO_BRIL_FILE)) </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a> app_graph: Dict[bm.BrilFunction, Tuple[nx.DiGraph, Dict[bm.BrilInstruction_Label, List[bm.BrilInstruction]]]] <span class="op">=</span> {} </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a> update_to_graph(bbs, app_graph) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="generating-gen-kill-and-expr-sets" class="level4">
+<h4 class="anchored" data-anchor-id="generating-gen-kill-and-expr-sets">4. Generating <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> Sets</h4>
+<p>For each basic block, the script calculates three sets:</p>
+<ul>
+<li><strong><code>GEN</code></strong>: The set of variables used before being assigned a new value in the block. These are the variables that “generate” dependencies in the block.</li>
+<li><strong><code>KILL</code></strong>: The set of variables that are redefined or “killed” within the block.</li>
+<li><strong><code>EXPR</code></strong>: The set of expressions that are still available at the end of the block.</li>
+</ul>
+<p>The function <code>get__args_used_before_assign__assigned__calc_expr_available_at_bb_end</code> iterates over the instructions in a basic block. It collects the following information: - <code>used_first</code>: Variables that are used before any assignment in the block. - <code>written</code>: Variables that are assigned new values within the block. - <code>avail_exprs</code>: Expressions that remain available for future use at the end of the block, ensuring that they haven’t been invalidated by any assignments.</p>
+<p>The <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> sets are essential for performing dataflow analysis like liveness and availability, which rely on tracking how variables and expressions evolve over the program.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L150-L168">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 150 to 168</a></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> get__args_used_before_assign__assigned__calc_expr_available_at_bb_end(instrs: List[bm.BrilInstruction]) <span class="op">-&gt;</span> Tuple[Set[<span class="bu">str</span>],Set[<span class="bu">str</span>],Set[Expr]]: </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>     <span class="co">""" </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">     Given a list of instructions, return the set of variables that are used before defined and the set of variables that are modified. </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">     This is from HW2, but modified to return the sets instead of printing them. </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">     """</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>     used_first: Set[<span class="bu">str</span>] <span class="op">=</span> <span class="bu">set</span>() </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>     written: Set[<span class="bu">str</span>] <span class="op">=</span> <span class="bu">set</span>() </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>     avail_exprs: Set[Expr] <span class="op">=</span> <span class="bu">set</span>() </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> instr <span class="kw">in</span> instrs: </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>         used_first.update(<span class="bu">set</span>(instr.args <span class="cf">if</span> instr.args <span class="cf">else</span> []) <span class="op">-</span> written) </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>         <span class="cf">if</span> instr.dest: </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>             <span class="co"># check if the dest was used in generating any of the expressions, if so, remove it from exprs </span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>             <span class="cf">for</span> expr <span class="kw">in</span> <span class="bu">list</span>(avail_exprs): </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                 <span class="cf">if</span> instr.dest <span class="kw">in</span> expr.args: </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                     avail_exprs.remove(expr) </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>             written.add(instr.dest) </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>             <span class="cf">if</span> instr.args <span class="kw">and</span> instr.op <span class="kw">not</span> <span class="kw">in</span> [<span class="st">'id'</span>, <span class="st">'const'</span>, <span class="st">'call'</span>]: </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>                 avail_exprs.add(Expr(instr.op, instr.args)) </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> used_first, written, avail_exprs </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="updating-gen-kill-and-expr-sets" class="level4">
+<h4 class="anchored" data-anchor-id="updating-gen-kill-and-expr-sets">5. Updating <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> Sets</h4>
+<p>After calculating the <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> sets for each basic block, the script updates the CFG with this information. The <code>update_gen_kill_sets</code> function iterates over each node (basic block) in the CFG and stores the calculated <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> sets in the node’s attributes.</p>
+<p>This step enriches the CFG with the necessary dataflow information, setting up the foundation for more complex analyses like determining which variables are live or which expressions are available.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L173-L180">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 173 to 180</a></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> update_gen_kill_sets(app_graph: Dict[bm.BrilFunction, Tuple[nx.DiGraph, Dict[bm.BrilInstruction_Label, List[bm.BrilInstruction]]]]): </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> _, (fdg, _) <span class="kw">in</span> app_graph.items(): </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>         <span class="cf">for</span> each_node, each_node_data <span class="kw">in</span> fdg.nodes(data<span class="op">=</span><span class="va">True</span>): </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>             each_block: List[bm.BrilInstruction] <span class="op">=</span> each_node_data.get(<span class="st">'instructions'</span>, <span class="va">None</span>) </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>             _gen, _kill, _expr <span class="op">=</span> gen_kill_expr_sets(each_block) <span class="cf">if</span> each_block <span class="cf">else</span> (<span class="bu">set</span>(), <span class="bu">set</span>(), <span class="bu">set</span>()) </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>             fdg.nodes[each_node][<span class="st">'GEN'</span>] <span class="op">=</span> _gen </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>             fdg.nodes[each_node][<span class="st">'KILL'</span>] <span class="op">=</span> _kill </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>             fdg.nodes[each_node][<span class="st">'EXPR'</span>] <span class="op">=</span> _expr </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="generic-dataflow-analysis" class="level4">
+<h4 class="anchored" data-anchor-id="generic-dataflow-analysis">6. Generic Dataflow Analysis</h4>
+<p>The script defines a generic dataflow analysis function <code>_fdg_update_bare_bone</code>, which can be adapted for different types of analyses (liveness, availability, busy expressions). This function operates by traversing the CFG and updating the <code>IN</code> and <code>OUT</code> sets of each node (basic block):</p>
+<ul>
+<li><strong><code>IN</code></strong>: The set of variables or expressions that are live or available at the entry to a basic block.</li>
+<li><strong><code>OUT</code></strong>: The set of variables or expressions that are live or available at the exit of a basic block.</li>
+</ul>
+<p>The function takes as input a specific analysis function (e.g., for liveness or availability) and applies it to update the <code>IN</code> and <code>OUT</code> sets for each node. The function also checks whether the <code>IN</code> and <code>OUT</code> sets change during the analysis—if they do, it indicates that the dataflow information has propagated, and further iterations are required.</p>
+<p>The generic nature of this function minimizes code duplication and allows the script to easily switch between different types of analyses.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L202-L213">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 202 to 213</a></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> _fdg_update_bare_bone(specific_analysis_func: Callable[[nx.DiGraph, <span class="bu">str</span>], Tuple[Set[<span class="bu">str</span>], Set[<span class="bu">str</span>]]], fdg: nx.DiGraph) <span class="op">-&gt;</span> <span class="bu">bool</span>: </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>     <span class="co"># here we extract the common part of the analysis </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>     has_changed <span class="op">=</span> <span class="va">False</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> this_node, _ <span class="kw">in</span> fdg.nodes(data<span class="op">=</span><span class="va">True</span>): </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>         _print_this_node_name <span class="op">=</span> this_node.replace(<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>, <span class="st">'</span><span class="ch">\\</span><span class="st">n'</span>) </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>         _in, _out <span class="op">=</span> specific_analysis_func(fdg, this_node) </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>         <span class="bu">print</span>(<span class="ss">f"Node: </span><span class="sc">{</span>_print_this_node_name<span class="sc">}</span><span class="ss">, IN: </span><span class="sc">{</span>_in<span class="sc">}</span><span class="ss">, OUT: </span><span class="sc">{</span>_out<span class="sc">}</span><span class="ss">"</span>) </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>         <span class="cf">if</span> _in <span class="op">!=</span> _get_node_in_set(fdg, this_node) <span class="kw">or</span> _out <span class="op">!=</span> _get_node_out_set(fdg, this_node): </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>             fdg.nodes[this_node][<span class="st">'IN'</span>] <span class="op">=</span> _in </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>             fdg.nodes[this_node][<span class="st">'OUT'</span>] <span class="op">=</span> _out </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>             has_changed <span class="op">=</span> <span class="va">True</span> </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> has_changed </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="specific-analysis-functions" class="level4">
+<h4 class="anchored" data-anchor-id="specific-analysis-functions">7. Specific Analysis Functions</h4>
+<p>The script defines specific analysis functions for each type of dataflow analysis:</p>
+<ul>
+<li><p><strong>Liveness Analysis</strong>: Computes the <code>IN</code> and <code>OUT</code> sets based on the liveness of variables. It updates the sets by looking at the successors of each node and determining which variables are still live at the entry of a basic block.</p></li>
+<li><p><strong>Availability Analysis</strong>: Determines which expressions are available at the entry and exit of a block. It considers the predecessor nodes and checks whether the expressions remain valid by avoiding any variables that were killed in the block.</p></li>
+<li><p><strong>Busy Expressions Analysis</strong>: Identifies which expressions must be computed before reaching the next use of a variable. This analysis is useful for identifying common subexpressions that can be optimized.</p></li>
+</ul>
+<p>Each function is passed to the generic <code>_fdg_update_bare_bone</code> function to perform the corresponding analysis.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L215-L258">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 215 to 258</a></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> _fdg_update_internal_liveness_sets(fdg: nx.DiGraph, this_node: <span class="bu">str</span>) <span class="op">-&gt;</span> Tuple[Set[<span class="bu">str</span>], Set[<span class="bu">str</span>]]: </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>     <span class="co">""" </span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">         this.gen = {v | v is used before defined here} </span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">         this.kill = {v | v is assigned here} </span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">         IN = this.gen + (OUT - this.kill) </span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">         OUT = union(successors' IN) </span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">     """</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>     _print_this_node_name <span class="op">=</span> this_node.replace(<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>, <span class="st">'</span><span class="ch">\\</span><span class="st">n'</span>) </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>     _temp_succ_req <span class="op">=</span> [_get_node_in_set(fdg, each_succ_node) <span class="cf">for</span> each_succ_node <span class="kw">in</span> _get_node_succ_set(fdg, this_node)] </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>     _out: Set[<span class="bu">str</span>] <span class="op">=</span> <span class="bu">set</span>.union(<span class="op">*</span>_temp_succ_req) <span class="cf">if</span> _temp_succ_req <span class="cf">else</span> <span class="bu">set</span>() </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>     <span class="bu">print</span>(<span class="ss">f"Node: </span><span class="sc">{</span>_print_this_node_name<span class="sc">}</span><span class="ss">, Succ: </span><span class="sc">{</span>_get_node_succ_set(fdg, this_node)<span class="sc">}</span><span class="ss">=&gt;</span><span class="sc">{</span>_temp_succ_req<span class="sc">}</span><span class="ss">, OUT: </span><span class="sc">{</span>_out<span class="sc">}</span><span class="ss">"</span>) </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>     _in: Set[<span class="bu">str</span>] <span class="op">=</span> <span class="bu">set</span>.union(_get_node_gen_set(fdg, this_node), <span class="bu">set</span>.difference(_out, _get_node_kill_set(fdg, this_node))) </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> _in, _out </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> _fdg_update_internal_availability_sets(fdg: nx.DiGraph, this_node: <span class="bu">str</span>) <span class="op">-&gt;</span> Tuple[Set[Expr], Set[Expr]]: </span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>     <span class="co">""" </span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">         this.exprs = {e | e is available at the end of the block} </span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">         IN = intersection(predeccessors' OUT) </span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">         OUT = (IN + this.exprs) - OUT(expr: any(var modified here exist in expr)) </span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">     """</span> </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>     _print_this_node_name <span class="op">=</span> this_node.replace(<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>, <span class="st">'</span><span class="ch">\\</span><span class="st">n'</span>) </span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>     _temp_pred_give <span class="op">=</span> [_get_node_out_set(fdg, each_pred_node) <span class="cf">for</span> each_pred_node <span class="kw">in</span> _get_node_pred_set(fdg, this_node)] </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>     _in: Set[Expr] <span class="op">=</span> <span class="bu">set</span>.intersection(<span class="op">*</span>_temp_pred_give) <span class="cf">if</span> _temp_pred_give <span class="cf">else</span> <span class="bu">set</span>() </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>     <span class="bu">print</span>(<span class="ss">f"Node: </span><span class="sc">{</span>_print_this_node_name<span class="sc">}</span><span class="ss">, Pred: </span><span class="sc">{</span>_get_node_pred_set(fdg, this_node)<span class="sc">}</span><span class="ss">=&gt;</span><span class="sc">{</span>_temp_pred_give<span class="sc">}</span><span class="ss">, IN: </span><span class="sc">{</span>_in<span class="sc">}</span><span class="ss">"</span>) </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>     <span class="co"># gatter all exprs that were computed before the end of this block  </span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>     _out: Set[Expr] <span class="op">=</span> <span class="bu">set</span>.union(_get_node_in_set(fdg, this_node), _get_node_expr_set(fdg, this_node)) </span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>     <span class="co"># remove such expr that include variables that were modified in this block </span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>     _out <span class="op">=</span> <span class="bu">set</span>([each_expr <span class="cf">for</span> each_expr <span class="kw">in</span> _out <span class="cf">if</span> <span class="kw">not</span> <span class="bu">set</span>.intersection(<span class="bu">set</span>(each_expr.args), _get_node_kill_set(fdg, this_node))]) </span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> _in, _out </span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> _fdg_update_internal_busy_sets(fdg: nx.DiGraph, this_node: <span class="bu">str</span>) <span class="op">-&gt;</span> Tuple[Set[Expr], Set[Expr]]: </span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>     <span class="co">""" </span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="co">         IN = (OUT - OUT(expr: any(var modified here exist in expr)) + this.exprs </span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="co">         OUT = intersection(successors' IN) </span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co">     """</span> </span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>     _print_this_node_name <span class="op">=</span> this_node.replace(<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>, <span class="st">'</span><span class="ch">\\</span><span class="st">n'</span>) </span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>     _temp_succ_req <span class="op">=</span> [_get_node_in_set(fdg, each_succ_node) <span class="cf">for</span> each_succ_node <span class="kw">in</span> _get_node_succ_set(fdg, this_node)] </span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>     _out: Set[Expr] <span class="op">=</span> <span class="bu">set</span>.intersection(<span class="op">*</span>_temp_succ_req) <span class="cf">if</span> _temp_succ_req <span class="cf">else</span> <span class="bu">set</span>() </span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>     <span class="bu">print</span>(<span class="ss">f"Node: </span><span class="sc">{</span>_print_this_node_name<span class="sc">}</span><span class="ss">, Succ: </span><span class="sc">{</span>_get_node_succ_set(fdg, this_node)<span class="sc">}</span><span class="ss">=&gt;</span><span class="sc">{</span>_temp_succ_req<span class="sc">}</span><span class="ss">, OUT: </span><span class="sc">{</span>_out<span class="sc">}</span><span class="ss">"</span>) </span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>     <span class="co"># remove such expr that include variables that were modified in this block </span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>     _in: Set[Expr] <span class="op">=</span> <span class="bu">set</span>([each_expr <span class="cf">for</span> each_expr <span class="kw">in</span> _out <span class="cf">if</span> <span class="kw">not</span> <span class="bu">set</span>.intersection(<span class="bu">set</span>(each_expr.args), _get_node_kill_set(fdg, this_node))]) </span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>     <span class="co"># add all exprs that are computed in this block </span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>     _in <span class="op">=</span> <span class="bu">set</span>.union(_in, _get_node_expr_set(fdg, this_node)) </span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> _in, _out </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="running-the-analysis" class="level4">
+<h4 class="anchored" data-anchor-id="running-the-analysis">8. Running the Analysis</h4>
+<p>The <code>update_analysis_sets</code> function orchestrates the execution of the selected analysis. Based on the user’s input (liveness, availability, or busy), the corresponding analysis function is retrieved from a mapping (<code>ANALYSIS_FUNC</code>).</p>
+<p>The analysis is executed iteratively, updating the CFG with the calculated <code>IN</code> and <code>OUT</code> sets until no further changes occur. This iterative approach is necessary because dataflow analysis typically involves propagating information through the CFG until a fixed point is reached (i.e., the point where further iterations don’t change the dataflow sets).</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L266-L277">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 266 to 277</a></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> update_analysis_sets(analysis_type_str: <span class="bu">str</span> , app_graph: Dict[bm.BrilFunction, Tuple[nx.DiGraph, Dict[bm.BrilInstruction_Label, List[bm.BrilInstruction]]]]): </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>     analysis_func <span class="op">=</span> ANALYSIS_FUNC.get(analysis_type_str, <span class="va">None</span>) </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>     <span class="cf">if</span> <span class="kw">not</span> analysis_func: </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>         <span class="bu">print</span>(<span class="ss">f"Analysis &lt;</span><span class="sc">{</span>analysis_type_str<span class="sc">}</span><span class="ss">&gt; not supported"</span>) </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>         <span class="cf">return</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>     has_changed <span class="op">=</span> <span class="va">True</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>     <span class="cf">while</span> has_changed: </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>         has_changed <span class="op">=</span> <span class="va">False</span> </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>         <span class="bu">print</span>(<span class="ss">f"Updating </span><span class="sc">{</span>analysis_type_str<span class="sc">}</span><span class="ss"> sets"</span>) </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>         <span class="cf">for</span> _, (fdg, _) <span class="kw">in</span> app_graph.items(): </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>             has_changed <span class="op">|=</span> _fdg_update_bare_bone(analysis_func, fdg) </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>         <span class="bu">print</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="visualization" class="level4">
+<h4 class="anchored" data-anchor-id="visualization">9. Visualization</h4>
+<p>The script concludes by generating a visual representation of the CFG using the <code>pyvis</code> library. It creates an interactive HTML file that displays the CFG along with the computed <code>IN</code>, <code>OUT</code>, <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> sets for each basic block.</p>
+<ul>
+<li>The <code>dump_into_pv_graph</code> function takes the CFG as input and converts it into a visual format. For each node (basic block) in the CFG, the <code>IN</code>, <code>OUT</code>, <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> sets are formatted as strings and added as attributes to the node in the visualization.</li>
+<li>The visualization allows users to interact with the CFG, inspect the dataflow information for each node, and understand the results of the analysis in a more intuitive manner.</li>
+</ul>
+<p>This final step provides a clear and accessible way to verify the results of the analysis.</p>
+<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L318-L376">EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 318 to 376</a></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> node <span class="kw">in</span> net.nodes: </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'IN'</span>] <span class="op">=</span> _in <span class="op">=</span> generate_set_str(node.pop(<span class="st">'IN'</span>, <span class="bu">set</span>())) </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'OUT'</span>] <span class="op">=</span> _out <span class="op">=</span> generate_set_str(node.pop(<span class="st">'OUT'</span>, <span class="bu">set</span>())) </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'GEN'</span>] <span class="op">=</span> _gen <span class="op">=</span> generate_set_str(node.pop(<span class="st">'GEN'</span>, <span class="bu">set</span>())) </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'KILL'</span>] <span class="op">=</span> _kill <span class="op">=</span> generate_set_str(node.pop(<span class="st">'KILL'</span>, <span class="bu">set</span>())) </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'EXPR'</span>] <span class="op">=</span> _expr <span class="op">=</span> generate_set_str([<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> node.pop(<span class="st">'EXPR'</span>, <span class="bu">set</span>())]) </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">=</span> <span class="st">''</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>         <span class="cf">if</span> <span class="st">'instructions'</span> <span class="kw">in</span> node: </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>             <span class="co"># remove 'data' key from node, and set 'title' key to the string representation of the data </span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>             node[<span class="st">'title'</span>] <span class="op">=</span> <span class="st">"</span><span class="ch">\n</span><span class="st">  "</span>.join([obj.to_briltxt() <span class="cf">if</span> <span class="bu">hasattr</span>(obj, <span class="st">'to_briltxt'</span>) <span class="cf">else</span> <span class="bu">str</span>(obj) <span class="cf">for</span> obj <span class="kw">in</span> node.pop(<span class="st">'instructions'</span>, [])]) </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>             node[<span class="st">'shape'</span>] <span class="op">=</span> <span class="st">'box'</span> </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">+=</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span> </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">+=</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">GEN: </span><span class="sc">{</span> _gen <span class="sc">}</span><span class="ss">"</span> </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">+=</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">KILL: </span><span class="sc">{</span> _kill <span class="sc">}</span><span class="ss">"</span> </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">+=</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">EXPR: </span><span class="sc">{</span> _expr <span class="sc">}</span><span class="ss">"</span> </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">+=</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">IN: </span><span class="sc">{</span> _in <span class="sc">}</span><span class="ss">"</span> </span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">+=</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">OUT: </span><span class="sc">{</span> _out <span class="sc">}</span><span class="ss">"</span> </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>         <span class="co"># title layout change (word replace): </span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>         <span class="co">#  strip: remove leading/trailing spaces, tabs, newlines, and carriage returns </span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>         <span class="co">#  double return -&gt; dash line </span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>         <span class="co">#  double space -&gt; full corner single space </span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>         node[<span class="st">'title'</span>] <span class="op">=</span> node[<span class="st">'title'</span>].strip(<span class="st">' </span><span class="ch">\t\n\r</span><span class="st">'</span>).replace(<span class="st">'</span><span class="ch">\n\n</span><span class="st">'</span>, <span class="st">'</span><span class="ch">\n</span><span class="st">--------</span><span class="ch">\n</span><span class="st">'</span>).replace(<span class="st">'  '</span>, <span class="st">'</span><span class="ch">\u3000</span><span class="st">'</span>) </span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>         <span class="co"># node['label'] = f"IN: {_in}" + '\n' + node['label'] + '\n' + f"OUT: {_out}" </span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>         <span class="cf">if</span> node[<span class="st">'id'</span>] <span class="kw">in</span> (ENTRY_POINT_NAME, RETURN_POINT_NAME): </span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>             node[<span class="st">'color'</span>] <span class="op">=</span> <span class="st">'grey'</span> </span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>             node[<span class="st">'shape'</span>] <span class="op">=</span> <span class="st">'circle'</span> </span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>     <span class="cf">for</span> edge <span class="kw">in</span> net.edges: </span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>         _reason <span class="op">=</span> edge.pop(<span class="st">'reason'</span>, <span class="va">None</span>) </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>         <span class="cf">if</span> _reason: </span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>             edge[<span class="st">'label'</span>] <span class="op">=</span> _reason </span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>         _src_node, _dst_node <span class="op">=</span> _get_node_by_name(edge[<span class="st">'from'</span>]), _get_node_by_name(edge[<span class="st">'to'</span>]) </span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>         <span class="cf">if</span> _src_node <span class="kw">and</span> _dst_node <span class="kw">and</span> <span class="st">'OUT'</span> <span class="kw">in</span> _src_node <span class="kw">and</span> <span class="st">'IN'</span> <span class="kw">in</span> _dst_node: </span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>             src_id, src_out, dst_id, dst_in <span class="op">=</span> _src_node[<span class="st">'id'</span>], _src_node[<span class="st">'OUT'</span>], _dst_node[<span class="st">'id'</span>], _dst_node[<span class="st">'IN'</span>] </span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>             <span class="cf">if</span> src_out <span class="op">==</span> CONST_EMPTY_STR: src_out <span class="op">=</span> dst_in </span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>             <span class="cf">if</span> dst_in <span class="op">==</span> CONST_EMPTY_STR: dst_in <span class="op">=</span> src_out </span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>             new_label <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>src_id<span class="sc">}</span><span class="ss">.OUT:</span><span class="sc">{</span>src_out<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span>dst_id<span class="sc">}</span><span class="ss">.IN:</span><span class="sc">{</span>dst_in<span class="sc">}</span><span class="ss">"</span> <span class="cf">if</span> src_out <span class="op">!=</span> dst_in <span class="cf">else</span> src_out </span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>             edge[<span class="st">'title'</span>] <span class="op">=</span> edge.get(<span class="st">'title'</span>, <span class="st">""</span>) <span class="op">+</span> edge.get(<span class="st">'label'</span>, <span class="st">""</span>)  <span class="co"># move label to popup title </span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>             edge[<span class="st">'label'</span>] <span class="op">=</span> new_label  <span class="co"># set new label </span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> net </span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a> <span class="co"># Safe linux fs name </span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a> safe_fs_name <span class="op">=</span> <span class="kw">lambda</span> raw_string: <span class="st">""</span>.join(c <span class="cf">if</span> c.isalnum() <span class="kw">or</span> c <span class="kw">in</span> (<span class="st">' '</span>, <span class="st">'.'</span>, <span class="st">'_'</span>) <span class="cf">else</span> <span class="st">'_'</span> <span class="cf">for</span> c <span class="kw">in</span> raw_string) </span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a> <span class="cf">for</span> each_func <span class="kw">in</span> bbs.functions: </span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>     <span class="co"># Remove illegal characters for Linux filesystem </span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>     save_dir <span class="op">=</span> os.path.join(SAVE_DIR, safe_fs_name(bbs.script_name), ANALYSIS) </span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>     save_file <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>safe_fs_name(each_func.name)<span class="sc">}</span><span class="ss">.html"</span> </span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>     <span class="co"># get the function directed graph </span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>     fdg, _ <span class="op">=</span> app_graph.get(each_func) </span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>     <span class="co"># mkdir -p ./save_dir </span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>     os.makedirs(<span class="ss">f"./</span><span class="sc">{</span>save_dir<span class="sc">}</span><span class="ss">"</span>, exist_ok<span class="op">=</span><span class="va">True</span>) </span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>     <span class="co"># save to html </span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>     dump_into_pv_graph(fdg).save_graph(os.path.join(save_dir, save_file)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>The script of <code>df_analysis.py</code> provides a flexible and extensible framework for performing dataflow analysis on Bril programs. By defining generic functions and specific analysis functions, it minimizes code duplication and allows for easy addition of new analysis types. The visualization step helps in understanding the results of the analysis by generating an interactive HTML representation of the CFG.</p>
+</section>
+</section>
+<section id="integration-and-testing" class="level2">
+<h2 class="anchored" data-anchor-id="integration-and-testing">Integration and Testing</h2>
+<p>The integration of the optimizations was done manually and thoroughly tested to ensure correctness. Testing was carried out using both class examples and official test cases from the Bril repository.</p>
+<p><strong>Manual Testing</strong>: To validate the correctness of the dataflow analysis, I manually executed the script on several examples provided during class lectures. This helped confirm that the basic dataflow functionality (liveness, availability, and busy expression analysis) was functioning as expected. To test each step of the workflow, use the <code>playground.ipynb</code> to break between steps and check output of each cell.</p>
+<p><strong>Class Examples</strong>: I tested the implementation with <code>in-class</code> examples, which serve as benchmarks for the expected output of liveness and availability analysis. Each example was carefully compared with the correct CFG and dataflow analysis results.</p>
+<p><strong>Bril Benchmark Tests</strong>: Additionally, I tested the system on Bril’s official dataflow test cases found in <code>bril/examples/test/df/*.bril</code>. These benchmark examples cover edge cases and typical control flow scenarios, further ensuring the robustness of the implementation.</p>
+<p><strong>Other Benchmarks</strong>: Beyond the standard tests, I applied the analysis to select benchmarks from <code>bril/benchmarks/core</code>. These more complex scenarios helped confirm that the system could scale effectively while maintaining correct results.</p>
+<p>Across all test cases, the output CFGs and the results of liveness, availability, and busy expressions analysis were consistent with the expected behavior. No discrepancies were found during manual inspection or benchmark comparisons.</p>
+<p>BTW, to rerun all results that I submitted to this repo, just simply use <code>make</code>.</p>
+</section>
+<section id="results-and-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="results-and-analysis">Results and Analysis</h2>
+<p>To make life easier, the Bril scripts that are tested in this HW are copied/created in the <code>./example</code> folder. The three types of dataflow analyses (<code>liveness</code>, <code>availability</code>, <code>busy</code>) were tested on the following :</p>
+<ul>
+<li><a href="./example/birthday.bril"><code>birthday.bril</code></a></li>
+<li><a href="./example/check-primes.bril"><code>check-primes.bril</code></a></li>
+<li><a href="./example/cond-args.bril"><code>cond-args.bril</code></a></li>
+<li><a href="./example/cond.bril"><code>cond.bril</code></a></li>
+<li><a href="./example/fact.bril"><code>fact.bril</code></a></li>
+<li><a href="./example/in_class_example_1.bril"><code>in_class_example_1.bril</code></a></li>
+<li><a href="./example/in_class_example_2.bril"><code>in_class_example_2.bril</code></a></li>
+<li><a href="./example/in_class_example_3.bril"><code>in_class_example_3.bril</code></a></li>
+<li><a href="./example/is-decreasing.bril"><code>is-decreasing.bril</code></a></li>
+</ul>
+<p>To view the graph, set up a <code>http</code> server and use any of your favourite modern web browsers to open the <code>.html</code> file that just generated.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> cd HW3</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> python <span class="at">-m</span> http.server</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Serving</span> HTTP on 0.0.0.0 port 8000 <span class="er">(</span><span class="ex">http://0.0.0.0:8000/</span><span class="kw">)</span> <span class="ex">...</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Goto http://&lt;server-ip&gt;:8000/output/in_class_example_1.bril/liveness/in_class_example_1.html</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="liveness-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="liveness-analysis">Liveness Analysis</h3>
+<p>Liveness analysis was correctly computed in all test cases. The variables that were “live” at each point in the program were accurately tracked. The results were particularly effective in identifying opportunities for Trivial DCE. For instance, variables that were defined but never live in subsequent instructions were correctly flagged, highlighting code that could be safely eliminated.</p>
+</section>
+<section id="availability-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="availability-analysis">Availability Analysis</h3>
+<p>Availability analysis was applied successfully, and all expressions available at the entry and exit of each basic block were correctly computed. This analysis is critical for Local Value Numbering (LVN), where equivalent expressions are consolidated. In benchmarks such as in_class_example_3.bril, the implementation showed how redundant computations could be eliminated by detecting available expressions early.</p>
+</section>
+<section id="busy-expressions-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="busy-expressions-analysis">Busy Expressions Analysis</h3>
+<p>Busy expressions analysis worked as expected, identifying expressions that were critical to compute before the next use. This was particularly useful in loops, where understanding which expressions are “busy” helps optimize the repeated evaluation of the same values.</p>
+</section>
+<section id="comparison-and-insights" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-and-insights">Comparison and Insights</h3>
+<p>For all test cases, I carefully compared the output CFG and dataflow graph to the expected results. No differences were found in any of the test cases, confirming that the implementation is consistent with the theoretical expectations for dataflow analysis.</p>
+<p>The visual representation of the analysis results (generated using vis.js and networkx) provided an intuitive way to verify the correctness of the <code>IN</code>, <code>OUT</code>, <code>GEN</code>, <code>KILL</code>, and <code>EXPR</code> sets for each basic block. This helped to easily identify points of optimization and confirmed that the framework was operating as intended.</p>
+</section>
+<section id="raw-test-log" class="level3">
+<h3 class="anchored" data-anchor-id="raw-test-log">Raw test log</h3>
+<p>Check the following pages: <!-- TODO: add the markdown iframe to graph.html --></p>
+<section id="typical-examples" class="level4">
+<h4 class="anchored" data-anchor-id="typical-examples">Typical Examples:</h4>
+<p><strong>in_class_example_1.bril/liveness</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://htmlpreview.github.io/?https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/main/HW3/output/in_class_example_1.bril/liveness/in_class_example_1.html"><img src="https://github.com/user-attachments/assets/5d198551-af77-4b87-82e7-c27b7b1f5962.png" class="img-fluid figure-img" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+<p><strong>in_class_example_3.bril/busy</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://htmlpreview.github.io/?https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/main/HW3/output/in_class_example_3.bril/busy/in_class_example_3.html"><img src="https://github.com/user-attachments/assets/5278828a-171e-4b81-9c38-3411a36ce964.png" class="img-fluid figure-img" alt="image"></a></p>
+<figcaption>image</figcaption>
+</figure>
+</div>
+</section>
+</section>
+</section>
+<section id="conclusion-1" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion-1">Conclusion</h2>
+<p>The dataflow analysis framework for Bril successfully implements liveness, availability, and busy expressions analyses, all of which are foundational for key compiler optimizations. Trivial Dead Code Elimination (DCE) and Local Value Numbering (LVN) will extremely benefit from these analyses by eliminating redundant computations and identifying unused variables.</p>
+<p>The testing of the framework on various Bril programs—ranging from simple in-class examples to more complex benchmark scripts—demonstrates that the analyses work correctly and efficiently. The interactive visualizations of the control flow graph (CFG) and associated dataflow sets provide valuable insights, making it easier to verify correctness and identify optimization opportunities.</p>
+<p>This project establishes a strong foundation for performing local optimizations on intermediate representations like Bril. Future work could extend the framework to handle interprocedural analyses, multi-block optimizations, or more advanced global dataflow analyses. By further refining these optimizations, we can significantly enhance the efficiency of compiled programs.</p>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/normrubin\.github\.io\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="pagination-link" aria-label="Homework 2: Optimizing with DCE and LVN">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 2: Optimizing with DCE and LVN</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="pagination-link" aria-label="Homework 1">
+        <span class="nav-page-text">Homework 1</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><a href="https://normrubin.github.io/">EECS 7398 website</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+<script>videojs(video_shortcode_videojs_video1);</script>
+
+
+
+
+</body></html>

@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Qucheng Jiang">
+<meta name="author" content="Michael Maurer">
 
-<title>Homework 2: Optimizing with DCE and LVN – EECE7398 Fall 2024</title>
+<title>EECE7309 Homework 3 – Data Flow – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,8 +65,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" rel="next">
-<link href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" rel="prev">
+<link href="../../blogs/oscar/2024-09-20-HW1.html" rel="next">
+<link href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -104,7 +104,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta property="og:title" content="Homework 2: Optimizing with DCE and LVN – EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7309 Homework 3 – Data Flow – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -118,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html">Homework 2: Optimizing with DCE and LVN</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html">EECE7309 Homework 3 – Data Flow</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -245,13 +245,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Michael</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
@@ -266,7 +266,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">EECE7309 Homework 3 – Data Flow</span></a>
   </div>
 </li>
@@ -303,13 +303,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Qucheng</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
@@ -318,7 +318,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2: Optimizing with DCE and LVN</span></a>
   </div>
 </li>
@@ -703,9 +703,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html">Homework 2: Optimizing with DCE and LVN</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html">EECE7309 Homework 3 – Data Flow</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 2: Optimizing with DCE and LVN</h1>
+<h1 class="title">EECE7309 Homework 3 – Data Flow</h1>
 </div>
 
 
@@ -715,7 +715,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Qucheng Jiang </p>
+             <p>Michael Maurer </p>
           </div>
   </div>
     
@@ -730,208 +730,399 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This assignment aims to implement two key local optimizations for the Bril intermediate language: Trivial Dead Code Elimination (DCE) and Local Value Numbering (LVN). These optimizations enhance the efficiency of Bril programs by removing unnecessary instructions and consolidating equivalent expressions. This report outlines the development process, testing methodology, and analysis of the implemented optimizations.</p>
+<p>This assignment asks us to investigate data flow analysis algorithms. Here, we discuss the algorithm implemented, and describe the process of developing this code. We primarily investigate “reaching definitions” here. Further, this code defines an <code>Analysis</code> class which allows the user to decelare a merge and transfer function for data flow analysis, and further allows them to indicate whether the analysis is forward or reverse. This was considered extra credit for this assignment.</p>
 </section>
-<section id="detail-design" class="level2">
-<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
-<p><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW2"><strong>Code</strong></a>: For details, check the code repository.</p>
-<section id="abstraction-classes" class="level3">
-<h3 class="anchored" data-anchor-id="abstraction-classes">Abstraction Classes</h3>
-<p>The core of the Bril language representation in this project is implemented in the <code>bril_model/_bril_struct.py</code> file. This module provides a structured and object-oriented way to represent Bril programs (<code>BrilScript</code>), functions (<code>BrilFunction</code>), and instructions (<code>BrilInstruction</code>). Each Bril instruction is modeled as a Python object, enabling intuitive manipulation and transformation of the program during optimization.</p>
-<p>The primary classes include:</p>
-<p><strong>Bril Program</strong>: Represents the entire Bril program, containing multiple functions.</p>
-<p><strong>Bril Function</strong>: Encapsulates a sequence of instructions and metadata for a function within the program.</p>
-<p><strong>Bril Instruction</strong>: Models individual instructions, differentiating between operations (e.g., addition, multiplication) and effectful statements (e.g., print).</p>
-<p>First, the <code>BrilInstruction</code> class is the base class for all instructions. Its constructor accepts a dictionary <code>raw</code> and deeply copies its contents into the instance variable <code>_raw</code>. It also initializes a mark dictionary <code>_marks</code> to track whether the instruction has been deleted, modified, or replaced. The constructor also checks whether the key in the raw dictionary is in the allowed key set <code>AVAILABLE_KEYS</code>, and throws <code>NotImplementedError</code> if there is an unrecognized key. The class also defines a series of properties and methods for accessing and modifying various parts of the instruction, such as <code>dest</code>, <code>type</code>, <code>op</code>, <code>args</code>, etc.</p>
-<p>Next are several subclasses inherited from <code>BrilInstruction</code>, which handle different types of instructions. The <code>BrilInstruction_Const</code> class is used to handle constant instructions. It checks whether the opcode is const in the constructor and verifies whether the key in the dictionary is in the allowed set. The <code>BrilInstruction_Label</code> class is used to handle label instructions. It checks whether the label exists in the constructor and verifies the key in the dictionary. The <code>BrilInstruction_ValOp</code> class is used to handle operation instructions with a return value. It checks whether the opcode is in the allowed set and verifies the key in the dictionary in the constructor. The <code>BrilInstruction_EffOp</code> class is used to handle operation instructions without a return value. It performs similar checks and verifications in the constructor.</p>
-<p>The <code>BrilFunction</code> class is used to represent a Bril function. Its constructor accepts a dictionary raw and extracts the instruction list <code>instrs</code> from it, converting each instruction into a corresponding <code>BrilInstruction</code> subclass instance. It also checks whether the key in the dictionary is in the allowed set. The class also defines some properties and methods for accessing and modifying various parts of the function, such as <code>name</code>, <code>type</code>, <code>args</code>, etc.</p>
-<p>Finally, the <code>BrilScript</code> class is used to represent a Bril script. Its constructor accepts a dictionary <code>raw</code> and extracts the function list <code>functions</code> from it, converting each function into a <code>BrilFunction</code> instance. It also checks whether the key in the dictionary is in the allowed set. The class also defines some properties and methods for accessing and modifying various parts of the script, such as <code>functions</code>, etc.</p>
-<p>Together, these classes form a framework for processing Bril language instructions and scripts, providing a wealth of properties and methods to access and modify various parts of instructions and scripts.</p>
+<section id="reaching-definitions" class="level2">
+<h2 class="anchored" data-anchor-id="reaching-definitions">Reaching Definitions</h2>
+<p>We wish to analyze whether a definition “reaches” a particular part of the program. This allows us to determine what definitions have a valid path to arrive at a specific block in the program. This can be very helpful for other optimizations such as dead code elimination. Reaching definition data flow analysis is a forward DFA algorithm, and employs a “may” merger strategy (i.e.&nbsp;a union). At a high level, this algorithm determines what definitions may reach the start of a basic block, and determines which definitions may leave the block, which can be deduced to the definitions at the start of the block minus those definitions which were killed (generally by reassignments).</p>
 </section>
-<section id="trivial-dead-code-elimination-dce" class="level3">
-<h3 class="anchored" data-anchor-id="trivial-dead-code-elimination-dce">Trivial Dead Code Elimination (DCE)</h3>
-<p>The Trivial-DCE implementation is encapsulated in <code>tdce.py</code>. This script scans through the instructions of a Bril function and removes any instructions whose results are not used before being overwritten. The optimization process involves:</p>
-<p>The <code>trivial_dce_once</code> function performs a dead code elimination operation. It traverses all instructions in the function, collects all used variables, and marks unused instructions for deletion. Then, it updates the function’s instruction list, deletes the instructions marked for deletion, and returns a Boolean value indicating whether the instruction is deleted.</p>
-<p>The <code>trivial_dce</code> function is a loop that repeatedly calls the <code>trivial_dce_once</code> function until no more instructions are deleted.</p>
-<p>The <code>_block_mark_reassign_before_use</code> function deletes instructions that are reassigned before use within a single basic block. It maintains a dictionary to track the most recent unused assignment instructions and deletes old assignment instructions before reassignment is found.</p>
-<p>The <code>rm_reassign_before_use</code> function traverses all basic blocks of the function, calls the _block_mark_reassign_before_use function to delete instructions that are reassigned before use, and updates the function’s instruction list.</p>
-<p>The <code>trivial_dce_plus</code> function combines function-level dead code elimination with instruction removal before reassignment until there are no more instructions to remove.</p>
-<p>This straightforward approach efficiently eliminates redundant calculations, contributing to a cleaner and faster program.</p>
+<section id="challenges-faced" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced">Challenges Faced</h2>
+<p>There were a couple of challenges which I faced developing this code. The first was in determining how to represent the CFG of a given program. The previous assignments did leverage basic blocks, but only limited interconnection of them. As such, I was able to get by without defining more formal structures. In this assignment, I formalized this structure as one typically does with a graph. This is not inherently a difficult task, however this is the first time I have done so in Python and as such neglected how some common types are passed around, namely whether they are copies or references. I wrote the code under the assumption that they were copies initially, but this introduced a handful of bugs into my code which were not immediately clear. I also learned this the hard way when defining the data flow analysis algorithm itself. This proved particularly confusing when analyzing code with loops.</p>
+<p>Another challenge I incurred was perhaps one of mistaken thought, where I had convinced myself that calls and returns would need to be handled for this analysis. What I neglected to realize is that at a call or return, the scope changes, and therefore this DFA does not really need to work across functions. The only scenario where this would be necessary is with some kind of global variable, which appears to be out of scope of this type of analysis. So, this was a bit of a tangent I sent myself on.</p>
 </section>
-<section id="local-value-numbering-lvn" class="level3">
-<h3 class="anchored" data-anchor-id="local-value-numbering-lvn">Local Value Numbering (LVN)</h3>
-<p>Local Value Numbering optimization is implemented in <code>lvn.py</code>, LVN assigns unique numbers to distinct computations to detect and eliminate redundant expressions within a single block. Key steps include:</p>
-<p><strong>Numbering Expressions</strong>: LVN assigns a unique identifier to each distinct computation. This identifier, or value number, is used to track expressions within a block. If an identical computation is encountered later, the existing value number is reused, eliminating the need to recompute the expression. For example, if the expression <code>a + b</code> is already computed and assigned a value number, any subsequent occurrence of <code>a + b</code> will directly use the same value number instead of recalculating the result.</p>
-<p><strong>Simplification and Substitution</strong>: The script replaces redundant operations with precomputed values or previously assigned variables, reducing the number of cpu-intense operations in the block. This is done by looking up the value number table for existing computations and substituting them wherever possible. By minimizing redundant calculations, LVN not only optimizes runtime performance but also simplifies the code.</p>
-<p><strong>Constant Folding</strong>: Constant folding is a compile-time optimization technique that evaluates expressions with known constant values. For instance, an expression like <code>const 2 + const 3</code> is directly replaced with <code>const 5</code>. In the script, a dictionary named <code>FOLDABLE_OPS</code> maps operation names (e.g., <code>add</code>, <code>mul</code>, <code>sub</code>) to their respective lambda functions that perform the computation. When the LVN process encounters an expression with constant arguments, it applies the corresponding function to compute the result immediately. <em>Credit: <a href="https://github.com/sampsyo/bril/blob/main/examples/lvn.py">Bril Official Example</a></em></p>
-<p><strong>Expression Tracking and Reuse</strong>: An <code>Expr</code> class is defined to uniquely represent computations in terms of operations and their arguments. This allows the LVN process to easily check if a computation has been previously performed and reuse the result if possible. The implementation also handles commutative operations (e.g., <code>add</code>, <code>mul</code>, <code>and</code>, <code>or</code>, <code>eq</code>) by normalizing the order of arguments, ensuring that expressions like <code>a + b</code> and <code>b + a</code> are recognized as identical.</p>
+<section id="implementation" class="level2">
+<h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
+<p>As mentioned above, this implementation analyzes whether a definiton reaches a particular part of the program. To do this, we define an algorithm which inspects every basic block in each function in the program. We determine, based on the definitions which enter the block, the definitions that exit the block.</p>
+<p>In more detail, we determine the definitions which enter the block as the union of all definitions exiting predecessor blocks to the given block (this is the <code>merge</code> step). Then, we determine what the outputs of the basic block are by overwriting any definitions found in <code>b_in</code> (the definitions which reach the block) of variables defined in the current block, which is to say that we overwrite the definitions killed by the current block. This is the <code>transfer</code> step. We iterate through all the basic blocks in the program, moving “forward” through the basic blocks, where forward is moving essentially forward through time in the program. At the end of each block’s analysis, if the outputs of the block have changed, we enqueue the successor blocks of the current block into our worklist. Once the outputs of the block cease to change, this analysis is complete and has converged (it is further provable that this algorithm always converges).</p>
+<p>The data structure in this analysis is a CFG, containing “Blocks” which are defined as follows:</p>
+<div id="6506816b" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Block:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, instrs: <span class="bu">list</span>, <span class="bu">id</span>, preds: <span class="bu">set</span>, succs: <span class="bu">set</span>):</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.instrs <span class="op">=</span> instrs</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.<span class="bu">id</span> <span class="op">=</span> <span class="bu">id</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.preds <span class="op">=</span> preds</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.succs <span class="op">=</span> succs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Further, this code was designed to be compatible with other analyses. It does so by definining the following class:</p>
+<div id="506be82a" class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Analysis():</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, forward: <span class="bu">bool</span>, merge: Callable[<span class="bu">list</span>, <span class="bu">list</span>], transfer: Callable[[<span class="bu">dict</span>, blocks.Block], <span class="bu">dict</span>]):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.forward <span class="op">=</span> forward</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.init <span class="op">=</span> init</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.merge <span class="op">=</span> merge</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transfer <span class="op">=</span> transfer</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> merge(<span class="va">self</span>, b_ins: <span class="bu">list</span>):</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.merge(b_ins)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> transfer(<span class="va">self</span>, b_in: <span class="bu">dict</span>, block: blocks.Block):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.transfer(b_in, block)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> data_flow(<span class="va">self</span>, blocks):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        ... <span class="co"># See linked code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">Testing</h2>
+<p>I tested this program on four programs, two of my own, and two found in Bril’s benchmark suite. One of the programs I experimented with was <code>quadratic.bril</code>, which is rather long, and as such I have put those results in the appendix of this blog.</p>
+<p>The most basic test case was the following code:</p>
+<pre class="{bril}"><code># sample.bril
+@main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add a b;
+    prod: int = mul sum1 sum2;
+    prod2: int = mul sum1 sum2;
+    print prod;
+}</code></pre>
+<p>This code only contains one basic block, and produces fairly trivial results, shown below.</p>
+<pre><code>printing blocks
+.start 
+ Instructions: [{'dest': 'a', 'op': 'const', 'type': 'int', 'value': 4}, {'dest': 'b', 'op': 'const', 'type': 'int', 'value': 2}, {'args': ['a', 'b'], 'dest': 'sum1', 'op': 'add', 'type': 'int'}, {'args': ['a', 'b'], 'dest': 'sum2', 'op': 'add', 'type': 'int'}, {'args': ['sum1', 'sum2'], 'dest': 'prod', 'op': 'mul', 'type': 'int'}, {'args': ['sum1', 'sum2'], 'dest': 'prod2', 'op': 'mul', 'type': 'int'}, {'args': ['prod'], 'op': 'print'}]
+ ID: .start
+ Predecessors: set()
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'a': ['.start_0'], 'b': ['.start_1'], 'sum1': ['.start_2'], 'sum2': ['.start_3'], 'prod': ['.start_4'], 'prod2': ['.start_5']}</code></pre>
+<p>The next program introduced branching control flow:</p>
+<pre class="{bril}"><code># test
+@main(a: int) {
+  v1: int = const 1;
+  cond: bool = lt v1 x;
+  br cond .then.0 .else.0;
+.then.0:
+  v2: int = id x;
+  jmp .print;
+.else.0:
+  v3: int = id x;
+  v4: int = const 1;
+  v2: int = sub v3 v4;
+.print:
+  print v2;
+}</code></pre>
+<p>This correctly produced the following result:</p>
+<pre><code>printing blocks
+then.0 
+ Instructions: [{'args': ['cond'], 'labels': ['then.0', 'else.0'], 'op': 'br'}, {'args': ['x'], 'dest': 'v2', 'op': 'id', 'type': 'int'}, {'labels': ['print'], 'op': 'jmp'}]
+ ID: then.0
+ Predecessors: {'.start'}
+ Successors: {'print'}
+
+printing blocks
+else.0 
+ Instructions: [{'args': ['cond'], 'labels': ['then.0', 'else.0'], 'op': 'br'}, {'args': ['x'], 'dest': 'v3', 'op': 'id', 'type': 'int'}, {'dest': 'v4', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v3', 'v4'], 'dest': 'v2', 'op': 'sub', 'type': 'int'}]
+ ID: else.0
+ Predecessors: {'.start'}
+ Successors: {'print'}
+
+printing blocks
+.start 
+ Instructions: [{'dest': 'v1', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v1', 'x'], 'dest': 'cond', 'op': 'lt', 'type': 'bool'}, {'args': ['cond'], 'labels': ['then.0', 'else.0'], 'op': 'br'}]
+ ID: .start
+ Predecessors: set()
+ Successors: {'else.0', 'then.0'}
+
+printing blocks
+print 
+ Instructions: [{'labels': ['print'], 'op': 'jmp'}, {'args': ['v2'], 'op': 'print'}]
+ ID: print
+ Predecessors: {'else.0', 'then.0'}
+ Successors: set()
+
+
+block_id:  then.0
+in_edges:  {'v1': ['.start_0'], 'cond': ['.start_1']}
+out_edges:  {'v1': ['.start_0'], 'cond': ['.start_1'], 'v2': ['then.0_1']}
+
+block_id:  else.0
+in_edges:  {'v1': ['.start_0'], 'cond': ['.start_1']}
+out_edges:  {'v1': ['.start_0'], 'cond': ['.start_1'], 'v3': ['else.0_1'], 'v4': ['else.0_2'], 'v2': ['else.0_3']}
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'v1': ['.start_0'], 'cond': ['.start_1']}
+
+block_id:  print
+in_edges:  {'v1': ['.start_0'], 'cond': ['.start_1'], 'v3': ['else.0_1'], 'v4': ['else.0_2'], 'v2': ['else.0_3', 'then.0_1']}
+out_edges:  {'v3': ['else.0_1'], 'v4': ['else.0_2'], 'v2': ['else.0_3', 'then.0_1'], 'v1': ['.start_0'], 'cond': ['.start_1']}</code></pre>
+<p>As we can see, the in and out edges for each block are what we expect. The key observation is in the final <code>print</code> block, definitions from both branches are “reaching”.</p>
+<p>For a more complex example, we examined the <code>loopfact.bril</code> benchmark from the bril repository.</p>
+<pre class="{bril}"><code># ARGS: 8
+@main(input: int) {
+  value: int = id input;
+  v1: int = const 1;
+  result: int = id v1;
+  v3: int = id value;
+  i: int = id v3;
+.for.cond.2:
+  v4: int = id i;
+  v5: int = const 0;
+  v6: bool = gt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: int = id result;
+  v8: int = id i;
+  v9: int = mul v7 v8;
+  result: int = id v9;
+  v10: int = id i;
+  v11: int = const 1;
+  v12: int = sub v10 v11;
+  i: int = id v12;
+  jmp .for.cond.2;
+.for.end.2:
+  v13: int = id result;
+  print v13;
+  v14: int = const 0;
+}</code></pre>
+<p>This code contains a loop, which is a good test for our analysis. What we expect is all definitions reach the final <code>.for.end.2</code> block, all definitions except for those in <code>.for.end.2</code> reach the blocks <code>.for.cond.2</code> and <code>.for.body.2</code>, and no definitions reach the start of <code>.start</code>. Further, we expect for <code>.for.body.2</code> to kill the definitions of <code>i</code> and <code>result</code> which will enter the block. No other blocks should kill instructions.</p>
+<p>We show that the expected results are generated by our program:</p>
+<pre><code>printing blocks
+.start 
+ Instructions: [{'args': ['input'], 'dest': 'value', 'op': 'id', 'type': 'int'}, {'dest': 'v1', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v1'], 'dest': 'result', 'op': 'id', 'type': 'int'}, {'args': ['value'], 'dest': 'v3', 'op': 'id', 'type': 'int'}, {'args': ['v3'], 'dest': 'i', 'op': 'id', 'type': 'int'}]
+ ID: .start
+ Predecessors: set()
+ Successors: {'for.cond.2'}
+
+printing blocks
+for.cond.2 
+ Instructions: [{'args': ['i'], 'dest': 'v4', 'op': 'id', 'type': 'int'}, {'dest': 'v5', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['v4', 'v5'], 'dest': 'v6', 'op': 'gt', 'type': 'bool'}, {'args': ['v6'], 'labels': ['for.body.2', 'for.end.2'], 'op': 'br'}]
+ ID: for.cond.2
+ Predecessors: {'for.body.2', '.start'}
+ Successors: {'for.end.2', 'for.body.2'}
+
+printing blocks
+for.body.2 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.2', 'for.end.2'], 'op': 'br'}, {'args': ['result'], 'dest': 'v7', 'op': 'id', 'type': 'int'}, {'args': ['i'], 'dest': 'v8', 'op': 'id', 'type': 'int'}, {'args': ['v7', 'v8'], 'dest': 'v9', 'op': 'mul', 'type': 'int'}, {'args': ['v9'], 'dest': 'result', 'op': 'id', 'type': 'int'}, {'args': ['i'], 'dest': 'v10', 'op': 'id', 'type': 'int'}, {'dest': 'v11', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v10', 'v11'], 'dest': 'v12', 'op': 'sub', 'type': 'int'}, {'args': ['v12'], 'dest': 'i', 'op': 'id', 'type': 'int'}, {'labels': ['for.cond.2'], 'op': 'jmp'}]
+ ID: for.body.2
+ Predecessors: {'for.cond.2'}
+ Successors: {'for.cond.2'}
+
+printing blocks
+for.end.2 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.2', 'for.end.2'], 'op': 'br'}, {'args': ['result'], 'dest': 'v13', 'op': 'id', 'type': 'int'}, {'args': ['v13'], 'op': 'print'}, {'dest': 'v14', 'op': 'const', 'type': 'int', 'value': 0}]
+ ID: for.end.2
+ Predecessors: {'for.cond.2'}
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2'], 'v3': ['.start_3'], 'i': ['.start_4']}
+
+block_id:  for.cond.2
+in_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7']}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2']}
+
+block_id:  for.body.2
+in_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2']}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'v3': ['.start_3'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'result': ['for.body.2_4'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'i': ['for.body.2_8']}
+
+block_id:  for.end.2
+in_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2']}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2'], 'v13': ['for.end.2_1'], 'v14': ['for.end.2_3']}</code></pre>
+<p>We further tested with the <code>quadratic.bril</code> program, and results for that test may be found in the appendix. This program contains multiple functions, loops, and branches, however is not especially interesting for this analysis as there is only one instance of a definition being killed (in the <code>.endif.7</code> block).</p>
 </section>
-<section id="integration-and-testing" class="level2">
-<h2 class="anchored" data-anchor-id="integration-and-testing">Integration and Testing</h2>
-<p>The <code>brench</code> tool is used for batch testing both optimizations across a variety of Bril programs. The <code>brench_test_lvn.toml</code> and <code>brench_test_tdce.toml</code> configuration files specify the programs and expected results for LVN and DCE tests, respectively. This ensures that both optimizations work correctly and consistently.</p>
-<p>As defined in <code>brench_test_lvn.toml</code>, we specifies the path to the Bril benchmark programs to be tested, which are all the <code>*.bril</code> located in the <code>../bril/benchmarks/core/</code>.</p>
-<p>The configuration file defines multiple test run pipelines, each of which is defined in the <code>[runs.&lt;name&gt;]</code> section. Each pipeline contains a pipeline field that lists the sequence of commands to be executed.</p>
-<p>The <code>baseline</code> pipeline is a baseline test without any optimization. It first converts the Bril program to JSON format and then runs the program using the brili interpreter.</p>
-<p>The <code>hw2p1_s0</code> pipeline is used to test whether the input and output structures are correct, but it does not perform any optimization. The purpose of this pipeline is to test if the Bril Construction work has no bug in it.</p>
-<p>The <code>hw2p1_s1</code> pipeline tests simple dead code elimination optimization. It calls the <code>tdce.py</code> script and passes the <code>tdce</code> parameter to enable function-level dead code elimination.</p>
-<p>The <code>hw2p1_s2</code> pipeline tests the instruction removal optimization used before revalue. It calls the <code>tdce.py</code> script and passes the <code>raby</code> argument to enable the <code>rm_reassign_before_use</code> pass optimization.</p>
-<p>The <code>hw2p1_s3</code> pipeline combines function-level dead code elimination and instruction removal optimization used before revalue. It calls the <code>tdce.py</code> script and passes the <code>tdce+</code> argument to enable both optimizations.</p>
-<p>Each pipeline ultimately runs the optimized Bril program using the <code>brili</code> interpreter, passing arguments via the <code>-p {args}</code> option.</p>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<p>The code for this assignment is contained in a <a href="https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw3">public GitHub repository</a>. The code and testing code + results can be found in this repository.</p>
 </section>
-<section id="results-and-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="results-and-analysis">Results and Analysis</h2>
-<p>The optimizations were tested using <code>brench</code> tool, which verifies the correctness and performance of the implemented passes. The tool checks the <code>brili</code> Standard Output (<code>STDOUT</code>) for each test specification to ensure that the optimized programs produce the same results as their unoptimized counterparts. This rigorous testing confirms that the optimization passes do not alter the semantics of the Bril programs.</p>
-<p>The testing demonstrated significant improvements in reducing the number of executed instructions for each Bril program. Programs with redundant calculations and unused instructions were simplified, leading to a reduced instruction count and faster execution times (based on Instructions Executed reported by <code>brili -p</code>).</p>
-<p>For example, in the original benchmark <code>check-primes</code>, the program required <em>8,468</em> instructions to complete its execution. After applying the <code>hw2p1_s3</code> optimization pipeline (DCE-only), the number of instructions executed was reduced to <em>8,419</em>. Furthermore, using the <code>hw2p2_s2</code> optimization pipeline (LVN+DCE), the total instructions executed dropped significantly to <em>4,238</em>, representing a reduction to <em>50.05%</em> of the original execution time. This demonstrates the substantial impact of combining LVN and DCE optimizations on program efficiency.</p>
-<section id="raw-test-log" class="level3">
-<h3 class="anchored" data-anchor-id="raw-test-log">Raw test log</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> brench brench_test_tdce.toml</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">benchmark,run,result</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,baseline,229</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s0,229</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s1,228</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s2,229</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p1_s3,228</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,baseline,785</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s0,785</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s1,783</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s2,785</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p1_s3,783</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,baseline,104</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s0,104</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s1,103</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s2,104</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p1_s3,103</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,baseline,146</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s0,146</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s1,139</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s2,146</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p1_s3,139</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,baseline,116</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s0,116</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s1,115</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s2,116</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p1_s3,115</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,baseline,3038</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s0,3038</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s1,3036</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s2,3038</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p1_s3,3036</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,baseline,484</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s0,484</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s1,483</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s2,484</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p1_s3,483</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,baseline,558</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s0,558</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s1,555</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s2,558</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p1_s3,555</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,baseline,8468</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s0,8468</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s1,8419</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s2,8468</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p1_s3,8419</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,baseline,1690</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s0,1690</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s1,1689</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s2,1690</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p1_s3,1689</span></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,baseline,1923</span></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s0,1923</span></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s1,1914</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s2,1923</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p1_s3,1914</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,baseline,563</span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s0,563</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s1,562</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s2,563</span></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p1_s3,562</span></span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,baseline,574100</span></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s0,574100</span></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s1,574100</span></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s2,574100</span></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p1_s3,574100</span></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,baseline,5018</span></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s0,5018</span></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s1,5018</span></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s2,5018</span></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p1_s3,5018</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,baseline,133</span></span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s0,133</span></span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s1,130</span></span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s2,133</span></span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p1_s3,130</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> brench brench_test_lvn.toml</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">benchmark,run,result</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,baseline,229</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p2_s1,229</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">fact,hw2p2_s2,167</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">is-decreasing,baseline,127</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">is-decreasing,hw2p2_s1,127</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">is-decreasing,hw2p2_s2,123</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,baseline,785</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p2_s1,785</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">quadratic,hw2p2_s2,500</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,baseline,104</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p2_s1,104</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">recfact,hw2p2_s2,64</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ex">fizz-buzz,baseline,3652</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ex">fizz-buzz,hw2p2_s1,3652</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="ex">fizz-buzz,hw2p2_s2,2103</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,baseline,146</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p2_s1,146</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="ex">pascals-row,hw2p2_s2,68</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,baseline,116</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p2_s1,116</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ex">loopfact,hw2p2_s2,78</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ex">reverse,baseline,46</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ex">reverse,hw2p2_s1,46</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="ex">reverse,hw2p2_s2,38</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,baseline,3038</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p2_s1,3038</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-sq-diff,hw2p2_s2,1717</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,baseline,484</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p2_s1,484</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="ex">birthday,hw2p2_s2,278</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,baseline,558</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p2_s1,558</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="ex">mod_inv,hw2p2_s2,304</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,baseline,8468</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p2_s1,8468</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="ex">check-primes,hw2p2_s2,4238</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,baseline,1690</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p2_s1,1690</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="ex">bitwise-ops,hw2p2_s2,1689</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,baseline,1923</span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p2_s1,1923</span></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="ex">relative-primes,hw2p2_s2,1207</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,baseline,563</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p2_s1,563</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="ex">euclid,hw2p2_s2,272</span></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,baseline,574100</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p2_s1,574100</span></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="ex">primes-between,hw2p2_s2,571439</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="ex">perfect,baseline,232</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="ex">perfect,hw2p2_s1,232</span></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="ex">perfect,hw2p2_s2,231</span></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="ex">bitshift,baseline,167</span></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="ex">bitshift,hw2p2_s1,167</span></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="ex">bitshift,hw2p2_s2,104</span></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,baseline,5018</span></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p2_s1,5018</span></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="ex">sum-check,hw2p2_s2,5018</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,baseline,133</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p2_s1,133</span></span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="ex">armstrong,hw2p2_s2,130</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>The implementation successfully optimizes Bril programs through Trivial Dead Code Elimination and Local Value Numbering. Both techniques were integrated and tested using brench, confirming their effectiveness. Future work could focus on extending these optimizations to handle more complex cases, such as multi-block programs and interprocedural optimizations.</p>
-<p>This project demonstrates the power of local optimizations in streamlining intermediate representations and serves as a solid foundation for further exploration of compiler optimization techniques.</p>
+<section id="appendix" class="level2">
+<h2 class="anchored" data-anchor-id="appendix">Appendix</h2>
+<pre class="{bril}"><code># quadratic.bril
+# ARGS: -5 8 21
+@main(a: int, b: int, c: int) {
+  call @quadratic a b c;
+}
+
+@sqrt(x: int): int {
+  v1: int = const 1;
+  i: int = id v1;
+.for.cond.0:
+  v2: int = id i;
+  v3: int = id x;
+  v4: int = const 1;
+  v5: int = sub v3 v4;
+  v6: bool = lt v2 v5;
+  br v6 .for.body.0 .for.end.0;
+.for.body.0:
+  v8: int = id i;
+  v9: int = id i;
+  v10: int = mul v8 v9;
+  v11: int = id x;
+  v12: bool = ge v10 v11;
+  br v12 .then.7 .else.7;
+.then.7:
+  v13: int = id i;
+  ret v13;
+.else.7:
+.endif.7:
+  v14: int = id i;
+  v15: int = const 1;
+  v16: int = add v14 v15;
+  i: int = id v16;
+  jmp .for.cond.0;
+.for.end.0:
+  v17: int = const 0;
+  ret v17;
+}
+
+@quadratic(a: int, b: int, c: int) {
+  v0: int = id b;
+  v1: int = id b;
+  v2: int = mul v0 v1;
+  v3: int = const 4;
+  v4: int = id a;
+  v5: int = mul v3 v4;
+  v6: int = id c;
+  v7: int = mul v5 v6;
+  v8: int = sub v2 v7;
+  s: int = id v8;
+  v9: int = const 2;
+  v10: int = id a;
+  v11: int = mul v9 v10;
+  d: int = id v11;
+  v12: int = const 0;
+  v13: int = id b;
+  v14: int = sub v12 v13;
+  v15: int = id s;
+  v16: int = call @sqrt v15;
+  v17: int = add v14 v16;
+  r1: int = id v17;
+  v18: int = const 0;
+  v19: int = id b;
+  v20: int = sub v18 v19;
+  v21: int = id s;
+  v22: int = call @sqrt v21;
+  v23: int = sub v20 v22;
+  r2: int = id v23;
+  v24: int = id r1;
+  v25: int = id d;
+  v26: int = div v24 v25;
+  print v26;
+  v27: int = const 0;
+  v28: int = id r2;
+  v29: int = id d;
+  v30: int = div v28 v29;
+  print v30;
+  v31: int = const 0;
+}</code></pre>
+<p>Results:</p>
+<pre><code>printing blocks
+.start 
+ Instructions: [{'args': ['a', 'b', 'c'], 'funcs': ['quadratic'], 'op': 'call'}]
+ ID: .start
+ Predecessors: set()
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {}
+
+printing blocks
+.start 
+ Instructions: [{'dest': 'v1', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v1'], 'dest': 'i', 'op': 'id', 'type': 'int'}]
+ ID: .start
+ Predecessors: set()
+ Successors: {'for.cond.0'}
+
+printing blocks
+for.cond.0 
+ Instructions: [{'args': ['i'], 'dest': 'v2', 'op': 'id', 'type': 'int'}, {'args': ['x'], 'dest': 'v3', 'op': 'id', 'type': 'int'}, {'dest': 'v4', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v3', 'v4'], 'dest': 'v5', 'op': 'sub', 'type': 'int'}, {'args': ['v2', 'v5'], 'dest': 'v6', 'op': 'lt', 'type': 'bool'}, {'args': ['v6'], 'labels': ['for.body.0', 'for.end.0'], 'op': 'br'}]
+ ID: for.cond.0
+ Predecessors: {'.start', 'endif.7'}
+ Successors: {'for.body.0', 'for.end.0'}
+
+printing blocks
+for.body.0 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.0', 'for.end.0'], 'op': 'br'}, {'args': ['i'], 'dest': 'v8', 'op': 'id', 'type': 'int'}, {'args': ['i'], 'dest': 'v9', 'op': 'id', 'type': 'int'}, {'args': ['v8', 'v9'], 'dest': 'v10', 'op': 'mul', 'type': 'int'}, {'args': ['x'], 'dest': 'v11', 'op': 'id', 'type': 'int'}, {'args': ['v10', 'v11'], 'dest': 'v12', 'op': 'ge', 'type': 'bool'}, {'args': ['v12'], 'labels': ['then.7', 'else.7'], 'op': 'br'}]
+ ID: for.body.0
+ Predecessors: {'for.cond.0'}
+ Successors: {'then.7', 'else.7'}
+
+printing blocks
+for.end.0 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.0', 'for.end.0'], 'op': 'br'}, {'dest': 'v17', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['v17'], 'op': 'ret'}]
+ ID: for.end.0
+ Predecessors: {'for.cond.0'}
+ Successors: set()
+
+printing blocks
+then.7 
+ Instructions: [{'args': ['v12'], 'labels': ['then.7', 'else.7'], 'op': 'br'}, {'args': ['i'], 'dest': 'v13', 'op': 'id', 'type': 'int'}, {'args': ['v13'], 'op': 'ret'}]
+ ID: then.7
+ Predecessors: {'for.body.0'}
+ Successors: set()
+
+printing blocks
+else.7 
+ Instructions: [{'args': ['v12'], 'labels': ['then.7', 'else.7'], 'op': 'br'}]
+ ID: else.7
+ Predecessors: {'for.body.0'}
+ Successors: {'endif.7'}
+
+printing blocks
+endif.7 
+ Instructions: [{'args': ['i'], 'dest': 'v14', 'op': 'id', 'type': 'int'}, {'dest': 'v15', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v14', 'v15'], 'dest': 'v16', 'op': 'add', 'type': 'int'}, {'args': ['v16'], 'dest': 'i', 'op': 'id', 'type': 'int'}, {'labels': ['for.cond.0'], 'op': 'jmp'}]
+ ID: endif.7
+ Predecessors: {'else.7'}
+ Successors: {'for.cond.0'}
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1']}
+
+block_id:  for.cond.0
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4']}
+
+block_id:  for.body.0
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+
+block_id:  for.end.0
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v17': ['for.end.0_1']}
+
+block_id:  then.7
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v13': ['then.7_1']}
+
+block_id:  else.7
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+
+block_id:  endif.7
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+out_edges:  {'v1': ['.start_0'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'i': ['endif.7_3']}
+
+printing blocks
+.start 
+ Instructions: [{'args': ['b'], 'dest': 'v0', 'op': 'id', 'type': 'int'}, {'args': ['b'], 'dest': 'v1', 'op': 'id', 'type': 'int'}, {'args': ['v0', 'v1'], 'dest': 'v2', 'op': 'mul', 'type': 'int'}, {'dest': 'v3', 'op': 'const', 'type': 'int', 'value': 4}, {'args': ['a'], 'dest': 'v4', 'op': 'id', 'type': 'int'}, {'args': ['v3', 'v4'], 'dest': 'v5', 'op': 'mul', 'type': 'int'}, {'args': ['c'], 'dest': 'v6', 'op': 'id', 'type': 'int'}, {'args': ['v5', 'v6'], 'dest': 'v7', 'op': 'mul', 'type': 'int'}, {'args': ['v2', 'v7'], 'dest': 'v8', 'op': 'sub', 'type': 'int'}, {'args': ['v8'], 'dest': 's', 'op': 'id', 'type': 'int'}, {'dest': 'v9', 'op': 'const', 'type': 'int', 'value': 2}, {'args': ['a'], 'dest': 'v10', 'op': 'id', 'type': 'int'}, {'args': ['v9', 'v10'], 'dest': 'v11', 'op': 'mul', 'type': 'int'}, {'args': ['v11'], 'dest': 'd', 'op': 'id', 'type': 'int'}, {'dest': 'v12', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['b'], 'dest': 'v13', 'op': 'id', 'type': 'int'}, {'args': ['v12', 'v13'], 'dest': 'v14', 'op': 'sub', 'type': 'int'}, {'args': ['s'], 'dest': 'v15', 'op': 'id', 'type': 'int'}, {'args': ['v15'], 'dest': 'v16', 'funcs': ['sqrt'], 'op': 'call', 'type': 'int'}, {'args': ['v14', 'v16'], 'dest': 'v17', 'op': 'add', 'type': 'int'}, {'args': ['v17'], 'dest': 'r1', 'op': 'id', 'type': 'int'}, {'dest': 'v18', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['b'], 'dest': 'v19', 'op': 'id', 'type': 'int'}, {'args': ['v18', 'v19'], 'dest': 'v20', 'op': 'sub', 'type': 'int'}, {'args': ['s'], 'dest': 'v21', 'op': 'id', 'type': 'int'}, {'args': ['v21'], 'dest': 'v22', 'funcs': ['sqrt'], 'op': 'call', 'type': 'int'}, {'args': ['v20', 'v22'], 'dest': 'v23', 'op': 'sub', 'type': 'int'}, {'args': ['v23'], 'dest': 'r2', 'op': 'id', 'type': 'int'}, {'args': ['r1'], 'dest': 'v24', 'op': 'id', 'type': 'int'}, {'args': ['d'], 'dest': 'v25', 'op': 'id', 'type': 'int'}, {'args': ['v24', 'v25'], 'dest': 'v26', 'op': 'div', 'type': 'int'}, {'args': ['v26'], 'op': 'print'}, {'dest': 'v27', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['r2'], 'dest': 'v28', 'op': 'id', 'type': 'int'}, {'args': ['d'], 'dest': 'v29', 'op': 'id', 'type': 'int'}, {'args': ['v28', 'v29'], 'dest': 'v30', 'op': 'div', 'type': 'int'}, {'args': ['v30'], 'op': 'print'}, {'dest': 'v31', 'op': 'const', 'type': 'int', 'value': 0}]
+ ID: .start
+ Predecessors: set()
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'v0': ['.start_0'], 'v1': ['.start_1'], 'v2': ['.start_2'], 'v3': ['.start_3'], 'v4': ['.start_4'], 'v5': ['.start_5'], 'v6': ['.start_6'], 'v7': ['.start_7'], 'v8': ['.start_8'], 's': ['.start_9'], 'v9': ['.start_10'], 'v10': ['.start_11'], 'v11': ['.start_12'], 'd': ['.start_13'], 'v12': ['.start_14'], 'v13': ['.start_15'], 'v14': ['.start_16'], 'v15': ['.start_17'], 'v16': ['.start_18'], 'v17': ['.start_19'], 'r1': ['.start_20'], 'v18': ['.start_21'], 'v19': ['.start_22'], 'v20': ['.start_23'], 'v21': ['.start_24'], 'v22': ['.start_25'], 'v23': ['.start_26'], 'r2': ['.start_27'], 'v24': ['.start_28'], 'v25': ['.start_29'], 'v26': ['.start_30'], 'v27': ['.start_32'], 'v28': ['.start_33'], 'v29': ['.start_34'], 'v30': ['.start_35'], 'v31': ['.start_37']}</code></pre>
 
 
 </section>
@@ -1359,13 +1550,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="pagination-link" aria-label="Homework 1: Exploring Bril">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 1: Exploring Bril</span>
+      <a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" class="pagination-link" aria-label="EECE7309 Homework 2 -- Local Optimizations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">EECE7309 Homework 2 – Local Optimizations</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" class="pagination-link" aria-label="Homework 3: Data Flow">
-        <span class="nav-page-text">Homework 3: Data Flow</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/oscar/2024-09-20-HW1.html" class="pagination-link" aria-label="HW1 - Trying Out Bril">
+        <span class="nav-page-text">HW1 - Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
