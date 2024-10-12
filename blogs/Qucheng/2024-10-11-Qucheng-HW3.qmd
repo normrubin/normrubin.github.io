@@ -11,12 +11,8 @@ This assignment focuses on implementing dataflow analysis for the Bril intermedi
 
 The report details the design of a flexible framework for these analyses, the implementation strategy for each type of dataflow analysis, and the use of visualization to display the results. The integration and testing process ensures the framework's correctness through various benchmark tests, and the results are analyzed to demonstrate its effectiveness.
 
-## Play Demo
-<p align="center">
-  <a href="https://htmlpreview.github.io/?https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/main/HW3/index.html">
-    <img src="https://github.com/user-attachments/assets/d50a704e-bd77-4b3c-9a4e-210d1d33f9be" width="50%" />
-  </a>
-</p>
+## Interactive Demo
+<iframe src="https://htmlpreview.github.io/?https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/main/HW3/index.html" style="width: 100%; aspect-ratio: 1.2;"></iframe>
 
 ## Detail Design
 
@@ -42,7 +38,7 @@ Since this task is about analizing some properties of the data-flow graph, a bet
 </summary>
 <p>
   
-[2024-10-12 05-11-13.webm](https://github.com/user-attachments/assets/efd234eb-a490-478f-a92d-36c4615d5998)
+{{< video https://raw.githubusercontent.com/jiangqucheng/EECE7398_ST_Compiler/refs/heads/main/HW3/demo.webm >}}
 
 </p>
 </details>
@@ -65,7 +61,16 @@ The script begins by utilizing the `argparse` module to handle command-line argu
 
 By parsing these arguments, the script can dynamically handle different types of analysis and ensure the correct files are processed and results saved to the right locations.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L20-L25
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 20 to 25](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L20-L25)
+
+```python
+ import argparse 
+ parser = argparse.ArgumentParser(description='Generate data flow graph for a bril script') 
+ parser.add_argument('ANALYSIS', type=str, help='Analysis: [liveness, availability, busy]') 
+ parser.add_argument('DEMO_BRIL_FILE', type=str, help='Path to the bril file') 
+ parser.add_argument('--save-dir', type=str, default='./save', help='Path to save the generated html files') 
+ args = parser.parse_args() 
+```
 
 ---
 
@@ -79,7 +84,27 @@ Once the arguments are parsed, the script proceeds to validate them:
 
 This ensures that only valid input and analysis types are processed.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L27-L43
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 27 to 43](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L27-L43)
+
+```python
+ ANALYSIS = args.ANALYSIS.lower() 
+ DEMO_BRIL_FILE = args.DEMO_BRIL_FILE 
+ # how to get the save-dir value 
+ SAVE_DIR = args.save_dir 
+  
+ # make sure args are allowed 
+ correct = True 
+ if ANALYSIS not in ['liveness', 'availability', 'busy']: 
+     print(f"Analysis <{ANALYSIS}> not supported") 
+     correct = False 
+ if not os.path.exists(DEMO_BRIL_FILE): 
+     print(f"File <{DEMO_BRIL_FILE}> not found") 
+     correct = False 
+ if not correct: 
+     # print help and exit 
+     parser.print_help() 
+     exit(1) 
+```
 
 ---
 
@@ -92,7 +117,13 @@ The script loads the Bril program into a `BrilScript` object, which represents t
 
 The CFG provides the foundation for performing various types of dataflow analysis, as it organizes the program's structure into a form that can be traversed and analyzed.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L135-L137
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 135 to 137](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L135-L137)
+
+```python
+ bbs = bm.BrilScript(script_name=os.path.basename(DEMO_BRIL_FILE), file_dir=os.path.dirname(DEMO_BRIL_FILE)) 
+ app_graph: Dict[bm.BrilFunction, Tuple[nx.DiGraph, Dict[bm.BrilInstruction_Label, List[bm.BrilInstruction]]]] = {} 
+ update_to_graph(bbs, app_graph) 
+```
 
 ---
 
@@ -111,7 +142,29 @@ The function `get__args_used_before_assign__assigned__calc_expr_available_at_bb_
 
 The `GEN`, `KILL`, and `EXPR` sets are essential for performing dataflow analysis like liveness and availability, which rely on tracking how variables and expressions evolve over the program.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L150-L168
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 150 to 168](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L150-L168)
+
+```python
+ def get__args_used_before_assign__assigned__calc_expr_available_at_bb_end(instrs: List[bm.BrilInstruction]) -> Tuple[Set[str],Set[str],Set[Expr]]: 
+     """ 
+     Given a list of instructions, return the set of variables that are used before defined and the set of variables that are modified. 
+     This is from HW2, but modified to return the sets instead of printing them. 
+     """ 
+     used_first: Set[str] = set() 
+     written: Set[str] = set() 
+     avail_exprs: Set[Expr] = set() 
+     for instr in instrs: 
+         used_first.update(set(instr.args if instr.args else []) - written) 
+         if instr.dest: 
+             # check if the dest was used in generating any of the expressions, if so, remove it from exprs 
+             for expr in list(avail_exprs): 
+                 if instr.dest in expr.args: 
+                     avail_exprs.remove(expr) 
+             written.add(instr.dest) 
+             if instr.args and instr.op not in ['id', 'const', 'call']: 
+                 avail_exprs.add(Expr(instr.op, instr.args)) 
+     return used_first, written, avail_exprs 
+```
 
 ---
 
@@ -121,7 +174,18 @@ After calculating the `GEN`, `KILL`, and `EXPR` sets for each basic block, the s
 
 This step enriches the CFG with the necessary dataflow information, setting up the foundation for more complex analyses like determining which variables are live or which expressions are available.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L173-L180
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 173 to 180](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L173-L180)
+
+```python
+ def update_gen_kill_sets(app_graph: Dict[bm.BrilFunction, Tuple[nx.DiGraph, Dict[bm.BrilInstruction_Label, List[bm.BrilInstruction]]]]): 
+     for _, (fdg, _) in app_graph.items(): 
+         for each_node, each_node_data in fdg.nodes(data=True): 
+             each_block: List[bm.BrilInstruction] = each_node_data.get('instructions', None) 
+             _gen, _kill, _expr = gen_kill_expr_sets(each_block) if each_block else (set(), set(), set()) 
+             fdg.nodes[each_node]['GEN'] = _gen 
+             fdg.nodes[each_node]['KILL'] = _kill 
+             fdg.nodes[each_node]['EXPR'] = _expr 
+```
 
 ---
 
@@ -136,7 +200,22 @@ The function takes as input a specific analysis function (e.g., for liveness or 
 
 The generic nature of this function minimizes code duplication and allows the script to easily switch between different types of analyses.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L202-L213
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 202 to 213](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L202-L213)
+
+```python
+ def _fdg_update_bare_bone(specific_analysis_func: Callable[[nx.DiGraph, str], Tuple[Set[str], Set[str]]], fdg: nx.DiGraph) -> bool: 
+     # here we extract the common part of the analysis 
+     has_changed = False 
+     for this_node, _ in fdg.nodes(data=True): 
+         _print_this_node_name = this_node.replace('\n', '\\n') 
+         _in, _out = specific_analysis_func(fdg, this_node) 
+         print(f"Node: {_print_this_node_name}, IN: {_in}, OUT: {_out}") 
+         if _in != _get_node_in_set(fdg, this_node) or _out != _get_node_out_set(fdg, this_node): 
+             fdg.nodes[this_node]['IN'] = _in 
+             fdg.nodes[this_node]['OUT'] = _out 
+             has_changed = True 
+     return has_changed 
+```
 
 ---
 
@@ -152,7 +231,54 @@ The script defines specific analysis functions for each type of dataflow analysi
 
 Each function is passed to the generic `_fdg_update_bare_bone` function to perform the corresponding analysis.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L215-L258
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 215 to 258](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L215-L258)
+
+```python
+ def _fdg_update_internal_liveness_sets(fdg: nx.DiGraph, this_node: str) -> Tuple[Set[str], Set[str]]: 
+     """ 
+         this.gen = {v | v is used before defined here} 
+         this.kill = {v | v is assigned here} 
+         IN = this.gen + (OUT - this.kill) 
+         OUT = union(successors' IN) 
+     """ 
+     _print_this_node_name = this_node.replace('\n', '\\n') 
+     _temp_succ_req = [_get_node_in_set(fdg, each_succ_node) for each_succ_node in _get_node_succ_set(fdg, this_node)] 
+     _out: Set[str] = set.union(*_temp_succ_req) if _temp_succ_req else set() 
+     print(f"Node: {_print_this_node_name}, Succ: {_get_node_succ_set(fdg, this_node)}=>{_temp_succ_req}, OUT: {_out}") 
+     _in: Set[str] = set.union(_get_node_gen_set(fdg, this_node), set.difference(_out, _get_node_kill_set(fdg, this_node))) 
+     return _in, _out 
+  
+ def _fdg_update_internal_availability_sets(fdg: nx.DiGraph, this_node: str) -> Tuple[Set[Expr], Set[Expr]]: 
+     """ 
+         this.exprs = {e | e is available at the end of the block} 
+         IN = intersection(predeccessors' OUT) 
+         OUT = (IN + this.exprs) - OUT(expr: any(var modified here exist in expr)) 
+     """ 
+     _print_this_node_name = this_node.replace('\n', '\\n') 
+     _temp_pred_give = [_get_node_out_set(fdg, each_pred_node) for each_pred_node in _get_node_pred_set(fdg, this_node)] 
+     _in: Set[Expr] = set.intersection(*_temp_pred_give) if _temp_pred_give else set() 
+     print(f"Node: {_print_this_node_name}, Pred: {_get_node_pred_set(fdg, this_node)}=>{_temp_pred_give}, IN: {_in}") 
+     # gatter all exprs that were computed before the end of this block  
+     _out: Set[Expr] = set.union(_get_node_in_set(fdg, this_node), _get_node_expr_set(fdg, this_node)) 
+     # remove such expr that include variables that were modified in this block 
+     _out = set([each_expr for each_expr in _out if not set.intersection(set(each_expr.args), _get_node_kill_set(fdg, this_node))]) 
+     return _in, _out 
+  
+ def _fdg_update_internal_busy_sets(fdg: nx.DiGraph, this_node: str) -> Tuple[Set[Expr], Set[Expr]]: 
+     """ 
+         IN = (OUT - OUT(expr: any(var modified here exist in expr)) + this.exprs 
+         OUT = intersection(successors' IN) 
+     """ 
+     _print_this_node_name = this_node.replace('\n', '\\n') 
+     _temp_succ_req = [_get_node_in_set(fdg, each_succ_node) for each_succ_node in _get_node_succ_set(fdg, this_node)] 
+     _out: Set[Expr] = set.intersection(*_temp_succ_req) if _temp_succ_req else set() 
+     print(f"Node: {_print_this_node_name}, Succ: {_get_node_succ_set(fdg, this_node)}=>{_temp_succ_req}, OUT: {_out}") 
+     # remove such expr that include variables that were modified in this block 
+     _in: Set[Expr] = set([each_expr for each_expr in _out if not set.intersection(set(each_expr.args), _get_node_kill_set(fdg, this_node))]) 
+     # add all exprs that are computed in this block 
+     _in = set.union(_in, _get_node_expr_set(fdg, this_node)) 
+     return _in, _out 
+```
 
 ---
 
@@ -162,7 +288,22 @@ The `update_analysis_sets` function orchestrates the execution of the selected a
 
 The analysis is executed iteratively, updating the CFG with the calculated `IN` and `OUT` sets until no further changes occur. This iterative approach is necessary because dataflow analysis typically involves propagating information through the CFG until a fixed point is reached (i.e., the point where further iterations don’t change the dataflow sets).
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L266-L277
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 266 to 277](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L266-L277)
+
+```python
+ def update_analysis_sets(analysis_type_str: str , app_graph: Dict[bm.BrilFunction, Tuple[nx.DiGraph, Dict[bm.BrilInstruction_Label, List[bm.BrilInstruction]]]]): 
+     analysis_func = ANALYSIS_FUNC.get(analysis_type_str, None) 
+     if not analysis_func: 
+         print(f"Analysis <{analysis_type_str}> not supported") 
+         return 
+     has_changed = True 
+     while has_changed: 
+         has_changed = False 
+         print(f"Updating {analysis_type_str} sets") 
+         for _, (fdg, _) in app_graph.items(): 
+             has_changed |= _fdg_update_bare_bone(analysis_func, fdg) 
+         print() 
+```
 
 ---
 
@@ -175,7 +316,69 @@ The script concludes by generating a visual representation of the CFG using the 
 
 This final step provides a clear and accessible way to verify the results of the analysis.
 
-https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L318-L376
+[EECE7398_ST_Compiler(601e0e9) :: HW3/df_analysis.py :: Lines 318 to 376](https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/601e0e9ae2116bd59ef11847346e94e5bc639a0f/HW3/df_analysis.py#L318-L376)
+
+```python
+     for node in net.nodes: 
+         node['IN'] = _in = generate_set_str(node.pop('IN', set())) 
+         node['OUT'] = _out = generate_set_str(node.pop('OUT', set())) 
+         node['GEN'] = _gen = generate_set_str(node.pop('GEN', set())) 
+         node['KILL'] = _kill = generate_set_str(node.pop('KILL', set())) 
+         node['EXPR'] = _expr = generate_set_str([str(x) for x in node.pop('EXPR', set())]) 
+  
+         node['title'] = '' 
+         if 'instructions' in node: 
+             # remove 'data' key from node, and set 'title' key to the string representation of the data 
+             node['title'] = "\n  ".join([obj.to_briltxt() if hasattr(obj, 'to_briltxt') else str(obj) for obj in node.pop('instructions', [])]) 
+             node['shape'] = 'box' 
+         node['title'] += "\n" 
+         node['title'] += f"\nGEN: { _gen }" 
+         node['title'] += f"\nKILL: { _kill }" 
+         node['title'] += f"\nEXPR: { _expr }" 
+         node['title'] += f"\nIN: { _in }" 
+         node['title'] += f"\nOUT: { _out }" 
+  
+         # title layout change (word replace): 
+         #  strip: remove leading/trailing spaces, tabs, newlines, and carriage returns 
+         #  double return -> dash line 
+         #  double space -> full corner single space 
+         node['title'] = node['title'].strip(' \t\n\r').replace('\n\n', '\n--------\n').replace('  ', '\u3000') 
+  
+         # node['label'] = f"IN: {_in}" + '\n' + node['label'] + '\n' + f"OUT: {_out}" 
+  
+         if node['id'] in (ENTRY_POINT_NAME, RETURN_POINT_NAME): 
+             node['color'] = 'grey' 
+             node['shape'] = 'circle' 
+  
+     for edge in net.edges: 
+         _reason = edge.pop('reason', None) 
+         if _reason: 
+             edge['label'] = _reason 
+         _src_node, _dst_node = _get_node_by_name(edge['from']), _get_node_by_name(edge['to']) 
+         if _src_node and _dst_node and 'OUT' in _src_node and 'IN' in _dst_node: 
+             src_id, src_out, dst_id, dst_in = _src_node['id'], _src_node['OUT'], _dst_node['id'], _dst_node['IN'] 
+             if src_out == CONST_EMPTY_STR: src_out = dst_in 
+             if dst_in == CONST_EMPTY_STR: dst_in = src_out 
+             new_label = f"{src_id}.OUT:{src_out}\n{dst_id}.IN:{dst_in}" if src_out != dst_in else src_out 
+             edge['title'] = edge.get('title', "") + edge.get('label', "")  # move label to popup title 
+             edge['label'] = new_label  # set new label 
+      
+     return net 
+  
+ # Safe linux fs name 
+ safe_fs_name = lambda raw_string: "".join(c if c.isalnum() or c in (' ', '.', '_') else '_' for c in raw_string) 
+  
+ for each_func in bbs.functions: 
+     # Remove illegal characters for Linux filesystem 
+     save_dir = os.path.join(SAVE_DIR, safe_fs_name(bbs.script_name), ANALYSIS) 
+     save_file = f"{safe_fs_name(each_func.name)}.html" 
+     # get the function directed graph 
+     fdg, _ = app_graph.get(each_func) 
+     # mkdir -p ./save_dir 
+     os.makedirs(f"./{save_dir}", exist_ok=True) 
+     # save to html 
+     dump_into_pv_graph(fdg).save_graph(os.path.join(save_dir, save_file)) 
+```
 
 ---
 
