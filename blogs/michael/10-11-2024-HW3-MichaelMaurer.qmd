@@ -1,0 +1,452 @@
+---
+author: Michael Maurer
+execute:
+  enabled: false
+format:
+  html: default
+title: EECE7309 Homework 3 -- Data Flow
+
+---
+
+## Introduction
+
+This assignment asks us to investigate data flow analysis algorithms. 
+Here, we discuss the algorithm implemented, and describe the process of developing this code.
+We primarily investigate "reaching definitions" here. 
+Further, this code defines an `Analysis` class which allows the user to 
+decelare a merge and transfer function for data flow analysis, and further
+allows them to indicate whether the analysis is forward or reverse. This was considered extra credit for this assignment.
+
+## Reaching Definitions
+We wish to analyze whether a definition "reaches" a particular part of the program.
+This allows us to determine what definitions have a valid path to arrive at a
+specific block in the program. This can be very helpful for other optimizations
+such as dead code elimination.
+Reaching definition data flow analysis is a forward DFA algorithm, and employs a "may" merger strategy (i.e. a union). 
+At a high level, this algorithm determines what definitions may reach the start of a basic block, and determines which definitions may leave the block, which can be deduced to the definitions at the start of the block minus those definitions which were killed (generally by reassignments).
+
+## Challenges Faced
+There were a couple of challenges which I faced developing this code. 
+The first was in determining how to represent the CFG of a given program.
+The previous assignments did leverage basic blocks, but only limited interconnection
+of them. As such, I was able to get by without defining more formal structures.
+In this assignment, I formalized this structure as one typically does with a graph.
+This is not inherently a difficult task, however this is the first time I have done
+so in Python and as such neglected how some common types are passed around, namely whether they are copies or references. I wrote the code under the assumption that they were copies initially, but this introduced a handful of bugs into my code which were not immediately clear. I also learned this the hard way when defining the data flow analysis algorithm itself. This proved particularly confusing when analyzing code with loops.
+
+Another challenge I incurred was perhaps one of mistaken thought, where I had convinced myself that calls and returns would need to be handled for this analysis. 
+What I neglected to realize is that at a call or return, the scope changes, and therefore this DFA does not really need to work across functions. The only scenario where this would be necessary is with some kind of global variable, which appears to be out of scope of this type of analysis.
+So, this was a bit of a tangent I sent myself on.
+
+## Implementation
+As mentioned above, this implementation analyzes whether a definiton reaches a particular part of the program. To do this, we define an algorithm which inspects every basic block in each function in the program. We determine, based on the definitions which enter the block, the definitions that exit the block. 
+
+In more detail, we determine the definitions which enter the block as the union of all definitions exiting predecessor blocks to the given block (this is the `merge` step). Then, we determine what the outputs of the basic block are by overwriting any definitions found in `b_in` (the definitions which reach the block) of variables defined in the current block, which is to say that we overwrite the definitions killed by the current block. This is the `transfer` step. We iterate through all the basic blocks in the program, moving "forward" through the basic blocks, where forward is moving essentially forward through time in the program.
+At the end of each block's analysis, if the outputs of the block have changed, we enqueue the successor blocks of the current block into our worklist. Once the outputs of the block cease to change, this analysis is complete and has converged (it is further provable that this algorithm always converges).
+
+The data structure in this analysis is a CFG, containing "Blocks" which are defined as follows:
+
+```{python}
+class Block:
+    def __init__(self, instrs: list, id, preds: set, succs: set):
+        self.instrs = instrs
+        self.id = id
+        self.preds = preds
+        self.succs = succs
+```
+
+Further, this code was designed to be compatible with other analyses. It does so by definining the following class:
+
+```{python}
+class Analysis():
+    def __init__(self, forward: bool, merge: Callable[list, list], transfer: Callable[[dict, blocks.Block], dict]):
+        self.forward = forward
+        self.init = init
+        self.merge = merge
+        self.transfer = transfer
+    
+    def merge(self, b_ins: list):
+        return self.merge(b_ins)
+    
+    def transfer(self, b_in: dict, block: blocks.Block):
+        return self.transfer(b_in, block)
+
+    def data_flow(self, blocks):
+        ... # See linked code
+```
+
+## Testing
+I tested this program on four programs, two of my own, and two found in Bril's benchmark suite. One of the programs I experimented with was `quadratic.bril`, which is rather long, and as such I have put those results in the appendix of this blog.
+
+The most basic test case was the following code:
+```{bril}
+# sample.bril
+@main {
+    a: int = const 4;
+    b: int = const 2;
+    sum1: int = add a b;
+    sum2: int = add a b;
+    prod: int = mul sum1 sum2;
+    prod2: int = mul sum1 sum2;
+    print prod;
+}
+```
+
+This code only contains one basic block, and produces fairly trivial results, shown below.
+
+```
+printing blocks
+.start 
+ Instructions: [{'dest': 'a', 'op': 'const', 'type': 'int', 'value': 4}, {'dest': 'b', 'op': 'const', 'type': 'int', 'value': 2}, {'args': ['a', 'b'], 'dest': 'sum1', 'op': 'add', 'type': 'int'}, {'args': ['a', 'b'], 'dest': 'sum2', 'op': 'add', 'type': 'int'}, {'args': ['sum1', 'sum2'], 'dest': 'prod', 'op': 'mul', 'type': 'int'}, {'args': ['sum1', 'sum2'], 'dest': 'prod2', 'op': 'mul', 'type': 'int'}, {'args': ['prod'], 'op': 'print'}]
+ ID: .start
+ Predecessors: set()
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'a': ['.start_0'], 'b': ['.start_1'], 'sum1': ['.start_2'], 'sum2': ['.start_3'], 'prod': ['.start_4'], 'prod2': ['.start_5']}
+```
+
+The next program introduced branching control flow:
+
+```{bril}
+# test
+@main(a: int) {
+  v1: int = const 1;
+  cond: bool = lt v1 x;
+  br cond .then.0 .else.0;
+.then.0:
+  v2: int = id x;
+  jmp .print;
+.else.0:
+  v3: int = id x;
+  v4: int = const 1;
+  v2: int = sub v3 v4;
+.print:
+  print v2;
+}
+```
+
+This correctly produced the following result:
+```
+printing blocks
+then.0 
+ Instructions: [{'args': ['cond'], 'labels': ['then.0', 'else.0'], 'op': 'br'}, {'args': ['x'], 'dest': 'v2', 'op': 'id', 'type': 'int'}, {'labels': ['print'], 'op': 'jmp'}]
+ ID: then.0
+ Predecessors: {'.start'}
+ Successors: {'print'}
+
+printing blocks
+else.0 
+ Instructions: [{'args': ['cond'], 'labels': ['then.0', 'else.0'], 'op': 'br'}, {'args': ['x'], 'dest': 'v3', 'op': 'id', 'type': 'int'}, {'dest': 'v4', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v3', 'v4'], 'dest': 'v2', 'op': 'sub', 'type': 'int'}]
+ ID: else.0
+ Predecessors: {'.start'}
+ Successors: {'print'}
+
+printing blocks
+.start 
+ Instructions: [{'dest': 'v1', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v1', 'x'], 'dest': 'cond', 'op': 'lt', 'type': 'bool'}, {'args': ['cond'], 'labels': ['then.0', 'else.0'], 'op': 'br'}]
+ ID: .start
+ Predecessors: set()
+ Successors: {'else.0', 'then.0'}
+
+printing blocks
+print 
+ Instructions: [{'labels': ['print'], 'op': 'jmp'}, {'args': ['v2'], 'op': 'print'}]
+ ID: print
+ Predecessors: {'else.0', 'then.0'}
+ Successors: set()
+
+
+block_id:  then.0
+in_edges:  {'v1': ['.start_0'], 'cond': ['.start_1']}
+out_edges:  {'v1': ['.start_0'], 'cond': ['.start_1'], 'v2': ['then.0_1']}
+
+block_id:  else.0
+in_edges:  {'v1': ['.start_0'], 'cond': ['.start_1']}
+out_edges:  {'v1': ['.start_0'], 'cond': ['.start_1'], 'v3': ['else.0_1'], 'v4': ['else.0_2'], 'v2': ['else.0_3']}
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'v1': ['.start_0'], 'cond': ['.start_1']}
+
+block_id:  print
+in_edges:  {'v1': ['.start_0'], 'cond': ['.start_1'], 'v3': ['else.0_1'], 'v4': ['else.0_2'], 'v2': ['else.0_3', 'then.0_1']}
+out_edges:  {'v3': ['else.0_1'], 'v4': ['else.0_2'], 'v2': ['else.0_3', 'then.0_1'], 'v1': ['.start_0'], 'cond': ['.start_1']}
+```
+As we can see, the in and out edges for each block are what we expect. The key observation is in the final `print` block, definitions from both branches are "reaching". 
+
+For a more complex example, we examined the `loopfact.bril` benchmark from the bril repository.
+
+```{bril}
+# ARGS: 8
+@main(input: int) {
+  value: int = id input;
+  v1: int = const 1;
+  result: int = id v1;
+  v3: int = id value;
+  i: int = id v3;
+.for.cond.2:
+  v4: int = id i;
+  v5: int = const 0;
+  v6: bool = gt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: int = id result;
+  v8: int = id i;
+  v9: int = mul v7 v8;
+  result: int = id v9;
+  v10: int = id i;
+  v11: int = const 1;
+  v12: int = sub v10 v11;
+  i: int = id v12;
+  jmp .for.cond.2;
+.for.end.2:
+  v13: int = id result;
+  print v13;
+  v14: int = const 0;
+}
+```
+
+This code contains a loop, which is a good test for our analysis. What we expect is all definitions reach the final `.for.end.2` block, all definitions except for those in `.for.end.2` reach the blocks `.for.cond.2` and `.for.body.2`, and no definitions reach the start of `.start`. Further, we expect for `.for.body.2` to kill the definitions of `i` and `result` which will enter the block. No other blocks should kill instructions.
+
+We show that the expected results are generated by our program:
+```
+printing blocks
+.start 
+ Instructions: [{'args': ['input'], 'dest': 'value', 'op': 'id', 'type': 'int'}, {'dest': 'v1', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v1'], 'dest': 'result', 'op': 'id', 'type': 'int'}, {'args': ['value'], 'dest': 'v3', 'op': 'id', 'type': 'int'}, {'args': ['v3'], 'dest': 'i', 'op': 'id', 'type': 'int'}]
+ ID: .start
+ Predecessors: set()
+ Successors: {'for.cond.2'}
+
+printing blocks
+for.cond.2 
+ Instructions: [{'args': ['i'], 'dest': 'v4', 'op': 'id', 'type': 'int'}, {'dest': 'v5', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['v4', 'v5'], 'dest': 'v6', 'op': 'gt', 'type': 'bool'}, {'args': ['v6'], 'labels': ['for.body.2', 'for.end.2'], 'op': 'br'}]
+ ID: for.cond.2
+ Predecessors: {'for.body.2', '.start'}
+ Successors: {'for.end.2', 'for.body.2'}
+
+printing blocks
+for.body.2 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.2', 'for.end.2'], 'op': 'br'}, {'args': ['result'], 'dest': 'v7', 'op': 'id', 'type': 'int'}, {'args': ['i'], 'dest': 'v8', 'op': 'id', 'type': 'int'}, {'args': ['v7', 'v8'], 'dest': 'v9', 'op': 'mul', 'type': 'int'}, {'args': ['v9'], 'dest': 'result', 'op': 'id', 'type': 'int'}, {'args': ['i'], 'dest': 'v10', 'op': 'id', 'type': 'int'}, {'dest': 'v11', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v10', 'v11'], 'dest': 'v12', 'op': 'sub', 'type': 'int'}, {'args': ['v12'], 'dest': 'i', 'op': 'id', 'type': 'int'}, {'labels': ['for.cond.2'], 'op': 'jmp'}]
+ ID: for.body.2
+ Predecessors: {'for.cond.2'}
+ Successors: {'for.cond.2'}
+
+printing blocks
+for.end.2 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.2', 'for.end.2'], 'op': 'br'}, {'args': ['result'], 'dest': 'v13', 'op': 'id', 'type': 'int'}, {'args': ['v13'], 'op': 'print'}, {'dest': 'v14', 'op': 'const', 'type': 'int', 'value': 0}]
+ ID: for.end.2
+ Predecessors: {'for.cond.2'}
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2'], 'v3': ['.start_3'], 'i': ['.start_4']}
+
+block_id:  for.cond.2
+in_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7']}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2']}
+
+block_id:  for.body.2
+in_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2']}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'v3': ['.start_3'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'result': ['for.body.2_4'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'i': ['for.body.2_8']}
+
+block_id:  for.end.2
+in_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2']}
+out_edges:  {'value': ['.start_0'], 'v1': ['.start_1'], 'result': ['.start_2', 'for.body.2_4'], 'v3': ['.start_3'], 'i': ['.start_4', 'for.body.2_8'], 'v7': ['for.body.2_1'], 'v8': ['for.body.2_2'], 'v9': ['for.body.2_3'], 'v10': ['for.body.2_5'], 'v11': ['for.body.2_6'], 'v12': ['for.body.2_7'], 'v4': ['for.cond.2_0'], 'v5': ['for.cond.2_1'], 'v6': ['for.cond.2_2'], 'v13': ['for.end.2_1'], 'v14': ['for.end.2_3']}
+```
+
+We further tested with the `quadratic.bril` program, and results for that test may be found in the appendix. This program contains multiple functions, loops, and branches, however is not especially interesting for this analysis as there is only one instance of a definition being killed (in the `.endif.7` block).
+
+## Code
+The code for this assignment is contained in a [public GitHub repository](https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw3). The code and testing code + results can be found in this repository.
+
+## Appendix
+```{bril}
+# quadratic.bril
+# ARGS: -5 8 21
+@main(a: int, b: int, c: int) {
+  call @quadratic a b c;
+}
+
+@sqrt(x: int): int {
+  v1: int = const 1;
+  i: int = id v1;
+.for.cond.0:
+  v2: int = id i;
+  v3: int = id x;
+  v4: int = const 1;
+  v5: int = sub v3 v4;
+  v6: bool = lt v2 v5;
+  br v6 .for.body.0 .for.end.0;
+.for.body.0:
+  v8: int = id i;
+  v9: int = id i;
+  v10: int = mul v8 v9;
+  v11: int = id x;
+  v12: bool = ge v10 v11;
+  br v12 .then.7 .else.7;
+.then.7:
+  v13: int = id i;
+  ret v13;
+.else.7:
+.endif.7:
+  v14: int = id i;
+  v15: int = const 1;
+  v16: int = add v14 v15;
+  i: int = id v16;
+  jmp .for.cond.0;
+.for.end.0:
+  v17: int = const 0;
+  ret v17;
+}
+
+@quadratic(a: int, b: int, c: int) {
+  v0: int = id b;
+  v1: int = id b;
+  v2: int = mul v0 v1;
+  v3: int = const 4;
+  v4: int = id a;
+  v5: int = mul v3 v4;
+  v6: int = id c;
+  v7: int = mul v5 v6;
+  v8: int = sub v2 v7;
+  s: int = id v8;
+  v9: int = const 2;
+  v10: int = id a;
+  v11: int = mul v9 v10;
+  d: int = id v11;
+  v12: int = const 0;
+  v13: int = id b;
+  v14: int = sub v12 v13;
+  v15: int = id s;
+  v16: int = call @sqrt v15;
+  v17: int = add v14 v16;
+  r1: int = id v17;
+  v18: int = const 0;
+  v19: int = id b;
+  v20: int = sub v18 v19;
+  v21: int = id s;
+  v22: int = call @sqrt v21;
+  v23: int = sub v20 v22;
+  r2: int = id v23;
+  v24: int = id r1;
+  v25: int = id d;
+  v26: int = div v24 v25;
+  print v26;
+  v27: int = const 0;
+  v28: int = id r2;
+  v29: int = id d;
+  v30: int = div v28 v29;
+  print v30;
+  v31: int = const 0;
+}
+```
+
+Results:
+```
+printing blocks
+.start 
+ Instructions: [{'args': ['a', 'b', 'c'], 'funcs': ['quadratic'], 'op': 'call'}]
+ ID: .start
+ Predecessors: set()
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {}
+
+printing blocks
+.start 
+ Instructions: [{'dest': 'v1', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v1'], 'dest': 'i', 'op': 'id', 'type': 'int'}]
+ ID: .start
+ Predecessors: set()
+ Successors: {'for.cond.0'}
+
+printing blocks
+for.cond.0 
+ Instructions: [{'args': ['i'], 'dest': 'v2', 'op': 'id', 'type': 'int'}, {'args': ['x'], 'dest': 'v3', 'op': 'id', 'type': 'int'}, {'dest': 'v4', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v3', 'v4'], 'dest': 'v5', 'op': 'sub', 'type': 'int'}, {'args': ['v2', 'v5'], 'dest': 'v6', 'op': 'lt', 'type': 'bool'}, {'args': ['v6'], 'labels': ['for.body.0', 'for.end.0'], 'op': 'br'}]
+ ID: for.cond.0
+ Predecessors: {'.start', 'endif.7'}
+ Successors: {'for.body.0', 'for.end.0'}
+
+printing blocks
+for.body.0 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.0', 'for.end.0'], 'op': 'br'}, {'args': ['i'], 'dest': 'v8', 'op': 'id', 'type': 'int'}, {'args': ['i'], 'dest': 'v9', 'op': 'id', 'type': 'int'}, {'args': ['v8', 'v9'], 'dest': 'v10', 'op': 'mul', 'type': 'int'}, {'args': ['x'], 'dest': 'v11', 'op': 'id', 'type': 'int'}, {'args': ['v10', 'v11'], 'dest': 'v12', 'op': 'ge', 'type': 'bool'}, {'args': ['v12'], 'labels': ['then.7', 'else.7'], 'op': 'br'}]
+ ID: for.body.0
+ Predecessors: {'for.cond.0'}
+ Successors: {'then.7', 'else.7'}
+
+printing blocks
+for.end.0 
+ Instructions: [{'args': ['v6'], 'labels': ['for.body.0', 'for.end.0'], 'op': 'br'}, {'dest': 'v17', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['v17'], 'op': 'ret'}]
+ ID: for.end.0
+ Predecessors: {'for.cond.0'}
+ Successors: set()
+
+printing blocks
+then.7 
+ Instructions: [{'args': ['v12'], 'labels': ['then.7', 'else.7'], 'op': 'br'}, {'args': ['i'], 'dest': 'v13', 'op': 'id', 'type': 'int'}, {'args': ['v13'], 'op': 'ret'}]
+ ID: then.7
+ Predecessors: {'for.body.0'}
+ Successors: set()
+
+printing blocks
+else.7 
+ Instructions: [{'args': ['v12'], 'labels': ['then.7', 'else.7'], 'op': 'br'}]
+ ID: else.7
+ Predecessors: {'for.body.0'}
+ Successors: {'endif.7'}
+
+printing blocks
+endif.7 
+ Instructions: [{'args': ['i'], 'dest': 'v14', 'op': 'id', 'type': 'int'}, {'dest': 'v15', 'op': 'const', 'type': 'int', 'value': 1}, {'args': ['v14', 'v15'], 'dest': 'v16', 'op': 'add', 'type': 'int'}, {'args': ['v16'], 'dest': 'i', 'op': 'id', 'type': 'int'}, {'labels': ['for.cond.0'], 'op': 'jmp'}]
+ ID: endif.7
+ Predecessors: {'else.7'}
+ Successors: {'for.cond.0'}
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1']}
+
+block_id:  for.cond.0
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4']}
+
+block_id:  for.body.0
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+
+block_id:  for.end.0
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v17': ['for.end.0_1']}
+
+block_id:  then.7
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v13': ['then.7_1']}
+
+block_id:  else.7
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+out_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+
+block_id:  endif.7
+in_edges:  {'v1': ['.start_0'], 'i': ['.start_1', 'endif.7_3'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5']}
+out_edges:  {'v1': ['.start_0'], 'v2': ['for.cond.0_0'], 'v3': ['for.cond.0_1'], 'v4': ['for.cond.0_2'], 'v5': ['for.cond.0_3'], 'v6': ['for.cond.0_4'], 'v8': ['for.body.0_1'], 'v9': ['for.body.0_2'], 'v10': ['for.body.0_3'], 'v11': ['for.body.0_4'], 'v12': ['for.body.0_5'], 'v14': ['endif.7_0'], 'v15': ['endif.7_1'], 'v16': ['endif.7_2'], 'i': ['endif.7_3']}
+
+printing blocks
+.start 
+ Instructions: [{'args': ['b'], 'dest': 'v0', 'op': 'id', 'type': 'int'}, {'args': ['b'], 'dest': 'v1', 'op': 'id', 'type': 'int'}, {'args': ['v0', 'v1'], 'dest': 'v2', 'op': 'mul', 'type': 'int'}, {'dest': 'v3', 'op': 'const', 'type': 'int', 'value': 4}, {'args': ['a'], 'dest': 'v4', 'op': 'id', 'type': 'int'}, {'args': ['v3', 'v4'], 'dest': 'v5', 'op': 'mul', 'type': 'int'}, {'args': ['c'], 'dest': 'v6', 'op': 'id', 'type': 'int'}, {'args': ['v5', 'v6'], 'dest': 'v7', 'op': 'mul', 'type': 'int'}, {'args': ['v2', 'v7'], 'dest': 'v8', 'op': 'sub', 'type': 'int'}, {'args': ['v8'], 'dest': 's', 'op': 'id', 'type': 'int'}, {'dest': 'v9', 'op': 'const', 'type': 'int', 'value': 2}, {'args': ['a'], 'dest': 'v10', 'op': 'id', 'type': 'int'}, {'args': ['v9', 'v10'], 'dest': 'v11', 'op': 'mul', 'type': 'int'}, {'args': ['v11'], 'dest': 'd', 'op': 'id', 'type': 'int'}, {'dest': 'v12', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['b'], 'dest': 'v13', 'op': 'id', 'type': 'int'}, {'args': ['v12', 'v13'], 'dest': 'v14', 'op': 'sub', 'type': 'int'}, {'args': ['s'], 'dest': 'v15', 'op': 'id', 'type': 'int'}, {'args': ['v15'], 'dest': 'v16', 'funcs': ['sqrt'], 'op': 'call', 'type': 'int'}, {'args': ['v14', 'v16'], 'dest': 'v17', 'op': 'add', 'type': 'int'}, {'args': ['v17'], 'dest': 'r1', 'op': 'id', 'type': 'int'}, {'dest': 'v18', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['b'], 'dest': 'v19', 'op': 'id', 'type': 'int'}, {'args': ['v18', 'v19'], 'dest': 'v20', 'op': 'sub', 'type': 'int'}, {'args': ['s'], 'dest': 'v21', 'op': 'id', 'type': 'int'}, {'args': ['v21'], 'dest': 'v22', 'funcs': ['sqrt'], 'op': 'call', 'type': 'int'}, {'args': ['v20', 'v22'], 'dest': 'v23', 'op': 'sub', 'type': 'int'}, {'args': ['v23'], 'dest': 'r2', 'op': 'id', 'type': 'int'}, {'args': ['r1'], 'dest': 'v24', 'op': 'id', 'type': 'int'}, {'args': ['d'], 'dest': 'v25', 'op': 'id', 'type': 'int'}, {'args': ['v24', 'v25'], 'dest': 'v26', 'op': 'div', 'type': 'int'}, {'args': ['v26'], 'op': 'print'}, {'dest': 'v27', 'op': 'const', 'type': 'int', 'value': 0}, {'args': ['r2'], 'dest': 'v28', 'op': 'id', 'type': 'int'}, {'args': ['d'], 'dest': 'v29', 'op': 'id', 'type': 'int'}, {'args': ['v28', 'v29'], 'dest': 'v30', 'op': 'div', 'type': 'int'}, {'args': ['v30'], 'op': 'print'}, {'dest': 'v31', 'op': 'const', 'type': 'int', 'value': 0}]
+ ID: .start
+ Predecessors: set()
+ Successors: set()
+
+
+block_id:  .start
+in_edges:  {}
+out_edges:  {'v0': ['.start_0'], 'v1': ['.start_1'], 'v2': ['.start_2'], 'v3': ['.start_3'], 'v4': ['.start_4'], 'v5': ['.start_5'], 'v6': ['.start_6'], 'v7': ['.start_7'], 'v8': ['.start_8'], 's': ['.start_9'], 'v9': ['.start_10'], 'v10': ['.start_11'], 'v11': ['.start_12'], 'd': ['.start_13'], 'v12': ['.start_14'], 'v13': ['.start_15'], 'v14': ['.start_16'], 'v15': ['.start_17'], 'v16': ['.start_18'], 'v17': ['.start_19'], 'r1': ['.start_20'], 'v18': ['.start_21'], 'v19': ['.start_22'], 'v20': ['.start_23'], 'v21': ['.start_24'], 'v22': ['.start_25'], 'v23': ['.start_26'], 'r2': ['.start_27'], 'v24': ['.start_28'], 'v25': ['.start_29'], 'v26': ['.start_30'], 'v27': ['.start_32'], 'v28': ['.start_33'], 'v29': ['.start_34'], 'v30': ['.start_35'], 'v31': ['.start_37']}
+```
