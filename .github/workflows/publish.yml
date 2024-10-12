@@ -45,6 +45,8 @@ jobs:
           /home/codespace/.deno/bin/deno install -f  --global --allow-env --allow-read ts2bril.ts
           /home/codespace/.deno/bin/deno install -f -g brili.ts 
           cd bril-txt
+          pwd
+          ls
           flit install --symlink --user
    
       - name: Render and Publish
