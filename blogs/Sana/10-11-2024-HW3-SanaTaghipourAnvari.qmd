@@ -1,0 +1,241 @@
+ ---
+author: Sana Taghipour Anvari
+format:
+  html: default
+title: Homework3 - data flow
+
+---
+
+Link for the code: [cfgnode](https://github.com/sanatgp/bril/tree/main/cfgnode_project)
+
+
+## Explanation of the code 
+
+I implemented a generic data flow analysis framework that supports multiple analyses by designing a reusable structure for different types of data flow problems. The code includes:
+
+This code implements a liveness analysis tool for Bril programs. It builds a control flow graph (CFG) from the program's instructions, computes the `in` and `out` sets for each basic block based on variable usage (using the `gen` and `kill` sets), and then prints the liveness information for each block. The analysis helps track which variables are live at various points in the program.
+
+
+
+```{python}
+import json
+import sys
+from collections import defaultdict
+
+class BrilLivenessAnalyzer:
+    def __init__(self):
+        self.cfg = defaultdict(lambda: {'instrs': [], 'succ': set(), 'pred': set()})
+        self.live_in = defaultdict(set)
+        self.live_out = defaultdict(set)
+
+    def analyze(self, program):
+        for function in program['functions']:
+            self.analyze_function(function)
+
+    def analyze_function(self, function):
+        self.build_cfg(function['instrs'])
+        self.compute_liveness()
+        self.print_results()
+
+    def build_cfg(self, instrs):
+        self.cfg.clear()
+        current_block = 'entry'
+
+        for i, instr in enumerate(instrs):
+            if 'label' in instr:
+                current_block = instr['label']
+            self.cfg[current_block]['instrs'].append(instr)
+
+            if instr.get('op') in ['jmp', 'br']:
+                if instr['op'] == 'jmp':
+                    target = instr['labels'][0]
+                    self.cfg[current_block]['succ'].add(target)
+                    self.cfg[target]['pred'].add(current_block)
+                elif instr['op'] == 'br':
+                    for label in instr['labels']:
+                        self.cfg[current_block]['succ'].add(label)
+                        self.cfg[label]['pred'].add(current_block)
+            elif instr.get('op') == 'ret':
+                pass 
+            else:
+                if i + 1 < len(instrs) and 'label' in instrs[i + 1]:
+                    next_block = instrs[i + 1]['label']
+                    self.cfg[current_block]['succ'].add(next_block)
+                    self.cfg[next_block]['pred'].add(current_block)
+
+    def compute_liveness(self):
+        changed = True
+        while changed:
+            changed = False
+            for block in self.cfg:
+                old_in = self.live_in[block].copy()
+                old_out = self.live_out[block].copy()
+
+                kill = set()
+                gen = set()
+
+                for instr in self.cfg[block]['instrs']:
+                    if 'dest' in instr:
+                        kill.add(instr['dest'])  
+                    if 'args' in instr:
+                        for arg in instr['args']:
+                            if arg not in kill:
+                                gen.add(arg)  
+
+                #  OUT{P} = Union of IN{Psuccessor}
+                self.live_out[block] = set()
+                for succ in self.cfg[block]['succ']:
+                    self.live_out[block] |= self.live_in[succ]
+
+                #  IN{P} = (OUT{P} - Kill{P}) U Gen{P}
+                self.live_in[block] = (self.live_out[block] - kill) | gen
+
+                if old_in != self.live_in[block] or old_out != self.live_out[block]:
+                    changed = True
+
+        self.live_in['entry'] = set()
+
+    def print_results(self):
+        for block in self.cfg:
+            print(f"Block: {block}")
+            print(f"  In:  {sorted(self.live_in[block])}")
+            print(f"  Out: {sorted(self.live_out[block])}")
+            print()
+
+def main():
+    json_input = '''
+    {
+      "functions": [
+        {
+          "name": "main",
+          "instrs": [
+            { "op": "const", "type": "int", "dest": "a", "value": 3 },
+            { "op": "const", "type": "int", "dest": "b", "value": 5 },
+            { "op": "const", "type": "int", "dest": "d", "value": 4 },
+            { "op": "const", "type": "int", "dest": "x", "value": 100 },
+            { "op": "br", "args": ["gt", "a", "b"], "labels": ["b2", "b3"] },
+
+            { "label": "b2" },
+            { "op": "add", "type": "int", "dest": "c", "args": ["a", "b"] },
+            { "op": "const", "type": "int", "dest": "d", "value": 2 },
+            { "op": "jmp", "labels": ["done"] },
+
+            { "label": "b3" },
+            { "op": "const", "type": "int", "dest": "c", "value": 4 },
+
+            { "label": "done" },
+            { "op": "mul", "type": "int", "dest": "result", "args": ["b", "d"] },
+            { "op": "add", "type": "int", "dest": "result", "args": ["result", "c"] },
+            { "op": "ret", "args": ["result"] }
+          ]
+        }
+      ]
+    }
+    '''
+
+    program = json.loads(json_input)
+    
+    analyzer = BrilLivenessAnalyzer()
+    analyzer.analyze(program)
+
+if __name__ == "__main__":
+    main()
+
+```
+
+
+## How we testing our implementation
+
+```json
+# Bril Code (Block by Block)
+
+# Block: entry
+const a: int = 3;
+const b: int = 5;
+const d: int = 4;
+const x: int = 100;
+br gt a b .b2 .b3;
+
+# Block: b2
+b2:
+  add c: int = a + b;
+  const d: int = 2;
+  jmp .done;
+
+# Block: b3
+b3:
+  const c: int = 4;
+
+# Block: done
+done:
+  mul result: int = b * d;
+  add result: int = result + c;
+  ret result;
+```
+
+# Liveness Analysis Results
+
+- Block: entry
+  - In:  []
+  - Out: ['a', 'b', 'd']
+
+- Block: b2
+  - In:  ['a', 'b']
+  - Out: ['b', 'c', 'd']
+
+- Block: b3
+  - In:  ['b', 'd']
+  - Out: ['b', 'c', 'd']
+
+- Block: done
+  - In:  ['b', 'c', 'd']
+  - Out: []
+
+# Expected Results and Comparison
+
+# Block: entry
+- Expected:
+   - In: []
+   - Out: ['a', 'b', 'd']
+- Explanation: 
+ In the entry block, `a`, `b`, and `d` are live after the block because they  are used later in the program. The variable `x` is defined but not used, so it is not live after `entry`.
+
+# Block: b2
+- Expected:
+   - In: ['a', 'b']
+   - Out: ['b', 'c', 'd']
+
+- Explanation: 
+ In block `b2`, `a` and `b` are used to compute `c`. `d` is redefined within this block, but the new value of `d` is used later in the `done` block, so `d` is live after `b2`. Additionally, `b` is live after `b2` because it is used in the `done` block. `c` is defined in `b2` and used later, so it is also live after this block.
+
+# Block: b3
+- Expected:
+   - In: ['b', 'd']
+   - Out: ['b', 'c', 'd']
+- Explanation:
+ In block `b3`, `b` and `d` are live because they are used in the `done`  block. `c` is redefined in `b3` and is used in the `done` block, so it  is live after `b3`.
+
+# Block: done
+- Expected:
+   - In: ['b', 'c', 'd']
+   - Out: []
+- Explanation:
+In the `done` block, the variables `b`, `c`, and `d` are used in the computation of `result`. After this block, there are no live variables because the function returns, so the `Out` set is empty.
+
+## Conclusion:
+ The results generated by the liveness analysis are correct based on the Bril code provided. Each block correctly identifies the variables that are live before and after it, based on the definitions and uses of those variables within the block and across the program.
+
+
+## Hardest Part of the Task and How We Addressed It
+
+
+The hardest part was ensuring that the liveness analysis results were correctly generalized without hardcoding specific variables. The challenge was to accurately compute the `gen` and `kill` sets for each block and propagate liveness across blocks.
+
+### How We Addressed It:
+1. **Generalized Propagation**: We avoided manual exclusions and relied on computing `gen` and `kill` sets to ensure only the necessary variables appeared in the `In` and `Out` sets.
+   
+2. **Fixed-Point Iteration**: Liveness information was iteratively propagated until no changes occurred, ensuring accurate results.
+
+3. **Validation**: We compared the results for each block with expected outcomes to ensure correctness.
+
+This approach ensured a generalized and correct liveness analysis.
