@@ -211,7 +211,7 @@ for (){
 b = a*2 
 
 d = 5 + b is loop invariant if b</code></pre>
-<p>In ssa a variable is loop invariant if it does not have a phi function at the loop of the loop, or it is defined by a phi function and all the inputs come from outside of the loop</p>
+<p>In ssa a variable is loop invariant if it does not have a phi function at the header of the loop, or it is defined by a phi function and all the inputs are loop constants</p>
 <p>SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed</p>
 </section>
 <section id="pre-steps---reshape-the-cfg" class="level2">
@@ -220,7 +220,7 @@ d = 5 + b is loop invariant if b</code></pre>
 <li>find the natural loops</li>
 <li>add pre-header</li>
 </ol>
-<p>if we are going to move code we often need to add a special basic block which is called a <strong><em>landing pad</em></strong> or a a <strong><em>pre-header</em></strong> create a new block b. change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header</p>
+<p>if we are going to move code we often need to add a special basic block which is called a <strong><em>landing pad</em></strong> or a <strong><em>pre-header</em></strong> create a new block b. change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header</p>
 </section>
 <section id="pre-header-can-change-phi-nodes" class="level2">
 <h2 class="anchored" data-anchor-id="pre-header-can-change-phi-nodes">pre-header can change phi nodes</h2>
