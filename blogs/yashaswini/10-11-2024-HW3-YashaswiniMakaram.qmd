@@ -1,0 +1,239 @@
+---
+author: Yashaswini Makaram
+execute:
+  enabled: false
+format:
+  html: default
+title: Homework3 - Yashaswini
+---
+
+# Data Flow Analysis
+
+
+## About the Code:
+- creates a flow diagram for a given bril code.  can choose whether to ggo forwards,ay must, ect. 
+
+'''
+import json
+from collections import defaultdict
+import graphviz
+
+def load_bril_program(filename):
+    """Load the Bril program from a JSON file."""
+    with open(filename, 'r') as file:
+        return json.load(file)
+
+def build_cfg(function):
+    """Build the Control Flow Graph (CFG) for a given function."""
+    instrs = function['instrs']
+    cfg = defaultdict(list)
+    label_map = {}
+
+    # Map labels to instruction indices
+    for i, instr in enumerate(instrs):
+        if 'label' in instr:
+            label_map[instr['label']] = i
+
+    for i, instr in enumerate(instrs):
+        if 'op' in instr and instr['op'] == 'jmp':
+            target = label_map[instr['labels'][0]]
+            cfg[i].append(target)
+        elif 'op' in instr and instr['op'] == 'br':
+            target1 = label_map[instr['labels'][0]]
+            target2 = label_map[instr['labels'][1]]
+            cfg[i].extend([target1, target2])
+        else:
+            # Fall-through case: connect to the next instruction
+            if i + 1 < len(instrs):
+                cfg[i].append(i + 1)
+
+    return cfg
+
+def predecessors(cfg):
+    """Find predecessors for each node in the CFG."""
+    pred = defaultdict(list)
+    for node, successors in cfg.items():
+        for succ in successors:
+            pred[succ].append(node)
+    return pred
+
+def generic_data_flow_analysis(function, transfer_fn, gen_fn, kill_fn, direction="forward", merge="union"):
+    """Perform a generic data flow analysis on the given function."""
+    cfg = build_cfg(function)
+    preds = predecessors(cfg)
+
+    # Initialize IN and OUT sets for all nodes
+    in_sets = defaultdict(set)
+    out_sets = defaultdict(set)  # Initialize with defaultdict to avoid KeyError
+
+    # Ensure every node in the function has an entry in out_sets
+    for node in range(len(function['instrs'])):
+        out_sets[node] = gen_fn(node)  # Start with GEN[n] if desired, or an empty set
+
+    changed = set(cfg.keys())
+
+    while changed:
+        n = changed.pop()
+
+        # Calculate IN[n] or OUT[n] based on direction
+        if direction == "forward":
+            in_sets[n] = set()
+            for p in preds[n]:
+                if merge == "union":
+                    in_sets[n] |= out_sets[p]
+                elif merge == "intersection" and out_sets[p]:
+                    in_sets[n] &= out_sets[p]
+        else:  # Backward analysis
+            out_sets[n] = set()
+            for s in cfg[n]:
+                if merge == "union":
+                    out_sets[n] |= in_sets[s]
+                elif merge == "intersection" and in_sets[s]:
+                    out_sets[n] &= in_sets[s]
+
+        old_out = out_sets[n].copy() if direction == "forward" else in_sets[n].copy()
+        
+        # Update OUT[n] or IN[n] using the transfer function
+        if direction == "forward":
+            out_sets[n] = transfer_fn(in_sets[n], gen_fn(n), kill_fn(n))
+        else:
+            in_sets[n] = transfer_fn(out_sets[n], gen_fn(n), kill_fn(n))
+
+        # If there's a change, update the changed set
+        if direction == "forward" and old_out != out_sets[n]:
+            for s in cfg[n]:
+                changed.add(s)
+        elif direction == "backward" and old_out != in_sets[n]:
+            for p in preds[n]:
+                changed.add(p)
+
+    return in_sets, out_sets
+
+def reaching_definitions_transfer(in_set, gen_set, kill_set):
+    """Transfer function for Reaching Definitions: OUT[n] = GEN[n] U (IN[n] - KILL[n])."""
+    return gen_set | (in_set - kill_set)
+
+def reaching_definitions_gen_kill(instr, idx):
+    """GEN and KILL sets for Reaching Definitions."""
+    if 'dest' in instr:
+        gen_set = {(instr['dest'], idx)}
+        kill_set = {var for var, _ in gen_set}
+        return gen_set, kill_set
+    return set(), set()
+
+def create_cfg_visualization(function, in_sets, out_sets):
+    """Create a graphical view of the CFG with IN and OUT sets."""
+    cfg = build_cfg(function)
+    dot = graphviz.Digraph(comment=function['name'])
+
+    for node, instr in enumerate(function['instrs']):
+        label = f"Instr {node}: {instr}\nIN: {in_sets[node]}\nOUT: {out_sets[node]}"
+        dot.node(str(node), label)
+
+    for node, successors in cfg.items():
+        for succ in successors:
+            dot.edge(str(node), str(succ))
+
+    # Save the CFG visualization as a PDF
+    dot.render(f"cfg_{function['name']}", format="pdf", cleanup=True)
+
+def run_analysis(program):
+    """Run the generic data flow analysis on each function in the Bril program."""
+    for function in program['functions']:
+        print(f"Analyzing function: {function['name']}")
+
+        def gen_fn(n):
+            instr = function['instrs'][n]
+            return reaching_definitions_gen_kill(instr, n)[0]
+
+        def kill_fn(n):
+            instr = function['instrs'][n]
+            return reaching_definitions_gen_kill(instr, n)[1]
+
+        in_sets, out_sets = generic_data_flow_analysis(
+            function, reaching_definitions_transfer, gen_fn, kill_fn, direction="forward", merge="union"
+        )
+
+        print(f"IN sets: {in_sets}")
+        print(f"OUT sets: {out_sets}")
+
+        # Create a graphical view of the CFG
+        create_cfg_visualization(function, in_sets, out_sets)
+
+def main():
+    # Load the Bril program from a file
+    bril_program = load_bril_program('add.bril')
+
+    # Run the analysis
+    run_analysis(bril_program)
+
+# Run the main function
+if __name__ == "__main__":
+    main()
+'''
+## Testing:
+
+test case:
+'''
+{
+  "functions": [
+    {
+      "instrs": [
+        { "dest": "v0", "op": "const", "type": "int", "value": 1 },
+        { "dest": "v1", "op": "const", "type": "int", "value": 2},
+        { "args": ["v0", "v1"],"dest": "v2", "op": "add", "type": "int"},
+        { "args": ["v2"], "op": "print"}
+      ],
+      "name": "main"
+    }
+  ]
+}
+'''
+
+output:
+
+![](img/cfg_main.png)
+
+
+test case 2
+'''
+{
+  "functions": [
+    {
+      "instrs": [
+        {"dest": "c5","op": "const","type": "int","value": 5},
+        {"args": ["c5"],"dest": "v0","op": "alloc","type": {"ptr": "int"}},
+        {"dest": "j","op": "const","type": "int","value": 1},
+        {"dest": "c1","op": "const","type": "int","value": 1},
+        {"args": ["v0","c1"],"op": "store"},
+        {"dest": "c2","op": "const","type": "int","value": 2},
+        {"args": ["v0","c2"],"op": "store"},
+        {"dest": "c3","op": "const","type": "int","value": 3},
+        {"args": ["v0","c2"],"op": "store"},
+        {"dest": "c4","op": "const","type": "int","value": 4},
+        {"args": ["v0","c2"],"op": "store"},
+        {"dest": "c5","op": "const","type": "int","value": 5},
+        {"args": ["v0","c2"],"op": "store"},
+        {"dest": "sum","op": "const","type": "int","value": 0},
+        {"dest": "i","op": "const","type": "int","value": 0},
+        {"label": "loop" },
+        {"args": ["i","c5"],"dest": "cond","op": "lt","type": "bool"},
+        {"args": ["cond"],"labels": ["body","end"],"op": "br"},
+        {"label": "body"},
+        {"args": ["v0"],"dest": "current","op": "load","type": "int"},
+        {"args": ["sum","current"],"dest": "sum","op": "add","type": "int"},
+        {"args": ["i","j"],"dest": "i","op": "add","type": "int"},
+        {"labels": [ "loop"],"op": "jmp"},
+        {"label": "end" },
+        {"args": ["sum"],"op": "print"},
+        {"args": ["v0"],"op": "free"},
+        {"op": "ret"}
+      ],
+      "name": "main"
+    }
+  ]
+}
+'''
+
+output
+![](img/cfg_loopadd.png)

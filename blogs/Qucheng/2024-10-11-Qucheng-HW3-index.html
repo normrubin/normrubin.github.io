@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="https://blog.jiang.news/XIAOZHOU/xiaozhou-1c/favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bril Dataflow Analyzer Viewer</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Ensure the iframe takes full width and dynamic height */
+        #previewFrame {
+            width: 100%;
+            border: none;
+        }
+
+        /* Optional: Style for other elements */
+        .content {
+            box-sizing: border-box;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 15px;
+            padding-bottom: 10px;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            display: flex;
+            align-items: flex-end;
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+
+        .logo {
+            display: inline-block;
+            height: auto; /* 使用 flex 的高度与 H2 匹配 */
+            margin-right: 10px; /* 为 logo 和标题之间添加间距 */
+        }
+
+        .logo img {
+            height: 2lh;
+            max-height: 100px; /* Limit the height */
+            width: auto; /* Keep aspect ratio */
+        }
+
+        h1 {
+            margin: 0;
+            display: inline-block; /* 确保H2元素为块状，且与其他元素对齐 */
+        }
+
+    </style>
+    <script>
+        // Mapping between bril scripts and their functions
+        const scriptFunctionMapping = {
+            "in_class_example_1.bril": ["in_class_example_1.html", "main.html"],
+            "in_class_example_2.bril": ["main.html"],
+            "in_class_example_3.bril": ["in_class_example_3.html", "main.html"],
+            "fact.bril": ["main.html"],
+            "cond.bril": ["main.html"],
+            "cond_args.bril": ["main.html"],
+            "is_decreasing.bril": ["last_digit.html", "is_decreasing.html", "main.html"],
+            "check_primes.bril": ["main.html", "checkPrime.html"],
+            "birthday.bril": ["probability.html", "main.html"],
+        };
+
+        // Default option for dropdowns
+        const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "-- Choose --";
+
+        // Dynamically populate the brilScript dropdown
+        function populateBrilScriptOptions() {
+            const brilScriptSelect = document.getElementById("brilScript");
+            brilScriptSelect.appendChild(defaultOption);
+
+            Object.keys(scriptFunctionMapping).forEach(script => {
+                const option = document.createElement("option");
+                option.value = script;
+                option.textContent = script;
+                brilScriptSelect.appendChild(option);
+            });
+        }
+
+        // Update the function options based on selected script
+        function updateFunctions() {
+            const scriptSelect = document.getElementById("brilScript");
+            const functionSelect = document.getElementById("function");
+            const selectedScript = scriptSelect.value;
+
+            // Clear the existing options in function select
+            functionSelect.innerHTML = ""; // Clear previous options
+            functionSelect.appendChild(defaultOption);
+
+            // Add new options based on selected script
+            if (selectedScript in scriptFunctionMapping) {
+                scriptFunctionMapping[selectedScript].forEach(functionName => {
+                    const option = document.createElement("option");
+                    option.value = functionName;
+                    option.textContent = functionName.endsWith(".html") ? functionName.slice(0, -5) : functionName;
+                    functionSelect.appendChild(option);
+                });
+            }
+
+            // Clear the iframe when the script changes
+            document.getElementById("previewFrame").src = "";
+        }
+
+
+        // Update iframe based on selected options
+        function updateIframe() {
+            const analysisType = document.getElementById("analysisType").value;
+            const brilScript = document.getElementById("brilScript").value;
+            const func = document.getElementById("function").value;
+            
+            if (brilScript && func) {
+                const url = `https://htmlpreview.github.io/?https://github.com/jiangqucheng/EECE7398_ST_Compiler/blob/main/HW3/output/${brilScript}/${analysisType}/${func}`;
+                document.getElementById("previewFrame").src = url;
+            }
+
+            // Save the selected values to localStorage
+            localStorage.setItem("analysisType", analysisType);
+            localStorage.setItem("brilScript", brilScript);
+            localStorage.setItem("function", func);
+        }
+    </script>
+    <script>
+        function adjustIframeHeight() {
+            const iframe = document.getElementById("previewFrame");
+            const contentHeight = document.querySelector(".content").offsetHeight;
+            iframe.style.height = `calc(100vh - ${contentHeight}px)`;
+        }
+
+        // Call adjustIframeHeight after the page loads and after any changes
+        window.onload = function() {
+            adjustIframeHeight();
+            populateBrilScriptOptions();
+            restoreSelections(); // Restore the selections on page load
+        };
+        window.onresize = adjustIframeHeight;
+    </script>
+    <script>
+        // Restore previously selected values from localStorage
+        function restoreSelections() {
+            const savedAnalysisType = localStorage.getItem("analysisType");
+            const savedBrilScript = localStorage.getItem("brilScript");
+            const savedFunction = localStorage.getItem("function");
+
+            if (savedAnalysisType) {
+                document.getElementById("analysisType").value = savedAnalysisType;
+            }
+
+            if (savedBrilScript) {
+                document.getElementById("brilScript").value = savedBrilScript;
+                updateFunctions(); // Populate the function dropdown
+
+                // Set the function if it was saved
+                if (savedFunction) {
+                    document.getElementById("function").value = savedFunction;
+                }
+
+                // Update the iframe if everything is selected
+                updateIframe();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="content">
+        
+        <div class="container">
+            <div class="logo"><img src="https://blog.jiang.news/XIAOZHOU/xiaozhou-1c/android-chrome-192x192.png" alt="logo"></div>
+            <h1>Bril Dataflow Analyzer Viewer</h1> 
+        </div>
+
+        <div style="gap: 15px; flex-wrap: wrap; display: inline-flex;">
+            <div style="flex: 1 1 auto; min-width: 80px;">
+            <label for="analysisType">Analysis:</label>
+            <select id="analysisType" onchange="updateIframe()" style="min-width: 12ch;">
+                <option value="liveness">Liveness</option>
+                <option value="availability">Availability</option>
+                <option value="busy">Busy</option>
+            </select>
+            </div>
+
+            <div style="flex: 1 1 auto; min-width: 80px;">
+            <label for="brilScript">Script:</label>
+            <select id="brilScript" onchange="updateFunctions()" style="min-width: 23ch;">
+                <option value="">-- Choose --</option>
+            </select>
+            </div>
+
+            <div style="flex: 1 1 auto; min-width: 80px;">
+            <label for="function">Function:</label>
+            <select id="function" onchange="updateIframe()" style="min-width: 20ch;">
+                <option value="">-- Choose --</option>
+            </select>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- make iframe extend to full height remain -->
+    <iframe id="previewFrame" width="100%" src=""></iframe>
+    <!-- <iframe id="previewFrame" width="100%" src="" style="border: none; height: calc(100vh - 200px);"></iframe> -->
+
+</body>
+</html>

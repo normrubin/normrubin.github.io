@@ -30,6 +30,7 @@ jobs:
 
       - name: Install deno and flit 
         run: |
+          cd 
           curl -fsSL https://deno.land/install.sh | sh
           echo 'export DENO_INSTALL="/home/runner/.deno"' >> ~/.bashrc
           echo 'export PATH="$DENO_INSTALL/bin:$PATH"' >> ~/.bashrc
@@ -39,16 +40,14 @@ jobs:
       - name: Bril tools
         run: |
           cd ~/bril
-          echo "DENO_INSTALL=/home/runner/.deno" >> $GITHUB_ENV
-          echo "PATH=/home/runner/.deno/bin:$PATH" >> $GITHUB_ENV
-          source ~/.bashrc
-          /home/runner/.deno/bin/deno install --allow-env --allow-read ts2bril.ts
-          /home/runner/.deno/bin/deno install brili.ts 
+          cat ~/.bashrc
+          set 
+          /home/runner/.deno/bin/deno install -f  --global --allow-env --allow-read ts2bril.ts
+          /home/runner/.deno/bin/deno install -f -g brili.ts 
           cd bril-txt
+          pwd
+          ls
           flit install --symlink --user
-
-       
-
    
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
