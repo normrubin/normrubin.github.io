@@ -476,7 +476,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 <section id="a-graphical-view" class="slide level2">
 <h2>a graphical view</h2>
 <p>(not legal if there is a pair where the arrows go in opposite directions)</p>
-<div id="7e419c27" class="cell" data-execution_count="1">
+<div id="e055a8f5" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -536,7 +536,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section class="slide level2">
 
-<div id="5d6cfd06" class="cell" data-execution_count="2">
+<div id="26ed6559" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -713,7 +713,7 @@ j - k == 0</code></pre>
      a[i,j] = 
 </code></pre>
 <p>There is no dependence so we can reorder the loops but what are the new bounds</p>
-<div id="3e435926" class="cell" data-execution_count="3">
+<div id="3bd59957" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -802,7 +802,7 @@ j - k == 0</code></pre>
 <pre><code>
 Here is a graph showing the data flow 
 
-::: {#3c683e36 .cell execution_count=4}
+::: {#af378bb1 .cell execution_count=4}
 ``` {.python .cell-code}
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -942,7 +942,7 @@ dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
 <pre><code>for (i=1; i&lt;=n; i++)
 for (j=1; j&lt;=n; j++)
 S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
-<div id="3f0feb9f" class="cell" data-execution_count="5">
+<div id="565597d5" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -1003,7 +1003,7 @@ S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
 
 <p>The schedule actually goes up each column (the j values) going over the columns left to right (the i column)</p>
 <p>notice that this does not execute in parallel, but it could if pick a different schedule</p>
-<div id="5283fe0a" class="cell" data-execution_count="6">
+<div id="7de94b4d" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -1485,7 +1485,7 @@ What does this mean and how does it help?
 
 
 </code></pre>
-<div id="cf58773c" class="cell" data-execution_count="7">
+<div id="e9941eaf" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
