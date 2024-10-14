@@ -38,6 +38,8 @@ we can use phi functions on memory tokens
 Maintaining Correct Memory Order: By tracking memory states explicitly in SSA form (through these memory tokens and versioning), SSA ensures that memory operations respect the correct order, even if the control flow of the program is complex. This helps compilers optimize code by making memory dependencies explicit.
 
 ```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
 graph TD
 store1
 load1
