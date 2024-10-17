@@ -1,0 +1,28 @@
+---
+author: Oscar Kellner
+format:
+  html: default
+title: HW3 - Data Flow Analysis
+
+---
+
+## Overview
+
+In this assignment, we model a dataflow framework to allow analysus for Bril programs in Lua through utilization of a control flow graph (CFG), which we also write a program to construct for us. A control flow graph represents all the possible paths that a program may take during execution in graph notation, delimited in blocks. Thus, we also use the gen_blocks program we had rewritten in the previous assignment.
+
+Using the provided examples for direction, we first verify the correctness of the generated CFG by generating a GraphViz file and comparing with the same output that the example provides. Then, we attempt to implement a framework for dataflow analysis, allowing a user-defined analysis to work with the CFG we generated.
+
+## Part 1: Control Flow Graph
+
+One challenge of working with Lua is that, as powerful and versatile tables are (essentially being an analogue of Python's dictionaries, or hash tables), are that there appears to be no standard implementation for other common data types such as sets, arrays, and so on. A lot of boilerplate must be written to emulate the same functionality that Python allows natively or within their standard library. One of these data structures is the OrderedDict, which keeps the order of key-value pairs stored in the order in which they were added. Lua does not keep a consistent order in its key-value pairs, so without any kind of ordering, the CFG will not maintain its order as its being created and it causes the graph to be formed incorrectly. We fix this by keeping an extra table specifically to keep track of the order in which blocks are added, which must be passed around alongside the block list across functions.
+
+We write `cfg_dot.lua` to generate GraphViz files to represent bril programs in CFG form to test our implementation. A small shell script generates an PNG of the CFG for all functions that was stored in the GraphViz file. The CFG for the merge sort program is included, which includes a decent amount of control flow to demonstrate the CFG program.
+
+## Part 2: Analysis Tool
+
+The analysis tool, `dataflow.lua` and `dataflow_run.lua`, provides a small framework in which a user defined analysis can be run on an existing CFG for a bril program that is generated through use of the `cfg.lua` module created in part 1. A couple of boilerplate utility functions were implemented to allow for set operations. To allow for easier testing against the existing implementation, the output was carefully formatted to recreate that which the `.out` test files appear.
+
+One of the issues encountered when debugging is that the program would loop indefinitely within the df_worklist function. It was resolved when a list of visited blocks was kept up to date, however it was remained to be seen whether it ended up affecting the correctness of the program.
+
+Unfortunately the output does not exactly match that of the provided example. Small errors appear in mismatching between the liveness of variables, particularly at the starts and ends of programs or functions. A small modification of the example turnt file allowed for comparison between the given and expected output.
+

@@ -1,0 +1,471 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_mem_consistancy.qmd
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: memory consistancy
+
+---
+
+
+## memory operations 
+
+The C semantics assume that (within a single thread) all loads and stores stay in order. That is is not allowed to re-order a store past a load of the same address.
+
+in ssa each argument of an instruction is a pointer to the source instruction.  These edges force  serialization of the code.
+
+We want to apply this to loads and stores this will make ordering explicit 
+
+In Static Single Assignment (SSA) form, memory tokens, representing stores or loads to memory, are typically handled by introducing memory state variables
+
+1) load:  dest = load addrs, memory_token
+1) store memory_token = store value, address, memory_token
+1) calls to functions that might modify memory also need to read and write memory tokens 
+
+treat a store as though it created a new copy of memory 
+
+we can use phi functions on memory tokens 
+
+Maintaining Correct Memory Order: By tracking memory states explicitly in SSA form (through these memory tokens and versioning), SSA ensures that memory operations respect the correct order, even if the control flow of the program is complex. This helps compilers optimize code by making memory dependencies explicit.
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+store1
+load1
+load2
+store2
+load4
+load3
+store1-->load1
+store1-->load2
+store1 --> store2
+store2 --> load3
+store2--> load4
+store2--> exit
+```
+
+Optimize  loads/stores 
+
+walk backwards - load from store 
+
+1) if we can prove the load address is the same as the store address-  remove the load 
+
+2) if we can prove the load address is different move the load up a store 
+
+3) otherwise go on
+
+
+
+
+
+
+
+
+
+## multi-threaded programs
+
+Compilers started out assuming targets are single threaded.  What optimizations change for multi-threaded code?
+How do users tell compiler that the target is multi-threaded?
+
+
+## shared memory multi-threading
+
+The most common parallel system is 
+
+1. A single big memory 
+1. multiple threads address that memory 
+
+
+# an example 
+
+
+Pretend we have parallel programming in bril
+
+```
+setup:
+  zero: int = const 0;
+  one:  int = const 1;
+  a: ptr<int> = alloc one;
+  b: ptr<int> = alloc one;
+  store a zero;
+  store b zero;
+
+  create two threads somehow 
+
+  thread 1                  thread 2
+  store a one;              store b one
+  bv: int = load b;         av: int load a;
+```
+
+av| bv| allowed
+--| --|---
+0| 0|
+0|1|
+1|0|
+1|1
+
+
+## what is  sequential consistency SQ 
+
+Program Order is Maintained Within Threads:
+
+Operations (reads and writes) appear to occur in the order they are issued by each individual thread. If a thread performs a write followed by a read, the read cannot appear to happen before the write in the execution.
+
+Global Order of Operations Across Threads:
+
+All threads see the effects of memory operations in the same sequential order. Every thread agrees on the order of reads and writes, though the specific order is not predefined—it just needs to be consistent across all threads.
+Interleaving of Operations:
+
+The execution can be viewed as an interleaving of instructions from all threads. However, the interleaving must follow the program order within each thread.
+
+no real machine/compiler  implements this 
+
+
+## compiler effects
+
+
+Compiler transformations that break multi-thread sequential consistency (SC) often reorder or optimize instructions in ways that do not respect the original program order seen by other threads. These transformations can lead to subtle bugs in multithreaded programs where the expected interleaving of operations is violated. 
+
+## Load/Store Reordering
+
+Transformation: Compilers might reorder loads and stores to improve performance.
+Violation: In a multi-threaded environment, this can lead to a situation where one thread sees stale or unexpected data.
+Example:
+
+```
+Copy code
+// Thread 1
+x = 1;     // Store
+r1 = y;    // Load
+
+// Thread 2
+y = 1;     // Store
+r2 = x;    // Load
+```
+
+Under sequential consistency, if thread 1’s x = 1 happens before thread 2’s r2 = x, then thread 2 should observe r2 == 1. But reordering could result in thread 2 reading x as 0.
+
+##  Common Subexpression Elimination (CSE)
+
+Transformation: If a variable or expression is computed multiple times, the compiler may optimize by reusing the result of an earlier computation.
+Violation: This assumes that no other thread modifies shared variables between these uses.
+Example:
+
+```
+// Original code
+r1 = x;
+r2 = x;
+
+// Transformed code (CSE applied)
+temp = x;
+r1 = temp;
+r2 = temp;
+```
+
+If x is modified by another thread between the two reads, the transformed code will incorrectly assume the value of x hasn't changed.
+
+## Dead Code Elimination (DCE)
+
+Transformation: The compiler may remove stores to variables that are not subsequently read in the same thread.
+Violation: If the variable is shared and accessed by other threads, removing the store could lead to unexpected behavior.
+Example:
+
+```
+// Original code
+x = 1;
+
+// Transformed code (DCE applied)
+```
+
+// x = 1 is removed because x is not used locally
+If another thread reads x, it expects the store to have happened, but DCE breaks this assumption.
+
+## Speculative Execution (Out-of-Order Execution)
+
+Transformation: Compilers (or  hardware) may execute instructions speculatively, assuming certain branches are likely to be taken.
+Violation: This can cause out-of-order writes or reads visible to other threads, breaking SC.
+Example:
+
+```
+if (flag) {
+    r1 = x;
+}
+```
+
+If the compiler speculatively reads x before knowing the value of flag, another thread’s write to x might be missed or observed out-of-order.
+
+## Loop Invariant Code Motion
+
+Transformation: The compiler moves computations that are invariant inside a loop to outside the loop.
+Violation: If these computations involve shared variables modified by other threads within the loop, moving them outside could make the code see stale values.
+Example:
+
+```
+// Original code
+while (condition) {
+    r = shared_variable;
+}
+
+// Transformed code (Loop Invariant Code Motion)
+temp = shared_variable;
+while (condition) {
+    r = temp;
+}
+```
+If shared_variable is updated by another thread, the transformed code might keep using the old value.
+
+### Register Allocation (Caching Shared Variables in Registers)
+
+Transformation: Compilers can keep a shared variable in a register for efficiency rather than repeatedly loading it from memory.
+Violation: If another thread modifies that shared variable in memory, the compiler's register optimization would cause the thread to read stale data.
+Example:
+
+```
+while (flag == 0) {
+    // busy-wait
+}
+```
+If flag is cached in a register, updates to flag by another thread in memory won’t be reflected, breaking SC.
+
+## Instruction Fusion (Combining Loads/Stores)
+
+Transformation: The compiler may combine consecutive memory accesses into one, such as merging adjacent stores into a single store or combining two loads.
+Violation: If other threads expect these loads or stores to happen separately, they might see an inconsistent view of memory.
+Example:
+
+```
+// Original code
+x = 1;
+y = 2;
+
+// Transformed code (store fusion)
+// x and y are stored together in a single transaction
+```
+
+A thread expecting x and y to be updated separately might observe an inconsistent state if this transformation is applied.
+
+
+
+## thread libraries 
+
+start out assuming single threaded, add a threads library like pthreads
+
+multiple threads could access shared memory simultaneously, leading to race conditions, inconsistent data, and undefined behavior.
+
+Modern CPUs and compilers perform optimizations like instruction reordering, which can break assumptions about the order of memory operations in multithreaded programs.
+
+Multithreaded code is harder to test because race conditions and bugs might only manifest under certain timing conditions.
+
+Debugging multithreaded programs is more difficult due to the unpredictable nature of thread execution and interactions.
+
+Some optimizations might reorder instructions in a way that is incompatible with multithreading, introducing subtle bugs or performance regressions.
+
+Caching, prefetching, or other memory optimizations need to account for the fact that multiple threads may be accessing the same memory, which a simple thread library does not handle.
+
+## using libraries 
+
+1. Functions such as pthread mutex lock() that are guaranteed by the standard to “synchronize memory” include hardware instructions (“memory barriers”) that prevent hardware reordering of memory operations around the call
+
+2. To prevent the compiler from moving memory operations around calls to functions such as pthread mutex lock(), they are essentially treated as calls to opaque functions, about which the compiler has no information.
+
+The compiler effectively assumes that pthread mutex lock() may read or write any global variable. Thus a memory reference cannot simply be moved across the call. This approach also ensures that transitive calls, e.g. a call to a function f() which then calls pthread mutex lock(), are handled in the same way more or less appropriately, i.e. memory operations are not moved across the call to f() either, whether or not the entire user program is being analyzed at once.
+
+# example 2
+```
+for (...) {
+     ... 
+     if (mt) pthread_mutex_lock(...); 
+     x = ... x ...
+     if (mt) pthread_mutex_unlock(...)
+    }
+```
+
+r = x; 
+for (...) {
+     ... 
+     if (mt) {
+         x = r; pthread_mutex_lock(...); r = x; 
+         } 
+     r = ... r ... 
+     if (mt) {
+         x = r; pthread_mutex_unlock(...); r = x; 
+     }
+} 
+x = r;
+
+
+
+
+## adding multi-threading to user explaining the intent 
+
+c++/c  added atomics 
+
+Atomic operations are operations that are completed as a single, uninterruptible action. No other thread can observe a partial update or interfere with the operation.
+
+These operations ensure that read-modify-write sequences are safe without needing explicit locks.
+
+## an example 
+
+```
+#include <atomic>
+#include <iostream>
+#include <thread>
+
+// Global spinlock using atomic_flag
+std::atomic_flag lock = ATOMIC_FLAG_INIT;
+
+void enter_critical_section() {
+    // Busy-wait (spin) until the lock is acquired
+    while (lock.test_and_set(std::memory_order_acquire)) {
+        // Spin and wait for the lock to become available
+    }
+}
+
+void leave_critical_section() {
+    // Release the lock
+    lock.clear(std::memory_order_release);
+}
+
+// Shared resource
+int shared_counter = 0;
+
+void critical_section_task(int num_increments) {
+    for (int i = 0; i < num_increments; ++i) {
+        enter_critical_section();
+        // Begin critical section
+        ++shared_counter;
+        // End critical section
+        leave_critical_section();
+    }
+}
+```
+
+
+## load acquire (needs special hardware )
+
+used by default with atomics not used for non-atomics 
+
+all memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.
+
+a one way fence - nothing can move up
+
+## write release (needs special hardware )
+
+prevents the compiler or processor from reordering any memory operations (reads or writes) that appear before the release store. This guarantees that all operations that modify shared data before the release are visible to other threads that subsequently perform an acquire operation.
+
+also a one way fence - nothing can move down 
+
+```
+load.acquire - 
+loads and stores on non-atomics  - compiler picks the order for these operations 
+store.release 
+```
+
+
+## using  atomics 
+
+All operations appear to occur in a single total order that is consistent across all threads. This means that the results of operations are predictable and consistent as if all operations were executed in some sequential order.
+
+limits the hardware and compiler because it prevents reordering 
+
+
+##  Data Race Free
+
+ 
+
+Data Race Free (DRF) means that a program is free from data races, which occur when:
+
+1. Two or more threads access the same variable concurrently.
+1. At least one of the accesses is a write.
+
+There is no synchronization mechanism (like mutexes or atomic operations) to control the access.
+In a data race-free program, every shared variable is accessed in a way that ensures predictable results. C++ provides various synchronization primitives (such as mutexes and atomic types) to help developers write DRF code.
+
+All shared variables must be accessed using synchronization to prevent concurrent threads from modifying shared data simultaneously without coordination.
+
+
+## an example
+
+```
+#include <iostream>
+#include <atomic>
+#include <thread>
+
+int shared_counter1 = 0;                  // First non-atomic shared variable
+int shared_counter2 = 0;                  // Second non-atomic shared variable
+std::atomic<bool> lock_flag(false);       // Atomic flag to control access
+
+void safe_increment() {
+    for (int i = 0; i < 1000; ++i) {
+        // Spin until the lock is acquired
+        while (lock_flag.exchange(true)) {
+            // Busy-wait (spin) until the lock is free
+        }
+
+        // Critical section: update the non-atomic shared variables
+        ++shared_counter1;
+        ++shared_counter2;
+
+        // Release the lock
+        lock_flag.store(false);
+    }
+}
+```
+
+## language rules
+
+C and C++ 
+
+do not define what happens in the presence of data races. If a program has data races (e.g., multiple threads concurrently reading and writing to the same variable without synchronization), the behavior is considered undefined. This means that the program may produce unexpected results, crash, or behave inconsistently across different executions or platforms.
+
+Java 
+
+tries to define what happens but definition is very complex and maybe inconsistent 
+
+Rust
+
+Compile-Time Guarantees: Rust's ownership and borrowing system prevents data races at compile time. If a program is not DRF, the Rust compiler will typically refuse to compile it, enforcing memory safety guarantees. 
+
+## can the compiler add a race to a drf program 
+
+new rule, compiler cannot add a write to a shared variable 
+
+```
+if (x ==1) y++
+
+to 
+y++
+if (x!=1) y--
+
+```
+
+## how does this effect hardware?
+
+```
+struct { char a; char b; char c; char d;} s;
+s.a = 1
+s.c = 3
+
+can a compiler do 
+char temp[4] = s // load 32 bits 
+temp[0] = 1
+temp[2] = 3
+s = temp
+```
+
+not allowed - reads/writes  b and d, so compiler incorrectly added writes 
+
+options are either have byte addressable hardware, or pad so that each char gets 32 bits
+
+Vendors forced to add 8 byte loads/stores 

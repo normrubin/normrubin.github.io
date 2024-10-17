@@ -1,0 +1,137 @@
+---
+author: Oscar Kellner
+format:
+  html: default
+title: HW2 - Minor Local Optimizations
+
+---
+
+## Overview
+
+In this assignment, we try to inplement two common forms of local optimization: trivial dead code elimination and value numbering. In this context, local refers to optimizations within the block level, meaning optimizations are isolated between any kind of control flow, which may include unconditional branches. Despite the limited scope of the optimizations, these two methods are relatively inexpensive and can be used in conjunction with each other to reduce unnecessary instructions from a program.
+
+I had struggled a lot with this homework in particular, partially due to my insistence on using Lua (a comparable scripting language to Python but with less library support) to get more familiar with the language. This also required rewriting plenty of utility functions to achieve some of the same functionality that was previously given, such as "gen_blocks". The time constraints have not been friendly.
+
+## Part 1: Trivial Dead Code Elimination (TDCE)
+
+For each of these optimizations, we will need to split our program into a series of blocks, which as mentioned before is separated between control flow instructions, such as `jmp`, `ret`, and `br`. Within these blocks, we can analyze what variables are used within this block and if any dead instructions are found. We can classify "trivial dead code" as those that write to a variable, and subsequently never use said variable in any accessible code path within the block. 
+
+We can run this process as many times as we like until our code converges to a point where no changes are further made after a round of execution (or "pass"). A single TDCE pass may not eliminate all dead code on the first iteration, as (for example) some useless variables may be used to assign other useless variables, which our TDCE detects as being "used" until the dependent dead variables are also eliminated.
+
+Implementing this was not too difficult - just simply iterate through all the instructions for a given block, and keep a table of used variables. Then, reconstruct the sequence of instructions, excluding any instructions that write to variables not within our table, and finally rewrite the trimmed block back to the original function. Repeat for all blocks, and you have a single TDCE pass. I opted to write an option for a user-specified number of passes if they like, with < 1 defaulting to repeating the TDCE until the program detects that no more instructions were eliminated in a given pass.
+
+## Part 2: Local Value Numbering (LVN)
+
+Local value numbering works somewhat similarly to TDCE in that it will iterate through the instructions for a given block and keep track of some statistics to determine what code to modify. In this case, LVN aims to reduce redundancy within a block, by enumaterating expressions (as opposed to variables) it encounters and eliminating any values that share the same operation and operands.
+
+There are a few methods that can be employed in conjunction in order to remove redundancy:
+
+- Constant folding: If operands within an instruction are constants, we can "fold" the result directly into the code so the machine does not have to recalculate it at runtime. This may also include algebraic identities, but I did not attempt to support it here.
+- Propagation: Redundant variables can be eliminated if multiple variables are assigned to be equal to each other and are not each used for different purposes.
+- Other properties: Making use various mathematical properties / boolean logic to find redundant expressions, such as (a + b) and (b + a), or (x == x).
+
+Debugging this code has proven to be very frustrating as most of the flow for execution involves piping in multiple commands through standard input / output (usually to accomodate for Turnt and Bril utilities), so any attempt to print debugging information onto the screen will modify the output and cause any subsequent programs to fail. Work became somewhat disorganized when I had opted to save a lot of intermediate output files and additional testing programs just to observe the outcome of a single change. I will admit that I had to restructure / rewrite a lot of code multiple times to find a good balance, and in doing so I had revised a lot of the code in accordance to the example program after having made my own attempts at implementation.
+
+## Testing
+
+Because Brili serves mostly to simulate code, our method of checking performance of our local optimization is to simply count the number of instructions reduced between the optimization passes. While this code does not aim specifically to target loops, it would be in our best interst to try and optimize repeated blocks of code so the gross number of instructions executed at runtime is reduced.
+
+I'm still struggling a lot to understand how turnt works. From my understanding, it doesn't seem to work past one directory level? I've needed to copy all of my source files and also benchmark folders just to make the process a little more convenient, but it is still pretty frustrating.
+
+Unfortunately, there seems to be a few bugs in the local optimizations, as there are a select few programs that appear to fail the consistency check after optimizations (comparing to the existing .out file). There are two bril programs that are the culprits - `mat-mul.bril` and `adj2csr.bril`. Upon further inspection, both of these programs appear to use a random number generator of sorts, but the important constants may be filtered out before they are run. However, after optimizations, the rest of the programs I have tested on appear to produce an identical output. I have tested the TDCE and LVN programs, as well as the two chained after another, on all `mem` and `core` benchmarks.
+
+Here are some stats on the `mem` set of benchmarks:
+
+Baseline:
+```
+total_dyn_inst: 56629
+total_dyn_inst: 6851
+total_dyn_inst: 78
+total_dyn_inst: 253
+total_dyn_inst: 121202
+total_dyn_inst: 88
+total_dyn_inst: 1006454
+total_dyn_inst: 121
+total_dyn_inst: 47
+total_dyn_inst: 1990407
+total_dyn_inst: 193
+total_dyn_inst: 677
+total_dyn_inst: 11029
+total_dyn_inst: 279
+total_dyn_inst: 27333
+total_dyn_inst: 264
+total_dyn_inst: 3482
+total_dyn_inst: 98
+total_dyn_inst: 86036
+```
+
+TDCE only:
+```
+total_dyn_inst: 56584
+total_dyn_inst: 6851
+total_dyn_inst: 75
+total_dyn_inst: 253
+total_dyn_inst: 120652
+total_dyn_inst: 88
+total_dyn_inst: 959702
+total_dyn_inst: 121
+total_dyn_inst: 47
+total_dyn_inst: 1990407
+total_dyn_inst: 193
+total_dyn_inst: 677
+total_dyn_inst: 11024
+total_dyn_inst: 279
+total_dyn_inst: 27011
+total_dyn_inst: 264
+total_dyn_inst: 3455
+total_dyn_inst: 88
+total_dyn_inst: 86036
+```
+
+LVN only:
+```
+total_dyn_inst: 56584
+total_dyn_inst: 6851
+total_dyn_inst: 78
+total_dyn_inst: 253
+total_dyn_inst: 121202
+total_dyn_inst: 88
+total_dyn_inst: 1006454
+total_dyn_inst: 121
+total_dyn_inst: 47
+total_dyn_inst: 1990407
+total_dyn_inst: 193
+total_dyn_inst: 677
+total_dyn_inst: 11029
+total_dyn_inst: 279
+total_dyn_inst: 27011
+total_dyn_inst: 264
+total_dyn_inst: 3482
+total_dyn_inst: 98
+total_dyn_inst: 86036
+```
+
+LVN | TDCE:
+```
+total_dyn_inst: 56584
+total_dyn_inst: 6851
+total_dyn_inst: 75
+total_dyn_inst: 253
+total_dyn_inst: 120652
+total_dyn_inst: 88
+total_dyn_inst: 959702
+total_dyn_inst: 121
+total_dyn_inst: 47
+total_dyn_inst: 1990407
+total_dyn_inst: 193
+total_dyn_inst: 677
+total_dyn_inst: 11024
+total_dyn_inst: 279
+total_dyn_inst: 27011
+total_dyn_inst: 264
+total_dyn_inst: 3455
+total_dyn_inst: 88
+total_dyn_inst: 86036
+```
+
+Unfortunately, as it stands only TDCE seems to create a marginal difference in performance - ironically LVN tends to increase the number of instructions likely leading to worse performance. Though, with working within a small scope such as individual blocks, it may be expected that programs with a lot of control flow would not see much benefit from block-level optimization. Perhaps with more aggressive scheduling and more awareness of instruction count, I could get LVN to improve on its ability, however I have struggled a lot with the programming as it is given the time constraints.

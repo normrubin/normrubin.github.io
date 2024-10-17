@@ -1,0 +1,631 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_llvm.qmd
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: using llvm
+
+---
+
+#  Using LLVM
+
+handy links 
+ 
+[llvm programmers guide](https://llvm.org/docs/ProgrammersManual.html)
+
+[Adrians tutorial](https://www.cs.cornell.edu/~asampson/blog/llvm.html)
+
+[skeleton code](https://github.com/sampsyo/llvm-pass-skeleton)
+ 
+[llvm doc]( https://llvm.org/docs/LangRef.html)
+ 
+google, github pilot and chatgpt are  very useful. 
+
+
+## install clang and friends 
+
+as a first step I'm going to show how to install clang and cmake 
+
+```
+sudo apt install clang cmake 
+```
+
+
+# lets take a look  at llvm ir 
+
+```
+// temp.c
+int main(int argc, char** argv){
+       return argc;}
+```
+
+dump the ir
+
+1. -emit-llvm  print the ir
+1. -S print as text not as binary 
+1. 0 -  output to stdout 
+
+clang -emit-llvm -S -o - temp.c
+
+##  llvm ir 
+
+```
+clang -emit-llvm -S -o - temp.c
+
+; ModuleID = 'temp.c'
+source_filename = "temp.c"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  ret i32 %6
+}
+```
+
+compared to bril 
+
+more complex types, variables are %n, assumes a stack, must be in ssa 
+
+## using copilet 
+
+what does the llvm alloca do
+
+In LLVM, the alloca instruction is used to allocate memory on the stack. It stands for "allocate" and is similar to the alloca function in C. The memory allocated by alloca is automatically freed when the function returns, making it suitable for allocating temporary storage within a function.
+
+```
+Explanation of alloca Instruction
+Syntax: alloca <type>, <num_elements>, <alignment>
+<type>: The type of the elements to be allocated.
+<num_elements>: The number of elements to allocate (optional, defaults to 1).
+<alignment>: The alignment of the allocated memory (optional).
+Example from the Provided Code
+Explanation:
+%3 = alloca i32, align 4:
+
+Allocates memory for a single i32 (32-bit integer) on the stack.
+The allocated memory is aligned to a 4-byte boundary.
+The result is a pointer to the allocated memory, stored in the variable %3.
+%4 = alloca i32, align 4:
+
+Similar to the first instruction, this allocates memory for another i32 on the stack with 4-byte alignment.
+The result is stored in the variable %4.
+%5 = alloca i8**, align 8:
+
+Allocates memory for a single i8** (pointer to a pointer to an 8-bit integer) on the stack.
+The allocated memory is aligned to an 8-byte boundary.
+The result is stored in the variable %5.
+Usage:
+Temporary Storage: alloca is typically used for temporary storage within a function, such as local variables.
+Automatic Deallocation: The memory allocated by alloca is automatically deallocated when the function returns, so there is no need to manually free it.
+Example in Context:
+In the provided LLVM IR code, the alloca instructions are used to allocate space for local variables %3, %4, and %5 on the stack. These variables are then used to store values and perform operations within the main function.
+
+In this function:
+
+%3 is allocated for an i32 and initialized to 0.
+%4 is allocated for an i32 and initialized with the value of the first argument %0.
+%5 is allocated for an i8** and initialized with the value of the second argument %1.
+The value stored in %4 is loaded into %6 and returned.
+This demonstrates how alloca is used to manage local variables within an LLVM function.
+```
+
+
+## llvm classes 
+
+what is llvm value
+
+```
+In LLVM, a Value is a fundamental class that represents a typed constant or variable. It is the base class for all values computed by a program that may be used as operands to other values. This includes constants, instructions, function arguments, and more.
+
+Key Points about llvm::Value:
+Base Class: llvm::Value is the base class for many other classes in LLVM, such as llvm::Instruction, llvm::Constant, llvm::Argument, and llvm::GlobalVariable.
+Typed: Every Value has a type, represented by the llvm::Type class. This type information is crucial for type checking and code generation.
+Use-Def Chain: Value objects maintain a list of uses, which are the places where the value is used. This is part of the use-def (use-definition) chain, which is important for optimizations and transformations.
+
+Common Subclasses of llvm::Value:
+llvm::Instruction: Represents an individual instruction in the LLVM IR.
+llvm::Constant: Represents a constant value, such as an integer or floating-point constant.
+llvm::Argument: Represents an argument to a function.
+llvm::GlobalVariable: Represents a global variable.
+```
+
+
+## llvm classes  (llvm is c++ but does not use standard library)
+
+1) llvm does not use char* or std::string, it has something else called a StringRef. 
+1) there is no std::cout or std::cerr there are outs(), errs() 
+1) lot of built in data structures
+1) complex class hierarchy  
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+flowchart TD;
+Value --> Argument ;
+Value --> other["..."];
+Value --> User;
+User --> Constant
+User--> Operator
+User--> Instruction
+Constant --> ConstantExpr
+Constant--> ConstantData
+Operator--> ConcreteOperator
+Instruction--> UnaryInst
+ConstantData --> ConstantInt
+ConstantData --> UndefValue
+Instruction --> BinaryOperator
+Instruction--> CallBase
+```
+
+Instructions are a kind of Value, since everything is in SSA form, so in memory operands are pointers to instructions 
+
+##  plugins 
+
+An LLVM plugin is a shared library that can add additional functionality to the LLVM infrastructure. Plugins can be used to add new passes, analyses, targets, and more.
+
+Plugins are dynamically loaded into LLVM. Once loaded, a plugin can register new command-line options, passes, etc., that are then available for use in that invocation of the tool.
+
+The advantage for us is that using a plugin means you do not have to ever build llvm from source.
+ 
+There is a cs6120 package that makes setting up the build process for plugins simpler
+
+[pass starter](https://github.com/sampsyo/llvm-pass-skeleton)
+
+This has branches 
+
+master -  prints names of functions
+
+containers - prints everything 
+
+mutate - changes the code  
+
+rtlib -  easier way to insert code with needing irbuilder 
+
+
+## using llvm branches 
+
+To clone a specific branch from a GitHub repository, you can use the git clone command with the -b option followed by the branch name and the repository URL. Here is the syntax:
+
+git clone -b <branch-name> <repository-url> <target-directory>
+
+
+to switch branches 
+
+git fetch --all
+
+git checkout <branch-name>
+
+
+## using the master branch 
+
+git clone https://github.com/sampsyo/llvm-pass-skeleton
+
+ls  gives
+
+CMakeLists.txt  LICENSE  README.md  skeleton
+
+ls skeleton 
+CMakeLists.txt  Skeleton.cpp
+
+## Skeleton.cpp
+```
+#include "llvm/Pass.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
+#include "llvm/Support/raw_ostream.h"
+
+using namespace llvm;
+
+namespace {
+
+struct SkeletonPass : public PassInfoMixin<SkeletonPass> {
+    PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
+        for (auto &F : M) {
+            errs() << "I saw a function called " << F.getName() << "!\n";
+        }
+        return PreservedAnalyses::all();
+    };
+};
+
+}
+
+extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+    return {
+        .APIVersion = LLVM_PLUGIN_API_VERSION,
+        .PluginName = "Skeleton pass",
+        .PluginVersion = "v0.1",
+        .RegisterPassBuilderCallbacks = [](PassBuilder &PB) {
+            PB.registerPipelineStartEPCallback(
+                [](ModulePassManager &MPM, OptimizationLevel Level) {
+                    MPM.addPass(SkeletonPass());
+                });
+        }
+    };
+}
+```
+
+
+## how to build this 
+
+```
+~/llvm/llvm-pass-skeleton$ mkdir build
+cd build 
+ cmake ..
+
+```
+-- Registering SkeletonPass as a pass plugin (static build: OFF)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build
+```
+
+This generates build/skeleton/SkeletonPass.so
+
+to run this 
+
+clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp
+
+creates a.out and prints out info from the pass
+
+
+to make this easier to use you might create a bash script or a makefile 
+
+## look at the post on containers 
+
+## getting more info 
+
+Some helpfull llvm operations
+
+```
+errs() << "function Body:\n";
+errs() << F << '\n"; '
+```
+
+output
+```
+I saw a function called main!
+function Body:
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  ret i32 %6
+}
+```
+
+## entering containers 
+```
+PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM)
+        {
+            for (auto &F : M)
+            {
+                errs() << "I saw a function called " << F.getName() << "!\n";
+                for (auto &B : F)
+                {
+                    errs() << "starting block\n";
+                    errs() << B << "\n";
+                    for (auto &I : B)
+                    {
+                        errs() << "instr:" << I << "\n";
+                    }
+                };
+            };
+            return PreservedAnalyses::all();
+        };
+
+```
+```
+I saw a function called main!
+starting block
+
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  ret i32 %6
+
+instr:  %3 = alloca i32, align 4
+instr:  %4 = alloca i32, align 4
+instr:  %5 = alloca i8**, align 8
+instr:  store i32 0, i32* %3, align 4
+instr:  store i32 %0, i32* %4, align 4
+instr:  store i8** %1, i8*** %5, align 8
+instr:  %6 = load i32, i32* %4, align 4
+instr:  ret i32 %6
+```
+
+
+## modify the program 
+
+find the first binary operator and change it to a multiply
+
+```
+#// temp.c
+int main(int argc, char **argv)
+{
+       return argc + 5;
+}
+```
+
+``` PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM)
+        {
+            for (auto &F : M)
+            {
+                errs() << "I saw a function called " << F.getName() << "!\n";
+                for (auto &B : F)
+                {
+                    for (auto &I : B)
+                    {
+                        if (isa<BinaryOperator>(&I))
+                        {
+                            errs() << "instr:" << I << "\n";
+                        }
+                        auto *op = dyn_cast<BinaryOperator>(&I);
+                        errs() << "from_op:" << op << "\n";
+                    }
+                };
+            };
+            return PreservedAnalyses::all();
+        }
+   
+```
+ output
+```
+I saw a function called main!
+I saw a function called main!
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+from_op:0x0
+instr:  %7 = add nsw i32 %6, 5
+from_op:0xb58610
+from_op:0x0
+```
+## getting analysis info 
+
+```
+   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM) {
+        // Get the FunctionAnalysisManager.
+        FunctionAnalysisManager &FAM = MAM.getResult<FunctionAnalysisManagerModuleProxy>(M).getManager();
+
+        for (Function &F : M) {
+            // Skip external functions.
+            if (F.isDeclaration()) continue;
+
+            // Get the DominatorTree for the function.
+            DominatorTree &DT = FAM.getResult<DominatorTreeAnalysis>(F);
+
+            // Print the dominator tree.
+            errs() << "Dominator Tree for function: " << F.getName() << "\n";
+            DT.print(errs());
+        }
+```
+
+## testing 
+
+1. isa<Argument>(V) true of V is a agument 
+1. cast<Argument>(V) casts to Argument, assert falure of not Argument 
+1. dyn_cast<Argument>(V) casts to Argument returns NULL if not an argument 
+
+## irbuilder 
+
+```
+
+ errs() << "I saw a function called " << F.getName() << "!\n";
+                for (auto &B : F)
+                {
+                    errs() << B << "\n";
+
+                    for (auto &I : B)
+                    {
+                        if (auto *op = dyn_cast<BinaryOperator>(&I))
+                        {
+                            errs() << "old inst " << *op << "\n";
+                            IRBuilder<> builder(op);
+                            Value *left = op->getOperand(0);  // first operand
+                            Value *right = op->getOperand(1); // second operad
+                            Value *mul = builder.CreateMul(left, right);
+
+                            errs() << "new inst:" << *mul << "\n";
+
+                            errs() << B << "\n";
+
+                            // replace uses of op with mul
+                            for (auto &U : op->uses())
+                            {
+                                int num = U.getOperandNo(); // which argument
+                                User *user = U.getUser();   // the instruction with the use
+                                errs() << " user:" << *user << "   ";
+                                user->setOperand(num, mul);
+                                errs() << *user << "\n";
+                            }
+                        }
+                    }
+                }
+            };
+ 
+             return PreservedAnalyses::none();
+```
+
+output 
+
+I saw a function called main!
+
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  %7 = add nsw i32 %6, 5
+  ret i32 %7
+
+old inst   %7 = add nsw i32 %6, 5
+new inst:  %7 = mul i32 %6, 5
+
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  %7 = mul i32 %6, 5
+  %8 = add nsw i32 %6, 5
+  ret i32 %8
+
+ user:  ret i32 %8     ret i32 %7
+
+```
+
+
+## more complex transforms -  for instrumentation  
+
+instrumentation code in c not using builder 
+
+insert calls to functions and link them in 
+
+using IRBuilder is a mess, So I'm going to show a trick that makes it much simpler 
+
+## chat gpt 
+
+how do i write an instrumentation function in c for llvm, use a plugin pass to insert a call to the instrumentation routine
+
+1. Write the Instrumentation Function in C: Create a C function that you want to call from your LLVM pass.
+1. Create an LLVM Pass: Write an LLVM pass that inserts a call to the instrumentation function.
+1. Build and Load the Pass: Compile the pass and load it using the opt tool or integrate it into your build system.
+
+## instrumentation routine 
+
+```
+void instrument_function(const char* bb_name) {
+    printf("Instrumentation function called for basic block: %s\n", bb_name);
+}
+```
+
+
+## pass
+
+```
+   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM) {
+        LLVMContext &Ctx = M.getContext();
+        IRBuilder<> Builder(Ctx);
+
+        // Declare the instrumentation function as an external function
+        FunctionType *FuncType = FunctionType::get(Type::getVoidTy(Ctx), Type::getInt8PtrTy(Cctx), false);
+        FunctionCallee InstrumentFunc = M.getOrInsertFunction("instrument_function", FuncType);
+
+        for (Function &F : M) {
+
+            // Insert the call at the beginning of each basic block
+            for (BasicBlock &BB : F) {
+                Builder.SetInsertPoint(&BB, BB.begin());
+
+                // Create a global string for the basic block name
+                Value *BBName = Builder.CreateGlobalStringPtr(BB.getName());
+
+                // Create the call to the instrumentation function
+                Builder.CreateCall(InstrumentFunc, BBName);
+            }
+        }
+
+        return PreservedAnalyses::none();
+
+
+
+```
+
+## starter code 
+
+rm -r llvm-pass-skeleton
+git clone  -b rtlib  https://github.com/sampsyo/llvm-pass-skeleton.git
+cd llvm-pass-skeleton
+mkdir -p build 
+cd build 
+cmake ..
+make
+
+
+## Adrians skeleton 
+
+```
+struct SkeletonPass : public PassInfoMixin<SkeletonPass> {
+    PreservedAnalyses run(Module &M, ModuleAnalysisManager &AM) {
+        for (auto &F : M.functions()) {
+
+            // Get the function to call from our runtime library.
+            LLVMContext &Ctx = F.getContext();
+            std::vector<Type*> paramTypes = {Type::getInt32Ty(Ctx)};
+            Type *retType = Type::getVoidTy(Ctx);
+            FunctionType *logFuncType = FunctionType::get(retType, paramTypes, false);
+            FunctionCallee logFunc =
+                F.getParent()->getOrInsertFunction("logop", logFuncType);
+
+            for (auto &B : F) {
+                for (auto &I : B) {
+                    if (auto *op = dyn_cast<BinaryOperator>(&I)) {
+                        // Insert *after* `op`.
+                        IRBuilder<> builder(op);
+                        builder.SetInsertPoint(&B, ++builder.GetInsertPoint());
+
+                        // Insert a call to our function.
+                        Value* args[] = {op};
+                        builder.CreateCall(logFunc, args);
+
+                        return PreservedAnalyses::none();
+                    }
+                }
+            }
+
+        }
+        return PreservedAnalyses::all();
+    }
+};
+```
+#include <stdio.h>
+void logop(int i) {
+    printf("computed: %i\n", i);
+}
+
+
+## link together 
+
+``
+cd llvm-pass-skeleton
+cc -c rtlib.c --- generates rtlib.o 
+clang  -fpass-plugin=build/skeleton/SkeletonPass.so -c test.cpp   -- generates test.o
+cc test.o rtlib.o  -- links it together 
+./a.out     --   runs it 
+
+
+

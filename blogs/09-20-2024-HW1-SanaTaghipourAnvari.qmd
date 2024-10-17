@@ -1,0 +1,152 @@
+ ---
+author: Sana Taghipour Anvari
+execute:
+  enabled: false
+format:
+  html: default
+title: Homework1 - Sana
+
+---
+
+ 
+# Part 1
+
+I created a Brill benchmark that calculates and prints the sum of prime numbers and composite numbers up to a given input (in this case, 100). The algorithm used here is very similar to the algorithm used in `sieve.bril` code in the Brill benchmark folder which is designed to find and print all prime numbers up to a specified limit. It emphasizes the identification of primes through boolean flags and modular functions. Our implementation extends the algorithm to calculate the sum of primes and the sum of composites up to a specified limit. It uses an integer array to flag primes and composites and focuses on aggregating values rather than listing them.
+
+## Explanation of the Code
+
+1. To give a little explanation about what each part of the code does:
+
+- **@sumOfPrimes**: This function calculates the sum of all prime numbers up to `n`. First, an array `nums` of size `n` is allocated, where each index represents whether a number is prime or composite (`1` for prime, `0` for composite). Initially, all numbers are marked as prime. Starting from `current = 2`, the function marks the multiples of each number as composite (`0`), skipping prime numbers. The outer loop increments `current`, and the inner loop marks all multiples of `current` as composite. After marking non-primes, the function iterates over the array from `2` to `n` and sums the numbers where the value is `1` (they are prime).
+
+- **@sumOfComposites**: This function calculates the sum of all composite numbers up to `n`. It works similarly to the `sumOfPrimes` function but focuses on composite numbers. The main difference is in the summing step: instead of summing primes, the function starts summing from `4` (since `1` is neither prime nor composite, and `2` and `3` are primes) and adds all numbers marked as `0` (composite).
+
+## How the Implementation is Tested
+
+To test the implementation, I used the following approach:
+
+- **a)** I ran the benchmark with different input values, starting with small numbers like `10`, `20`, and then larger numbers like `100`.
+- **b)** I verified the results manually for smaller inputs by calculating the expected sums of primes and composites.
+
+- **c)** I used the Brill interpreter (`brili`) to run the benchmark and checked both the output and the number of dynamic instructions executed.
+
+Quantitative results for input `100`:
+
+```
+1060
+3889
+```
+## Challenges Faced
+
+The most challenging part was handling the inner and outer loops in the Bril format, especially managing control flow with branches (`br`) and jumps (`jmp`). In Bril, control flow is more explicit than in higher-level languages, and ensuring proper transitions between loop bodies and loop conditions while avoiding infinite loops or incorrect logic was complex.
+
+
+
+# Part 2
+
+I developed a Python script that analyzes and modifies Bril programs. The script performs two main tasks:
+
+- **a)**  Counts the total number of instructions in the Bril program.
+
+- **b)**  Adds a print instruction before every jump instruction (both `br` and `jmp`).
+
+The implementation involves parsing a JSON file containing the Bril program, iterating through its instructions, counting them, and inserting new print instructions where necessary. The modified program is then output along with the total instruction count.
+
+## Explanation of the Code
+The code first iterates through each function in the program using the outer loop. Inside the function, the inner loop goes through each instruction. For each instruction, it increments the instruction count and checks if the instruction is a jump (`br` or `jmp`). If it is, a `print` instruction is added before the jump.
+
+```{python}
+import json
+import copy
+
+bril_json = """
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
+        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
+        { "op": "add", "type": "int", "dest": "v2", "args": ["v0", "v1"] },
+        { "op": "br", "args": ["v2"], "labels": ["then", "else"] },
+        { "label": "then" },
+        { "op": "print", "args": ["v2"] },
+        { "op": "jmp", "labels": ["end"] },
+        { "label": "else" },
+        { "op": "print", "args": ["v1"] },
+        { "label": "end" },
+        { "op": "ret" }
+      ]
+    }
+  ]
+}
+"""
+
+bril_program = json.loads(bril_json)
+
+def process_bril_program(bril_program):
+    total_instructions = 0
+    for function in bril_program['functions']:
+        new_instrs = []
+        for instruction in function['instrs']:
+            total_instructions += 1
+            
+            # add a print instruction before a jump!
+            if instruction.get('op') in ['br', 'jmp']:
+                print_instr = {
+                    "op": "print",
+                    "args": ["Jumping"]
+                }
+                new_instrs.append(print_instr)
+            
+            new_instrs.append(instruction)
+        
+        function['instrs'] = new_instrs
+
+    return bril_program, total_instructions
+
+modified_program, instruction_count = process_bril_program(bril_program)
+
+print("Total number of instructions:", instruction_count)
+print("Modified Bril program:")
+print(json.dumps(modified_program, indent=2))
+
+```
+
+## How the Implementation is Tested
+To test the implementation, I created a small Bril program called `test.json` that contains various types of instructions, including constants, an add operation, a branch instruction (`br`), a jump instruction (`jmp`), and print statements. I used this file to verify that the transformation was applied correctly and that the total number of instructions was counted.
+
+Test Input (`test.json`):
+```{html}
+{
+  "functions": [
+    {
+      "name": "main",
+      "instrs": [
+        { "op": "const", "type": "int", "dest": "v0", "value": 1 },
+        { "op": "const", "type": "int", "dest": "v1", "value": 2 },
+        { "op": "add", "type": "int", "dest": "v2", "args": ["v0", "v1"] },
+        { "op": "br", "args": ["v2"], "labels": ["then", "else"] },
+        { "label": "then" },
+        { "op": "print", "args": ["v2"] },
+        { "op": "jmp", "labels": ["end"] },
+        { "label": "else" },
+        { "op": "print", "args": ["v1"] },
+        { "label": "end" },
+        { "op": "ret" }
+      ]
+    }
+  ]
+}
+
+```
+
+
+Output of The program is shown in previous section.
+
+Quantitative Results:
+The total number of instructions before the transformation was 11.
+After transformation, 2 print instructions were added (one before the br and another before the jmp), making the total number of instructions 13. (We can conclude this by counting the instructions in the modified Bril program)
+
+## Challenges Faced
+The most challenging part of the task was ensuring that the additional instructions were inserted in the correct place without modifying the logic of the Bril program. The Bril program must still execute in the intended order, and placing the print instructions incorrectly could have changed the control flow. To address this challenge, I carefully looped through the instruction list, checked for `br` and `jmp` operations, and inserted the print instructions before each of these jump-related instructions by also maintaining the program's original flow and semantics.

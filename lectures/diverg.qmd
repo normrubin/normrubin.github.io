@@ -1,0 +1,465 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_diverg.qmd
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: 'divergent flow '
+
+---
+
+## What is the cost of divergence 
+
+```{cuda}
+__global__ void dec2zero(int* v, int N) { 
+    int xIndex = blockIdx.x*blockDim.x+threadIdx.x;   
+    if (xIndex < N) {
+             while (v[xIndex] > 0) { v[xIndex]--;     
+             }     
+        } 
+} 
+```
+
+Depending on how we initialize the vector, we get different times and different subtracts
+
+1. Size of array 1048576
+1. Threads Per Block = 256
+1. Blocks In Grid    = 4096
+
+## some initializers 
+
+## constant 
+
+```{C}
+  // all 1
+  for (int i = 0; i < n; i++) {
+    A[i] = 1; 
+  }
+  ```
+. . .
+
+kind| subtracts| time ms
+--|--:|--:
+constant one  | 1048576   |   0.1
+
+## decreasing 
+
+```{c}
+// decreasing values from n-1 to 0
+  for (int i = 0; i < n; i++) {
+    A[i] = n - i - 1;  // count should be N*(n+1)/2 = 54975572...
+  }
+```
+. . .
+
+kind| subtracts| time  ms
+--|--:|--:
+constant one  | 1048576   |   0.1 
+decreasing    | 549755289600  | 45.7 
+
+## middle value 
+
+```{c}
+// Fill function to set all elements of the array to the middle value of n
+  for (int i = 0; i < n; i++) {
+    A[i] = n / 2;  // count should be N*N/2 54975572...
+  }
+```
+
+. . .
+
+kind| subtracts| time ms
+--|--:|--:
+constant one  | 1048576   |   0.1 
+decreasing    | 549755289600  | 45.7 
+middle value | 549755813888   | 45.6 
+
+## alternate values 
+
+```{c}
+// Fill function to set alternate elements to 0 or n
+  for (int i = 0; i < n; i++) {
+    A[i] = 0;
+    if (i%2){ A[i] = n;} 
+  }
+```
+. . .
+
+kind| subtracts| time ms
+--|--:|--:
+constant one  | 1048576   |   0.1 
+decreasing    | 549755289600  | 45.7 
+middle value | 549755813888   | 45.6 
+alternate    |  549755813888  | 83.9 
+
+
+
+## divergence example 
+
+::: {.columns}
+
+::: {.column}
+
+```
+__global__ void example(float* v){
+    if (v[tid]) < 0.0){
+        v[tid] = /=2;
+    } else {
+        v[tid] = 0;
+    }
+}
+```
+:::
+
+
+::: {.column}
+```{C}
+start: 
+r1 = addr v[tid]
+f1 = load r1
+p1 = set.lt f0, 0.0
+
+@p1? less: f2 = div f1, 2
+@p1? less2: jmp Bstore
+
+!@p1? ge: f2 = 0.0
+
+Bstore: store r1, f2
+```
+:::
+
+:::
+
+## cfg 
+
+
+:::{.columns}
+::: {.column width="50%"}
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+start --> less
+less--> less2
+less2  --> bstore
+less2 --> ge
+ge--> bstore
+```
+:::
+
+::: {.column width="50%"}
+```{C}
+start: 
+r1 = addr v[tid]
+f1 = load r1
+p1 = set.lt f0, 0.0
+
+@p1? less: f2 = div f1, 2
+@p1? less2: jmp Bstore
+
+!@p1? ge: f2 = 0.0
+
+Bstore: store r1, f2
+```
+:::
+
+::: 
+
+
+## what happens to implement this?
+
+hardware version 1 (pre volta Nvidia chips)
+
+There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask.
+When hardware reaches an if- push 3 entries 
+pc then, mask for then
+pc else,  mask for else
+pc reconvergence point, mask for reconvergence 
+
+## simt stack for 4 wide warp 
+
+```
+
+                          t0 t1 t2 t3    stack
+a:                        r  r  r  r      a: 1111
+--------------------------------------------------------
+  if (cond      ) {       r  r  r  r      b  1100
+                                          c  0011
+                                          f  1111
+----------------------------------------------------------
+    b:                    r r   -  -      c 0011
+    c:                    r r   -  -      f  1111
+-------------------------------------------------
+  } else {                
+    d:                    - -   r r 
+    e:                    - -   r r
+  }
+  f:                                    stack is empty    
+```
+
+at the else pc matches tos
+at  convergance pc matches tos  
+
+## rules:
+
+1. divergent paths execute serially 
+1. threads execute in lock step
+1. reconverge at immediate  post dominator 
+
+easy to find post dominator for reducible control flow, hard for other cases- could turn into end of program 
+
+
+# when does threading model break down?
+
+some code deadlocks:
+
+```
+1: *mutex = 0; 
+2: while(!atomicCAS(mutex,0,1)); 
+3:    // Critical Section 
+4: atomicExch(mutex,0);
+```
+
+Nothing make sure threads make forward progress
+
+
+## volta and newer 
+
+[possible structure](https://arxiv.org/pdf/2407.02944)
+
+Handles unstructured code nicely 
+always makes forward progress 
+
+
+```
+
+                          t0 t1 t2 t3    
+a:                        r  r  r  r      
+--------------------------------------------------------
+  if (cond) {             r  r  r  r    
+                                                                           
+----------------------------------------------------------
+    b:                    r r   -  -    
+    d:                    - -   r r  
+    c:                    r r   -  -  
+    e:                    - -   r r    
+-------------------------------------------------
+                
+  f:                      r r  --
+                          - -  r r 
+   _syncthreads()         r r r r 
+  g:             
+```
+
+
+## changes 
+
+adds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize 
+
+new instructions:
+
+1. bssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point
+2. bmov copies between barrier registers and regular registers 
+3. bsync forces threads in the mask to wait 
+4. bbreak removes threads from mask
+
+
+## what does this solve 
+
+The Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity of previous hardware architectures.
+
+
+## changes 
+
+When porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.
+
+## cross warp operations 
+To avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.
+
+
+## memory access 
+
+Applications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.
+
+## barriers 
+
+Applications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.
+
+## AMD 
+
+AMD implemented something betweene the two versions.  There is a scalar processor to figure out masks. S calar registers are used as an 'exec mask' to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions 
+
+
+```
+save the exec mask
+set exect mask to running threads
+do the then 
+invert the exec mask if there is an else 
+do the else 
+restore the exec mask 
+```
+
+## compiler challenge 
+
+programing language does not talk about scalar processor. Compiler has to figure out where to use it.  
+
+## what does this do to control flow graph 
+
+two kinds of edges- vector view and scalar view. 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+if--> then 
+if--> else
+then --> join
+else --> join
+if .-> then
+then.-> else
+else.-> join
+```
+
+
+
+## static detection of divergences 
+
+can we determine which branches may cause divergences and which branches are uniform?
+
+at a dirergent branch some threads go one way, some the other, we will need to insert instructions for reconvergence
+at a uniform branch all threads go the same way 
+
+## divergent and uniform variables 
+
+ A	program	variable is	divergent	if	different	threads	see	different values.	
+ 
+ If	different threads	always	see	that	variable	with	the	same	value,	then the variable is uniform 	
+
+ divergent variables
+
+ 1. v = tid 
+ 1. atomic()
+ 1. v is data dependent on a divergent variable
+ 1. v is control dependent on a divergent variable 
+
+## thread id is always divergent 
+
+```
+ __global__ 
+ void saxpy (int n, float alpha, float *x, float *y) {
+   int i = blockIdx.x * blockDim.x + threadIdx.x;  
+  if (i < n) y[i] = alpha * x[i] + y[i]; } 
+```
+
+Each thread sees a different value 
+
+Threads in different blocks see the same threadid - is that a problem?
+
+## variables defined by atomic operations 
+
+```
+__global__ void ex_atomic (int index, float* v) {
+   int i = 0; 
+   i = ATOMINC( v[index] ); } 
+```
+
+## dependences 
+
+Two	types	of	dependences:	data	and	control.	
+
+If	the	program	contains	an	assignment	such	as	v	=	f(v1,	v2,	…,	vn),	then	v	is	data	dependent on the arguments v1,v2 ...
+
+If	the	value	assigned	to	variable	v	depends	on	a	branch	controlled	by	p,	then	we	say	that	v	is	control	dependent	on	p.	
+ 
+Divergences	propagate	transitively	on	the	graph	determined	by	the	dependence	relation.	
+
+A variable might be divergent at one program point and uniform at another
+
+## an example 
+
+![](images/da10.svg)
+
+## 
+
+![](images/da9.svg)
+##
+
+![](images/da11.svg)
+
+## 
+![](images/da12.svg)
+
+## 
+![](images/da13.svg)
+
+## 
+![](images/da14.svg)
+
+## 
+![](images/da15.svg)
+
+## 
+![](images/da17.svg)
+
+
+## 
+![](images/da16.svg)
+
+## 
+![](images/da18.svg)
+
+## 
+![](images/da19.svg)
+
+
+## 
+![](images/da20.svg)
+
+
+## 
+![](images/da21.svg)
+
+
+## 
+![](images/da22.svg)
+
+
+## 
+![](images/da23.svg)
+
+## finding control dependences
+
+let branch p, label  be a branch instruction and $I_p$ be its post dominator. A varable v is control dependent on p if 
+
+1. v is defined inside the influence region of p
+1. v reaches $I_p$
+
+## 
+![](images/da26.svg)
+
+
+## 
+![](images/da27.svg)
+
+
+## 
+![](images/da28.svg)
+
+## 
+![](images/da29.svg)
+
+## 
+![](images/da30.svg)
+
+## some optimizations 
+
+1. on AMD use scalar processor 
+1. if a branch condition is uniform no need for a sync in the post dominator 
+1. place uniform spills in shared memory 

@@ -15,16 +15,11 @@ sidebar: false
 title: Data Flow
 
 ---
-The material in these slides have been taken from "Lecture Notes in Static Analysis" (Sec.6), by Michael I. Schwartzbach,
-https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/,  "Principles of Program Analysis", Chapter 6, by Niesen et al, and from Miachel Schwartzbach's "Lecture notes in Static Analysis", Chapter 6, First Section. 
-
-```{python}
-for i in range(131):
-    print(f"![](df/ra{i+1}.svg)\n##")
-```
-
+The material in these slides have been taken from [Lecture Notes in Static Analysis" (Sec.6), by Michael I. Schwartzbach](
+https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/),  "Principles of Program Analysis", Chapter 6, by Niesen et al, and from Miachel Schwartzbach's "Lecture notes in Static Analysis", Chapter 6, First Section. 
 
 ##
+
 ![](df/ra1.svg)
 
 ##
@@ -57,10 +52,10 @@ for i in range(131):
 ##
 ![](df/ra11.svg)
 
-##
+## IN and OUT
 ![](df/ra12.svg)
 
-##
+## EQUATIONS
 ![](df/ra13.svg)
 
 ##
@@ -72,8 +67,94 @@ for i in range(131):
 ##
 ![](df/ra16.svg)
 
-##
+## Liveness Example 
 ![](df/ra17.svg)
+
+## Summary by basic blocks
+
+The dataflow equations used for a given basic block b and exiting block final  in live variable analysis:
+
+$\operatorname{GEN}[b]$ - The set of variables that are used in b before any assignment in the same basic block.
+
+$\operatorname{KILL}[b]$ - The set of variables that are assigned a value in b
+
+
+The in-state of a block is the set of variables that are live at the start of the block. Its out-state is the set of variables that are live at the end of it. The out-state is the union of the in-states of the block's successors. The transfer function of a statement is applied by making the variables that are written dead, then making the variables that are read live.
+
+## equations 
+
+$
+\begin{aligned}
+  & \operatorname{IN}[b]=\operatorname{GEN}[b] \cup\left(\operatorname{OUT}[b]-\operatorname{KILL}[s]\right) \\
+  & \operatorname{OUT}[\text { final }]=\emptyset \\ 
+  & \operatorname{OUT}[b]=\bigcup_{p \in s u c c[b]} \operatorname{IN}[p] \\ 
+  & \operatorname{GEN}\left[b: y \leftarrow f\left(x_1, \cdots, x_n\right)\right]=\left\{x_1, \ldots, x_n\right\} \\ 
+  & \operatorname{KILL}\left[b: y \leftarrow f\left(x_1, \cdots, x_n\right)\right]=\{y\}
+
+\end{aligned}
+$
+
+
+
+## an example 
+
+```
+b1: 
+a = 3
+b = 5
+d = 4
+x = 100
+if a > b then 
+
+   b2: 
+    c = a + b
+    d = 2 
+
+b3: 
+   c = 4
+   return b*d +c
+```
+
+$\operatorname{GEN}[b]$ - The set of variables that are used in b before any assignment in the same basic block.
+
+$\operatorname{KILL}[b]$ - The set of variables that are assigned a value in b
+
+---
+
+```
+GEN[b1] = []         kill[b1] = [a,b,d,x]
+GEN[b2] = [a,b]      kill[b2] = [c,d]
+GEN[b3] = [b,d]      Kill[b3] = [c]
+```
+
+## processing 
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TB
+b1--> b2
+b1 --> b3
+b2--> b3
+```
+
+```
+GEN[b1] = []         kill[b1] = [a,b,d,x]
+GEN[b2] = [a,b]      kill[b2] = [c,d]
+GEN[b3] = [b,d]      Kill[b3] = [c]
+```
+
+
+```
+block OUT       IN   Next IN        worklist  
+b3    []        []    [b,d]           b1,b2
+b1    [b,d]     []    []              b2
+b2    [b,d]     []    [a,b]           b1
+b1    [a,b,d]   []    []              empty
+
+```
+
+
+  
 
 ##
 ![](df/ra18.svg)
@@ -168,7 +249,7 @@ for i in range(131):
 ##
 ![](df/ra48.svg)
 
-##
+## 
 ![](df/ra49.svg)
 
 ##
@@ -189,6 +270,7 @@ for i in range(131):
 ##
 ![](df/ra55.svg)
 
+
 ##
 ![](df/ra56.svg)
 
@@ -201,80 +283,202 @@ for i in range(131):
 ##
 ![](df/ra59.svg)
 
-##
+##  frameworks 
+
 ![](df/ra60.svg)
 
-##
-![](df/ra61.svg)
+## common properties  Direction
 
-##
-![](df/ra62.svg)
+Direction 
 
-##
-![](df/ra63.svg)
+::: {.columns}
+
+::: {.column}
+
+backward 
+
+1. liveness
+1. very  busy expressions 
+
+OUT is a function of the IN  of successors 
+
+:::
+
+::: {.column}
+
+forward 
+
+1. reaching Defs 
+1. Available Expressions 
+
+IN is a function of the OUT of Preds
+
+:::
+
+::: 
+
+
+## common properties  Operation 
+
+
+::: {.columns}
+
+::: {.column}
+
+May union 
+
+1. Liveness 
+1. Reaching defs 
+
+merge using intersection
+
+:::
+
+::: {.column}
+
+must 
+
+1. very busy expressions 
+1. Available Expressions 
+
+merge using union 
+
+:::
+
+::: 
+
+
 
 ##
 ![](df/ra64.svg)
 
-##
-![](df/ra65.svg)
+## transfer functions with a block or for one statement 
 
-##
-![](df/ra66.svg)
+Forward   
+$$ \text{OUT}_b = f_b(\text{IN}_b) $$
 
-##
-![](df/ra67.svg)
+Backward  
+$$ \text{IN}_b = f_b(\text{OUT}_b) $$
 
-##
-![](df/ra68.svg)
+liveness IN = (OUT-def) union (args)
 
-##
-![](df/ra69.svg)
+Very busy expressions IN = (OUT - exprs(def)) union (this expr)
 
-##
-![](df/ra70.svg)
 
-##
-![](df/ra71.svg)
+## an example
+```
+if b1 
+    while b2 { x = a1}
+else 
+    while b3 { x = a2}
+x = a3
+```
 
-##
-![](df/ra72.svg)
 
-##
-![](df/ra73.svg)
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 
-##
-![](df/ra74.svg)
+graph TD;
+b1["p1: if b1"]
+b2["p2: use b3"]
+b3["p3: x = a2"]
+b4["p4: use b2"]
+b5["p5: x = a1"]
+b6["p6: x = a3"]
+b1--> b4
+b1 --> b2
 
-##
-![](df/ra75.svg)
 
-##
-![](df/ra76.svg)
+b2--> b6
+b2--> b3
 
-##
-![](df/ra77.svg)
+b3--> b2
+b5--> b4
 
-##
-![](df/ra78.svg)
+b4--> b5
+b4--> b6
+
+```
+
+reaching defs - a definition of a variable v at pv reaches a point p if
+there is a path from pv tp p and v is not redefined along the path
+
+## equations 
+
+
+::: {.columns}
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+
+graph TD;
+b1["p1: if b1"]
+b2["p2: use b3"]
+b3["p3: x = a2"]
+b4["p4: use b2"]
+b5["p5: x = a1"]
+b6["p6: x = a3"]
+b1--> b4
+b1 --> b2
+
+
+b2--> b6
+b2--> b3
+
+b3--> b2
+b5--> b4
+
+b4--> b5
+b4--> b6
+
+```
+
+:::
+
+
+::: {.column}
+
+:::{.fragment}
+
+$$ \small \text{IN}_p = \bigcup \text{OUT}_{ps}, ps \in pred(p)$$
+```
+IN[1] = empty
+IN[2] = OUT[1] union OUT[3]
+IN[3] = OUT[2]
+IN[4] = OUT[1] union OUT[5]
+IN[5] = OUT[4]
+IN[6] = OUT[2] union OUT[4]
+```
+:::
+
+:::{.fragment}
+
+$$ \small \text{OUT}_p = (\text{IN)}_p - defs(v)) \cup \{ (p,v) \}  $$
+```
+OUT[1] = IN[1]
+OUT[2] = IN[2]
+OUT[3] = (IN[3] -{3,5,6}) union {3}
+OUT[4] = IN[4]
+OUT[5] = (IN[5] - {3,5,6}) union {5}
+OUT[6] = (IN[6] - {3,5,6}) union {6}
+```
+:::
+
+:::
+
+::: 
+
 
 ## 
 ![](df/ra79.svg)
 
-##
-![](df/ra80.svg)
 
-##
-![](df/ra81.svg)
-
-##
-![](df/ra82.svg)
-
-##
+## complexity 
 ![](df/ra83.svg)
 
-## 84
-![](df/ra84.svg)
 
 ##
 ![](df/ra85.svg)
@@ -288,107 +492,142 @@ for i in range(131):
 ##
 ![](df/ra88.svg)
 
-##
-![](df/ra89.svg)
 
-## 
-![](df/ra90.svg)
 
-##
-![](df/ra91.svg)
+## graph of equations 
 
-##
-![](df/ra92.svg)
+::: {.columns}
 
-##
-![](df/ra93.svg)
+::: {.column}
 
-##
-![](df/ra94.svg)
+```
+IN[1] = empty
+IN[2] = OUT[1] union OUT[3]
+IN[3] = OUT[2]
+IN[4] = OUT[1] union OUT[5]
+IN[5] = OUT[4]
+IN[6] = OUT[2] union OUT[4]
+OUT[1] = IN[1]
+OUT[2] = IN[2]
+OUT[3] = (IN[3] -{3,5,6}) union {3}
+OUT[4] = IN[4]
+OUT[5] = (IN[5] - {3,5,6}) union {5}
+OUT[6] = (IN[6] - {3,5,6}) union {6}
+```
 
-##
+
+:::
+
+::: {.column}
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB;
+IN1-->OUT1
+OUT1-->IN2
+OUT1-->IN4
+OUT3--> IN2
+OUT2--> IN3
+OUT5--> IN4
+OUT4--> IN5
+OUT2--> IN6
+OUT4--> IN6
+IN2--> OUT2
+IN3--> OUT3
+IN4--> OUT4
+IN5--> OUT5
+IN6--> OUT6
+
+
+```
+
+:::
+
+::: 
+
+
+
+## Reverse Postorder 
+visit successors first (need an ordering)
+
 ![](df/ra95.svg)
 
-##
-![](df/ra96.svg)
 
-##
-![](df/ra97.svg)
 
-##
-![](df/ra98.svg)
+## order 
 
-##
-![](df/ra99.svg)
+::: {.columns}
 
-##
-![](df/ra100.svg)
+::: {.column}
 
-##
-![](df/ra101.svg)
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 
-##
-![](df/ra102.svg)
+graph TB;
+IN1-->OUT1
+OUT1-->IN2
+OUT1-->IN4
+OUT3--> IN2
+OUT2--> IN3
+OUT5--> IN4
+OUT4--> IN5
+OUT2--> IN6
+OUT4--> IN6
+IN2--> OUT2
+IN3--> OUT3
+IN4--> OUT4
+IN5--> OUT5
+IN6--> OUT6
 
-##
-![](df/ra103.svg)
 
-##
-![](df/ra104.svg)
 
-##
-![](df/ra105.svg)
+```
 
-##
-![](df/ra106.svg)
+:::
 
-##
-![](df/ra107.svg)
+::: {.column}
 
-##
-![](df/ra108.svg)
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+b1[b1-1]--> b4[b4-4]
+b1--> b2[b2-2]
+b4--> b6[b6-5]
+b4--> b5[b5-6]
+b2--> b3[b3-3]
 
-##
-![](df/ra109.svg)
+```
 
-##
-![](df/ra110.svg)
+order b5 b6  b3 b3 b2 b1
 
-##
-![](df/ra111.svg)
+:::
 
-##
-![](df/ra112.svg)
+:::
 
-##
-![](df/ra113.svg)
 
-##
-![](df/ra114.svg)
+## implement 
 
-##
-![](df/ra115.svg)
+keep two data structures 
 
-##
-![](df/ra116.svg)
+1. C current list 
+2. P set of pending lists 
 
-##
-![](df/ra117.svg)
+initially C is a reverse post order sort of the nodes 
 
-##
-![](df/ra118.svg)
+process each element of C 
 
-##
-![](df/ra119.svg)
+when we find a changed add it to P
 
-##
-![](df/ra120.svg)
+When C is empty, sort P in reverse post order and move to C 
 
-##
-![](df/ra121.svg)
+## representing sets 
 
-##
-![](df/ra122.svg)
+we keep doing union and intersection for sets, which are sparse 
+
+compilers generally use bit vectors 
+
+
 
 ##
 ![](df/ra123.svg)
@@ -418,7 +657,6 @@ for i in range(131):
 ![](df/ra131.svg)
 
 ## pseudo code 
-
 ```
 // Initialize
 for all CFG nodes n in N,
@@ -464,15 +702,15 @@ while (Changed != emptyset)
 This algorithm has no problems with loops!
 
 
-## partial orders 
-
-The domain of values you're trying compute needs to form a *partial order* with a unique lower bound. The rough idea is that the worklist algorithm should only "move" values monotonically in the order, so it's guaranteed to eventually terminate.
-
-In terms of a partial order ⊑, the merge function is the *meet* (greatest lower bound) operator ⊓; the initial value is the top value ⊤; and the transfer function must be a monotonic function, so `x ⊑ y` implies `f(x) ⊑ f(y)`.
-
 ## homework 3  
 
 
 Implement one data flow analysis - For Bonus points make it generic so that the
 same code supports multiple analysis. As always, think about how to test it.
+use a simple ordering- Not necessary to use reverse post order 
+
+as always think about testing 
+
+
+
 

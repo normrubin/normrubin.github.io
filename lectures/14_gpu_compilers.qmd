@@ -110,10 +110,10 @@ and it is the user’s responsibility to synchronize
 
 ## memory spaces 
 
-1. cpu and gpu have different memory spaces (cpu can copy from one to the other).  Some amount of combined memory (slower the not combined)
+1. cpu and gpu have different memory spaces (cpu can copy from one to the other).  Some amount of combined memory (slower then not combined)
 1. gpu has ***shared/lds*** memory which can be accessed by threads within a block,  passing an address to a different block does not work
 1. main gpu memory is called ***global*** accessible by all threads
-1. gpu has per thread memory called ***local*** or ***scratch*** ot ***private*** memory - unlike C, passing an address in local memory to another thread does not work.  (under some restrictions AMD implements part of the C memory model)
+1. gpu has per thread memory called ***local*** or ***scratch*** or ***private*** memory - unlike C, passing an address in local memory to another thread does not work.  (under some restrictions AMD implements part of the C memory model)
 1. a few special gpu memory types: constant, texture, surface (left over from graphics)
 1. gpu can treat registers as fast memory 
 
@@ -164,7 +164,7 @@ nvidia packs 4 execution engines into a SM (streaming multi-processor) ands an L
 
 ## and 
 
-![](images/amd-compute-unit.svg)
+![](images/amd-compute-unit.jpg)
 
 
 AMD has a similar block with some important differences 

@@ -25,59 +25,102 @@ Either 1 or 2 people can sign up for a paper.  Once everyone has done so, I'll s
 
 | session | Date    | topic  | due | discussions|
 |--:|---------|--------| ----| -----------|
-1| Sept 6    | [Compiler Overview](lectures/010_compiler_overview.qmd)              | |  [discussion](https://github.com/normrubin/normrubin.github.io/discussions/70)
+1|  Friday Sept 6    | [Compiler Overview](lectures/010_compiler_overview.qmd)              | |  [discussion](https://github.com/normrubin/normrubin.github.io/discussions/70)
 | | | [Performance Measurement-1](lectures/01a1_performance_measurement.qmd)  | | 
-2|Sept 10   | [Performance Measurement-2](lectures/01a2_performance_measurement.qmd)  | | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/71)
-3|Sept 13    |[Representing programs](lectures/02a_representation.qmd)| hw0 | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/72)
-3|   | [Bril](lectures/02b_bril.qmd)| |[discussion](https://github.com/normrubin/normrubin.github.io/discussions/73)
-4| Sept 17   | [Local analysis and optimization](lectures/03_local.qmd)  | | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/74)
-5|sept 20|[Local Value Numbering](lectures/03b_local_value_numbering.qmd) |[hw1](homework/1.hw.qmd)|
-6| Sept 24   | [data flow](lectures/04_data_flow.qmd)  |  | 
-7| Sept 27   | Data flow  continued   | 
-8| Oct 1 | graphs |
-9| Oct 4     | Static single assignment  | |
-10|Oct 8 |Loop invariant code motion |
-11|Oct 11  | Norm unavailable - maybe guest lecture 
-12| Oct 15  | [GPU Compilers](lectures/14_gpu_compilers.qmd)  | | 
-13| Oct 22   |Global value number |
-14| Oct 25   |LLVM  | |
-15| Oct 29   | readings  | |
-16| Nov 1| readings  |
-17| Nov 5   |[Dynamic compilers 1 ](lectures/13_dynamic_compilers.qmd) |
-18| Nov 8   | [Dynamic compilers 2 ](lectures/13_dynamic_compilers.qmd)  | | 
-19| Nov 12 |register allocation |
-20| Nov 15    |  readings  | | 
-21| Nov 19    | readings  | | | 
-22| Nov 22    | readings   | | 
-| |Nov 29 | **Thanksgiving**|
-23|Nov 26    |  Polyhedral analysis | | 
-24| Dec 3     |readings | 
-25| Dec 6     | ai in compilers  | 
+2| Tuesday Sept 10   | [Performance Measurement-2](lectures/01a2_performance_measurement.qmd)  | | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/71)
+3| Friday Sept 13    |[Representing programs](lectures/02a_representation.qmd)| hw0 | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/72)
+ |    || [Bril](lectures/02b_bril.qmd)| |[discussion](https://github.com/normrubin/normrubin.github.io/discussions/73)
+4  | Tuesday Sept 17   | [Local analysis and optimization](lectures/03_local.qmd)  | | [discussion](https://github.com/normrubin/normrubin.github.io/discussions/74)
+5| Friday Sept 20|[Local Value Numbering](lectures/03b_local_value_numbering.qmd) |[hw1](homework/1.hw.qmd)|
+6| Tuesday Sept 24   |  lvn + [data flow](lectures/04_data_flow.qmd)  |  | 
+7| Friday Sept 27   | Data flow  continued   | 
+8| Tuesday Oct 1 |  Data flow  + [graphs](lectures/05_global.qmd) |
+9| Friday Oct 4 | [Static single assignment](lectures/06_ssa.qmd)
+10|Tuesday Oct 8 | [register allocation](lectures/register_allocation.qmd)
+11|Friday Oct 11  | Norm unavailable - guest lecture over zoom |  [hw3](homework/3_hw.qmd)
+
+Link in canvas 
 
 
-Suggested Papers 
 
-Sana Taghipour Anvari [Large Language Models for Compiler Optimization](https://ar5iv.labs.arxiv.org/html/2309.07062)
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+12| Tuesday Oct 15  | reading | | 
 
-Oscar Kellner(https://github.com/Eightscer) [Retargeting and Respecializing GPU Workloads for Performance Portability](https://ieeexplore.ieee.org/document/10444828)
+Leader: Aymane Jerari [The MLIR Transform Dialect](https://arxiv.org/abs/2002.11054)
 
-Aymane El Jerari [MLIR: A Compiler Infrastructure for the End of Moore’s Law](https://arxiv.org/abs/2002.11054)
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+13|  Friday Oct 18 |  [GPU Compilers](lectures/14_gpu_compilers.qmd) | [hw4](homework/4_hw.qmd) ||
+14| Tuesday Oct 22   |reading  |
 
-Yashaswini Makaram [ProGraML: Graph-based Deep Learning for Program Optimization and Analysis](https://arxiv.org/abs/2003.10536)
+Leader: Oscar Kellner [Retargeting and Respecializing GPU Workloads for Performance 
+Portability](https://ieeexplore.ieee.org/document/10444828)
 
-Yankai Jiang [TVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen)
+project proposal due 
 
-Qucheng Jiang(https://github.com/jiangqucheng) [An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration](https://dl.acm.org/doi/abs/10.1145/3508352.3549424)
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+15| Friday Oct 25   |LLVM  | |
+16 | Tuesday Oct 29   |reading  | |
 
-Zhaoyang Han [Autotuning OpenCL workgroup size for stencil patterns](https://arxiv.org/pdf/1511.02490)
+Leader Sana Anvari [Large Language Models for Compiler Optimization](https://ar5iv.labs.arxiv.org/html/2309.07062)
+
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+17| Friday Nov 1| [more on divergence](lectures/diverg.qmd)    |
+18| Tuesday Nov 5   |[Dynamic compilers 1 ](lectures/13_dynamic_compilers.qmd) + reading
+
+Leader: Qucheng Jiang [An MLIR-based Compiler Flow for System-Level Design and Hardware Acceleration](https://dl.acm.org/doi/abs/10.1145/3508352.3549424)
+
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+19| Friday Nov 8   | [Dynamic compilers ](lectures/13_dynamic_compilers.qmd)  | | 
+20| Tuesday Nov 12 | reading    |
+
+Leader: Yashaswini Makaram [ProGraML: Graph-based Deep Learning for Program Optimization and Analysis](https://arxiv.org/abs/2003.10536)
+
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+21| Friday Nov 15    |  typic   | | 
+22| Tuesday Nov 19    | ra checking + reading   | | | 
+
+Leaders: Rohit Anandakumar  and Sharmila Sivalingam [Generating GPU Compiler Heuristics using Reinforcement Learning](https://arxiv.org/abs/2111.12055)
 
 
-Rohit Gurusamy Anandakumar [Sharmila Sivalingam] [Generating GPU Compiler Heuristics using Reinforcement Learning](https://arxiv.org/abs/2111.12055)
 
-Michael Maurer(https://github.com/maurermi/) [Energy-Aware Tile Size Selection for Affine Programs on GPUs](https://malithjayaweera.com/wp-content/uploads/2024/01/CGO24_eatss_PREPRINT.pdf)
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+23| Friday Nov 22    | polyhedral part 1  | | 
+24|Tuesday Nov 26    |  Polyhedral part 2  + reading   | | 
+
+Leader: Michael Maurer [Energy-Aware Tile Size Selection for Affine Programs on GPUs](https://malithjayaweera.com/wp-content/uploads/2024/01/CGO24_eatss_PREPRINT.pdf)
+
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+|Nov 29 | **Thanksgiving** | 
+26| Tuesday Dec 3     | reading
 
 
-Matin Raayai: [Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers](https://arxiv.org/html/2406.12146v1)
+Leader: Matin Raayai: [Should AI Optimize Your Code? A Comparative Study of Current Large Language Models Versus Classical Optimizing Compilers](https://arxiv.org/html/2406.12146v1)
+
+| |  |  |  | |
+|--:|---------|--------| ----| -----------|
+27| Friday Dec 6     | ai in compilers  | 
+
+
+
+Papers 
+
+
+
+
+
+
+------------------
+
+TVM: An Automated End-to-End Optimizing Compiler for Deep Learning](https://www.usenix.org/conference/osdi18/presentation/chen)
+[paper](/https://www.usenix.org/system/files/osdi18-chen.pdf)
 
 leader: [SLaDe: A Portable Small Language Model Decompiler for Optimized Assembly](https://arxiv.org/abs/2305.12520)
 
