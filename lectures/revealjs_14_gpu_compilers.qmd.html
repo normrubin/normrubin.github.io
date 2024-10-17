@@ -437,10 +437,10 @@
 <section id="memory-spaces" class="slide level2 scrollable">
 <h2>memory spaces</h2>
 <ol type="1">
-<li>cpu and gpu have different memory spaces (cpu can copy from one to the other). Some amount of combined memory (slower the not combined)</li>
+<li>cpu and gpu have different memory spaces (cpu can copy from one to the other). Some amount of combined memory (slower then not combined)</li>
 <li>gpu has <strong><em>shared/lds</em></strong> memory which can be accessed by threads within a block, passing an address to a different block does not work</li>
 <li>main gpu memory is called <strong><em>global</em></strong> accessible by all threads</li>
-<li>gpu has per thread memory called <strong><em>local</em></strong> or <strong><em>scratch</em></strong> ot <strong><em>private</em></strong> memory - unlike C, passing an address in local memory to another thread does not work. (under some restrictions AMD implements part of the C memory model)</li>
+<li>gpu has per thread memory called <strong><em>local</em></strong> or <strong><em>scratch</em></strong> or <strong><em>private</em></strong> memory - unlike C, passing an address in local memory to another thread does not work. (under some restrictions AMD implements part of the C memory model)</li>
 <li>a few special gpu memory types: constant, texture, surface (left over from graphics)</li>
 <li>gpu can treat registers as fast memory</li>
 </ol>
