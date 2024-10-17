@@ -1,0 +1,269 @@
+---
+author: Sharmila Sivalingam
+execute:
+  enabled: false
+format:
+  html: default
+title: Compiler Homework 03 - Data Flow Analysis
+---
+
+# Implementing Data Flow Analysis
+
+In this homework the task is to implement a data flow analysis. The challenge was to make it generic enough to support multiple types of analysis, such as liveness analysis, reaching definitions, available expressions, and very busy expressions.. In this blog post, I'll share my experience, the code I developed, and some of the challenges I faced along the way.
+
+
+## Introduction to Data Flow Analysis Types
+
+The four types of data flow analysis that I implemented in this project:
+
+1. **Liveness Analysis (Backward)**
+   Liveness analysis determines which variables are "live" at each point in the program. A variable is considered live if its value may be read in the future before it's overwritten. This is a backward analysis because it propagates information from the end of the program towards the beginning.
+   - Direction: Backward
+   - Initial State: Empty set
+   - Merge Operation: Union
+
+2. **Very Busy Expressions Analysis (Backward)**
+   Very Busy Expressions (VBE) analysis identifies expressions that are "very busy" at each program point. An expression is very busy if it will be evaluated again before any of its operands are overwrittern. This is also a backward analysis.
+
+   - Direction: Backward
+   - Initial State: Empty set
+   - Merge Operation: Intersection
+   
+3. **Reaching Definitions Analysis (Forward)**
+   Reaching Definitions analysis determines which definitions of variables may reach each point in the program. A definition reaches a point if there is a path from the definition to the point without any other overwrite or interven of the same variable. This is a forward analysis.
+
+   - Direction: Forward
+   - Initial State: Empty set
+   - Merge Operation: Union
+
+4. **Available Expressions Analysis (Forward)**
+   Available Expressions analysis determines which expressions are already computed and not modified at each point in the program. An expression is available at a point if it has been computed on every path to that point and none of its operands have been redefined since its last computation. This is a forward analysis.
+
+   - Direction: Forward
+   - Initial State: Empty set (or all expressions for some formulations)
+   - Merge Operation: Intersection
+
+
+## The Implementation
+
+I decided to take on the challenge of creating a generic data flow analysis framework. Here's a overview of the key components of my analysis:
+
+1. A `df_worklist` function that implements the worklist algorithm for data flow analysis.
+2. A `run_df` function that applies the analysis to each function in the input program.
+3. Several helper functions for set operations and formatting output.
+4. Specific analysis implementations for liveness, very busy expressions (VBE), reaching definitions, and available expressions.
+
+The core of the implementation is the `df_worklist` function, which can perform both forward and backward analysis based on the configuration provided:
+
+```python
+def df_worklist(blocks, analysis):
+    # ... (implementation details)
+```
+
+This function takes a set of basic blocks and an analysis configuration, and returns the in and out sets for each block.
+
+The analysis configuration is defined using a named tuple:
+
+```python
+Analysis = namedtuple('Analysis', ['forward', 'init', 'merge', 'transfer'])
+```
+
+This allows us to easily specify different analyses by providing the appropriate parameters.
+
+## Testing the Implementation
+
+I tested my implementation with two examples to ensure it was working correctly. 
+
+1. simple.bril:
+    In order to understand that my analysis works or not I took a simple example to test and assured that the code works for all 4 types
+
+```{html}
+    @main {
+    a: int = const 5;
+    b: int = const 10;
+    
+    sum: int = add a b;
+    print sum;
+    }
+```
+
+And the output are:
+```{html}
+a. Liveness:
+    b1:
+    in:  ∅
+    out: ∅
+
+b. Very Busy Expression:
+    b1:
+    in:  ('add', ('a', 'b'))
+    out: ∅
+c. Reaching Definition:
+    b1:
+    in:  ∅
+    out: ('a', 'b1'), ('b', 'b1'), ('sum', 'b1')
+d. Available Expression:
+    b1:
+    in:  ∅
+    out: ('add', ('a', 'b'))
+```
+
+2. Adding Square of Even and Odd numbers:
+        This is another example which has loop and check whether my analysis works or not for this example.
+
+```{html}
+    @main {
+    sum_even: int = const 0;      
+    sum_odd: int = const 0;       
+    i: int = const 1;             
+    limit: int = const 10;        
+    one: int = const 1;           
+    two: int = const 2;           
+
+    .loop:
+    square: int = mul i i;        
+    half: int = div i two;        
+    check: int = mul half two;    
+    is_even: bool = eq check i;   
+    br is_even .even_case .odd_case; 
+
+    .even_case:
+    sum_even: int = add sum_even square; 
+    jmp .increment;
+
+    .odd_case:
+    sum_odd: int = add sum_odd square;   
+
+    .increment:
+    i: int = add i one;           
+    cond: bool = le i limit;      
+    br cond .loop .exit;          
+
+    .exit:
+    print sum_even;               
+    print sum_odd;                
+    }
+```
+
+And the output are:
+
+```{html}
+a. Liveness:
+        b1:
+        in:  ∅
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        loop:
+        in:  i, limit, one, sum_even, sum_odd, two
+        out: i, limit, one, square, sum_even, sum_odd, two
+        
+        even_case:
+        in:  i, limit, one, square, sum_even, sum_odd, two
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        odd_case:
+        in:  i, limit, one, square, sum_even, sum_odd, two
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        increment:
+        in:  i, limit, one, sum_even, sum_odd, two
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        exit:
+        in:  sum_even, sum_odd
+        out: ∅
+
+b. Very Busy Expression:
+        b1:
+        in:  ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        loop:
+        in:  ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        
+        even_case:
+        in:  ('add', ('i', 'one')), ('add', ('sum_even', 'square')), ('le', ('i', 'limit'))
+        out: ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        
+        odd_case:
+        in:  ('add', ('i', 'one')), ('add', ('sum_odd', 'square')), ('le', ('i', 'limit'))
+        out: ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        
+        increment:
+        in:  ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        out: ∅
+        
+        exit:
+        in:  ∅
+        out: ∅
+   
+c. Reaching Definition:
+        b1:
+        in:  ∅
+        out: ('i', 'b1'), ('limit', 'b1'), ('one', 'b1'), ('sum_even', 'b1'), ('sum_odd', 'b1'), ('two', 'b1')
+
+        loop:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+
+        even_case:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        
+        odd_case:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        
+        increment:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        
+        exit:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+
+d. Available Expression:
+        b1:
+        in:  ∅
+        out: ∅
+        
+        loop:
+        in:  ∅
+        out: ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        even_case:
+        in:  ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('sum_even', 'square')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        odd_case:
+        in:  ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('sum_odd', 'square')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        increment:
+        in:  ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        exit:
+        in:  ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))    
+
+```
+
+## Challenges Faced: Forward vs. Backward Analysis
+
+One of the most significant challenges I encountered was correctly implementing both forward and backward analysis within the same framework. This took a considerable amount of time to debug and get right.
+
+The most tricky part was getting the initialization and update of the `in_` and `out` dictionaries correct.
+
+Initially, I made the mistake of not properly distinguishing between `in_` and `out` for forward and backward analyses, which led to incorrect results. After careful debugging and reexamining the theory behind data flow analysis, I was able to correct this issue.
+
+## Conclusion
+
+Implementing a generic data flow analysis framework was a challenging. It deepened my understanding of how different analyses work. The main steps in this assignment are:
+
+1. Figure out the thing you want to know at the entry and exit of a block.
+2. write an equation for every block relting to the entry and exit.
+3. Add equalities according to edges in the CFGs.
+4. Finally, solve the system of equations.
+
