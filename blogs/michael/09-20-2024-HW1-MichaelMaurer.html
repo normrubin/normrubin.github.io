@@ -247,6 +247,12 @@ window.Quarto = {
  <span class="menu-text">Homework 3 – Implementing Liveness Dataflow Analysis</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3 – Implementing Liveness Dataflow Analysis</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -297,6 +303,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 3 – Data Flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 4 – Dominance</span></a>
   </div>
 </li>
       </ul>
@@ -357,6 +369,12 @@ window.Quarto = {
  <span class="menu-text">Homework 3: Data Flow</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4: Dominance</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -378,6 +396,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/rohit/2024-09-28-Rohit-HW2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-10-17-Rohit-HW3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-10-18-Rohit-HW4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4</span></a>
   </div>
 </li>
       </ul>
@@ -403,6 +433,12 @@ window.Quarto = {
  <span class="menu-text">Homework3 - data flow</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/10-18-2024-HW4-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework4 - dominance</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -424,6 +460,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Homework 02 - Local Optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 03 - Data Flow Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 04 - Implementing Dominance Utilities</span></a>
   </div>
 </li>
       </ul>
@@ -453,6 +501,12 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/yashaswini/10-11-2024-HW3-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework3 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/10-18-2024-HW4-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework4 - Yashaswini</span></a>
   </div>
 </li>
       </ul>
@@ -805,7 +859,7 @@ sys 0m0.031s</code></pre>
 <p>To do this, I wrote a Python script which consumed the input JSON, parsed it to get the available instructions, and iterated through the map. Each instruction type has a unique construction, which I used to determine how many of each type of isntruction was contained. This tool only requires one pass through the program JSON to determine the count of each instruction type.</p>
 <p>This tool could readily be extended to gather information about the types of instructions in a program.</p>
 <p>The code for this tool is shared below:</p>
-<div id="c8990d0a" class="cell">
+<div id="0fd44a58" class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>

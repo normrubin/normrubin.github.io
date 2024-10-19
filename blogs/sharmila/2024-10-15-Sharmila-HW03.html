@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Aymane El Jerari">
+<meta name="author" content="Sharmila Sivalingam">
 
-<title>Homework 1 – Trying Out Bril – EECE7398 Fall 2024</title>
+<title>Compiler Homework 03 - Data Flow Analysis – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -31,8 +65,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/aymane/readme2.html" rel="next">
-<link href="../../blogs/junk.html" rel="prev">
+<link href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" rel="next">
+<link href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +104,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1 – Trying Out Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="Compiler Homework 03 - Data Flow Analysis – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +118,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html">Compiler Homework 03 - Data Flow Analysis</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -159,16 +193,16 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Aymane</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
@@ -380,13 +414,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
  <span class="menu-text">Sharmila</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
@@ -401,7 +435,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Compiler Homework 03 - Data Flow Analysis</span></a>
   </div>
 </li>
@@ -723,9 +757,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html">Compiler Homework 03 - Data Flow Analysis</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1 – Trying Out Bril</h1>
+<h1 class="title">Compiler Homework 03 - Data Flow Analysis</h1>
 </div>
 
 
@@ -735,7 +769,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Aymane El Jerari </p>
+             <p>Sharmila Sivalingam </p>
           </div>
   </div>
     
@@ -748,212 +782,241 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="part-1" class="level1">
-<h1>Part 1</h1>
-<p>To compile from typescript to bril and execute the program run the following:</p>
-<pre><code>$ ts2bril bench.ts &gt; bench.bril &amp;&amp; brili &lt; bench.bril
-727</code></pre>
-<p>The typescript benchmark I wrote performs a series of simple arithmetic, logical and alu operations. The function outputs <code>727</code> with the default input value 10.</p>
-<section id="passing-command-line-arugments" class="level2">
-<h2 class="anchored" data-anchor-id="passing-command-line-arugments">Passing Command Line Arugments</h2>
-<p>When writing the typescript benchmark, the input function argument was hardcoded to have value <code>10</code>. So I couldn’t parametrized the <code>turnt</code> tests. I wanted to figure out a way to pass the input as a command line argument from <code>stdin</code> in order to generate different tests. Now I could do this by importing a typescript package to handle user input. But I’ve decided to manually modify my benchmark at the bril level.</p>
-<p>Initially, the typescript benchmark I wrote resulted in the following bril ir:</p>
-<p><code>bench.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        {
-          "op": "const",
-          "value": 10,
-          "dest": "v31",
-          "type": "int"
-        },
-        ...
-      ]
-      "args": []
-    },
-    ...
-  ]
-}</code></pre>
-<p>The value 10 is passed in as a constant to main. In order to parametrize it, a few things need to be modified. First, we need to change the <code>op</code> field from <code>const</code> to <code>id</code>. As explained in the <a href="https://capra.cs.cornell.edu/bril/lang/core.html#miscellaneous">bril documentation</a>, the <code>id</code> opcode is a type-insensitive identity we can use to pass variables around. Additonally, we also need specify the arguments passed to main. To do so, we pass a argument to the function. So the new bril representation becomes:</p>
-<p><code>bench-param.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "args": [
-        {
-          "name": "val",
-          "type": "int"
-        }
-      ],
-      "instrs": [
-        {
-          "args": [
-            "val"
-          ],
-          "dest": "v31",
-          "op": "id",
-          "type": "int"
-        }, 
-      ],
-    },
-    ...
-  ]
-}
+<section id="implementing-data-flow-analysis" class="level1">
+<h1>Implementing Data Flow Analysis</h1>
+<p>In this homework the task is to implement a data flow analysis. The challenge was to make it generic enough to support multiple types of analysis, such as liveness analysis, reaching definitions, available expressions, and very busy expressions.. In this blog post, I’ll share my experience, the code I developed, and some of the challenges I faced along the way.</p>
+<section id="introduction-to-data-flow-analysis-types" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-to-data-flow-analysis-types">Introduction to Data Flow Analysis Types</h2>
+<p>The four types of data flow analysis that I implemented in this project:</p>
+<ol type="1">
+<li><p><strong>Liveness Analysis (Backward)</strong> Liveness analysis determines which variables are “live” at each point in the program. A variable is considered live if its value may be read in the future before it’s overwritten. This is a backward analysis because it propagates information from the end of the program towards the beginning.</p>
+<ul>
+<li>Direction: Backward</li>
+<li>Initial State: Empty set</li>
+<li>Merge Operation: Union</li>
+</ul></li>
+<li><p><strong>Very Busy Expressions Analysis (Backward)</strong> Very Busy Expressions (VBE) analysis identifies expressions that are “very busy” at each program point. An expression is very busy if it will be evaluated again before any of its operands are overwrittern. This is also a backward analysis.</p>
+<ul>
+<li>Direction: Backward</li>
+<li>Initial State: Empty set</li>
+<li>Merge Operation: Intersection</li>
+</ul></li>
+<li><p><strong>Reaching Definitions Analysis (Forward)</strong> Reaching Definitions analysis determines which definitions of variables may reach each point in the program. A definition reaches a point if there is a path from the definition to the point without any other overwrite or interven of the same variable. This is a forward analysis.</p>
+<ul>
+<li>Direction: Forward</li>
+<li>Initial State: Empty set</li>
+<li>Merge Operation: Union</li>
+</ul></li>
+<li><p><strong>Available Expressions Analysis (Forward)</strong> Available Expressions analysis determines which expressions are already computed and not modified at each point in the program. An expression is available at a point if it has been computed on every path to that point and none of its operands have been redefined since its last computation. This is a forward analysis.</p>
+<ul>
+<li>Direction: Forward</li>
+<li>Initial State: Empty set (or all expressions for some formulations)</li>
+<li>Merge Operation: Intersection</li>
+</ul></li>
+</ol>
+</section>
+<section id="the-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="the-implementation">The Implementation</h2>
+<p>I decided to take on the challenge of creating a generic data flow analysis framework. Here’s a overview of the key components of my analysis:</p>
+<ol type="1">
+<li>A <code>df_worklist</code> function that implements the worklist algorithm for data flow analysis.</li>
+<li>A <code>run_df</code> function that applies the analysis to each function in the input program.</li>
+<li>Several helper functions for set operations and formatting output.</li>
+<li>Specific analysis implementations for liveness, very busy expressions (VBE), reaching definitions, and available expressions.</li>
+</ol>
+<p>The core of the implementation is the <code>df_worklist</code> function, which can perform both forward and backward analysis based on the configuration provided:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> df_worklist(blocks, analysis):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... (implementation details)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This function takes a set of basic blocks and an analysis configuration, and returns the in and out sets for each block.</p>
+<p>The analysis configuration is defined using a named tuple:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Analysis <span class="op">=</span> namedtuple(<span class="st">'Analysis'</span>, [<span class="st">'forward'</span>, <span class="st">'init'</span>, <span class="st">'merge'</span>, <span class="st">'transfer'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This allows us to easily specify different analyses by providing the appropriate parameters.</p>
+</section>
+<section id="testing-the-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="testing-the-implementation">Testing the Implementation</h2>
+<p>I tested my implementation with two examples to ensure it was working correctly.</p>
+<ol type="1">
+<li>simple.bril: In order to understand that my analysis works or not I took a simple example to test and assured that the code works for all 4 types</li>
+</ol>
+<pre class="{html}"><code>    @main {
+    a: int = const 5;
+    b: int = const 10;
+    
+    sum: int = add a b;
+    print sum;
+    }</code></pre>
+<p>And the output are:</p>
+<pre class="{html}"><code>a. Liveness:
+    b1:
+    in:  ∅
+    out: ∅
+
+b. Very Busy Expression:
+    b1:
+    in:  ('add', ('a', 'b'))
+    out: ∅
+c. Reaching Definition:
+    b1:
+    in:  ∅
+    out: ('a', 'b1'), ('b', 'b1'), ('sum', 'b1')
+d. Available Expression:
+    b1:
+    in:  ∅
+    out: ('add', ('a', 'b'))</code></pre>
+<ol start="2" type="1">
+<li>Adding Square of Even and Odd numbers: This is another example which has loop and check whether my analysis works or not for this example.</li>
+</ol>
+<pre class="{html}"><code>    @main {
+    sum_even: int = const 0;      
+    sum_odd: int = const 0;       
+    i: int = const 1;             
+    limit: int = const 10;        
+    one: int = const 1;           
+    two: int = const 2;           
+
+    .loop:
+    square: int = mul i i;        
+    half: int = div i two;        
+    check: int = mul half two;    
+    is_even: bool = eq check i;   
+    br is_even .even_case .odd_case; 
+
+    .even_case:
+    sum_even: int = add sum_even square; 
+    jmp .increment;
+
+    .odd_case:
+    sum_odd: int = add sum_odd square;   
+
+    .increment:
+    i: int = add i one;           
+    cond: bool = le i limit;      
+    br cond .loop .exit;          
+
+    .exit:
+    print sum_even;               
+    print sum_odd;                
+    }</code></pre>
+<p>And the output are:</p>
+<pre class="{html}"><code>a. Liveness:
+        b1:
+        in:  ∅
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        loop:
+        in:  i, limit, one, sum_even, sum_odd, two
+        out: i, limit, one, square, sum_even, sum_odd, two
+        
+        even_case:
+        in:  i, limit, one, square, sum_even, sum_odd, two
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        odd_case:
+        in:  i, limit, one, square, sum_even, sum_odd, two
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        increment:
+        in:  i, limit, one, sum_even, sum_odd, two
+        out: i, limit, one, sum_even, sum_odd, two
+        
+        exit:
+        in:  sum_even, sum_odd
+        out: ∅
+
+b. Very Busy Expression:
+        b1:
+        in:  ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        loop:
+        in:  ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        
+        even_case:
+        in:  ('add', ('i', 'one')), ('add', ('sum_even', 'square')), ('le', ('i', 'limit'))
+        out: ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        
+        odd_case:
+        in:  ('add', ('i', 'one')), ('add', ('sum_odd', 'square')), ('le', ('i', 'limit'))
+        out: ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        
+        increment:
+        in:  ('add', ('i', 'one')), ('le', ('i', 'limit'))
+        out: ∅
+        
+        exit:
+        in:  ∅
+        out: ∅
+   
+c. Reaching Definition:
+        b1:
+        in:  ∅
+        out: ('i', 'b1'), ('limit', 'b1'), ('one', 'b1'), ('sum_even', 'b1'), ('sum_odd', 'b1'), ('two', 'b1')
+
+        loop:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+
+        even_case:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        
+        odd_case:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        
+        increment:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'b1'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        
+        exit:
+        in:  ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+        out: ('check', 'loop'), ('cond', 'increment'), ('half', 'loop'), ('i', 'increment'), ('is_even', 'loop'), ('limit', 'b1'), ('one', 'b1'), ('square', 'loop'), ('sum_even', 'b1'), ('sum_even', 'even_case'), ('sum_odd', 'b1'), ('sum_odd', 'odd_case'), ('two', 'b1')
+
+d. Available Expression:
+        b1:
+        in:  ∅
+        out: ∅
+        
+        loop:
+        in:  ∅
+        out: ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        even_case:
+        in:  ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('sum_even', 'square')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        odd_case:
+        in:  ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('sum_odd', 'square')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        increment:
+        in:  ('div', ('i', 'two')), ('eq', ('check', 'i')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        
+        exit:
+        in:  ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))
+        out: ('add', ('i', 'one')), ('div', ('i', 'two')), ('eq', ('check', 'i')), ('le', ('i', 'limit')), ('mul', ('half', 'two')), ('mul', ('i', 'i'))    
 </code></pre>
-<p>Now we can pass any value to the function:</p>
-<pre><code>$ brili &lt; bench-param.bril 12
-2796</code></pre>
-<p>To more easily view these changes, let’s look at the text formatting of bril by running these commands to convert from json to text.</p>
-<pre><code>$ bril2txt &lt; bench.bril &gt; bench.txt &amp;&amp; bril2txt &lt; bench-param.bril &gt; bench-param.txt</code></pre>
-<p><code>bench.txt</code></p>
-<pre><code>@main {
-  v31: int = const 10;
-  ...
-}</code></pre>
-<p><code>bench-param.txt</code></p>
-<pre><code>@main(val: int) {
-  v31: int = id val;
-  ...
-}</code></pre>
 </section>
+<section id="challenges-faced-forward-vs.-backward-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced-forward-vs.-backward-analysis">Challenges Faced: Forward vs.&nbsp;Backward Analysis</h2>
+<p>One of the most significant challenges I encountered was correctly implementing both forward and backward analysis within the same framework. This took a considerable amount of time to debug and get right.</p>
+<p>The most tricky part was getting the initialization and update of the <code>in_</code> and <code>out</code> dictionaries correct.</p>
+<p>Initially, I made the mistake of not properly distinguishing between <code>in_</code> and <code>out</code> for forward and backward analyses, which led to incorrect results. After careful debugging and reexamining the theory behind data flow analysis, I was able to correct this issue.</p>
 </section>
-<section id="part-2" class="level1">
-<h1>Part 2</h1>
-<p>I wrote a <code>find_op(bril_file, op)</code> function that takes as input the bril json formated file as well as the opcode of the target instruction. The fuction returns all occurencens of the input opcode.</p>
-<pre><code>def find_op(bril_file, op):
-    add_instrs = []
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        num_instrs = len(instrs)
-        
-        print(f"Function '{function['name']}' has {num_instrs} instructions.")
-        
-        for instr in instrs:
-            if instr.get('op') == op:
-                add_instrs.append(instr)
-
-    return add_instrs
-
-find_op(bril_file, "br")
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-Function 'main' has 6 instructions.
-Function 'benchmark' has 54 instructions.
-
-[{'op': 'br', 'args': ['v7'], 'labels': ['for.body.3', 'for.end.3']},
- {'op': 'br', 'args': ['v20'], 'labels': ['then.17', 'else.17']}]</code></pre>
-<p>The second function <code>count_instruction_types(bril_file)</code> returns the number of occurences for all opcodes.</p>
-<pre><code>def count_instruction_types(bril_file):
-    instruction_count = {}
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        
-        for instr in instrs:
-            op_type = instr.get('op')
-            if op_type:
-
-                instruction_count[op_type] = instruction_count.get(op_type, 0) + 1
-
-    return instruction_count
-
-count_instruction_types(bril_file)
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Implementing a generic data flow analysis framework was a challenging. It deepened my understanding of how different analyses work. The main steps in this assignment are:</p>
+<ol type="1">
+<li>Figure out the thing you want to know at the entry and exit of a block.</li>
+<li>write an equation for every block relting to the entry and exit.</li>
+<li>Add equalities according to edges in the CFGs.</li>
+<li>Finally, solve the system of equations.</li>
+</ol>
 
 
- ---------------
-|    OUTPUT     |
- ---------------
-
-{'const': 10,
- 'call': 1,
- 'id': 25,
- 'print': 1,
- 'lt': 1,
- 'br': 2,
- 'add': 3,
- 'mul': 1,
- 'sub': 2,
- 'eq': 1,
- 'jmp': 2,
- 'ret': 1}</code></pre>
-<p>The last function <code>insert_before_op_code(bril_json, target_op_code):</code> takes as input the json formatted bril, and an instruction opcode, then proceeds to insert the following instructions before every occurence of the opcode:</p>
-<pre><code>{"op": "id", 
-  "dest": "v30", 
-  "type": "int", 
-  "args": ["i"]},
-{"op": "print", 
-  "args": ["v30"]}</code></pre>
-<p>The first instruction loads the value <code>i</code> into <code>v30</code>, which is the loop iterator. Then prints out the value.</p>
-<pre><code>def insert_before_op_code(bril_file, target_op_code):
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-
-        modified_instrs = []
-
-        for instr in instrs:
-            if instr.get('op') == target_op_code:
-                modified_instrs.append({"op": "id", 
-                                        "dest": "v30", 
-                                        "type": "int", 
-                                        "args": ["i"]})
-                                        
-                modified_instrs.append({"op": "print", 
-                                         "args": ["v30"]})
-
-            modified_instrs.append(instr)
-
-        function['instrs'] = modified_instrs
-
-    return bril_file
-
-with open('bench.bril', 'r') as file:
-    bril_file = json.load(file)
-
-print_after_jmp = insert_before_op_code(bril_file, "jmp")
-print(print_after_jmp)
-
-with open("bench-print-after-jmp.bril", 'w') as file:
-    json.dump(print_after_jmp, file)</code></pre>
-<p>The implementation below adds print statements before <code>jmp</code> instructions, then saves the new program (with added print statements) into a new file called <code>bench-print-before-jmp.bril</code>.</p>
-<p>To execute the new program, run:</p>
-<pre><code>$ brili &lt; bench-print-before-jmp.bril
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-0
-1
-2
-2
-3
-4
-4
-5
-6
-6
-7
-8
-8
-9
-10
-727</code></pre>
-
-
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -1379,13 +1442,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/junk.html" class="pagination-link" aria-label="sample blog">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">sample blog</span>
+      <a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="pagination-link" aria-label="Compiler Homework 02 - Local Optimization">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Compiler Homework 02 - Local Optimization</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/aymane/readme2.html" class="pagination-link" aria-label="Homework 2 -- Implementing DCE and LVN">
-        <span class="nav-page-text">Homework 2 – Implementing DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="pagination-link" aria-label="Compiler Homework 04 -  Implementing Dominance Utilities">
+        <span class="nav-page-text">Compiler Homework 04 - Implementing Dominance Utilities</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Aymane El Jerari">
+<meta name="author" content="Michael Maurer">
 
-<title>Homework 1 – Trying Out Bril – EECE7398 Fall 2024</title>
+<title>EECE7309 Homework 4 – Dominance – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/aymane/readme2.html" rel="next">
-<link href="../../blogs/junk.html" rel="prev">
+<link href="../../blogs/oscar/2024-09-20-HW1.html" rel="next">
+<link href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -68,9 +68,12 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="Homework 1 – Trying Out Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7309 Homework 4 – Dominance – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +87,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html">EECE7309 Homework 4 – Dominance</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -159,16 +162,16 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Aymane</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
@@ -217,13 +220,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Michael</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
@@ -244,7 +247,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">EECE7309 Homework 4 – Dominance</span></a>
   </div>
 </li>
@@ -723,9 +726,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html">EECE7309 Homework 4 – Dominance</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1 – Trying Out Bril</h1>
+<h1 class="title">EECE7309 Homework 4 – Dominance</h1>
 </div>
 
 
@@ -735,7 +738,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Aymane El Jerari </p>
+             <p>Michael Maurer </p>
           </div>
   </div>
     
@@ -748,210 +751,362 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="part-1" class="level1">
-<h1>Part 1</h1>
-<p>To compile from typescript to bril and execute the program run the following:</p>
-<pre><code>$ ts2bril bench.ts &gt; bench.bril &amp;&amp; brili &lt; bench.bril
-727</code></pre>
-<p>The typescript benchmark I wrote performs a series of simple arithmetic, logical and alu operations. The function outputs <code>727</code> with the default input value 10.</p>
-<section id="passing-command-line-arugments" class="level2">
-<h2 class="anchored" data-anchor-id="passing-command-line-arugments">Passing Command Line Arugments</h2>
-<p>When writing the typescript benchmark, the input function argument was hardcoded to have value <code>10</code>. So I couldn’t parametrized the <code>turnt</code> tests. I wanted to figure out a way to pass the input as a command line argument from <code>stdin</code> in order to generate different tests. Now I could do this by importing a typescript package to handle user input. But I’ve decided to manually modify my benchmark at the bril level.</p>
-<p>Initially, the typescript benchmark I wrote resulted in the following bril ir:</p>
-<p><code>bench.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        {
-          "op": "const",
-          "value": 10,
-          "dest": "v31",
-          "type": "int"
-        },
-        ...
-      ]
-      "args": []
-    },
-    ...
-  ]
-}</code></pre>
-<p>The value 10 is passed in as a constant to main. In order to parametrize it, a few things need to be modified. First, we need to change the <code>op</code> field from <code>const</code> to <code>id</code>. As explained in the <a href="https://capra.cs.cornell.edu/bril/lang/core.html#miscellaneous">bril documentation</a>, the <code>id</code> opcode is a type-insensitive identity we can use to pass variables around. Additonally, we also need specify the arguments passed to main. To do so, we pass a argument to the function. So the new bril representation becomes:</p>
-<p><code>bench-param.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "args": [
-        {
-          "name": "val",
-          "type": "int"
-        }
-      ],
-      "instrs": [
-        {
-          "args": [
-            "val"
-          ],
-          "dest": "v31",
-          "op": "id",
-          "type": "int"
-        }, 
-      ],
-    },
-    ...
-  ]
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This assignment asks us to develop code to find the dominators for a basic block, construct the dominance tree, and compute the dominance frontier for each basic block in the program.</p>
+</section>
+<section id="dominance" class="level2">
+<h2 class="anchored" data-anchor-id="dominance">Dominance</h2>
+<p>A basic block <code>A</code> dominates another basic block <code>B</code> when there is no path in the program which reaches <code>B</code> and does not pass through <code>A</code>. Understanding the dominance relationship between basic blocks can be quite useful for program analysis, and so it is useful to have this tool with which we may determine the dominance relationships in a given program. Additionally, it’s useful to know where a basic block’s dominance “ends” for program analysis techniques. Dominance relationships can further be represented in a graph, which we call a dominance tree. The dominance tree does not always indicate the dominance frontier, particularly in the case of loops. Here, we will show these graphs as Mermaid diagrams.</p>
+</section>
+<section id="implementation" class="level2">
+<h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
+<p>The implementation for this program is a set of short python scripts, which can be found using the link at the bottom of this page. To do this effectively, we defined a class for a control flow graph, and gave it four important methods. The first identifies the dominators of a block (<code>compute_dominators()</code>). The dominators of a block are the intersection of all blocks which dominate the predecessors of said block, as well as the block itself. To do this algorithmically, we must iterate at least once through all nodes in the graph. We may iterate more times particularly if there are loops in the control flow, and we can iterate util we reach convergence at an answer. The second identifies the strict dominators of a block (<code>compute_strict_dominators()</code>). Strict dominance is simply dominance but without the property of reflexivity. We compute the strict dominators of a block by taking its dominators and removing itself. The third identifies the immediate dominators of a block. Immediate dominators are the direct parents of blocks in the dominator tree, and indicate when a block strictly dominates another block, but does not dominate any other node which strictly dominates this block. The fourth is a method for computing the dominance frontier of a block. This is done by taking a block, and first investigating whether its successors are dominated by this block. If they are not, then they are included in the dominance frontier. If they are, then we need to investigate the successors of said block. We continue this until we’ve investigated all blocks.</p>
+</section>
+<section id="challenges-faced" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced">Challenges Faced</h2>
+<p>One challenge I faced was simply in understanding how to efficiently compute the dominators of a basic block. It is fairly clear when considering the physical representation of a graph what the dominators of a node are, however it took me a moment to determine it using mathematical representations of graphs. Another challenge I faced was when computing the dominance frontiers, I at first implemented an algorithm which did not properly allow nodes to be their own dominance frontiers in certain scenarios. However, this proved to be a relatively easy fix.</p>
+</section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">Testing</h2>
+<p>I tested my program on five different program inputs, generated in part courtesy of large language models. The programs which I used as test cases have varying types of control flow, and appear to give good coverage of possible program inputs.</p>
+<p>The first, and most basic code I tested was a program containing a simple if statement.</p>
+<pre class="{bril}"><code>@main {
+  x: int = const 5;
+  zero: int = const 0;
+  cond: bool = gt x zero;
+  br cond .true .continue;
+.true:
+  one: int = const 1;
+  x: int = add x one;
+.continue:
+  one: int = const 1;
+  x: int = sub x one;
+  ret x;
 }
 </code></pre>
-<p>Now we can pass any value to the function:</p>
-<pre><code>$ brili &lt; bench-param.bril 12
-2796</code></pre>
-<p>To more easily view these changes, let’s look at the text formatting of bril by running these commands to convert from json to text.</p>
-<pre><code>$ bril2txt &lt; bench.bril &gt; bench.txt &amp;&amp; bril2txt &lt; bench-param.bril &gt; bench-param.txt</code></pre>
-<p><code>bench.txt</code></p>
-<pre><code>@main {
-  v31: int = const 10;
-  ...
+<p>Which has the following CFG:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    true --&gt; continue
+    .start --&gt; continue
+    .start --&gt; true
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Here, we expect that .start strictly dominates both true and continue, and neither true nor continue strictly dominate any nodes. Further, the dominance frontier for all nodes should be empty.</p>
+<p>This generated the following output:</p>
+<pre><code>Nodes and their dominators:
+{'true': {'.start', 'true'}, 'continue': {'continue', '.start'}, '.start': {'.start'}}
+
+Nodes and their strict dominators:
+{'true': {'.start'}, 'continue': {'.start'}, '.start': set()}
+
+Nodes and their immediate dominators:
+{'true': '.start', 'continue': '.start', '.start': None}
+
+Nodes and their dominance frontiers:
+{'true': {'continue'}, 'continue': set(), '.start': set()}</code></pre>
+<p>And the following dominance tree:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; true
+    .start --&gt; continue
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>These results are as expected. One note, is in the printed results from this program, an empty set (<code>set()</code>) and <code>None</code> are used interchangably.</p>
+<p>Next, I examined a program with control flow similar to a switch statement, shown below:</p>
+<pre class="{bril}"><code>@main {
+  x: int = const 2;
+  one: int = const 1;
+  two: int = const 2;
+  cond1: bool = eq x one;
+  br cond1 .case1 .check_case2;
+.check_case2:
+  cond2: bool = eq x two;
+  br cond2 .case2 .default;
+.case1:
+  ret one;
+.case2:
+  ret two;
+.default:
+  zero: int = const 0;
+  ret zero;
 }</code></pre>
-<p><code>bench-param.txt</code></p>
-<pre><code>@main(val: int) {
-  v31: int = id val;
-  ...
+<p>With the following CFG:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    check_case2 --&gt; default
+    check_case2 --&gt; case2
+    .start --&gt; case1
+    .start --&gt; check_case2
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>What’s interesting here is we expect the dominance graph to look the same as the CFG, because there is no re-connection of branches. Using this as input, we get the following results:</p>
+<pre><code>Nodes and their dominators:
+{'case1': {'case1', '.start'}, 'check_case2': {'.start', 'check_case2'}, '.start': {'.start'}, 'case2': {'case2', '.start', 'check_case2'}, 'default': {'default', '.start', 'check_case2'}}
+
+Nodes and their strict dominators:
+{'case1': {'.start'}, 'check_case2': {'.start'}, '.start': set(), 'case2': {'.start', 'check_case2'}, 'default': {'.start', 'check_case2'}}
+
+Nodes and their immediate dominators:
+{'case1': '.start', 'check_case2': '.start', '.start': None, 'case2': 'check_case2', 'default': 'check_case2'}
+
+Nodes and their dominance frontiers:
+{'case1': set(), 'check_case2': set(), '.start': set(), 'case2': set(), 'default': set()}</code></pre>
+<p>With the dominance graph:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; case1
+    .start --&gt; check_case2
+    check_case2 --&gt; case2
+    check_case2 --&gt; default
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>As we can see, this graph is the same as the CFG (though mirrored on the vertical axis in this case).</p>
+<p>The next program I examined was that of a while loop:</p>
+<pre class="{bril}"><code>@main {
+  x: int = const 0;
+.loop:
+  ten: int = const 10;
+  cond: bool = lt x ten;
+  br cond .body .exit;
+.body:
+  one: int = const 1;
+  x: int = add x one;
+  jmp .loop;
+.exit:
+  ret x;
 }</code></pre>
+<p>Which has the CFG:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; loop
+    loop --&gt; exit
+    loop --&gt; body
+    body --&gt; loop
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Here, we expect that .start dominates all nodes, loop dominates all nodes but .start, and exit and body do not strictly dominate any nodes. Further, the dominance frontier for .start and exit should be no nodes, however loop and body should both have a dominance frontier of loop. This is due to the loop structure of this function. Analyizing this program, we get the following results:</p>
+<pre><code>Nodes and their dominators:
+{'.start': {'.start'}, 'loop': {'.start', 'loop'}, 'body': {'.start', 'body', 'loop'}, 'exit': {'.start', 'exit', 'loop'}}
+
+Nodes and their strict dominators:
+{'.start': set(), 'loop': {'.start'}, 'body': {'.start', 'loop'}, 'exit': {'.start', 'loop'}}
+
+Nodes and their immediate dominators:
+{'.start': None, 'loop': '.start', 'body': 'loop', 'exit': 'loop'}
+
+Nodes and their dominance frontiers:
+{'.start': set(), 'loop': {'loop'}, 'body': {'loop'}, 'exit': set()}</code></pre>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; loop
+    loop --&gt; body
+    loop --&gt; exit
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>These results align with what we expect.</p>
+<p>Now for a more complex looping program, we investigate a program with a loop which contains a branch internally, seen below:</p>
+<pre class="{bril}"><code>@main {
+  x: int = const 0;
+.loop:
+  ten: int = const 10;
+  cond: bool = lt x ten;
+  br cond .body .exit;
+.body:
+  two: int = const 2;
+  mod: int = mod x two;
+  zero: int = const 0;
+  cond2: bool = eq mod zero;
+  br cond2 .even .odd;
+.even:
+  two: int = const 2;
+  x: int = add x two;
+  jmp .merge;
+.odd:
+  one: int = const 1;
+  x: int = add x one;
+  jmp .merge;
+.merge:
+  jmp .loop;
+.exit:
+  ret x;
+}</code></pre>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; loop
+    loop --&gt; body
+    loop --&gt; exit
+    body --&gt; odd
+    body --&gt; even
+    even --&gt; merge
+    odd --&gt; merge
+    merge --&gt; loop
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Here we expect that start dominates all directly connected successors, as do loop and body. Even, odd, and merge should strictly dominate no nodes, and should all have the immediate dominator of body. The dominance frontier of start and exit should both be empty, whereas body, loop, and merge should have a dominance frontier of only loop. Even and odd should contain merge as their dominance frontier.</p>
+<p>We generate the following results, which align with our expectations:</p>
+<pre><code>Nodes and their dominators:
+{'.start': {'.start'}, 'loop': {'.start', 'loop'}, 'body': {'.start', 'loop', 'body'}, 'exit': {'exit', '.start', 'loop'}, 'even': {'even', '.start', 'loop', 'body'}, 'odd': {'odd', '.start', 'loop', 'body'}, 'merge': {'merge', '.start', 'loop', 'body'}}
+
+Nodes and their strict dominators:
+{'.start': set(), 'loop': {'.start'}, 'body': {'.start', 'loop'}, 'exit': {'.start', 'loop'}, 'even': {'.start', 'loop', 'body'}, 'odd': {'.start', 'loop', 'body'}, 'merge': {'.start', 'loop', 'body'}}
+
+Nodes and their immediate dominators:
+{'.start': None, 'loop': '.start', 'body': 'loop', 'exit': 'loop', 'even': 'body', 'odd': 'body', 'merge': 'body'}
+
+Nodes and their dominance frontiers:
+{'.start': set(), 'loop': {'loop'}, 'body': {'loop'}, 'exit': set(), 'even': {'merge'}, 'odd': {'merge'}, 'merge': {'loop'}}</code></pre>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; loop
+    loop --&gt; body
+    loop --&gt; exit
+    body --&gt; even
+    body --&gt; odd
+    body --&gt; merge
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Now, finally, we investigate a program which contains a nested loop:</p>
+<pre class="{bril}"><code>@main {
+  x: int = const 0;
+  y: int = const 0;
+.outer_loop:
+  ten: int = const 10;
+  cond_outer: bool = lt x ten;
+  br cond_outer .inner_loop .exit;
+.inner_loop:
+  five: int = const 5;
+  cond_inner: bool = lt y five;
+  br cond_inner .inner_body .increment_outer;
+.inner_body:
+  one: int = const 1;
+  y: int = add y one;
+  jmp .inner_loop;
+.increment_outer:
+  one: int = const 1;
+  x: int = add x one;
+  y: int = const 0;
+  jmp .outer_loop;
+.exit:
+  ret x;
+}</code></pre>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; outer_loop
+    outer_loop --&gt; inner_loop
+    outer_loop --&gt; exit
+    inner_loop --&gt; inner_body
+    inner_loop --&gt; increment_outer
+    inner_body --&gt; inner_loop
+    increment_outer --&gt; outer_loop
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Here, we expect that start and outer_loop strictly dominate all successor nodes, and the successors of those nodes. Exit should only dominate itself, as should inner_body and increment_outer. inner_loop should strictly dominate inner_body and increment_outer. .start and exit should have an empty dominance frontier. inner_loop, increment_outer, and outer_loop should contain outer_loop in their dominance frontiers. inner_body should have inner_loop as its dominance frontier. The results of our program are shown below:</p>
+<pre><code>Nodes and their dominators:
+{'.start': {'.start'}, 'outer_loop': {'.start', 'outer_loop'}, 'inner_loop': {'inner_loop', '.start', 'outer_loop'}, 'exit': {'.start', 'exit', 'outer_loop'}, 'inner_body': {'inner_body', 'inner_loop', '.start', 'outer_loop'}, 'increment_outer': {'inner_loop', '.start', 'increment_outer', 'outer_loop'}}
+
+Nodes and their strict dominators:
+{'.start': set(), 'outer_loop': {'.start'}, 'inner_loop': {'.start', 'outer_loop'}, 'exit': {'.start', 'outer_loop'}, 'inner_body': {'inner_loop', '.start', 'outer_loop'}, 'increment_outer': {'inner_loop', '.start', 'outer_loop'}}
+
+Nodes and their immediate dominators:
+{'.start': None, 'outer_loop': '.start', 'inner_loop': 'outer_loop', 'exit': 'outer_loop', 'inner_body': 'inner_loop', 'increment_outer': 'inner_loop'}
+
+Nodes and their dominance frontiers:
+{'.start': set(), 'outer_loop': {'outer_loop'}, 'inner_loop': {'inner_loop', 'outer_loop'}, 'exit': set(), 'inner_body': {'inner_loop'}, 'increment_outer': {'outer_loop'}}</code></pre>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    .start --&gt; outer_loop
+    outer_loop --&gt; inner_loop
+    outer_loop --&gt; exit
+    inner_loop --&gt; inner_body
+    inner_loop --&gt; increment_outer
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 </section>
-</section>
-<section id="part-2" class="level1">
-<h1>Part 2</h1>
-<p>I wrote a <code>find_op(bril_file, op)</code> function that takes as input the bril json formated file as well as the opcode of the target instruction. The fuction returns all occurencens of the input opcode.</p>
-<pre><code>def find_op(bril_file, op):
-    add_instrs = []
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        num_instrs = len(instrs)
-        
-        print(f"Function '{function['name']}' has {num_instrs} instructions.")
-        
-        for instr in instrs:
-            if instr.get('op') == op:
-                add_instrs.append(instr)
-
-    return add_instrs
-
-find_op(bril_file, "br")
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-Function 'main' has 6 instructions.
-Function 'benchmark' has 54 instructions.
-
-[{'op': 'br', 'args': ['v7'], 'labels': ['for.body.3', 'for.end.3']},
- {'op': 'br', 'args': ['v20'], 'labels': ['then.17', 'else.17']}]</code></pre>
-<p>The second function <code>count_instruction_types(bril_file)</code> returns the number of occurences for all opcodes.</p>
-<pre><code>def count_instruction_types(bril_file):
-    instruction_count = {}
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        
-        for instr in instrs:
-            op_type = instr.get('op')
-            if op_type:
-
-                instruction_count[op_type] = instruction_count.get(op_type, 0) + 1
-
-    return instruction_count
-
-count_instruction_types(bril_file)
-
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-{'const': 10,
- 'call': 1,
- 'id': 25,
- 'print': 1,
- 'lt': 1,
- 'br': 2,
- 'add': 3,
- 'mul': 1,
- 'sub': 2,
- 'eq': 1,
- 'jmp': 2,
- 'ret': 1}</code></pre>
-<p>The last function <code>insert_before_op_code(bril_json, target_op_code):</code> takes as input the json formatted bril, and an instruction opcode, then proceeds to insert the following instructions before every occurence of the opcode:</p>
-<pre><code>{"op": "id", 
-  "dest": "v30", 
-  "type": "int", 
-  "args": ["i"]},
-{"op": "print", 
-  "args": ["v30"]}</code></pre>
-<p>The first instruction loads the value <code>i</code> into <code>v30</code>, which is the loop iterator. Then prints out the value.</p>
-<pre><code>def insert_before_op_code(bril_file, target_op_code):
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-
-        modified_instrs = []
-
-        for instr in instrs:
-            if instr.get('op') == target_op_code:
-                modified_instrs.append({"op": "id", 
-                                        "dest": "v30", 
-                                        "type": "int", 
-                                        "args": ["i"]})
-                                        
-                modified_instrs.append({"op": "print", 
-                                         "args": ["v30"]})
-
-            modified_instrs.append(instr)
-
-        function['instrs'] = modified_instrs
-
-    return bril_file
-
-with open('bench.bril', 'r') as file:
-    bril_file = json.load(file)
-
-print_after_jmp = insert_before_op_code(bril_file, "jmp")
-print(print_after_jmp)
-
-with open("bench-print-after-jmp.bril", 'w') as file:
-    json.dump(print_after_jmp, file)</code></pre>
-<p>The implementation below adds print statements before <code>jmp</code> instructions, then saves the new program (with added print statements) into a new file called <code>bench-print-before-jmp.bril</code>.</p>
-<p>To execute the new program, run:</p>
-<pre><code>$ brili &lt; bench-print-before-jmp.bril
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-0
-1
-2
-2
-3
-4
-4
-5
-6
-6
-7
-8
-8
-9
-10
-727</code></pre>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<p>The code used to generate the above results can be found <a href="https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw4">here</a>. Some of the test cases were initially generated by ChatGPT, but were modified to create better test cases (and for correctness).</p>
 
 
 </section>
@@ -1379,13 +1534,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/junk.html" class="pagination-link" aria-label="sample blog">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">sample blog</span>
+      <a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="pagination-link" aria-label="EECE7309 Homework 3 -- Data Flow">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">EECE7309 Homework 3 – Data Flow</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/aymane/readme2.html" class="pagination-link" aria-label="Homework 2 -- Implementing DCE and LVN">
-        <span class="nav-page-text">Homework 2 – Implementing DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/oscar/2024-09-20-HW1.html" class="pagination-link" aria-label="HW1 - Trying Out Bril">
+        <span class="nav-page-text">HW1 - Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

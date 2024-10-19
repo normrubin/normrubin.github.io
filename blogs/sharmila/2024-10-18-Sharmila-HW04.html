@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Aymane El Jerari">
+<meta name="author" content="Sharmila Sivalingam">
 
-<title>Homework 1 – Trying Out Bril – EECE7398 Fall 2024</title>
+<title>Compiler Homework 04 - Implementing Dominance Utilities – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/aymane/readme2.html" rel="next">
-<link href="../../blogs/junk.html" rel="prev">
+<link href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" rel="next">
+<link href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1 – Trying Out Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="Compiler Homework 04 - Implementing Dominance Utilities – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html">Compiler Homework 04 - Implementing Dominance Utilities</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -159,16 +159,16 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
  <span class="menu-text">Aymane</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
@@ -380,13 +380,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
  <span class="menu-text">Sharmila</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
@@ -407,7 +407,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Compiler Homework 04 - Implementing Dominance Utilities</span></a>
   </div>
 </li>
@@ -723,9 +723,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html">Compiler Homework 04 - Implementing Dominance Utilities</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1 – Trying Out Bril</h1>
+<h1 class="title">Compiler Homework 04 - Implementing Dominance Utilities</h1>
 </div>
 
 
@@ -735,7 +735,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Aymane El Jerari </p>
+             <p>Sharmila Sivalingam </p>
           </div>
   </div>
     
@@ -748,210 +748,131 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="part-1" class="level1">
-<h1>Part 1</h1>
-<p>To compile from typescript to bril and execute the program run the following:</p>
-<pre><code>$ ts2bril bench.ts &gt; bench.bril &amp;&amp; brili &lt; bench.bril
-727</code></pre>
-<p>The typescript benchmark I wrote performs a series of simple arithmetic, logical and alu operations. The function outputs <code>727</code> with the default input value 10.</p>
-<section id="passing-command-line-arugments" class="level2">
-<h2 class="anchored" data-anchor-id="passing-command-line-arugments">Passing Command Line Arugments</h2>
-<p>When writing the typescript benchmark, the input function argument was hardcoded to have value <code>10</code>. So I couldn’t parametrized the <code>turnt</code> tests. I wanted to figure out a way to pass the input as a command line argument from <code>stdin</code> in order to generate different tests. Now I could do this by importing a typescript package to handle user input. But I’ve decided to manually modify my benchmark at the bril level.</p>
-<p>Initially, the typescript benchmark I wrote resulted in the following bril ir:</p>
-<p><code>bench.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        {
-          "op": "const",
-          "value": 10,
-          "dest": "v31",
-          "type": "int"
-        },
-        ...
-      ]
-      "args": []
-    },
-    ...
-  ]
+<p>In this homework blog, the task involves three main components: finding dominators for a function, constructing the dominance tree, and computing the dominance frontier. This blog post will walk through the implementation process, challenges faced, and testing my implementation.</p>
+<section id="implementation-process" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-process">Implementation Process</h2>
+<section id="finding-dominators" class="level3">
+<h3 class="anchored" data-anchor-id="finding-dominators">1. Finding Dominators</h3>
+<p>The first step was to implement a function to find dominators for a given control flow graph (CFG). I used the iterative algorithm, which involves:</p>
+<ol type="1">
+<li>Initializing all nodes as dominators for each node.</li>
+<li>Iteratively refining the dominator sets based on the predecessors of each node.</li>
+<li>Continuing until no changes occur in the dominator sets.</li>
+</ol>
+</section>
+<section id="constructing-the-dominance-tree" class="level3">
+<h3 class="anchored" data-anchor-id="constructing-the-dominance-tree">2. Constructing the Dominance Tree</h3>
+<p>With the dominator information in hand, constructing the dominance tree was the next challenge, implemented by:</p>
+<ol type="1">
+<li>Inverting the dominator relation to get a map of dominated nodes.</li>
+<li>Identifying the strictly dominated nodes (excluding self-domination).</li>
+<li>Building the tree structure by finding the immediate dominator for each node.</li>
+</ol>
+</section>
+<section id="computing-the-dominance-frontier" class="level3">
+<h3 class="anchored" data-anchor-id="computing-the-dominance-frontier">3. Computing the Dominance Frontier</h3>
+<p>The final piece of the puzzle was computing the dominance frontier. Implemented this by:</p>
+<ol type="1">
+<li>Finding all successors of dominated blocks for each node.</li>
+<li>Identifying which of these successors are not strictly dominated by the current node.</li>
+</ol>
+</section>
+</section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">Testing</h2>
+<p>To ensure the correctness of the implementation, I tested the code with 2 examples:</p>
+<ol type="1">
+<li>Example 1: Sum of Two Numbers</li>
+</ol>
+<pre class="{Bril}"><code>@main {
+ a: int = const 10;
+ b: int = const 3;
+ sum: int = add a b;
+ print sum;
 }</code></pre>
-<p>The value 10 is passed in as a constant to main. In order to parametrize it, a few things need to be modified. First, we need to change the <code>op</code> field from <code>const</code> to <code>id</code>. As explained in the <a href="https://capra.cs.cornell.edu/bril/lang/core.html#miscellaneous">bril documentation</a>, the <code>id</code> opcode is a type-insensitive identity we can use to pass variables around. Additonally, we also need specify the arguments passed to main. To do so, we pass a argument to the function. So the new bril representation becomes:</p>
-<p><code>bench-param.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "args": [
-        {
-          "name": "val",
-          "type": "int"
-        }
-      ],
-      "instrs": [
-        {
-          "args": [
-            "val"
-          ],
-          "dest": "v31",
-          "op": "id",
-          "type": "int"
-        }, 
-      ],
-    },
-    ...
-  ]
+<p>Output: Dominators:</p>
+<pre class="{Output}"><code>{
+  "Main1": ["Main1"]
+}</code></pre>
+<p>Dominance Tree:</p>
+<pre class="{Output}"><code>{
+  "Main1": []
+}</code></pre>
+<p>Dominance Frontier:</p>
+<pre class="{Output}"><code>{
+  "Main1": []
+}</code></pre>
+<ol start="2" type="1">
+<li>Example 1: Fibonacci Sequence</li>
+</ol>
+<pre class="{Bril}"><code>@main(n: int) {
+ zero: int = const 0;
+ one: int = const 1;
+ is_base_case: bool = le n one;
+ br is_base_case .base_case .recursive_case;
+
+.base_case:
+ result: int = id n;
+ jmp .end;
+
+.recursive_case:
+ n_minus_one: int = sub n one;
+ n_minus_two: int = sub n two;
+ 
+ fib_n_minus_one: int = call @fibonacci n_minus_one;
+ fib_n_minus_two: int = call @fibonacci n_minus_two;
+ 
+ result: int = add fib_n_minus_one fib_n_minus_two;
+
+.end:
+ print result;
 }
-</code></pre>
-<p>Now we can pass any value to the function:</p>
-<pre><code>$ brili &lt; bench-param.bril 12
-2796</code></pre>
-<p>To more easily view these changes, let’s look at the text formatting of bril by running these commands to convert from json to text.</p>
-<pre><code>$ bril2txt &lt; bench.bril &gt; bench.txt &amp;&amp; bril2txt &lt; bench-param.bril &gt; bench-param.txt</code></pre>
-<p><code>bench.txt</code></p>
-<pre><code>@main {
-  v31: int = const 10;
-  ...
+
+@fibonacci(n: int): int {
+ zero: int = const 0;
+ one: int = const 1;
+ is_base_case: bool = le n one;
+ br is_base_case .base_case .recursive_case;
+
+.base_case:
+ ret n;
+
+.recursive_case:
+ n_minus_one: int = sub n one;
+ n_minus_two: int = sub n two;
+ 
+ fib_n_minus_one: int = call @fibonacci n_minus_one;
+ fib_n_minus_two: int = call @fibonacci n_minus_two;
+ 
+ result: int = add fib_n_minus_one fib_n_minus_two;
+ ret result;
 }</code></pre>
-<p><code>bench-param.txt</code></p>
-<pre><code>@main(val: int) {
-  v31: int = id val;
-  ...
+<p>Output: Dominators:</p>
+<pre class="{Output}"><code>{
+  "Main1": ["Main1"],
+  "base_case": ["Main1","base_case"],
+  "end": ["Main1","end"],
+  "recursive_case": ["Main1","recursive_case"]
 }</code></pre>
+<p>Dominance Tree:</p>
+<pre class="{Output}"><code>{
+  "Main1": ["base_case","end","recursive_case"],
+  "base_case": [],
+  "end": [],
+  "recursive_case": []
+}</code></pre>
+<p>Dominance Frontier:</p>
+<pre class="{Output}"><code>{
+  "Main1": [],
+  "base_case": ["end"],
+  "end": [],
+  "recursive_case": ["end"]
+}</code></pre>
+<p>The code correctly identifies dominators, constructs accurate dominance trees, and computes the correct dominance frontiers. By these output it is understood that Block A(Main1 block here) dominates the other blocks.</p>
 </section>
-</section>
-<section id="part-2" class="level1">
-<h1>Part 2</h1>
-<p>I wrote a <code>find_op(bril_file, op)</code> function that takes as input the bril json formated file as well as the opcode of the target instruction. The fuction returns all occurencens of the input opcode.</p>
-<pre><code>def find_op(bril_file, op):
-    add_instrs = []
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        num_instrs = len(instrs)
-        
-        print(f"Function '{function['name']}' has {num_instrs} instructions.")
-        
-        for instr in instrs:
-            if instr.get('op') == op:
-                add_instrs.append(instr)
-
-    return add_instrs
-
-find_op(bril_file, "br")
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-Function 'main' has 6 instructions.
-Function 'benchmark' has 54 instructions.
-
-[{'op': 'br', 'args': ['v7'], 'labels': ['for.body.3', 'for.end.3']},
- {'op': 'br', 'args': ['v20'], 'labels': ['then.17', 'else.17']}]</code></pre>
-<p>The second function <code>count_instruction_types(bril_file)</code> returns the number of occurences for all opcodes.</p>
-<pre><code>def count_instruction_types(bril_file):
-    instruction_count = {}
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        
-        for instr in instrs:
-            op_type = instr.get('op')
-            if op_type:
-
-                instruction_count[op_type] = instruction_count.get(op_type, 0) + 1
-
-    return instruction_count
-
-count_instruction_types(bril_file)
-
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-{'const': 10,
- 'call': 1,
- 'id': 25,
- 'print': 1,
- 'lt': 1,
- 'br': 2,
- 'add': 3,
- 'mul': 1,
- 'sub': 2,
- 'eq': 1,
- 'jmp': 2,
- 'ret': 1}</code></pre>
-<p>The last function <code>insert_before_op_code(bril_json, target_op_code):</code> takes as input the json formatted bril, and an instruction opcode, then proceeds to insert the following instructions before every occurence of the opcode:</p>
-<pre><code>{"op": "id", 
-  "dest": "v30", 
-  "type": "int", 
-  "args": ["i"]},
-{"op": "print", 
-  "args": ["v30"]}</code></pre>
-<p>The first instruction loads the value <code>i</code> into <code>v30</code>, which is the loop iterator. Then prints out the value.</p>
-<pre><code>def insert_before_op_code(bril_file, target_op_code):
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-
-        modified_instrs = []
-
-        for instr in instrs:
-            if instr.get('op') == target_op_code:
-                modified_instrs.append({"op": "id", 
-                                        "dest": "v30", 
-                                        "type": "int", 
-                                        "args": ["i"]})
-                                        
-                modified_instrs.append({"op": "print", 
-                                         "args": ["v30"]})
-
-            modified_instrs.append(instr)
-
-        function['instrs'] = modified_instrs
-
-    return bril_file
-
-with open('bench.bril', 'r') as file:
-    bril_file = json.load(file)
-
-print_after_jmp = insert_before_op_code(bril_file, "jmp")
-print(print_after_jmp)
-
-with open("bench-print-after-jmp.bril", 'w') as file:
-    json.dump(print_after_jmp, file)</code></pre>
-<p>The implementation below adds print statements before <code>jmp</code> instructions, then saves the new program (with added print statements) into a new file called <code>bench-print-before-jmp.bril</code>.</p>
-<p>To execute the new program, run:</p>
-<pre><code>$ brili &lt; bench-print-before-jmp.bril
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-0
-1
-2
-2
-3
-4
-4
-5
-6
-6
-7
-8
-8
-9
-10
-727</code></pre>
+<section id="challenges-faced" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced">Challenges Faced</h2>
+<p>Complexity of the dominator finding algorithm, which is slow for large tree. Additionally, constructing dominator tree was difficult required extra testing and debugging to ensure correctness.</p>
 
 
 </section>
@@ -1379,13 +1300,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/junk.html" class="pagination-link" aria-label="sample blog">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">sample blog</span>
+      <a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html" class="pagination-link" aria-label="Compiler Homework 03 - Data Flow Analysis">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Compiler Homework 03 - Data Flow Analysis</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/aymane/readme2.html" class="pagination-link" aria-label="Homework 2 -- Implementing DCE and LVN">
-        <span class="nav-page-text">Homework 2 – Implementing DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="pagination-link" aria-label="Homework1 - Yashaswini">
+        <span class="nav-page-text">Homework1 - Yashaswini</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

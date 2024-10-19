@@ -8,7 +8,7 @@
 
 <meta name="author" content="Aymane El Jerari">
 
-<title>Homework 1 – Trying Out Bril – EECE7398 Fall 2024</title>
+<title>Homework 3 – Implementing Liveness Dataflow Analysis – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/aymane/readme2.html" rel="next">
-<link href="../../blogs/junk.html" rel="prev">
+<link href="../../blogs/matin/2024-09-20-HW1.html" rel="next">
+<link href="../../blogs/aymane/readme3.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1 – Trying Out Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="Homework 3 – Implementing Liveness Dataflow Analysis – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme4.html">Homework 3 – Implementing Liveness Dataflow Analysis</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -168,7 +168,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
@@ -186,7 +186,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/aymane/readme4.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/aymane/readme4.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Homework 3 – Implementing Liveness Dataflow Analysis</span></a>
   </div>
 </li>
@@ -723,9 +723,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Homework 1 – Trying Out Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme4.html">Homework 3 – Implementing Liveness Dataflow Analysis</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1 – Trying Out Bril</h1>
+<h1 class="title">Homework 3 – Implementing Liveness Dataflow Analysis</h1>
 </div>
 
 
@@ -748,210 +748,210 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="part-1" class="level1">
-<h1>Part 1</h1>
-<p>To compile from typescript to bril and execute the program run the following:</p>
-<pre><code>$ ts2bril bench.ts &gt; bench.bril &amp;&amp; brili &lt; bench.bril
-727</code></pre>
-<p>The typescript benchmark I wrote performs a series of simple arithmetic, logical and alu operations. The function outputs <code>727</code> with the default input value 10.</p>
-<section id="passing-command-line-arugments" class="level2">
-<h2 class="anchored" data-anchor-id="passing-command-line-arugments">Passing Command Line Arugments</h2>
-<p>When writing the typescript benchmark, the input function argument was hardcoded to have value <code>10</code>. So I couldn’t parametrized the <code>turnt</code> tests. I wanted to figure out a way to pass the input as a command line argument from <code>stdin</code> in order to generate different tests. Now I could do this by importing a typescript package to handle user input. But I’ve decided to manually modify my benchmark at the bril level.</p>
-<p>Initially, the typescript benchmark I wrote resulted in the following bril ir:</p>
-<p><code>bench.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        {
-          "op": "const",
-          "value": 10,
-          "dest": "v31",
-          "type": "int"
-        },
-        ...
-      ]
-      "args": []
-    },
-    ...
-  ]
-}</code></pre>
-<p>The value 10 is passed in as a constant to main. In order to parametrize it, a few things need to be modified. First, we need to change the <code>op</code> field from <code>const</code> to <code>id</code>. As explained in the <a href="https://capra.cs.cornell.edu/bril/lang/core.html#miscellaneous">bril documentation</a>, the <code>id</code> opcode is a type-insensitive identity we can use to pass variables around. Additonally, we also need specify the arguments passed to main. To do so, we pass a argument to the function. So the new bril representation becomes:</p>
-<p><code>bench-param.bril</code>:</p>
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "args": [
-        {
-          "name": "val",
-          "type": "int"
-        }
-      ],
-      "instrs": [
-        {
-          "args": [
-            "val"
-          ],
-          "dest": "v31",
-          "op": "id",
-          "type": "int"
-        }, 
-      ],
-    },
-    ...
-  ]
-}
+<p>I implemented the dominator functions inside <code>dominator.py</code>. There are some utility functions in the <code>utils.py</code> file. Functions to draw the graphs are located inside <code>graph.py</code>. To run the program, pass a bril file through stdin <code>bril2json &lt; file.bril | python3 dominatory.py --doms --doms_tree --dom_frontier --test_dom --nodes nodeA nodeB</code></p>
+<p><code>--doms</code> computes the dominators for each block and generates a cfg image. <code>--dom_tree</code> computes the dominator tree and generates the image. <code>--dom_frontier</code> computes the dominance frontier of all nodes and prints it out. <code>--test_dom --nodes nodeA nodeB</code> tests if nodeA dominates nodeB.</p>
+<p>Key Concepts</p>
+<pre><code>•   Dominators: A block B1 dominates another block B2 if every path from the entry block to B2 must go through B1.
+•   Immediate Dominators: The closest dominator of a block B is called its immediate dominator (idom).
+•   Dominance Frontier: The set of blocks where the dominance relationship breaks.</code></pre>
+<p>The <code>get_dominators()</code> function returns a dictionary mapping a node to its dominators. We find a node’s dominators by finding the common ancestry of all it’s predecessors.</p>
+<pre><code>def get_dominators(blocks):
+    # get block list and block set structures
+    all_blks_l = list(blocks.keys())
+    all_blks_s = set(all_blks_l)
+
+    # get the firs block
+    entry = next(iter(blocks))
+
+    # init dominator dict
+    dom = {name: all_blks_s for name in blocks.keys()} 
+    dom[entry] = {entry}
+
+    _, predecessors = generate_graph(blocks)
+
+    changed = True
+    while changed:
+        changed = False
+        # all vertices except the entry point
+        for v in all_blks_l[1:]:
+            intrsct = all_blks_s
+
+            # get the common ancestors of all predecessors
+            for pred in predecessors[v]:
+                intrsct = intrsct.intersection(dom[pred])
+
+            # self dominates
+            new_dom = intrsct.union({v})
+
+            # update the dominator tree entries
+            if new_dom != dom[v]:
+                dom[v] = new_dom
+                changed = True
+
+    return dom</code></pre>
+<p>We build the dominance tree by finding the immediate dominators of each block. A node a immediately dominates a node b if a != b and no node c (with c != a and c != b) exists such that a dominates c and c dominates b.</p>
+<pre><code>def strictly_dominates(b1, b2, doms):
+    return b1 in doms[b2] and b1 != b2
+
+def build_dominance_tree(dom):
+    # init dominator tree
+    dom_tree = {node: [] for node in dom.keys()}
+
+    for a in dom.keys():
+        for b, b_doms in dom.items():
+            if a != b:
+                E_a_stric_dom_c = False
+                # look at all dominators of b
+                for c in b_doms:
+                    # c != b
+                    if c != b:
+                        # check if a strictly dominates any of b's dominators
+                        E_a_stric_dom_c = E_a_stric_dom_c or strictly_dominates(a, c, dom)
+
+                # b1 strictly dominates 
+                if a in b_doms and not E_a_stric_dom_c:
+                    dom_tree[a].append(b)
+    return dom_tree</code></pre>
+<p>Finally, the <code>get_dominance_frontier()</code> function returns a dictionary mapping each block to the blocks that lie within its dominance frontier. First we compute the intersection between the dominators of all predecessors of the node, then compute the union for the same set. Subtracting the intersection from the union results in the dominance frontier for a given node.</p>
+<pre><code>def get_dominance_frontier(blks):
+    # get predecessors and dominators for each block
+    _, p = generate_graph(blks)
+    doms = get_dominators(blks)
+
+    # init the frontier dict
+    frontier = {name: [] for name in doms.keys()}
+
+    # loop over all nodes
+    for node in doms:
+        # get the dominators of all predecessors of the current node
+        pred_doms = [doms[pred] for pred in p[node]]
+        # if none, we can skip to the next node
+        if len(pred_doms) == 0:
+            continue
+
+        # get the set intersection for dominators of all predecessors of current node
+        intersection = set.intersection(*map(set,pred_doms))
+        # get the set union for dominators of all predecessors of the current node
+        union = set.union(*map(set,pred_doms)) 
+        frontier_set = union - intersection
+        
+        # add nodes to the frontier dict
+        for block in frontier_set:
+            frontier[block].append(node)
+
+    return frontier
 </code></pre>
-<p>Now we can pass any value to the function:</p>
-<pre><code>$ brili &lt; bench-param.bril 12
-2796</code></pre>
-<p>To more easily view these changes, let’s look at the text formatting of bril by running these commands to convert from json to text.</p>
-<pre><code>$ bril2txt &lt; bench.bril &gt; bench.txt &amp;&amp; bril2txt &lt; bench-param.bril &gt; bench-param.txt</code></pre>
-<p><code>bench.txt</code></p>
+<p>Let’s look at some examples.</p>
+<p><code>test1.bril</code></p>
+<pre><code># ARGS: 8
+@main(input: int) {
+  value: int = id input;
+  v1: int = const 1;
+  result: int = id v1;
+  v3: int = id value;
+  i: int = id v3;
+.for.cond.2:
+  v4: int = id i;
+  v5: int = const 0;
+  v6: bool = gt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: int = id result;
+  v8: int = id i;
+  v9: int = mul v7 v8;
+  result: int = id v9;
+  v10: int = id i;
+  v11: int = const 1;
+  v12: int = sub v10 v11;
+  i: int = id v12;
+  jmp .for.cond.2;
+.for.end.2:
+  v13: int = id result;
+  print v13;
+  v14: int = const 0;
+}</code></pre>
+<section id="cfg-with-dominators" class="level4">
+<h4 class="anchored" data-anchor-id="cfg-with-dominators">CFG with Dominators</h4>
+<p><img src="img/1_dominator_graph.png" class="img-fluid" alt="test1_cfg"> #### Dominance Tree <img src="img/1_dominance_tree_graph.png" class="img-fluid" alt="test1_dom_tree"></p>
+<p>We can run the following command to generate these two graphs, compute the dominance frontier and check whether node <code>b1</code> dominates <code>for.cond.2</code>.</p>
+<pre><code>bril2json &lt; test1.bril | python3 dominator.py --doms --dom_tree --dom_frontier --test_dom --nodes b1 for.cond.2
+
+Dominance Frontier
+{'b1': [], 'for.cond.2': ['for.cond.2'], 'for.body.2': ['for.cond.2'], 'for.end.2': []}
+
+b1 dominates for.cond.2</code></pre>
+<p><code>test7.bril</code> generates the same graph as one of the <a href="https://normrubin.github.io/lectures/05_global.html#a-more-complex-example">examples shown in the class slides</a>.</p>
+<pre><code>@main{
+.b0:
+    a: int = const 1;
+    b: int = const 0;
+    cond1: bool = a;
+    br cond1 .b5 .b1;
+.b5:
+    cond2: bool = a;
+    br cond1 .b6 .b7;
+.b1:
+    cond3: bool = a;
+    br cond1 .b2 .b3;
+.b2:
+    jmp .b4;
+.b4:
+    jmp .b8;
+.b6:
+    jmp .b4;
+.b3:
+    jmp .b8;
+.b7:
+    jmp .b8;
+.b8:
+    print a;
+}</code></pre>
+<p>We can verify that block b4 doesn’t dominate block b0 by running:</p>
+<pre><code>bril2json &lt; test7.bril | python3 dominator.py --doms --dom_tree --test_dom --nodes b4 b0
+b4 doesn't dominate b0</code></pre>
+</section>
+<section id="cfg-with-dominators-1" class="level4">
+<h4 class="anchored" data-anchor-id="cfg-with-dominators-1">CFG with Dominators</h4>
+<p><img src="img/7_dominator_graph.png" class="img-fluid" alt="test7_cfg"> #### Dominance Tree <img src="img/7_dominance_tree_graph.png" class="img-fluid" alt="test7_dom_tree"></p>
+<p><code>test4.bril</code> incorporate phi nodes:</p>
 <pre><code>@main {
-  v31: int = const 10;
-  ...
-}</code></pre>
-<p><code>bench-param.txt</code></p>
-<pre><code>@main(val: int) {
-  v31: int = id val;
-  ...
+  x: int = const 1;
+  y: int = const 2;
+  
+.entry:
+  z: int = add x y;
+  
+.branch1:
+  cond1: bool = le x y;
+  br cond1 .then1 .else1;
+
+.then1:
+  t1: int = mul x z;
+  jmp .merge;
+
+.else1:
+  t2: int = sub y z;
+  
+.branch2:
+  cond2: bool = gt t2 x;
+  br cond2 .then2 .else2;
+
+.then2:
+  t3: int = add t2 x;
+  
+.else2:
+  t4: int = sub t2 y;
+
+.merge:
+  u: int = phi t1 .then1 t3 .then2 t4 .else2;
+  
+.exit:
+  print u;
 }</code></pre>
 </section>
-</section>
-<section id="part-2" class="level1">
-<h1>Part 2</h1>
-<p>I wrote a <code>find_op(bril_file, op)</code> function that takes as input the bril json formated file as well as the opcode of the target instruction. The fuction returns all occurencens of the input opcode.</p>
-<pre><code>def find_op(bril_file, op):
-    add_instrs = []
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        num_instrs = len(instrs)
-        
-        print(f"Function '{function['name']}' has {num_instrs} instructions.")
-        
-        for instr in instrs:
-            if instr.get('op') == op:
-                add_instrs.append(instr)
-
-    return add_instrs
-
-find_op(bril_file, "br")
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-Function 'main' has 6 instructions.
-Function 'benchmark' has 54 instructions.
-
-[{'op': 'br', 'args': ['v7'], 'labels': ['for.body.3', 'for.end.3']},
- {'op': 'br', 'args': ['v20'], 'labels': ['then.17', 'else.17']}]</code></pre>
-<p>The second function <code>count_instruction_types(bril_file)</code> returns the number of occurences for all opcodes.</p>
-<pre><code>def count_instruction_types(bril_file):
-    instruction_count = {}
-    
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-        
-        for instr in instrs:
-            op_type = instr.get('op')
-            if op_type:
-
-                instruction_count[op_type] = instruction_count.get(op_type, 0) + 1
-
-    return instruction_count
-
-count_instruction_types(bril_file)
-
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-{'const': 10,
- 'call': 1,
- 'id': 25,
- 'print': 1,
- 'lt': 1,
- 'br': 2,
- 'add': 3,
- 'mul': 1,
- 'sub': 2,
- 'eq': 1,
- 'jmp': 2,
- 'ret': 1}</code></pre>
-<p>The last function <code>insert_before_op_code(bril_json, target_op_code):</code> takes as input the json formatted bril, and an instruction opcode, then proceeds to insert the following instructions before every occurence of the opcode:</p>
-<pre><code>{"op": "id", 
-  "dest": "v30", 
-  "type": "int", 
-  "args": ["i"]},
-{"op": "print", 
-  "args": ["v30"]}</code></pre>
-<p>The first instruction loads the value <code>i</code> into <code>v30</code>, which is the loop iterator. Then prints out the value.</p>
-<pre><code>def insert_before_op_code(bril_file, target_op_code):
-    functions = bril_file.get('functions', [])
-
-    for function in functions:
-        instrs = function.get('instrs', [])
-
-        modified_instrs = []
-
-        for instr in instrs:
-            if instr.get('op') == target_op_code:
-                modified_instrs.append({"op": "id", 
-                                        "dest": "v30", 
-                                        "type": "int", 
-                                        "args": ["i"]})
-                                        
-                modified_instrs.append({"op": "print", 
-                                         "args": ["v30"]})
-
-            modified_instrs.append(instr)
-
-        function['instrs'] = modified_instrs
-
-    return bril_file
-
-with open('bench.bril', 'r') as file:
-    bril_file = json.load(file)
-
-print_after_jmp = insert_before_op_code(bril_file, "jmp")
-print(print_after_jmp)
-
-with open("bench-print-after-jmp.bril", 'w') as file:
-    json.dump(print_after_jmp, file)</code></pre>
-<p>The implementation below adds print statements before <code>jmp</code> instructions, then saves the new program (with added print statements) into a new file called <code>bench-print-before-jmp.bril</code>.</p>
-<p>To execute the new program, run:</p>
-<pre><code>$ brili &lt; bench-print-before-jmp.bril
-
- ---------------
-|    OUTPUT     |
- ---------------
-
-0
-1
-2
-2
-3
-4
-4
-5
-6
-6
-7
-8
-8
-9
-10
-727</code></pre>
+<section id="cfg-with-dominators-2" class="level4">
+<h4 class="anchored" data-anchor-id="cfg-with-dominators-2">CFG with Dominators</h4>
+<p><img src="img/4_dominator_graph.png" class="img-fluid" alt="test4_cfg"> #### Dominance Tree <img src="img/4_dominance_tree_graph.png" class="img-fluid" alt="test4_dom_tree"></p>
 
 
 </section>
@@ -1379,13 +1379,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/junk.html" class="pagination-link" aria-label="sample blog">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">sample blog</span>
+      <a href="../../blogs/aymane/readme3.html" class="pagination-link" aria-label="Homework 3 -- Implementing Liveness Dataflow Analysis">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 3 – Implementing Liveness Dataflow Analysis</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/aymane/readme2.html" class="pagination-link" aria-label="Homework 2 -- Implementing DCE and LVN">
-        <span class="nav-page-text">Homework 2 – Implementing DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/matin/2024-09-20-HW1.html" class="pagination-link" aria-label="Homework 1">
+        <span class="nav-page-text">Homework 1</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
