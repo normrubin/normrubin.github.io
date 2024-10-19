@@ -2,7 +2,7 @@
 author: Aymane El Jerari
 format:
   html: default
-title: Homework 3 -- Implementing Liveness Dataflow Analysis
+title: Homework 4 -- Implementing Dominance Algorithms
 
 ---
 
@@ -153,9 +153,9 @@ Let's look at some examples.
 }
 ```
 #### CFG with Dominators
-![test1_cfg](img/1_dominator_graph.png)
+![test1_cfg](img-hw4/1_dominator_graph.png)
 #### Dominance Tree
-![test1_dom_tree](img/1_dominance_tree_graph.png)
+![test1_dom_tree](img-hw4/1_dominance_tree_graph.png)
 
 We can run the following command to generate these two graphs, compute the dominance frontier and check whether node `b1` dominates `for.cond.2`. 
 
@@ -205,9 +205,9 @@ bril2json < test7.bril | python3 dominator.py --doms --dom_tree --test_dom --nod
 b4 doesn't dominate b0
 ```
 #### CFG with Dominators
-![test7_cfg](img/7_dominator_graph.png)
+![test7_cfg](img-hw4/7_dominator_graph.png)
 #### Dominance Tree
-![test7_dom_tree](img/7_dominance_tree_graph.png)
+![test7_dom_tree](img-hw4/7_dominance_tree_graph.png)
 
 
 `test4.bril` incorporate phi nodes:
@@ -250,6 +250,6 @@ b4 doesn't dominate b0
 ```
 
 #### CFG with Dominators
-![test4_cfg](img/4_dominator_graph.png)
+![test4_cfg](img-hw4/4_dominator_graph.png)
 #### Dominance Tree
-![test4_dom_tree](img/4_dominance_tree_graph.png)
+![test4_dom_tree](img-hw4/4_dominance_tree_graph.png)
