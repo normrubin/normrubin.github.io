@@ -8,7 +8,7 @@
 
 <meta name="author" content="Aymane El Jerari">
 
-<title>Homework 3 – Implementing Liveness Dataflow Analysis – EECE7398 Fall 2024</title>
+<title>Homework 4 – Implementing Dominance Algorithms – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 3 – Implementing Liveness Dataflow Analysis – EECE7398 Fall 2024">
+<meta property="og:title" content="Homework 4 – Implementing Dominance Algorithms – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme4.html">Homework 3 – Implementing Liveness Dataflow Analysis</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme4.html">Homework 4 – Implementing Dominance Algorithms</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -187,7 +187,7 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/aymane/readme4.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Homework 3 – Implementing Liveness Dataflow Analysis</span></a>
+ <span class="menu-text">Homework 4 – Implementing Dominance Algorithms</span></a>
   </div>
 </li>
       </ul>
@@ -717,9 +717,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme4.html">Homework 3 – Implementing Liveness Dataflow Analysis</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/readme4.html">Homework 4 – Implementing Dominance Algorithms</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 3 – Implementing Liveness Dataflow Analysis</h1>
+<h1 class="title">Homework 4 – Implementing Dominance Algorithms</h1>
 </div>
 
 
@@ -866,7 +866,7 @@ def build_dominance_tree(dom):
 }</code></pre>
 <section id="cfg-with-dominators" class="level4">
 <h4 class="anchored" data-anchor-id="cfg-with-dominators">CFG with Dominators</h4>
-<p><img src="img/1_dominator_graph.png" class="img-fluid" alt="test1_cfg"> #### Dominance Tree <img src="img/1_dominance_tree_graph.png" class="img-fluid" alt="test1_dom_tree"></p>
+<p><img src="img-hw4/1_dominator_graph.png" class="img-fluid" alt="test1_cfg"> #### Dominance Tree <img src="img-hw4/1_dominance_tree_graph.png" class="img-fluid" alt="test1_dom_tree"></p>
 <p>We can run the following command to generate these two graphs, compute the dominance frontier and check whether node <code>b1</code> dominates <code>for.cond.2</code>.</p>
 <pre><code>bril2json &lt; test1.bril | python3 dominator.py --doms --dom_tree --dom_frontier --test_dom --nodes b1 for.cond.2
 
@@ -906,7 +906,7 @@ b4 doesn't dominate b0</code></pre>
 </section>
 <section id="cfg-with-dominators-1" class="level4">
 <h4 class="anchored" data-anchor-id="cfg-with-dominators-1">CFG with Dominators</h4>
-<p><img src="img/7_dominator_graph.png" class="img-fluid" alt="test7_cfg"> #### Dominance Tree <img src="img/7_dominance_tree_graph.png" class="img-fluid" alt="test7_dom_tree"></p>
+<p><img src="img-hw4/7_dominator_graph.png" class="img-fluid" alt="test7_cfg"> #### Dominance Tree <img src="img-hw4/7_dominance_tree_graph.png" class="img-fluid" alt="test7_dom_tree"></p>
 <p><code>test4.bril</code> incorporate phi nodes:</p>
 <pre><code>@main {
   x: int = const 1;
@@ -945,7 +945,7 @@ b4 doesn't dominate b0</code></pre>
 </section>
 <section id="cfg-with-dominators-2" class="level4">
 <h4 class="anchored" data-anchor-id="cfg-with-dominators-2">CFG with Dominators</h4>
-<p><img src="img/4_dominator_graph.png" class="img-fluid" alt="test4_cfg"> #### Dominance Tree <img src="img/4_dominance_tree_graph.png" class="img-fluid" alt="test4_dom_tree"></p>
+<p><img src="img-hw4/4_dominator_graph.png" class="img-fluid" alt="test4_cfg"> #### Dominance Tree <img src="img-hw4/4_dominance_tree_graph.png" class="img-fluid" alt="test4_dom_tree"></p>
 
 
 </section>
