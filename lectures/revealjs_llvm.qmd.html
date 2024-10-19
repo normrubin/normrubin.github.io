@@ -404,30 +404,62 @@
 </div>
 
 </section>
-<section>
-<section id="using-llvm" class="title-slide slide level1 center">
-<h1>Using LLVM</h1>
+<section id="remember-that-project-proposals-are-due-oct-22" class="slide level2 scrollable">
+<h2>remember that project proposals are due oct 22!</h2>
+<p>At the end of the course, you’ll do a language implementation research project. This is an open-ended and open-source project that can be on any topic that you can construe as being about compiler hacking. The final product is an experience report on the course blog where you rigorously evaluate the success of your implementation.</p>
+<p>You can work individually or in groups of 2–3 people.</p>
+<p>Proposal</p>
+<p>answer these three questions</p>
+<ol type="1">
+<li>What will you do?</li>
+<li>How will you do it?</li>
+<li>How will you empirically measure success?</li>
+</ol>
+<p>I will have feedback on how to approach your project.</p>
+<p>Implementation</p>
+<p>The main phase, of course, is implementing the thing you said you would implement. I recommend you keep a “lab notebook” to log your thoughts, attempts, and frustrations—this will come in handy for the report you’ll write about the project.</p>
+<p>Evaluation</p>
+<p>A major part of your project is an empirical evaluation. To design your evaluation strategy, you will need to consider at least these things:</p>
+<ol type="1">
+<li>Where will you get the input code you’ll use in your evaluation?</li>
+<li>How will you check the correctness of your implementation? If you’ve implemented an optimization, for example, “correctness” means that the transformed programs behave the same way as the original programs.</li>
+<li>How will you measure the benefit (in performance, energy, complexity, etc.) of your implementation?</li>
+<li>How will you present the data you collect from your empirical evaluation?</li>
+</ol>
+<p>Other questions may be relevant depending on the project you choose. Consider the SIGPLAN empirical evaluation guidelines when you design your methodology.</p>
+<p>Experience Report</p>
+<p>For the main project deadline, you will write up the project’s outcomes in the form of a post on the course blog. Your writeup should answer these questions:</p>
+<ol type="1">
+<li>What was the goal?</li>
+<li>What did you do? (Include both the design and the implementation.)</li>
+<li>What were the hardest parts to get right?</li>
+<li>Were you successful? (Report rigorously on your empirical evaluation.)</li>
+</ol>
+<p>To submit your report, open a pull request in the course’s GitHub repository to add your post to the blog.</p>
+</section>
+<section id="using-llvm" class="slide level2">
+<h2>Using LLVM</h2>
 <p>handy links</p>
-<p><a href="https://llvm.org/docs/ProgrammersManual.html">llvm programmers guide</a></p>
 <p><a href="https://www.cs.cornell.edu/~asampson/blog/llvm.html">Adrians tutorial</a></p>
 <p><a href="https://github.com/sampsyo/llvm-pass-skeleton">skeleton code</a></p>
 <p><a href="https://llvm.org/docs/LangRef.html">llvm doc</a></p>
+<p><a href="https://llvm.org/docs/ProgrammersManual.html">llvm programmers guide</a></p>
 <p>google, github pilot and chatgpt are very useful.</p>
 </section>
-<section id="install-clang-and-friends" class="slide level2">
-<h2>install clang and friends</h2>
-<p>as a first step I’m going to show how to install clang and cmake</p>
+<section id="install-clang-and-cmake" class="slide level2">
+<h2>install clang and cmake</h2>
+<p>how to install clang and cmake</p>
 <pre><code>sudo apt install clang cmake </code></pre>
-</section></section>
+</section>
 <section>
 <section id="lets-take-a-look-at-llvm-ir" class="title-slide slide level1 center scrollable">
 <h1>lets take a look at llvm ir</h1>
 <pre><code>// temp.c
 int main(int argc, char** argv){
        return argc;}</code></pre>
-<p>dump the ir</p>
+<p>dump the ir (flags)</p>
 <ol type="1">
-<li>-emit-llvm print the ir</li>
+<li>-emit-llvm prints the ir</li>
 <li>-S print as text not as binary</li>
 <li>0 - output to stdout</li>
 </ol>
@@ -456,38 +488,53 @@ define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
 <p>compared to bril</p>
 <p>more complex types, variables are %n, assumes a stack, must be in ssa</p>
 </section>
-<section id="using-copilet" class="slide level2">
-<h2>using copilet</h2>
-<p>what does the llvm alloca do</p>
+<section id="using-copilot" class="slide level2">
+<h2>using copilot</h2>
+<p><strong><em>what does the llvm alloca do</em></strong></p>
 <p>In LLVM, the alloca instruction is used to allocate memory on the stack. It stands for “allocate” and is similar to the alloca function in C. The memory allocated by alloca is automatically freed when the function returns, making it suitable for allocating temporary storage within a function.</p>
+</section>
+<section id="alloca" class="slide level2">
+<h2>alloca</h2>
 <pre><code>Explanation of alloca Instruction
 Syntax: alloca &lt;type&gt;, &lt;num_elements&gt;, &lt;alignment&gt;
 &lt;type&gt;: The type of the elements to be allocated.
 &lt;num_elements&gt;: The number of elements to allocate (optional, defaults to 1).
-&lt;alignment&gt;: The alignment of the allocated memory (optional).
-Example from the Provided Code
-Explanation:
+&lt;alignment&gt;: The alignment of the allocated memory (optional).</code></pre>
+</section>
+<section id="example" class="slide level2">
+<h2>example</h2>
+<pre><code>Explanation:
 %3 = alloca i32, align 4:
 
 Allocates memory for a single i32 (32-bit integer) on the stack.
 The allocated memory is aligned to a 4-byte boundary.
-The result is a pointer to the allocated memory, stored in the variable %3.
-%4 = alloca i32, align 4:
+The result is a pointer to the allocated memory, stored in the variable %3.</code></pre>
+</section>
+<section id="example-2" class="slide level2">
+<h2>example 2</h2>
+<pre><code>%4 = alloca i32, align 4:
 
 Similar to the first instruction, this allocates memory for another i32 on the stack with 4-byte alignment.
 The result is stored in the variable %4.
+
+
 %5 = alloca i8**, align 8:
 
 Allocates memory for a single i8** (pointer to a pointer to an 8-bit integer) on the stack.
 The allocated memory is aligned to an 8-byte boundary.
-The result is stored in the variable %5.
-Usage:
+The result is stored in the variable %5.</code></pre>
+</section>
+<section id="allocate-usage" class="slide level2">
+<h2>allocate usage</h2>
+<pre><code>Usage:
 Temporary Storage: alloca is typically used for temporary storage within a function, such as local variables.
 Automatic Deallocation: The memory allocated by alloca is automatically deallocated when the function returns, so there is no need to manually free it.
 Example in Context:
-In the provided LLVM IR code, the alloca instructions are used to allocate space for local variables %3, %4, and %5 on the stack. These variables are then used to store values and perform operations within the main function.
-
-In this function:
+In the provided LLVM IR code, the alloca instructions are used to allocate space for local variables %3, %4, and %5 on the stack. These variables are then used to store values and perform operations within the main function.</code></pre>
+</section>
+<section id="allocate" class="slide level2">
+<h2>allocate</h2>
+<pre><code>In this function:
 
 %3 is allocated for an i32 and initialized to 0.
 %4 is allocated for an i32 and initialized with the value of the first argument %0.
@@ -497,15 +544,19 @@ This demonstrates how alloca is used to manage local variables within an LLVM fu
 </section>
 <section id="llvm-classes" class="slide level2">
 <h2>llvm classes</h2>
-<p>what is llvm value</p>
-<pre><code>In LLVM, a Value is a fundamental class that represents a typed constant or variable. It is the base class for all values computed by a program that may be used as operands to other values. This includes constants, instructions, function arguments, and more.
-
-Key Points about llvm::Value:
+<p><strong><em>what is an llvm value</em></strong></p>
+<pre><code>In LLVM, a Value is a fundamental class that represents a typed constant or variable. It is the base class for all values computed by a program that may be used as operands to other values. This includes constants, instructions, function arguments, and more.</code></pre>
+</section>
+<section id="value-continued" class="slide level2">
+<h2>value continued</h2>
+<pre><code>Key Points about llvm::Value:
 Base Class: llvm::Value is the base class for many other classes in LLVM, such as llvm::Instruction, llvm::Constant, llvm::Argument, and llvm::GlobalVariable.
 Typed: Every Value has a type, represented by the llvm::Type class. This type information is crucial for type checking and code generation.
-Use-Def Chain: Value objects maintain a list of uses, which are the places where the value is used. This is part of the use-def (use-definition) chain, which is important for optimizations and transformations.
-
-Common Subclasses of llvm::Value:
+Use-Def Chain: Value objects maintain a list of uses, which are the places where the value is used. This is part of the use-def (use-definition) chain, which is important for optimizations and transformations.</code></pre>
+</section>
+<section id="value-continued-1" class="slide level2">
+<h2>value continued</h2>
+<pre><code>Common Subclasses of llvm::Value:
 llvm::Instruction: Represents an individual instruction in the LLVM IR.
 llvm::Constant: Represents a constant value, such as an integer or floating-point constant.
 llvm::Argument: Represents an argument to a function.
@@ -519,26 +570,29 @@ llvm::GlobalVariable: Represents a global variable.</code></pre>
 <li>lot of built in data structures</li>
 <li>complex class hierarchy</li>
 </ol>
+</section>
+<section id="class-hierarchy" class="slide level2">
+<h2>class hierarchy</h2>
 <div class="cell" data-reveal="true" data-layout-align="default">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb6-2"><a></a></span>
-<span id="cb6-3"><a></a>flowchart TD;</span>
-<span id="cb6-4"><a></a>Value --&gt; Argument ;</span>
-<span id="cb6-5"><a></a>Value --&gt; other["..."];</span>
-<span id="cb6-6"><a></a>Value --&gt; User;</span>
-<span id="cb6-7"><a></a>User --&gt; Constant</span>
-<span id="cb6-8"><a></a>User--&gt; Operator</span>
-<span id="cb6-9"><a></a>User--&gt; Instruction</span>
-<span id="cb6-10"><a></a>Constant --&gt; ConstantExpr</span>
-<span id="cb6-11"><a></a>Constant--&gt; ConstantData</span>
-<span id="cb6-12"><a></a>Operator--&gt; ConcreteOperator</span>
-<span id="cb6-13"><a></a>Instruction--&gt; UnaryInst</span>
-<span id="cb6-14"><a></a>ConstantData --&gt; ConstantInt</span>
-<span id="cb6-15"><a></a>ConstantData --&gt; UndefValue</span>
-<span id="cb6-16"><a></a>Instruction --&gt; BinaryOperator</span>
-<span id="cb6-17"><a></a>Instruction--&gt; CallBase</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb12-2"><a></a></span>
+<span id="cb12-3"><a></a>flowchart TD;</span>
+<span id="cb12-4"><a></a>Value --&gt; Argument ;</span>
+<span id="cb12-5"><a></a>Value --&gt; other["..."];</span>
+<span id="cb12-6"><a></a>Value --&gt; User;</span>
+<span id="cb12-7"><a></a>User --&gt; Constant</span>
+<span id="cb12-8"><a></a>User--&gt; Operator</span>
+<span id="cb12-9"><a></a>User--&gt; Instruction</span>
+<span id="cb12-10"><a></a>Constant --&gt; ConstantExpr</span>
+<span id="cb12-11"><a></a>Constant--&gt; ConstantData</span>
+<span id="cb12-12"><a></a>Operator--&gt; ConcreteOperator</span>
+<span id="cb12-13"><a></a>Instruction--&gt; UnaryInst</span>
+<span id="cb12-14"><a></a>ConstantData --&gt; ConstantInt</span>
+<span id="cb12-15"><a></a>ConstantData --&gt; UndefValue</span>
+<span id="cb12-16"><a></a>Instruction --&gt; BinaryOperator</span>
+<span id="cb12-17"><a></a>Instruction--&gt; CallBase</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -567,13 +621,16 @@ Instruction--&gt; CallBase
 </div>
 </div>
 </div>
-<p>Instructions are a kind of Value, since everything is in SSA form, so in memory operands are pointers to instructions</p>
+<p>Instructions are a kind of Value, since everything is in SSA form, operands are pointers to instructions</p>
 </section>
 <section id="plugins" class="slide level2">
 <h2>plugins</h2>
 <p>An LLVM plugin is a shared library that can add additional functionality to the LLVM infrastructure. Plugins can be used to add new passes, analyses, targets, and more.</p>
 <p>Plugins are dynamically loaded into LLVM. Once loaded, a plugin can register new command-line options, passes, etc., that are then available for use in that invocation of the tool.</p>
 <p>The advantage for us is that using a plugin means you do not have to ever build llvm from source.</p>
+</section>
+<section id="pass-starter" class="slide level2">
+<h2>pass starter</h2>
 <p>There is a cs6120 package that makes setting up the build process for plugins simpler</p>
 <p><a href="https://github.com/sampsyo/llvm-pass-skeleton">pass starter</a></p>
 <p>This has branches</p>
@@ -638,67 +695,119 @@ llvmGetPassPluginInfo() {
 <h2>how to build this</h2>
 <pre><code>~/llvm/llvm-pass-skeleton$ mkdir build
 cd build 
- cmake ..
-</code></pre>
-<p>– Registering SkeletonPass as a pass plugin (static build: OFF) – Configuring done – Generating done – Build files have been written to: /home/norm/llvm/llvm-pass-skeleton/build</p>
-<pre><code>
-This generates build/skeleton/SkeletonPass.so
-
-to run this 
-
-clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp
-
-creates a.out and prints out info from the pass
-
-
-to make this easier to use you might create a bash script or a makefile 
-
-## look at the post on containers 
-
-## getting more info 
-
-Some helpfull llvm operations
-</code></pre>
-<p>errs() &lt;&lt; “function Body:”; errs() &lt;&lt; F &lt;&lt; ‘“;’</p>
-<pre><code>
-output</code></pre>
-<p>I saw a function called main! function Body: ; Function Attrs: noinline nounwind optnone uwtable define dso_local i32 <span class="citation" data-cites="main">@main</span>(i32 noundef %0, i8** noundef %1) #0 { %3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6 }</p>
-<pre><code>
-## entering containers </code></pre>
-<p>PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM) { for (auto &amp;F : M) { errs() &lt;&lt; “I saw a function called” &lt;&lt; F.getName() &lt;&lt; “!”; for (auto &amp;B : F) { errs() &lt;&lt; “starting block”; errs() &lt;&lt; B &lt;&lt; “”; for (auto &amp;I : B) { errs() &lt;&lt; “instr:” &lt;&lt; I &lt;&lt; “”; } }; }; return PreservedAnalyses::all(); };</p>
-<pre><code></code></pre>
-<p>I saw a function called main! starting block</p>
-<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 ret i32 %6</p>
-<p>instr: %3 = alloca i32, align 4 instr: %4 = alloca i32, align 4 instr: %5 = alloca i8<strong>, align 8 instr: store i32 0, i32* %3, align 4 instr: store i32 %0, i32* %4, align 4 instr: store i8</strong> %1, i8*** %5, align 8 instr: %6 = load i32, i32* %4, align 4 instr: ret i32 %6</p>
-<pre><code>
-
-## modify the program 
-
-find the first binary operator and change it to a multiply
-</code></pre>
-<p>#// temp.c int main(int argc, char **argv) { return argc + 5; }</p>
-<pre><code>
-``` PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM)
+cmake ..</code></pre>
+<p>This generates build/skeleton/SkeletonPass.so</p>
+</section>
+<section id="how-to-run-a-plugin" class="slide level2">
+<h2>how to run a plugin</h2>
+<p>to run this</p>
+<pre><code>clang -fpass-plugin=llvm-pass-skeleton/build/skeleton/SkeletonPass.so a.cpp</code></pre>
+<p>creates a.out and prints out info from the pass</p>
+<p>to make this easier to use you might create a bash script or a makefile</p>
+</section>
+<section id="look-at-the-post-on-containers" class="slide level2">
+<h2>look at the post on containers</h2>
+</section>
+<section id="getting-more-info" class="slide level2">
+<h2>getting more info</h2>
+<p>Some helpful llvm operations</p>
+<pre><code>errs() &lt;&lt; "function Body:\n";
+errs() &lt;&lt; F &lt;&lt; '\n"; '</code></pre>
+<p>output</p>
+<pre><code>I saw a function called main!
+function Body:
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @main(i32 noundef %0, i8** noundef %1) #0 {
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  ret i32 %6
+}</code></pre>
+</section>
+<section id="entering-containers" class="slide level2">
+<h2>entering containers</h2>
+<pre><code>PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM)
         {
             for (auto &amp;F : M)
             {
                 errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
                 for (auto &amp;B : F)
                 {
+                    errs() &lt;&lt; "starting block\n";
+                    errs() &lt;&lt; B &lt;&lt; "\n";
                     for (auto &amp;I : B)
                     {
-                        if (isa&lt;BinaryOperator&gt;(&amp;I))
-                        {
-                            errs() &lt;&lt; "instr:" &lt;&lt; I &lt;&lt; "\n";
-                        }
-                        auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I);
-                        errs() &lt;&lt; "from_op:" &lt;&lt; op &lt;&lt; "\n";
+                        errs() &lt;&lt; "instr:" &lt;&lt; I &lt;&lt; "\n";
                     }
                 };
             };
             return PreservedAnalyses::all();
-        }
-   </code></pre>
+        };
+</code></pre>
+<pre><code>I saw a function called main!
+starting block
+
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  ret i32 %6
+
+instr:  %3 = alloca i32, align 4
+instr:  %4 = alloca i32, align 4
+instr:  %5 = alloca i8**, align 8
+instr:  store i32 0, i32* %3, align 4
+instr:  store i32 %0, i32* %4, align 4
+instr:  store i8** %1, i8*** %5, align 8
+instr:  %6 = load i32, i32* %4, align 4
+instr:  ret i32 %6</code></pre>
+</section>
+<section id="modify-the-program" class="slide level2">
+<h2>modify the program</h2>
+<p>find the binary operators and change them to multiplies</p>
+<pre><code>#// temp.c
+int main(int argc, char **argv)
+{
+       return argc + 5;
+}</code></pre>
+</section>
+<section id="find-all-the-binary-operators" class="slide level2">
+<h2>find all the binary operators</h2>
+<p><strong><em>how do i find all the binary operators in a llvm plugin</em></strong></p>
+<pre><code>to find all the binary operators in an LLVM plugin, you can iterate over all instructions in each function and use the isa&lt;BinaryOperator&gt; function to check if an instruction is a binary operator. If it is, you can then cast it to a BinaryOperator using dyn_cast&lt;BinaryOperator&gt; and process it as needed.
+
+Here is an example of how you can modify your LLVM plugin to find and print all binary operators:</code></pre>
+</section>
+<section id="plugin" class="slide level2">
+<h2>plugin</h2>
+<pre><code>PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM)
+    {
+        for (auto &amp;F : M)
+        {
+            errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
+            for (auto &amp;B : F)
+            {
+                for (auto &amp;I : B)
+                {
+                    if (isa&lt;BinaryOperator&gt;(&amp;I))
+                    {
+                        errs() &lt;&lt; "instr:" &lt;&lt; I &lt;&lt; "\n";
+                    }
+                    auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I);
+                    errs() &lt;&lt; "from_op:" &lt;&lt; op &lt;&lt; "\n";
+                }
+            };
+        };
+        return PreservedAnalyses::all();
+    }
+</code></pre>
 <p>output</p>
 <pre><code>I saw a function called main!
 I saw a function called main!
@@ -731,149 +840,188 @@ from_op:0x0</code></pre>
             DT.print(errs());
         }</code></pre>
 </section>
-<section id="testing" class="slide level2 scrollable">
-<h2>testing</h2>
-<ol type="1">
-<li>isa<argument>(V) true of V is a agument</argument></li>
-<li>cast<argument>(V) casts to Argument, assert falure of not Argument</argument></li>
-<li>dyn_cast<argument>(V) casts to Argument returns NULL if not an argument</argument></li>
-</ol>
-</section>
 <section id="irbuilder" class="slide level2">
 <h2>irbuilder</h2>
-<pre><code>
- errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
-                for (auto &amp;B : F)
-                {
-                    errs() &lt;&lt; B &lt;&lt; "\n";
+<pre><code>errs() &lt;&lt; "I saw a function called " &lt;&lt; F.getName() &lt;&lt; "!\n";
+for (auto &amp;B : F){
+    errs() &lt;&lt; B &lt;&lt; "\n";
+    for (auto &amp;I : B){
+        if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I)){
+            errs() &lt;&lt; "old inst " &lt;&lt; *op &lt;&lt; "\n";
+            IRBuilder&lt;&gt; builder(op);
+            Value *left = op-&gt;getOperand(0);  // first operand
+            Value *right = op-&gt;getOperand(1); // second operad
+            Value *mul = builder.CreateMul(left, right);
 
-                    for (auto &amp;I : B)
-                    {
-                        if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I))
-                        {
-                            errs() &lt;&lt; "old inst " &lt;&lt; *op &lt;&lt; "\n";
-                            IRBuilder&lt;&gt; builder(op);
-                            Value *left = op-&gt;getOperand(0);  // first operand
-                            Value *right = op-&gt;getOperand(1); // second operad
-                            Value *mul = builder.CreateMul(left, right);
+            errs() &lt;&lt; "new inst:" &lt;&lt; *mul &lt;&lt; "\n";
 
-                            errs() &lt;&lt; "new inst:" &lt;&lt; *mul &lt;&lt; "\n";
+            errs() &lt;&lt; B &lt;&lt; "\n";
 
-                            errs() &lt;&lt; B &lt;&lt; "\n";
-
-                            // replace uses of op with mul
-                            for (auto &amp;U : op-&gt;uses())
-                            {
-                                int num = U.getOperandNo(); // which argument
-                                User *user = U.getUser();   // the instruction with the use
-                                errs() &lt;&lt; " user:" &lt;&lt; *user &lt;&lt; "   ";
-                                user-&gt;setOperand(num, mul);
-                                errs() &lt;&lt; *user &lt;&lt; "\n";
-                            }
-                        }
-                    }
+            // replace uses of op with mul
+            for (auto &amp;U : op-&gt;uses()){
+                int num = U.getOperandNo(); // which argument
+                User *user = U.getUser();   // the instruction with the use
+                errs() &lt;&lt; " user:" &lt;&lt; *user &lt;&lt; "   ";
+                user-&gt;setOperand(num, mul);
+                errs() &lt;&lt; *user &lt;&lt; "\n";
                 }
-            };
- 
-             return PreservedAnalyses::none();</code></pre>
-<p>output</p>
-<p>I saw a function called main!</p>
-<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = add nsw i32 %6, 5 ret i32 %7</p>
-<p>old inst %7 = add nsw i32 %6, 5 new inst: %7 = mul i32 %6, 5</p>
-<p>%3 = alloca i32, align 4 %4 = alloca i32, align 4 %5 = alloca i8<strong>, align 8 store i32 0, i32* %3, align 4 store i32 %0, i32* %4, align 4 store i8</strong> %1, i8*** %5, align 8 %6 = load i32, i32* %4, align 4 %7 = mul i32 %6, 5 %8 = add nsw i32 %6, 5 ret i32 %8</p>
-<p>user: ret i32 %8 ret i32 %7</p>
-<pre><code>
-
-## more complex transforms -  for instrumentation  
-
-instrumentation code in c not using builder 
-
-insert calls to functions and link them in 
-
-using IRBuilder is a mess, So I'm going to show a trick that makes it much simpler 
-
-## chat gpt 
-
-how do i write an instrumentation function in c for llvm, use a plugin pass to insert a call to the instrumentation routine
-
-1. Write the Instrumentation Function in C: Create a C function that you want to call from your LLVM pass.
-1. Create an LLVM Pass: Write an LLVM pass that inserts a call to the instrumentation function.
-1. Build and Load the Pass: Compile the pass and load it using the opt tool or integrate it into your build system.
-
-## instrumentation routine 
-</code></pre>
-<p>void instrument_function(const char* bb_name) { printf(“Instrumentation function called for basic block: %s”, bb_name); }</p>
-<pre><code>
-
-## pass
-</code></pre>
-<p>PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;MAM) { LLVMContext &amp;Ctx = M.getContext(); IRBuilder&lt;&gt; Builder(Ctx);</p>
-<pre><code>    // Declare the instrumentation function as an external function
-    FunctionType *FuncType = FunctionType::get(Type::getVoidTy(Ctx), Type::getInt8PtrTy(Cctx), false);
-    FunctionCallee InstrumentFunc = M.getOrInsertFunction("instrument_function", FuncType);
-
-    for (Function &amp;F : M) {
-
-        // Insert the call at the beginning of each basic block
-        for (BasicBlock &amp;BB : F) {
-            Builder.SetInsertPoint(&amp;BB, BB.begin());
-
-            // Create a global string for the basic block name
-            Value *BBName = Builder.CreateGlobalStringPtr(BB.getName());
-
-            // Create the call to the instrumentation function
-            Builder.CreateCall(InstrumentFunc, BBName);
+            }
         }
     }
+};
+return PreservedAnalyses::none();</code></pre>
+</section>
+<section id="output" class="slide level2">
+<h2>output</h2>
+<pre><code>I saw a function called main!
 
-    return PreservedAnalyses::none();</code></pre>
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  %7 = add nsw i32 %6, 5
+  ret i32 %7</code></pre>
+</section>
+<section id="output-2" class="slide level2">
+<h2>output 2</h2>
 <pre><code>
-## starter code 
+old inst   %7 = add nsw i32 %6, 5
+new inst:  %7 = mul i32 %6, 5
 
-rm -r llvm-pass-skeleton
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i8**, align 8
+  store i32 0, i32* %3, align 4
+  store i32 %0, i32* %4, align 4
+  store i8** %1, i8*** %5, align 8
+  %6 = load i32, i32* %4, align 4
+  %7 = mul i32 %6, 5
+  %8 = add nsw i32 %6, 5
+  ret i32 %8
+
+ user:  ret i32 %8     ret i32 %7
+</code></pre>
+</section>
+<section id="more-complex-transforms---for-instrumentation" class="slide level2">
+<h2>more complex transforms - for instrumentation</h2>
+<p>instrumentation code in c not using builder</p>
+<p>insert calls to functions and link them in</p>
+<p>using IRBuilder is a mess, So I’m going to show a trick that makes it much simpler</p>
+</section>
+<section id="chat-gpt" class="slide level2 scrollable">
+<h2>chat gpt</h2>
+<p><strong><em>how do i write an instrumentation function in c for llvm, use a plugin pass to insert a call to the instrumentation routine</em></strong></p>
+<ol type="1">
+<li>Write the Instrumentation Function in C: Create a C function that you want to call from your LLVM pass.</li>
+<li>Create an LLVM Pass: Write an LLVM pass that inserts a call to the instrumentation function.</li>
+<li>Build and Load the Pass: Compile the pass and load it using the opt tool or integrate it into your build system.</li>
+</ol>
+</section>
+<section id="instrumentation-routine" class="slide level2">
+<h2>instrumentation routine</h2>
+<pre><code>void instrument_function(const char* bb_name) {
+    printf("Instrumentation function called for basic block: %s\n", bb_name);
+}</code></pre>
+</section>
+<section id="pass" class="slide level2">
+<h2>pass</h2>
+<pre><code>   PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;MAM) {
+        LLVMContext &amp;Ctx = M.getContext();
+        IRBuilder&lt;&gt; Builder(Ctx);
+
+        // Declare the instrumentation function as an external function
+        FunctionType *FuncType = FunctionType::get(Type::getVoidTy(Ctx), Type::getInt8PtrTy(Cctx), false);
+        FunctionCallee InstrumentFunc =
+                  M.getOrInsertFunction("instrument_function", FuncType);
+
+        for (Function &amp;F : M) {
+
+            // Insert the call at the beginning of each basic block
+            for (BasicBlock &amp;BB : F) {
+                Builder.SetInsertPoint(&amp;BB, BB.begin());
+
+                // Create a global string for the basic block name
+                Value *BBName = Builder.CreateGlobalStringPtr(BB.getName());
+
+                // Create the call to the instrumentation function
+                Builder.CreateCall(InstrumentFunc, BBName);
+            }
+        }
+
+        return PreservedAnalyses::none();
+
+
+</code></pre>
+</section>
+<section id="starter-code" class="slide level2">
+<h2>starter code</h2>
+<pre><code>rm -r llvm-pass-skeleton
 git clone  -b rtlib  https://github.com/sampsyo/llvm-pass-skeleton.git
 cd llvm-pass-skeleton
 mkdir -p build 
 cd build 
 cmake ..
-make
+make</code></pre>
+</section>
+<section id="adrians-skeleton" class="slide level2">
+<h2>Adrians skeleton</h2>
+<pre><code>struct SkeletonPass : public PassInfoMixin&lt;SkeletonPass&gt; {
+    PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM) {
+        for (auto &amp;F : M.functions()) {
 
+            // Get the function to call from our runtime library.
+            LLVMContext &amp;Ctx = F.getContext();
+            std::vector&lt;Type*&gt; paramTypes = {Type::getInt32Ty(Ctx)};
+            Type *retType = Type::getVoidTy(Ctx);
+            FunctionType *logFuncType = FunctionType::get(retType, paramTypes, false);
+            FunctionCallee logFunc =
+                F.getParent()-&gt;getOrInsertFunction("logop", logFuncType);
 
-## Adrians skeleton 
-</code></pre>
-<p>struct SkeletonPass : public PassInfoMixin<skeletonpass> { PreservedAnalyses run(Module &amp;M, ModuleAnalysisManager &amp;AM) { for (auto &amp;F : M.functions()) {</skeletonpass></p>
-<pre><code>        // Get the function to call from our runtime library.
-        LLVMContext &amp;Ctx = F.getContext();
-        std::vector&lt;Type*&gt; paramTypes = {Type::getInt32Ty(Ctx)};
-        Type *retType = Type::getVoidTy(Ctx);
-        FunctionType *logFuncType = FunctionType::get(retType, paramTypes, false);
-        FunctionCallee logFunc =
-            F.getParent()-&gt;getOrInsertFunction("logop", logFuncType);
+            for (auto &amp;B : F) {
+                for (auto &amp;I : B) {
+                    if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I)) {
+                        // Insert *after* `op`.
+                        IRBuilder&lt;&gt; builder(op);
+                        builder.SetInsertPoint(&amp;B, ++builder.GetInsertPoint());
 
-        for (auto &amp;B : F) {
-            for (auto &amp;I : B) {
-                if (auto *op = dyn_cast&lt;BinaryOperator&gt;(&amp;I)) {
-                    // Insert *after* `op`.
-                    IRBuilder&lt;&gt; builder(op);
-                    builder.SetInsertPoint(&amp;B, ++builder.GetInsertPoint());
+                        // Insert a call to our function.
+                        Value* args[] = {op};
+                        builder.CreateCall(logFunc, args);
 
-                    // Insert a call to our function.
-                    Value* args[] = {op};
-                    builder.CreateCall(logFunc, args);
-
-                    return PreservedAnalyses::none();
+                        return PreservedAnalyses::none();
+                    }
                 }
             }
-        }
 
+        }
+        return PreservedAnalyses::all();
     }
-    return PreservedAnalyses::all();
+};</code></pre>
+</section>
+<section id="adrians-instrumentation-code" class="slide level2">
+<h2>Adrians instrumentation code</h2>
+<pre><code>#include &lt;stdio.h&gt;
+void logop(int i) {
+    printf("computed: %i\n", i);
 }</code></pre>
-<p>}; ``` #include &lt;stdio.h&gt; void logop(int i) { printf(“computed: %i”, i); }</p>
 </section>
 <section id="link-together" class="slide level2">
 <h2>link together</h2>
-<p>`` cd llvm-pass-skeleton cc -c rtlib.c — generates rtlib.o clang -fpass-plugin=build/skeleton/SkeletonPass.so -c test.cpp – generates test.o cc test.o rtlib.o – links it together ./a.out – runs it</p>
+<pre><code>cd llvm-pass-skeleton
+cc -c rtlib.c --- generates rtlib.o 
+clang  -fpass-plugin=build/skeleton/SkeletonPass.so -c test.cpp   -- generates test.o
+cc test.o rtlib.o  -- links it together 
+./a.out     --   runs it </code></pre>
+</section>
+<section id="homework" class="slide level2">
+<h2>Homework</h2>
+<p>Follow the LLVM tutorial blog post far enough to implement a pass that changes program execution.</p>
+<p>This is intentionally open-ended. You can be as ambitious or as unambitious as you want. An example of an unambitious but acceptable task would be to print out a message every time the program uses floating-point division.</p>
+<p>An example of an ambitious task would be to implement an optimization on LLVM IR and make sure it speeds things up in actual wall-clock time execution.</p>
+<p>Find a real-ish C/C++ program somewhere and run your pass on it to observe the results.</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
