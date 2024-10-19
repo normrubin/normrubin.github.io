@@ -1,0 +1,254 @@
+---
+title: "Homework 3"
+author: Rohit Gurusamy Anandakumar
+format: html
+---
+
+## Data Flow Analysis
+
+### About data flow analysis:
+**Definition:** Data Flow Analysis (DFA) is a technique used in compiler optimization to analyze how values flow through program variables during execution.
+
+- The code should remove the instructions that are reassigned without being used.
+- If the value in being used in between the reassigning, then the instruction should be retained.
+
+#### Forward (Top-Down) Analysis:
+##### Reaching Definitions
+- Flows in direction of program execution
+- Propagates information about variable definitions forward
+- Initial state flows from start to end
+
+##### Available Expressions
+- Information flows from top to bottom
+- Computes expressions already evaluated at each point
+- Propagates forward through control flow graph
+
+#### Backward (Bottom-Up) Analysis:
+##### Liveness Analysis
+- Information flows opposite to program execution
+- Starts from variable uses and works backwards
+- Determines if variable value will be needed later
+
+##### Very Busy Expressions
+- Flows from bottom to top
+- Works backwards from expression uses
+- Determines what will definitely be computed later
+
+#### The direction matters because:
+- Forward analyses use information from predecessor nodes
+- Backward analyses use information from successor nodes
+- Direction affects how we iterate through the control flow graph
+- Initialization points differ (entry vs exit nodes)
+
+### Implementation:
+#### Import Libraries and Define Named Tuples
+- Import necessary modules (sys, json, etc.)
+- Define Analysis named tuple with attributes: forward, init, merge, transfer
+
+#### Define Union and Intersection Functions
+- Define union function: Merge multiple sets into one
+- Define intersection function: Find common elements among sets
+
+#### Define Data Flow Worklist Algorithm
+- Determine edges based on analysis direction (forward/backward)
+- Initialize in_ and out sets for each block
+- Add all blocks to worklist
+- While worklist is not empty:
+    + Pop a block, calculate in_ value by merging predecessor/successor out values
+    + Update out value using transfer function
+    + If out value changes, re-add successors/predecessors to worklist
+
+#### Define Formatting Function
+- Format sets and dictionaries into readable strings
+
+#### Run Data Flow Analysis
+- For each function in the BRIL program:
+    + Convert instructions into blocks
+    + Add terminators to blocks
+    + Execute worklist algorithm
+    + Print in_ and out values for each block
+
+#### Define Generation and Killing Functions for Analyses
+- Define functions to generate and kill variables/expressions for different analyses (liveness, reaching defs, very busy expressions, available expressions)
+
+#### Define Analyses
+- Define attributes and transfer functions for each analysis type (LIVENESS, VERYBUSY, REACHING, AVAILABLE)
+
+#### Main Execution
+- Load BRIL program from input
+- Run the specified data flow analysis
+
+Full code: https://github.com/gurusamyanandakuma-r/bril/blob/main/HW/HW3_Rohit/dfa.py
+
+### Testing:
+#### Testing Tool: (Turnt)
+```{turnt.toml}
+    [envs.LIVENESS]
+    command = "bril2json < {filename} | python3 dfa.py LIVENESS"
+    output."LIVENESS.out" = "-"
+
+    [envs.VERYBUSY]
+    command = "bril2json < {filename} | python3 dfa.py VERYBUSY"
+    output."VERYBUSY.out" = "-"
+
+    [envs.REACHING]
+    command = "bril2json < {filename} | python3 dfa.py REACHING"
+    output."REACHING.out" = "-"
+
+    [envs.AVAILABLE]
+    command = "bril2json < {filename} | python3 dfa.py AVAILABLE"
+    output."AVAILABLE.out" = "-"
+
+```
+#### Example 1: Without branches (one block code)
+##### Input bril:
+```{bril}
+    @main {
+
+        divisor: int = const 7;
+        divident: int = const 42;
+        quotient: int = div divident divisor;
+        product: int = mul quotient divisor;
+        remainder: int = sub divident product;  
+
+        print remainder; 
+
+    }
+```
+
+##### Output: LIVENESS:
+```{bril}
+    BLOCK1:
+        IN:  NULL
+        OUT: NULL
+```
+
+##### Output: VERY BUSY:
+```{bril}
+    BLOCK1:
+        IN:  ('div', ('divident', 'divisor')), ('mul', ('quotient', 'divisor')), ('sub', ('divident', 'product'))
+        OUT: NULL
+```
+
+##### Output: REACHING:
+```{bril}
+    BLOCK1:
+        IN:  NULL
+        OUT: ('divident', 'BLOCK1'), ('divisor', 'BLOCK1'), ('product', 'BLOCK1'), ('quotient', 'BLOCK1'), ('remainder', 'BLOCK1')
+```
+
+##### Output: AVAILABLE:
+```{bril}
+    BLOCK1:
+        IN:  NULL
+        OUT: ('div', ('divident', 'divisor')), ('mul', ('quotient', 'divisor')), ('sub', ('divident', 'product'))
+```
+
+#### Example 2: With branches
+##### Input bril:
+```{bril}
+    @main {
+    x: int = const 3;
+    y: int = const 4;
+    
+    .header:
+        cond: bool = lt x y;   # Check if x < y
+        br cond .then .else;   # Branch based on condition
+
+    .then:
+        result: int = add x y;  # result = x + y
+        jmp .end;
+
+    .else:
+        result: int = sub x y;  # result = x - y
+        jmp .end;
+
+    .end:
+        print result;           # Print the result
+    }
+```
+
+
+##### Output: LIVENESS:
+```{bril}
+    BLOCK1:
+        IN:  NULL
+        OUT: x, y
+    header:
+        IN:  x, y
+        OUT: x, y
+    then:
+        IN:  x, y
+        OUT: result
+    else:
+        IN:  x, y
+        OUT: result
+    end:
+        IN:  result
+        OUT: NULL
+```
+
+##### Output: VERY BUSY:
+```{bril}
+    BLOCK1:
+        IN:  ('lt', ('x', 'y'))
+        OUT: ('lt', ('x', 'y'))
+    header:
+        IN:  ('lt', ('x', 'y'))
+        OUT: NULL
+    then:
+        IN:  ('add', ('x', 'y'))
+        OUT: NULL
+    else:
+        IN:  ('sub', ('x', 'y'))
+        OUT: NULL
+    end:
+        IN:  NULL
+        OUT: NULL
+```
+
+##### Output: REACHING:
+```{bril}
+    BLOCK1:
+        IN:  NULL
+        OUT: ('x', 'BLOCK1'), ('y', 'BLOCK1')
+    header:
+        IN:  ('x', 'BLOCK1'), ('y', 'BLOCK1')
+        OUT: ('cond', 'header'), ('x', 'BLOCK1'), ('y', 'BLOCK1')
+    then:
+        IN:  ('cond', 'header'), ('x', 'BLOCK1'), ('y', 'BLOCK1')
+        OUT: ('cond', 'header'), ('result', 'then'), ('x', 'BLOCK1'), ('y', 'BLOCK1')
+    else:
+        IN:  ('cond', 'header'), ('x', 'BLOCK1'), ('y', 'BLOCK1')
+        OUT: ('cond', 'header'), ('result', 'else'), ('x', 'BLOCK1'), ('y', 'BLOCK1')
+    end:
+        IN:  ('cond', 'header'), ('result', 'else'), ('result', 'then'), ('x', 'BLOCK1'), ('y', 'BLOCK1')
+        OUT: ('cond', 'header'), ('result', 'else'), ('result', 'then'), ('x', 'BLOCK1'), ('y', 'BLOCK1')
+```
+
+##### Output: AVAILABLE:
+```{bril}
+    BLOCK1:
+        IN:  NULL
+        OUT: NULL
+    header:
+        IN:  NULL
+        OUT: ('lt', ('x', 'y'))
+    then:
+        IN:  ('lt', ('x', 'y'))
+        OUT: ('add', ('x', 'y')), ('lt', ('x', 'y'))
+    else:
+        IN:  ('lt', ('x', 'y'))
+        OUT: ('lt', ('x', 'y')), ('sub', ('x', 'y'))
+    end:
+        IN:  ('lt', ('x', 'y'))
+        OUT: ('lt', ('x', 'y'))
+```
+
+
+
+### Challenges
+- Balancing the forward and backward data flow analysis while managing the worklist efficiently wass tough. Each direction affects the edges and node values differently, which can lead to complicated logic.
+
+### Conclusion
+Developed code that handles liveness, availability, reaching definitions, and very busy expressions using a worklist algorithm. This ensures effective forward and backward analysis by generating and killing sets for each analysis type.
