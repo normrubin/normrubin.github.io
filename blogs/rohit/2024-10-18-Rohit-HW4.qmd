@@ -532,48 +532,75 @@ format: html
 ```
 
 
-### Check 
+### Check that block A dominates block B
 
-
-#### Define check_dominance function
+#### Implementation
+##### Define check_dominance function
 - Input: dominators (dictionary), block_A (string), block_B (string)
 - Output: Boolean indicating if block_A dominates block_B
 - Logic:
-If block_B exists in dominators dictionary:
+    + If block_B exists in dominators dictionary:
+        - Check if block_A is in the list of dominators for block_B
+        - Return True if it is, else return False
 
-Check if block_A is in the list of dominators for block_B
+##### Define main function
+- Load the dominator sets from a JSON file ex1.DOM.json
+    + Open the file and parse JSON data into dominator_data dictionary
+- Display the available blocks
+    + Retrieve keys from dominator_data and store in available_blocks
+    + Print each block with its index number
+- Get user input for block_A and block_B
+    + Prompt user to enter index for block_A and block_B
+    + Convert user input to integer and adjust for zero-based indexing
+    + Use these indices to select block_A and block_B from available_blocks
+- Check if block_A dominates block_B
+    + Call check_dominance function with dominator_data, block_A, block_B
+    + Print result indicating if block_A dominates block_B
+- Execute main function if the script is run directly
 
-Return True if it is, else return False
+#### Testing
 
-Define main function
+#### command: 
+```{cmd}
+    python3 checkDom.py ex1.DOM.json
+```
+#### Simple Code: Absolute Value
+##### Input bril: 
+```{json}
+    {
+    "BLOCK1": [
+        "BLOCK1"
+    ],
+    "end": [
+        "BLOCK1",
+        "end"
+    ],
+    "negative": [
+        "BLOCK1",
+        "negative"
+    ],
+    "positive": [
+        "BLOCK1",
+        "positive"
+    ]
+    }
 
-Load the dominator sets from a JSON file ex1.DOM.json
+```
 
-Open the file and parse JSON data into dominator_data dictionary
+##### Output:
+```{cmd}
+    Available blocks:
+    1. BLOCK1
+    2. end
+    3. negative
+    4. positive
 
-Display the available blocks
+    Enter the number for block A: 1
+    Enter the number for block B: 2
 
-Retrieve keys from dominator_data and store in available_blocks
+    BLOCK1 dominates end
+```
 
-Print each block with its index number
-
-Get user input for block_A and block_B
-
-Prompt user to enter index for block_A and block_B
-
-Convert user input to integer and adjust for zero-based indexing
-
-Use these indices to select block_A and block_B from available_blocks
-
-Check if block_A dominates block_B
-
-Call check_dominance function with dominator_data, block_A, block_B
-
-Print result indicating if block_A dominates block_B
-
-Execute main function if the script is run directly
-
-- Balancing the forward and backward data flow analysis while managing the worklist efficiently wass tough. Each direction affects the edges and node values differently, which can lead to complicated logic.
 
 ### Conclusion
-Developed code that handles liveness, availability, reaching definitions, and very busy expressions using a worklist algorithm. This ensures effective forward and backward analysis by generating and killing sets for each analysis type.
+The dominator finding algorithm was complex and slow, and constructing the dominator tree required extensive testing and debugging to ensure accuracy.
