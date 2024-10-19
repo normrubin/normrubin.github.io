@@ -1,0 +1,606 @@
+---
+title: "Homework 4"
+author: Rohit Gurusamy Anandakumar
+format: html
+---
+
+## Dominance
+
+### About Dominance
+**Definition:** Dominance analysis is a fundamental concept in compiler optimization that helps us understand control flow relationships between basic blocks in a program. Let's break down the key components and their implementations.
+
+#### Find dominators for a function:
+- A block D dominates block B if every path from the program entry to B must go through D
+- Properties:
+    + Entry block dominates all blocks
+    + Every block dominates itself
+    + If A dominates B and B dominates C, then A dominates C (transitive)
+- Applications:
+    + Used in SSA form construction
+    + Helps identify natural loops
+    + Critical for many optimizations
+
+#### Construct the dominance tree:
+- A compact representation of dominance relationships
+- Properties:
+    + Each block (except entry) has exactly one immediate dominator
+    + Forms a tree structure where parent dominates all its children
+    + Immediate dominator is the closest dominator in the path from entry
+
+- Benefits:
+    + Efficient dominance queries
+    + Simplified analysis of nested structures
+    + Quick ancestor-descendant checks
+
+
+
+#### Compute the dominance frontier:
+- The dominance frontier of block X contains blocks where X's dominance stops
+- Key aspects:
+    + Critical for SSA form construction
+    + Identifies where to place φ-functions
+    + Helps determine variable live ranges
+- Usage:
+    + Control dependence analysis
+    + Data flow optimization
+    + Loop optimization
+
+
+### Implementation:
+#### Define DominanceProcessor Class
+- Initialize with a stack.
+- Define methods for:
+    + Reversing the graph.
+    + Traversing the graph in post-order.
+    + Merging sets.
+    + Calculating dominators.
+    + Finding dominance frontiers.
+    + Building a dominator tree.
+
+#### Reverse Graph Method:
+- Create a reversed graph dictionary.
+
+#### Traverse Post Method:
+- Perform post-order traversal on the graph starting from a given node.
+
+#### Merge Sets Method:
+- Merge multiple sets, finding the intersection.
+
+#### Calculate Dominators Method:
+- Reverse the graph.
+- Traverse the graph in post-order.
+- Initialize dominator sets.
+- Iteratively update dominator sets until convergence.
+
+#### Find Dominance Frontiers Method:
+- Reverse the dominator sets.
+- Identify and return the dominance frontiers for each block.
+
+#### Build Dominator Tree Method:
+- Reverse the dominator sets.
+- Create strict dominator sets.
+- Create double strict dominator sets.
+- Build and return the dominator tree.
+
+#### Process Dominance Function:
+- Initialize DominanceProcessor.
+- For each function in BRIL:
+    + Map blocks and add entry/terminators.
+    + Calculate dominators.
+    + Based on analysis type, find frontiers or build tree.
+    + Print results in JSON format.
+
+#### Main Execution:
+- Load BRIL from input.
+- Call process_dominance with the specified analysis type.
+
+
+### Testing:
+#### Testing Tool: (Turnt)
+```{turnt.toml}
+    [envs.DOM]
+    command = "bril2json < {filename} | python3 HW4.py DOM"
+    output."DOM.json" = "-"
+
+    [envs.FRONT]
+    command = "bril2json < {filename} | python3 HW4.py FRONT"
+    output."FRONT.json" = "-"
+
+    [envs.TREE]
+    command = "bril2json < {filename} | python3 HW4.py TREE"
+    output."TREE.json" = "-"
+
+
+```
+#### Example 1: Simple Code: Absolute Value
+##### Input bril:
+```{bril}
+    @main(x: int) {
+    zero: int = const 0;
+    is_negative: bool = lt x zero;
+    br is_negative .negative .positive;
+    .negative:
+    result: int = sub zero x;
+    jmp .end;
+    .positive:
+    result: int = id x;
+    .end:
+    print result;
+    }
+```
+
+##### Output: Dominator
+```{json}
+    {
+    "BLOCK1": [
+        "BLOCK1"
+    ],
+    "end": [
+        "BLOCK1",
+        "end"
+    ],
+    "negative": [
+        "BLOCK1",
+        "negative"
+    ],
+    "positive": [
+        "BLOCK1",
+        "positive"
+    ]
+    }
+
+```
+
+##### Output: FRONT
+```{json}
+{
+  "BLOCK1": []
+}
+{
+  "BLOCK1": [],
+  "body": [
+    "loop"
+  ],
+  "done": [],
+  "loop": [
+    "loop"
+  ],
+  "loop_end": [
+    "loop"
+  ]
+}
+{
+  "BLOCK1": [],
+  "done": [],
+  "swap": [
+    "done"
+  ]
+}
+{
+  "BLOCK1": [],
+  "bodyi": [
+    "loopi"
+  ],
+  "bodyj": [
+    "loopj"
+  ],
+  "donei": [],
+  "donej": [
+    "loopi"
+  ],
+  "loop_endj": [
+    "loopj"
+  ],
+  "loopi": [
+    "loopi"
+  ],
+  "loopi_end": [
+    "loopi"
+  ],
+  "loopj": [
+    "loopi",
+    "loopj"
+  ]
+}
+
+```
+
+##### Output: TREE
+```{json}
+    {
+    "BLOCK1": [
+        "end",
+        "negative",
+        "positive"
+    ],
+    "end": [],
+    "negative": [],
+    "positive": []
+    }
+
+```
+
+#### Example 2: Complex Code: Bubblesort
+##### Input bril:
+```{bril}
+        
+    @pack(size: int, n1: int, n2: int, n3: int, n4: int, n5: int) : ptr<int> {
+        one: int = const 1;
+        i: int = const 0;
+        array: ptr<int> = alloc size;
+    # Pack data into array manually. Cannot use loop because of the different var name.     
+        loc: ptr<int> = ptradd array i;
+        store loc n1;
+        i: int = add i one;
+        loc: ptr<int> = ptradd array i;
+        store loc n2;
+        i: int = add i one;        
+        loc: ptr<int> = ptradd array i;
+        store loc n3;
+        i: int = add i one;        
+        loc: ptr<int> = ptradd array i;
+        store loc n4;
+        i: int = add i one;        
+        loc: ptr<int> = ptradd array i;
+        store loc n5;
+        ret array;
+    }
+
+    @print_array(array: ptr<int>, size: int) {
+        i: int = const 0;
+        one: int = const 1;
+    .loop:
+        cond: bool = lt i size;
+        br cond .body .done;
+    .body:
+        loc: ptr<int> = ptradd array i;
+        val: int = load loc;
+        print val;
+    .loop_end:
+        i: int = add i one;
+        jmp .loop;
+    .done:
+        ret;
+    }
+
+    @swap_cond(array: ptr<int>, j: int) {
+        one: int = const 1;
+        j_add_1: int = add j one;
+        loc: ptr<int> = ptradd array j;
+        loc_next: ptr<int> = ptradd array j_add_1;
+        elem_a: int = load loc;
+        elem_b: int = load loc_next;
+        
+        cond: bool = gt elem_a elem_b;
+        br cond .swap .done;
+    .swap:
+        store loc elem_b;
+        store loc_next elem_a;
+    .done:
+        ret;
+    }
+
+    # ARGS: 5 3 10 1 9 7
+    @main(size: int, n1: int, n2: int, n3: int, n4: int, n5: int) {
+    # Pack the input elements into an array with a starting pointer
+        array: ptr<int> = call @pack size n1 n2 n3 n4 n5;
+
+    # Bubble Sort
+    one: int = const 1;
+    i: int = const 0;
+    j: int = const 0;
+    sizei: int = sub size one;
+    .loopi:
+        condi: bool = lt i sizei;
+        br condi .bodyi .donei;
+    .bodyi:
+        sizej: int = sub size i;
+        sizej: int = sub sizej one;
+    .loopj:
+        condj: bool = lt j sizej;
+        br condj .bodyj .donej;
+    .bodyj:
+        call @swap_cond array j;
+    .loop_endj:
+        j: int = add j one;
+        jmp .loopj;
+    .donej:
+        j: int = const 0;
+    .loopi_end:
+        i: int = add i one;
+        jmp .loopi;
+    .donei:
+
+    # Print array
+        call @print_array array size;
+
+        free array;
+    }
+```
+
+
+##### Output: Dominator
+```{json}
+    {
+    "BLOCK1": [
+        "BLOCK1"
+    ]
+    }
+    {
+    "BLOCK1": [
+        "BLOCK1"
+    ],
+    "body": [
+        "BLOCK1",
+        "body",
+        "loop"
+    ],
+    "done": [
+        "BLOCK1",
+        "done",
+        "loop"
+    ],
+    "loop": [
+        "BLOCK1",
+        "loop"
+    ],
+    "loop_end": [
+        "BLOCK1",
+        "body",
+        "loop",
+        "loop_end"
+    ]
+    }
+    {
+    "BLOCK1": [
+        "BLOCK1"
+    ],
+    "done": [
+        "BLOCK1",
+        "done"
+    ],
+    "swap": [
+        "BLOCK1",
+        "swap"
+    ]
+    }
+    {
+    "BLOCK1": [
+        "BLOCK1"
+    ],
+    "bodyi": [
+        "BLOCK1",
+        "bodyi",
+        "loopi"
+    ],
+    "bodyj": [
+        "BLOCK1",
+        "bodyi",
+        "bodyj",
+        "loopi",
+        "loopj"
+    ],
+    "donei": [
+        "BLOCK1",
+        "donei",
+        "loopi"
+    ],
+    "donej": [
+        "BLOCK1",
+        "bodyi",
+        "donej",
+        "loopi",
+        "loopj"
+    ],
+    "loop_endj": [
+        "BLOCK1",
+        "bodyi",
+        "bodyj",
+        "loop_endj",
+        "loopi",
+        "loopj"
+    ],
+    "loopi": [
+        "BLOCK1",
+        "loopi"
+    ],
+    "loopi_end": [
+        "BLOCK1",
+        "bodyi",
+        "donej",
+        "loopi",
+        "loopi_end",
+        "loopj"
+    ],
+    "loopj": [
+        "BLOCK1",
+        "bodyi",
+        "loopi",
+        "loopj"
+    ]
+    }
+
+```
+
+##### Output: FRONT
+```{json}
+        {
+    "BLOCK1": []
+    }
+    {
+    "BLOCK1": [],
+    "body": [
+        "loop"
+    ],
+    "done": [],
+    "loop": [
+        "loop"
+    ],
+    "loop_end": [
+        "loop"
+    ]
+    }
+    {
+    "BLOCK1": [],
+    "done": [],
+    "swap": [
+        "done"
+    ]
+    }
+    {
+    "BLOCK1": [],
+    "bodyi": [
+        "loopi"
+    ],
+    "bodyj": [
+        "loopj"
+    ],
+    "donei": [],
+    "donej": [
+        "loopi"
+    ],
+    "loop_endj": [
+        "loopj"
+    ],
+    "loopi": [
+        "loopi"
+    ],
+    "loopi_end": [
+        "loopi"
+    ],
+    "loopj": [
+        "loopi",
+        "loopj"
+    ]
+    }
+
+```
+
+##### Output: TREE
+```{json}
+        {
+    "BLOCK1": []
+    }
+    {
+    "BLOCK1": [
+        "loop"
+    ],
+    "body": [
+        "loop_end"
+    ],
+    "done": [],
+    "loop": [
+        "body",
+        "done"
+    ],
+    "loop_end": []
+    }
+    {
+    "BLOCK1": [
+        "done",
+        "swap"
+    ],
+    "done": [],
+    "swap": []
+    }
+    {
+    "BLOCK1": [
+        "loopi"
+    ],
+    "bodyi": [
+        "loopj"
+    ],
+    "bodyj": [
+        "loop_endj"
+    ],
+    "donei": [],
+    "donej": [
+        "loopi_end"
+    ],
+    "loop_endj": [],
+    "loopi": [
+        "bodyi",
+        "donei"
+    ],
+    "loopi_end": [],
+    "loopj": [
+        "bodyj",
+        "donej"
+    ]
+    }
+
+```
+
+
+### Check that block A dominates block B
+
+#### Implementation
+##### Define check_dominance function
+- Input: dominators (dictionary), block_A (string), block_B (string)
+- Output: Boolean indicating if block_A dominates block_B
+- Logic:
+    + If block_B exists in dominators dictionary:
+        - Check if block_A is in the list of dominators for block_B
+        - Return True if it is, else return False
+
+##### Define main function
+- Load the dominator sets from a JSON file ex1.DOM.json
+    + Open the file and parse JSON data into dominator_data dictionary
+- Display the available blocks
+    + Retrieve keys from dominator_data and store in available_blocks
+    + Print each block with its index number
+- Get user input for block_A and block_B
+    + Prompt user to enter index for block_A and block_B
+    + Convert user input to integer and adjust for zero-based indexing
+    + Use these indices to select block_A and block_B from available_blocks
+- Check if block_A dominates block_B
+    + Call check_dominance function with dominator_data, block_A, block_B
+    + Print result indicating if block_A dominates block_B
+- Execute main function if the script is run directly
+
+#### Testing
+
+#### command: 
+```{cmd}
+    python3 checkDom.py ex1.DOM.json
+```
+#### Simple Code: Absolute Value
+##### Input bril: 
+```{json}
+    {
+    "BLOCK1": [
+        "BLOCK1"
+    ],
+    "end": [
+        "BLOCK1",
+        "end"
+    ],
+    "negative": [
+        "BLOCK1",
+        "negative"
+    ],
+    "positive": [
+        "BLOCK1",
+        "positive"
+    ]
+    }
+
+```
+
+##### Output:
+```{cmd}
+    Available blocks:
+    1. BLOCK1
+    2. end
+    3. negative
+    4. positive
+
+    Enter the number for block A: 1
+    Enter the number for block B: 2
+
+    BLOCK1 dominates end
+```
+
+
+### Conclusion
+The dominator finding algorithm was complex and slow, and constructing the dominator tree required extensive testing and debugging to ensure accuracy.

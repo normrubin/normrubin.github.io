@@ -1,0 +1,158 @@
+---
+author: Sharmila Sivalingam
+execute:
+  enabled: false
+format:
+  html: default
+title: Compiler Homework 04 -  Implementing Dominance Utilities
+---
+
+
+In this homework blog, the task involves three main components: finding dominators for a function, constructing the dominance tree, and computing the dominance frontier. This blog post will walk through the implementation process, challenges faced, and testing my implementation.
+
+## Implementation Process
+
+### 1. Finding Dominators
+
+The first step was to implement a function to find dominators for a given control flow graph (CFG). I used the iterative algorithm, which involves:
+
+1. Initializing all nodes as dominators for each node.
+2. Iteratively refining the dominator sets based on the predecessors of each node.
+3. Continuing until no changes occur in the dominator sets.
+
+### 2. Constructing the Dominance Tree
+
+With the dominator information in hand, constructing the dominance tree was the next challenge, implemented by:
+
+1. Inverting the dominator relation to get a map of dominated nodes.
+2. Identifying the strictly dominated nodes (excluding self-domination).
+3. Building the tree structure by finding the immediate dominator for each node.
+
+### 3. Computing the Dominance Frontier
+
+The final piece of the puzzle was computing the dominance frontier. Implemented this by:
+
+1. Finding all successors of dominated blocks for each node.
+2. Identifying which of these successors are not strictly dominated by the current node.
+
+## Testing
+
+To ensure the correctness of the implementation, I tested the code with 2 examples:
+
+1. Example 1: Sum of Two Numbers
+
+ ```{Bril}
+@main {
+  a: int = const 10;
+  b: int = const 3;
+  sum: int = add a b;
+  print sum;
+}
+ ```
+
+Output:
+Dominators:
+```{Output}
+{
+  "Main1": ["Main1"]
+}
+```
+
+Dominance Tree:
+```{Output}
+{
+  "Main1": []
+}
+```
+
+Dominance Frontier:
+```{Output}
+{
+  "Main1": []
+}
+```
+
+2. Example 1: Fibonacci Sequence
+
+ ```{Bril}
+@main(n: int) {
+  zero: int = const 0;
+  one: int = const 1;
+  is_base_case: bool = le n one;
+  br is_base_case .base_case .recursive_case;
+
+.base_case:
+  result: int = id n;
+  jmp .end;
+
+.recursive_case:
+  n_minus_one: int = sub n one;
+  n_minus_two: int = sub n two;
+  
+  fib_n_minus_one: int = call @fibonacci n_minus_one;
+  fib_n_minus_two: int = call @fibonacci n_minus_two;
+  
+  result: int = add fib_n_minus_one fib_n_minus_two;
+
+.end:
+  print result;
+}
+
+@fibonacci(n: int): int {
+  zero: int = const 0;
+  one: int = const 1;
+  is_base_case: bool = le n one;
+  br is_base_case .base_case .recursive_case;
+
+.base_case:
+  ret n;
+
+.recursive_case:
+  n_minus_one: int = sub n one;
+  n_minus_two: int = sub n two;
+  
+  fib_n_minus_one: int = call @fibonacci n_minus_one;
+  fib_n_minus_two: int = call @fibonacci n_minus_two;
+  
+  result: int = add fib_n_minus_one fib_n_minus_two;
+  ret result;
+}
+ ```
+
+Output:
+Dominators:
+```{Output}
+{
+  "Main1": ["Main1"],
+  "base_case": ["Main1","base_case"],
+  "end": ["Main1","end"],
+  "recursive_case": ["Main1","recursive_case"]
+}
+```
+
+Dominance Tree:
+```{Output}
+{
+  "Main1": ["base_case","end","recursive_case"],
+  "base_case": [],
+  "end": [],
+  "recursive_case": []
+}
+```
+
+Dominance Frontier:
+```{Output}
+{
+  "Main1": [],
+  "base_case": ["end"],
+  "end": [],
+  "recursive_case": ["end"]
+}
+```
+
+The code correctly identifies dominators, constructs accurate dominance trees, and computes the correct dominance frontiers.
+By these output it is understood that Block A(Main1 block here) dominates the other blocks.
+
+## Challenges Faced
+
+Complexity of the dominator finding algorithm, which is slow for large tree. Additionally, constructing dominator tree was difficult required extra testing and debugging to ensure correctness.
