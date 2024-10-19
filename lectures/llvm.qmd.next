@@ -1,0 +1,233 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_llvm.qmd.next
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: llvm
+
+---
+
+# %% [markdown]
+# 
+# # intro to llvm
+# 
+# difference between bril and llvm 
+# 
+# 
+# handy links 
+# 
+# [llvm programmers guide]( https://llvm.org/docs/ProgrammersManual.html)
+# 
+# [Adrians tutorial](https://www.cs.cornell.edu/~asampson/blog/llvm.html)
+# 
+# 
+# [llvm doc]( https://llvm.org/docs/LangRef.html)
+# 
+# google or github pilot is very useful for this 
+
+# %%
+#as a first step I'm going to show how to install clang and cmake 
+
+# step remove any old copies 
+# the -S flag to sudo means - read from stdinput
+# the -y flag means always ans yes to apt 
+# since sudo needs a password 
+# -qq is the very quiet option 
+get_ipython().system('sudo -S apt purge -y -qq clang cmake')
+get_ipython().system('sudo -S apt install -y -qq clang cmake')
+
+
+# %% [markdown]
+# lets take a look  at llvm ir 
+
+# %%
+get_ipython().run_cell_magic('writefile', 'temp.c', 'int main(int argc, char** argv){\n    return argc;\n}\n')
+
+
+# %%
+# call clang and dump the ir
+# # -emit-llvm  print the ir
+# -S print as text not as binary 
+# 0 -  output to stdout 
+# 
+get_ipython().system('clang -emit-llvm -S -o - temp.c')
+
+
+# %% [markdown]
+# An LLVM plugin is a shared library that can add additional functionality to the LLVM infrastructure. Plugins can be used to add new passes, analyses, targets, and more.
+# 
+# Plugins are dynamically loaded into LLVM. Once loaded, a plugin can register new command-line options, passes, etc., that are then available for use in that invocation of the tool.
+# 
+# There is a cs6120 package that makes setting up the build process for plugins simple
+# %% [markdown]
+# llvm ir, has two forms .bc files are bitcode,  .ll forms are text versions that look like assembly.
+# 
+# 
+# llvm is not written in C++ but it has a lot of features that look like C++.
+# 
+# 1) llvm does not use char* or std::string, it has something else called a StringRef. 
+# 1) there is no std::cout or std::cerr there are outs(), errs() 
+# 1) lot of built in data structures
+# 1) complex class hierarchy  
+# 
+# ```{mermaid}
+# flowchart TD;
+# Value --> Argument ;
+# Value --> other["..."];
+# Value --> User;
+# User --> Constant
+# User--> Operator
+# User--> Instruction
+# Constant --> ConstantExpr
+# Constant--> ConstantData
+# Operator--> ConcreteOperator
+# Instruction--> UnaryInst
+# ConstantData --> ConstantInt
+# ConstantData --> UndefValue
+# Instruction --> BinaryOperator
+# Instruction--> CallBase
+# 
+# ```
+# 
+# Instructions are a kind of Value, since everything is in SSA form, so in memory operands are pointers to instructions 
+# so if I is an instruction
+# 
+# outs() << *(I.getOperand(0)) ; prints an instruction 
+# 
+# %% [markdown]
+# Given a Value* V, what kind of thing is V?
+# 
+# 1) isa<Argument>(V) true of V is a agument 
+# 1) cast<Argument>(V) casts to Argument, assert falure of not Argument 
+# 1) dyn_cast<Argument>(V) casts to Argument returns NULL if not an argument 
+# 
+# ```(C++)
+# Static bool isLoopInvariant(const Value *V, const Loop *L) { 
+#     if (isa<Constant>(V) || isa<Argument>(V) || isa<GlobalValue<(V)) {
+#          return true; } 
+#     //otherwise it must be an instruction…    
+#     return !L->contains(cast<Instruction>(V)->getParent());
+#      … 
+# }
+# ```
+# %% [markdown]
+# Navigating llvm IR  - IT Containers 
+# 
+# 1) Module - two way linked list of Functions
+# 1) Function - two way linked list of Basic Blocks
+# 1) Basic Block - two way linked list of Instructions
+# %% [markdown]
+# %5 = add i32 %4,2 
+# 
+# this instruction adds two 32 bit ints, input is in register %4 and the constant 2, result goes into register %5
+# 
+# %% [markdown]
+# blog post: [Why would a grad student care about llvm](https://www.cs.cornell.edu/~asampson/blog/llvm.html)
+
+# %%
+
+
+
+# %%
+get_ipython().run_cell_magic('bash', '', 'rm -r llvm-pass-skeleton/\ngit clone   https://github.com/sampsyo/llvm-pass-skeleton.git\ncd llvm-pass-skeleton/\nmkdir -p build \ncd build \ncmake ..\nmake\n\n\n# look at  llvm-pass-skeleton/skeleton/Skeleton.cpp\n\n')
+
+# %% [markdown]
+# The function returns PreservedAnalyses::all() to indicate that it didn’t modify M. Later, when we actually transform the program, we’ll need to return something like PreservedAnalyses::none().
+# 
+# The ModuleAnalysisManager is  responsible for managing the analysis results for Module passes.
+# 
+# When a pass requests an analysis, the ModuleAnalysisManager checks if the analysis result is already available. If it is, the ModuleAnalysisManager returns the cached result. If it's not, the ModuleAnalysisManager runs the analysis pass, caches the result, and then returns it.
+# 
+# This allows LLVM to avoid recomputing analysis results unnecessarily, which can significantly improve the performance of the compiler.
+# 
+# Here's an example of how you might use it:
+# 
+# ````
+# PreservedAnalyses MyPass::run(Module &M, ModuleAnalysisManager &MAM) {
+#     // Request an analysis result.
+#     const auto &Result = MAM.getResult<SomeAnalysis>(M);
+# 
+#     // Use the analysis result.
+#     // ...
+# 
+#     return PreservedAnalyses::all();
+# }
+# ````
+# 
+# Here is a second example getting the dominator tree 
+# 
+# 
+# ```
+#     PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM) {
+#         // Get the FunctionAnalysisManager.
+#         FunctionAnalysisManager &FAM = MAM.getResult<FunctionAnalysisManagerModuleProxy>(M).getManager();
+# 
+#         for (Function &F : M) {
+#             // Skip external functions.
+#             if (F.isDeclaration()) continue;
+# 
+#             // Request the dominator tree of the function.
+#             const DominatorTree &DT = FAM.getResult<DominatorTreeAnalysis>(F);
+# 
+#             // Use the dominator tree.
+#             // ...
+#         }
+# 
+#         return PreservedAnalyses::all();
+#     }
+# ```
+# %% [markdown]
+# now let look at the containers 
+
+# %%
+get_ipython().run_cell_magic('bash', '', 'rm -r llvm-pass-skeleton/\ngit clone  -b containers  https://github.com/sampsyo/llvm-pass-skeleton.git\ncd llvm-pass-skeleton/\nmkdir -p build \ncd build \ncmake ..\nmake\n\n')
+
+
+# %%
+# run the plugin 
+# 
+get_ipython().system('clang -fpass-plugin=`echo llvm-pass-skeleton/build/skeleton/SkeletonPass.*` temp.c')
+
+
+
+# %%
+get_ipython().run_cell_magic('writefile', 'temp1.c', 'int main(int argc, char** argv){\n    if (argc >2 )\n        return argc;\n    return 0;\n}\n')
+
+
+# %%
+get_ipython().system('clang -fpass-plugin=`echo llvm-pass-skeleton/build/skeleton/SkeletonPass.*` temp1.c')
+
+# %% [markdown]
+# ![](dot.pdf)
+# %% [markdown]
+# using IRBuilder is a mess, So I'm going to show a trick that makes it much simpler 
+
+# %%
+get_ipython().run_cell_magic('bash', '', 'rm -r llvm-pass-skeleton/\ngit clone  -b rtlib  https://github.com/sampsyo/llvm-pass-skeleton.git\ncd llvm-pass-skeleton/\nmkdir -p build \ncd build \ncmake ..\nmake\n')
+
+
+# %%
+get_ipython().run_cell_magic('bash', '', 'cat ls ~/llvm/llvm-pass-skeleton/skeleton/Skeleton.cpp \necho done\n')
+
+
+# %%
+get_ipython().run_cell_magic('bash', '', 'cat /home/norm/llvm/llvm-pass-skeleton/rtlib.c\necho\n')
+
+
+# %%
+get_ipython().run_cell_magic('writefile', 'llvm-pass-skeleton/test_r.cpp', '#include <stdio.h>\nint main (int argc, char** argv) {\n    printf("%d %d", argc, (argc + 2) * (argc +3));\n}\n')
+
+
+# %%
+get_ipython().run_cell_magic('bash', '', 'cd llvm-pass-skeleton/\ncc -c rtlib.c\nclang  -fpass-plugin=build/skeleton/SkeletonPass.so -c test_r.cpp\ncc test_r.o rtlib.o\n./a.out 1 2 3 4\necho \n')
+
+

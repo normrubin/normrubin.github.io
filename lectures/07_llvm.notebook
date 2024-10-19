@@ -2,11 +2,27 @@
  "cells": [
   {
    "cell_type": "raw",
-   "metadata": {},
+   "metadata": {
+    "vscode": {
+     "languageId": "raw"
+    }
+   },
    "source": [
     "---\n",
-    "title: \"7 LLVM\"\n",
-    "format: html\n",
+    "execute:\n",
+    "  echo: true\n",
+    "format:\n",
+    "  html: default\n",
+    "  revealjs:\n",
+    "    chalkboard: true\n",
+    "    code-fold: true\n",
+    "    code-line-numbers: true\n",
+    "    echo: true\n",
+    "    output-file: revealjs_llvm.qmd\n",
+    "    scrollable: true\n",
+    "    slideNumber: c/t\n",
+    "sidebar: false\n",
+    "title: llvmn\n",
     "---"
    ]
   },
@@ -22,7 +38,7 @@
     "\n",
     "handy links \n",
     "\n",
-    "[llvm programmers guid]( https://llvm.org/docs/ProgrammersManual.html)\n",
+    "[llvm programmers guide]( https://llvm.org/docs/ProgrammersManual.html)\n",
     "\n",
     "[Adrians tutorial](https://www.cs.cornell.edu/~asampson/blog/llvm.html)\n",
     "\n",
@@ -34,18 +50,9 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": null,
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "/bin/bash: line 1: /home/norm/pw: No such file or directory\n",
-      "/bin/bash: line 1: /home/norm/pw: No such file or directory\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "#as a first step I'm going to show how to install clang and cmake \n",
     "\n",
@@ -54,8 +61,8 @@
     "# the -y flag means always ans yes to apt \n",
     "# since sudo needs a password \n",
     "# -qq is the very quiet option \n",
-    "!sudo -S apt purge -y -qq clang cmake <  ~/pw\n",
-    "!sudo -S apt install -y -qq clang cmake < ~/pw\n",
+    "!sudo -S apt purge -y -qq clang cmake \n",
+    "!sudo -S apt install -y -qq clang cmake \n",
     "\n"
    ]
   },
@@ -804,7 +811,7 @@
  ],
  "metadata": {
   "kernelspec": {
-   "display_name": "Python 3",
+   "display_name": "kaggle_comp",
    "language": "python",
    "name": "python3"
   },
