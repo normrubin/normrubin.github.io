@@ -189,9 +189,11 @@ hardware version 1 (pre volta Nvidia chips)
 
 There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask.
 When hardware reaches an if- push 3 entries 
-pc then, mask for then
-pc else,  mask for else
-pc reconvergence point, mask for reconvergence 
+
+1. pc then, mask for then
+1. pc else,  mask for else
+1. pc reconvergence point, mask for reconvergence 
+
 
 ## simt stack for 4 wide warp 
 
