@@ -395,7 +395,12 @@ Bstore: store r1, f2</code></pre>
 <section id="what-happens-to-implement-this" class="level2">
 <h2 class="anchored" data-anchor-id="what-happens-to-implement-this">what happens to implement this?</h2>
 <p>hardware version 1 (pre volta Nvidia chips)</p>
-<p>There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reaches an if- push 3 entries pc then, mask for then pc else, mask for else pc reconvergence point, mask for reconvergence</p>
+<p>There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reaches an if- push 3 entries</p>
+<ol type="1">
+<li>pc then, mask for then</li>
+<li>pc else, mask for else</li>
+<li>pc reconvergence point, mask for reconvergence</li>
+</ol>
 </section>
 <section id="simt-stack-for-4-wide-warp" class="level2">
 <h2 class="anchored" data-anchor-id="simt-stack-for-4-wide-warp">simt stack for 4 wide warp</h2>

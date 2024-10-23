@@ -520,7 +520,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../homework/5_hw.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Homework 5 SSA</span></a>
+ <span class="menu-text">Homework 5 ssa</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -539,6 +539,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../homework/hw0.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homework 0</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/hw5_llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hw 5 llvm</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -781,7 +787,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="explanation-of-the-code">Explanation of the code</h2>
 <p>I implemented a generic data flow analysis framework that supports multiple analyses by designing a reusable structure for different types of data flow problems. The code includes:</p>
 <p>This code implements a liveness analysis tool for Bril programs. It builds a control flow graph (CFG) from the program’s instructions, computes the <code>in</code> and <code>out</code> sets for each basic block based on variable usage (using the <code>gen</code> and <code>kill</code> sets), and then prints the liveness information for each block. The analysis helps track which variables are live at various points in the program.</p>
-<div id="b835a1e6" class="cell" data-execution_count="1">
+<div id="aaf76c5b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>

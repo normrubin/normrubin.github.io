@@ -629,10 +629,15 @@ ge--&gt; bstore
 <span id="cb9-11"><a></a>Bstore: store r1, f2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div>
 </section>
-<section id="what-happens-to-implement-this" class="slide level2">
+<section id="what-happens-to-implement-this" class="slide level2 scrollable">
 <h2>what happens to implement this?</h2>
 <p>hardware version 1 (pre volta Nvidia chips)</p>
-<p>There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reaches an if- push 3 entries pc then, mask for then pc else, mask for else pc reconvergence point, mask for reconvergence</p>
+<p>There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reaches an if- push 3 entries</p>
+<ol type="1">
+<li>pc then, mask for then</li>
+<li>pc else, mask for else</li>
+<li>pc reconvergence point, mask for reconvergence</li>
+</ol>
 </section>
 <section id="simt-stack-for-4-wide-warp" class="slide level2">
 <h2>simt stack for 4 wide warp</h2>
