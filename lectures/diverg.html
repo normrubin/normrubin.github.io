@@ -187,6 +187,10 @@ window.Quarto = {
 <li>Threads Per Block = 256</li>
 <li>Blocks In Grid = 4096</li>
 </ol>
+<p>256 threads means 8 warps</p>
+<p>each warp start running - calculates a unique index</p>
+<p>each thread checks if v[index]&gt; 0 giving a mask, each thread read v[xindex] decrements the value and if the mask is on, updates, if the mask bit is off, the thread does not write</p>
+<p>if half the masks are on, half the threads do work, the other half don’t so 50% active</p>
 </section>
 <section id="some-initializers" class="level2">
 <h2 class="anchored" data-anchor-id="some-initializers">some initializers</h2>
