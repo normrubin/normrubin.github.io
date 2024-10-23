@@ -26,7 +26,6 @@ I recently explored the MLIR (Multi-Level Intermediate Representation) Transform
  
  The complexity needed to manage this ever growing compute platform diversity is not trivial. However, with the help of the compiler, we can bridge the gap between high level software constructs and lower level platform specific implementations. Given the current landscape, frameworks such as LLVM and MLIR aim to consolidate, standardize and solve many of the problems caused by the ever increasing number of specialized architectures. 
 
-ADD IMAGE
 
 
 ## Payload and Schedule Approach
