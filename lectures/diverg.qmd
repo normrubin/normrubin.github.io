@@ -183,54 +183,213 @@ Bstore: store r1, f2
 ::: 
 
 
-## what happens to implement this?
+---------
 
-hardware version 1 (pre volta Nvidia chips)
-
-There is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask.
-When hardware reaches an if- push 3 entries 
-
-1. pc then, mask for then
-1. pc else,  mask for else
-1. pc reconvergence point, mask for reconvergence 
+simt 
 
 
-## simt stack for 4 wide warp 
+##simple if -  
+```
+assume warp size is 4
+execution mask per thread - if 1 perform instruction if 0 do nothing 
+
+operation                active 
+if      cond             r r r r  assume first two threads get true
+reset active to cond     r r - -
+then statements          r r - - 
+invert active cond       --  r r 
+else statements          - - r r 
+join                     r r r r 
+restore active 
+```
+
+control is uniform when all threads in  warp - take the same path
+
+control is divergent when different threads take different paths 
+
+
+suppose all threads take the same path 
+
+## nested if
+
+
+```
+operation                active 
+if      cond             r r r r 
+reset active to cond     r r - -
+inner if                 r r - -   assume first thread gets true 
+reset active             r - - - 
+inner then               r - - - 
+invert mask              - r - -
+inner else               - r - - 
+join                     r r - - 
+invert active cond       --  r r 
+else statements          - - r r 
+join                     r r r r 
+restore active 
+```
+
+When we start the then we need to know the new mask 
+
+When we change from then to else - we need the new mask and we need to know the pc (for else)
+
+when we change from the else to the endif we need the new mask and we need to know the pc (for reconvergance)
+
+
+
+## stack verison
+
+how do we do this in general 
+
+one way is a stack of masks 
+
+each stack entry has 3 parts - reconvergence pc, next pc, mask
+when current pc == reconvergence pc, set pc to next pc, set mask, pop the stack
+
+when we have a branch 
+
+1. push reconverge, next pc of then,  mask
+1. push reconverge, next pc of else,  mask
+
+when pc matches the reconverge point at tos,  go to next pc and pop the stack
+
+
+
+## another option
+
+use a scalar processor with scalar registers that hold the mask 
+
+
+## special cases 
+
+special case if all threads go the same way, one of the masks has to be zero,
+ignore it 
+
+## loop case 
+
+loops - keep looping till all threads exit the loop
+```
+i = 0
+wile (i < tid){
+  i++
+}
+print(i)
+```
+four threads 
+```
+i = 0  i< tid      0 r r r 
+       i           0 0 0 0
+
+i++    i < tid     0 0  1 1
+       i           0 1 1 1 
+
+i++     i          0 1 2 2 
+        i< tid     0 0 0  1
+i++     i          0 1 2 3 
+        i< tid     0 0 0 0 
+```
+  no active threads restore mask and exit loop
+```
+print(i)   i   0 1 2 3 
+mask           1 1 1 1 
+```
+
+
+## kinds of flow 
+
+Structured control flow: 
+
+1. single-entry, single exit 
+1. properly nested Conditionals: if-then-else 
+1. Single-entry, single-exit loops: while, do-while, for… 
+1. Function call-return
+
+Unstructured control flow:
+
+1. break,
+1. continue 
+1. && || short-circuit evaluation
+
+
+
+## short circuit if 
+
+```
+if (c || d) {
+   S1; 
+   } else { 
+   S2; 
+   } 
+S3;
+```
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+entry-- t1 t2 t3 t4 --> c[c?]  --t3 t4--> d[d?]
+c -- t1 t2 --> s1
+d -- t3 --> s1
+d  --t4 --> s2
+s1 -- t1 t2 t3 --> s3
+s2 -- t4--> s3
+```
+
+c has a post dominator at s3 
+
+forces s1 to run twice 
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+entry-- t1 t2 t3 t4 --> c[c?]  --t3 t4--> d[d?]
+d  --t4 --> s2 
+c -- t1 t2 --> ptest
+d -- t3 --> p1[p1=1]
+
+s2--> p2[p1=0]
+p1--> null
+p2--> null
+null --> ptest
+ptest -- t1 t2 t3 --> s1
+ptest --t4 --> s3
+s1 -- t1 t2 t3 --> s3
+```
+
+
+
+expansion by adding flags to get to reducible flow 
+
+The basic idea is to insert predicate 
+assignments (p:=0and p :=1) and branches (p?) such that all splits and joins are properly nested, and the resultingCFG is structured. This
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TB
+c1 --> stmt1
+stmt1--> past
+stmt2--> past
+c1 --> c2
+c2 --> stmt2
+c2 --> past
+```
 
 ```
 
-                          t0 t1 t2 t3    stack
-a:                        r  r  r  r      a: 1111
---------------------------------------------------------
-  if (cond      ) {       r  r  r  r      b  1100
-                                          c  0011
-                                          f  1111
-----------------------------------------------------------
-    b:                    r r   -  -      c 0011
-    c:                    r r   -  -      f  1111
--------------------------------------------------
-  } else {                
-    d:                    - -   r r 
-    e:                    - -   r r
-  }
-  f:                                    stack is empty    
-```
-
-at the else pc matches tos
-at  convergance pc matches tos  
-
-## rules:
-
-1. divergent paths execute serially 
-1. threads execute in lock step
-1. reconverge at immediate  post dominator 
-
-easy to find post dominator for reducible control flow, hard for other cases- could turn into end of program 
+stmt runs twice for different threads 
 
 
-# when does threading model break down?
+## simt deadlock problems
 
-some code deadlocks:
+
+forward progress cases 
+
+producer consummer cases 
+
+how can threads syncronize- 
 
 ```
 1: *mutex = 0; 
@@ -242,6 +401,35 @@ some code deadlocks:
 Nothing make sure threads make forward progress
 
 
+1. for a critical section- thread0 gets the lock
+2. other threads keep looping waiting for the lock to be released 
+1, thread 0 never runs again- lock is never released 
+
+
+
+## mask stacks vs per-thread pc
+
+stacks:
+1. O(n) memory 
+1. structured control flow only 
+
+per threadd pc:
+1. o(1) memory 
+1. more expensive to implement 
+
+
+nested control flow and skipped control flow 
+
+
+
+
+
+# when does threading model break down?
+
+some code deadlocks:
+
+
+
 ## volta and newer 
 
 [possible structure](https://arxiv.org/pdf/2407.02944)
@@ -250,37 +438,41 @@ Handles unstructured code nicely
 always makes forward progress 
 
 
-```
+## an example 
 
-                          t0 t1 t2 t3    
-a:                        r  r  r  r      
---------------------------------------------------------
-  if (cond) {             r  r  r  r    
-                                                                           
-----------------------------------------------------------
-    b:                    r r   -  -    
-    d:                    - -   r r  
-    c:                    r r   -  -  
-    e:                    - -   r r    
--------------------------------------------------
-                
-  f:                      r r  --
-                          - -  r r 
-   _syncthreads()         r r r r 
-  g:             
+```
+A:
+if (tid %4 <2) {
+  B 
+  C 
+} else {
+  D 
+  E
+}
+F
 ```
 
 
-## changes 
+## volta and later 
 
-adds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize 
+hardware keeps a pc for each thread
 
-new instructions:
+at any time step, hardware picks an active pc and runs a step of all threads that have that pc
 
-1. bssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point
-2. bmov copies between barrier registers and regular registers 
-3. bsync forces threads in the mask to wait 
-4. bbreak removes threads from mask
+step    | mask  
+--|--|--
+A    | 1 1 1 
+B    |  1 1 00 
+D    |  00  11   
+c     |  1100 
+D   |    0011   
+F    | 1111   
+
+
+
+
+
+
 
 
 ## what does this solve 
@@ -304,21 +496,8 @@ Applications that assume reads and writes are implicitly visible to other thread
 
 Applications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.
 
-## AMD 
 
-AMD implemented something betweene the two versions.  There is a scalar processor to figure out masks. S calar registers are used as an 'exec mask' to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions 
-
-
-```
-save the exec mask
-set exect mask to running threads
-do the then 
-invert the exec mask if there is an else 
-do the else 
-restore the exec mask 
-```
-
-## compiler challenge 
+## AMD scalar processor compiler challenge 
 
 programing language does not talk about scalar processor. Compiler has to figure out where to use it.  
 
@@ -396,82 +575,521 @@ A variable might be divergent at one program point and uniform at another
 
 ## an example 
 
-![](images/da10.svg)
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 
-## 
+graph
+b0["bo: i0 = ld v[tid]\n j0 = 0"]
+b1["b1: i = phi(i0,i1)\nj=phi(j0,j3\np0 = i < 100\n branch p0 B2"]
+b0 --> b1
+b1--> b2
+b2["b2: i1= i +1\n j1 = j +1\n t0 = j1 mod2 \n p1 = t0 ==0\n branch b1, b4"]
+b5["b5: sync\np2 = j < 100\n, branch p2, b7"]
+b2--> b3["b3:j2 = j1 -3"]
+b2 --> b4["b4: j3= phi(j2, j1)\n jump b1"]
+b4 --> b1
+b3--> b4
+b1--> b5
+b5--> b6["b6:x0 =1\n jump b8"]
+b5--> b7[x1 =2]
+b7 --> b8
+b6--> b8["b8:x = phi(x0,x1)\n sync\st v[tid] = x0"]
 
-![](images/da9.svg)
-##
+```
 
-![](images/da11.svg)
+We can construct the data dependenc graph 
 
-## 
-![](images/da12.svg)
-
-## 
-![](images/da13.svg)
-
-## 
-![](images/da14.svg)
-
-## 
-![](images/da15.svg)
-
-## 
-![](images/da17.svg)
-
-
-## 
-![](images/da16.svg)
-
-## 
-![](images/da18.svg)
-
-## 
-![](images/da19.svg)
+1. a node for each variable 
+1. an edge from u to v, if v is data depedent on u
 
 
-## 
-![](images/da20.svg)
+## dd graph
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph 
+tid --> i0
+i0--> i
+i1--> i
+j0--> j
+j3--> j
+i--> p0
+i--> i1
+j--> j1
+j1--> t0
+j--> p2
+j1--> j2
+j2--> j3
+j1--> j3
+x0--> x
+x1--> x 
+t0--> t1
+
+```
+
+The data divergences show that not all the nodes are data dependent on tid
 
 
-## 
-![](images/da21.svg)
+
+is j in b5 divergent? 
+
+i is divergent, p0 is divergent so  threads go though the loop diferent number of times so j varies 
+
+what about x in block 8?  efected by p2 which depends of j 
 
 
-## 
-![](images/da22.svg)
 
 
-## 
-![](images/da23.svg)
+## memory operations 
 
-## finding control dependences
+The C semantics assume that (within a single thread) all loads and stores stay in order. That is is not allowed to re-order a store past a load of the same address.
 
-let branch p, label  be a branch instruction and $I_p$ be its post dominator. A varable v is control dependent on p if 
+in ssa each argument of an instruction is a pointer to the source instruction.  These edges force  serialization of the code.
 
-1. v is defined inside the influence region of p
-1. v reaches $I_p$
+We want to apply this to loads and stores this will make ordering explicit 
 
-## 
-![](images/da26.svg)
+In Static Single Assignment (SSA) form, memory tokens, representing stores or loads to memory, are typically handled by introducing memory state variables
+
+1) load:  dest = load addrs, memory_token
+1) store memory_token = store value, address, memory_token
+1) calls to functions that might modify memory also need to read and write memory tokens 
+
+treat a store as though it created a new copy of memory 
+
+we can use phi functions on memory tokens 
+
+Maintaining Correct Memory Order: By tracking memory states explicitly in SSA form (through these memory tokens and versioning), SSA ensures that memory operations respect the correct order, even if the control flow of the program is complex. This helps compilers optimize code by making memory dependencies explicit.
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+store1
+load1
+load2
+store2
+load4
+load3
+store1-->load1
+store1-->load2
+store1 --> store2
+store2 --> load3
+store2--> load4
+store2--> exit
+```
+
+Optimize  loads/stores 
+
+walk backwards - load from store 
+
+1) if we can prove the load address is the same as the store address-  remove the load 
+
+2) if we can prove the load address is different move the load up a store 
+
+3) otherwise go on
 
 
-## 
-![](images/da27.svg)
 
 
-## 
-![](images/da28.svg)
 
-## 
-![](images/da29.svg)
 
-## 
-![](images/da30.svg)
 
-## some optimizations 
 
-1. on AMD use scalar processor 
-1. if a branch condition is uniform no need for a sync in the post dominator 
-1. place uniform spills in shared memory 
+
+## multi-threaded programs
+
+Compilers started out assuming targets are single threaded.  What optimizations change for multi-threaded code?
+How do users tell compiler that the target is multi-threaded?
+
+
+## shared memory multi-threading
+
+The most common parallel system is 
+
+1. A single big memory 
+1. multiple threads address that memory 
+
+
+# an example 
+
+
+Pretend we have parallel programming in bril
+
+```
+setup:
+  zero: int = const 0;
+  one:  int = const 1;
+  a: ptr<int> = alloc one;
+  b: ptr<int> = alloc one;
+  store a zero;
+  store b zero;
+
+  create two threads somehow 
+
+  thread 1                  thread 2
+  store a one;              store b one
+  bv: int = load b;         av: int load a;
+```
+
+av| bv| allowed
+--| --|---
+0| 0|
+0|1|
+1|0|
+1|1
+
+
+## what is  sequential consistency SQ 
+
+Program Order is Maintained Within Threads:
+
+Operations (reads and writes) appear to occur in the order they are issued by each individual thread. If a thread performs a write followed by a read, the read cannot appear to happen before the write in the execution.
+
+Global Order of Operations Across Threads:
+
+All threads see the effects of memory operations in the same sequential order. Every thread agrees on the order of reads and writes, though the specific order is not predefined—it just needs to be consistent across all threads.
+Interleaving of Operations:
+
+The execution can be viewed as an interleaving of instructions from all threads. However, the interleaving must follow the program order within each thread.
+
+no real machine/compiler  implements this 
+
+
+## compiler effects
+
+
+Compiler transformations that break multi-thread sequential consistency (SC) often reorder or optimize instructions in ways that do not respect the original program order seen by other threads. These transformations can lead to subtle bugs in multithreaded programs where the expected interleaving of operations is violated. 
+
+## Load/Store Reordering
+
+Transformation: Compilers might reorder loads and stores to improve performance.
+Violation: In a multi-threaded environment, this can lead to a situation where one thread sees stale or unexpected data.
+Example:
+
+```
+Copy code
+// Thread 1
+x = 1;     // Store
+r1 = y;    // Load
+
+// Thread 2
+y = 1;     // Store
+r2 = x;    // Load
+```
+
+Under sequential consistency, if thread 1’s x = 1 happens before thread 2’s r2 = x, then thread 2 should observe r2 == 1. But reordering could result in thread 2 reading x as 0.
+
+##  Common Subexpression Elimination (CSE)
+
+Transformation: If a variable or expression is computed multiple times, the compiler may optimize by reusing the result of an earlier computation.
+Violation: This assumes that no other thread modifies shared variables between these uses.
+Example:
+
+```
+// Original code
+r1 = x;
+r2 = x;
+
+// Transformed code (CSE applied)
+temp = x;
+r1 = temp;
+r2 = temp;
+```
+
+If x is modified by another thread between the two reads, the transformed code will incorrectly assume the value of x hasn't changed.
+
+## Dead Code Elimination (DCE)
+
+Transformation: The compiler may remove stores to variables that are not subsequently read in the same thread.
+Violation: If the variable is shared and accessed by other threads, removing the store could lead to unexpected behavior.
+Example:
+
+```
+// Original code
+x = 1;
+
+// Transformed code (DCE applied)
+```
+
+// x = 1 is removed because x is not used locally
+If another thread reads x, it expects the store to have happened, but DCE breaks this assumption.
+
+## Speculative Execution (Out-of-Order Execution)
+
+Transformation: Compilers (or  hardware) may execute instructions speculatively, assuming certain branches are likely to be taken.
+Violation: This can cause out-of-order writes or reads visible to other threads, breaking SC.
+Example:
+
+```
+if (flag) {
+    r1 = x;
+}
+```
+
+If the compiler speculatively reads x before knowing the value of flag, another thread’s write to x might be missed or observed out-of-order.
+
+## Loop Invariant Code Motion
+
+Transformation: The compiler moves computations that are invariant inside a loop to outside the loop.
+Violation: If these computations involve shared variables modified by other threads within the loop, moving them outside could make the code see stale values.
+Example:
+
+```
+// Original code
+while (condition) {
+    r = shared_variable;
+}
+
+// Transformed code (Loop Invariant Code Motion)
+temp = shared_variable;
+while (condition) {
+    r = temp;
+}
+```
+If shared_variable is updated by another thread, the transformed code might keep using the old value.
+
+### Register Allocation (Caching Shared Variables in Registers)
+
+Transformation: Compilers can keep a shared variable in a register for efficiency rather than repeatedly loading it from memory.
+Violation: If another thread modifies that shared variable in memory, the compiler's register optimization would cause the thread to read stale data.
+Example:
+
+```
+while (flag == 0) {
+    // busy-wait
+}
+```
+If flag is cached in a register, updates to flag by another thread in memory won’t be reflected, breaking SC.
+
+## Instruction Fusion (Combining Loads/Stores)
+
+Transformation: The compiler may combine consecutive memory accesses into one, such as merging adjacent stores into a single store or combining two loads.
+Violation: If other threads expect these loads or stores to happen separately, they might see an inconsistent view of memory.
+Example:
+
+```
+// Original code
+x = 1;
+y = 2;
+
+// Transformed code (store fusion)
+// x and y are stored together in a single transaction
+```
+
+A thread expecting x and y to be updated separately might observe an inconsistent state if this transformation is applied.
+
+
+
+## thread libraries 
+
+start out assuming single threaded, add a threads library like pthreads
+
+multiple threads could access shared memory simultaneously, leading to race conditions, inconsistent data, and undefined behavior.
+
+Modern CPUs and compilers perform optimizations like instruction reordering, which can break assumptions about the order of memory operations in multithreaded programs.
+
+Multithreaded code is harder to test because race conditions and bugs might only manifest under certain timing conditions.
+
+Debugging multithreaded programs is more difficult due to the unpredictable nature of thread execution and interactions.
+
+Some optimizations might reorder instructions in a way that is incompatible with multithreading, introducing subtle bugs or performance regressions.
+
+Caching, prefetching, or other memory optimizations need to account for the fact that multiple threads may be accessing the same memory, which a simple thread library does not handle.
+
+## using libraries 
+
+1. Functions such as pthread mutex lock() that are guaranteed by the standard to “synchronize memory” include hardware instructions (“memory barriers”) that prevent hardware reordering of memory operations around the call
+
+2. To prevent the compiler from moving memory operations around calls to functions such as pthread mutex lock(), they are essentially treated as calls to opaque functions, about which the compiler has no information.
+
+The compiler effectively assumes that pthread mutex lock() may read or write any global variable. Thus a memory reference cannot simply be moved across the call. This approach also ensures that transitive calls, e.g. a call to a function f() which then calls pthread mutex lock(), are handled in the same way more or less appropriately, i.e. memory operations are not moved across the call to f() either, whether or not the entire user program is being analyzed at once.
+
+# example 2
+```
+for (...) {
+     ... 
+     if (mt) pthread_mutex_lock(...); 
+     x = ... x ...
+     if (mt) pthread_mutex_unlock(...)
+    }
+```
+
+r = x; 
+for (...) {
+     ... 
+     if (mt) {
+         x = r; pthread_mutex_lock(...); r = x; 
+         } 
+     r = ... r ... 
+     if (mt) {
+         x = r; pthread_mutex_unlock(...); r = x; 
+     }
+} 
+x = r;
+
+
+
+
+## adding multi-threading to user explaining the intent 
+
+c++/c  added atomics 
+
+Atomic operations are operations that are completed as a single, uninterruptible action. No other thread can observe a partial update or interfere with the operation.
+
+These operations ensure that read-modify-write sequences are safe without needing explicit locks.
+
+## an example 
+
+```
+#include <atomic>
+#include <iostream>
+#include <thread>
+
+// Global spinlock using atomic_flag
+std::atomic_flag lock = ATOMIC_FLAG_INIT;
+
+void enter_critical_section() {
+    // Busy-wait (spin) until the lock is acquired
+    while (lock.test_and_set(std::memory_order_acquire)) {
+        // Spin and wait for the lock to become available
+    }
+}
+
+void leave_critical_section() {
+    // Release the lock
+    lock.clear(std::memory_order_release);
+}
+
+// Shared resource
+int shared_counter = 0;
+
+void critical_section_task(int num_increments) {
+    for (int i = 0; i < num_increments; ++i) {
+        enter_critical_section();
+        // Begin critical section
+        ++shared_counter;
+        // End critical section
+        leave_critical_section();
+    }
+}
+```
+
+
+## load acquire (needs special hardware )
+
+used by default with atomics not used for non-atomics 
+
+all memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.
+
+a one way fence - nothing can move up
+
+## write release (needs special hardware )
+
+prevents the compiler or processor from reordering any memory operations (reads or writes) that appear before the release store. This guarantees that all operations that modify shared data before the release are visible to other threads that subsequently perform an acquire operation.
+
+also a one way fence - nothing can move down 
+
+```
+load.acquire - 
+loads and stores on non-atomics  - compiler picks the order for these operations 
+store.release 
+```
+
+
+## using  atomics 
+
+All operations appear to occur in a single total order that is consistent across all threads. This means that the results of operations are predictable and consistent as if all operations were executed in some sequential order.
+
+limits the hardware and compiler because it prevents reordering 
+
+
+##  Data Race Free
+
+ 
+
+Data Race Free (DRF) means that a program is free from data races, which occur when:
+
+1. Two or more threads access the same variable concurrently.
+1. At least one of the accesses is a write.
+
+There is no synchronization mechanism (like mutexes or atomic operations) to control the access.
+In a data race-free program, every shared variable is accessed in a way that ensures predictable results. C++ provides various synchronization primitives (such as mutexes and atomic types) to help developers write DRF code.
+
+All shared variables must be accessed using synchronization to prevent concurrent threads from modifying shared data simultaneously without coordination.
+
+
+## an example
+
+```
+#include <iostream>
+#include <atomic>
+#include <thread>
+
+int shared_counter1 = 0;                  // First non-atomic shared variable
+int shared_counter2 = 0;                  // Second non-atomic shared variable
+std::atomic<bool> lock_flag(false);       // Atomic flag to control access
+
+void safe_increment() {
+    for (int i = 0; i < 1000; ++i) {
+        // Spin until the lock is acquired
+        while (lock_flag.exchange(true)) {
+            // Busy-wait (spin) until the lock is free
+        }
+
+        // Critical section: update the non-atomic shared variables
+        ++shared_counter1;
+        ++shared_counter2;
+
+        // Release the lock
+        lock_flag.store(false);
+    }
+}
+```
+
+## language rules
+
+C and C++ 
+
+do not define what happens in the presence of data races. If a program has data races (e.g., multiple threads concurrently reading and writing to the same variable without synchronization), the behavior is considered undefined. This means that the program may produce unexpected results, crash, or behave inconsistently across different executions or platforms.
+
+Java 
+
+tries to define what happens but definition is very complex and maybe inconsistent 
+
+Rust
+
+Compile-Time Guarantees: Rust's ownership and borrowing system prevents data races at compile time. If a program is not DRF, the Rust compiler will typically refuse to compile it, enforcing memory safety guarantees. 
+
+## can the compiler add a race to a drf program 
+
+new rule, compiler cannot add a write to a shared variable 
+
+```
+if (x ==1) y++
+
+to 
+y++
+if (x!=1) y--
+
+```
+
+## how does this effect hardware?
+
+```
+struct { char a; char b; char c; char d;} s;
+s.a = 1
+s.c = 3
+
+can a compiler do 
+char temp[4] = s // load 32 bits 
+temp[0] = 1
+temp[2] = 3
+s = temp
+```
+
+not allowed - reads/writes  b and d, so compiler incorrectly added writes 
+
+options are either have byte addressable hardware, or pad so that each char gets 32 bits
+
+Vendors forced to add 8 byte loads/stores 
+
