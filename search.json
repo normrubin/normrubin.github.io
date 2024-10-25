@@ -2313,7 +2313,7 @@
     "href": "lectures/diverg.html#cfg",
     "title": "divergent flow",
     "section": "cfg",
-    "text": "cfg\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nstart --&gt; less\nless--&gt; less2\nless2  --&gt; bstore\nless2 --&gt; ge\nge--&gt; bstore\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nstart --&gt; less\nless--&gt; less2\nless2  --&gt; bstore\nless2 --&gt; ge\nge--&gt; bstore\n\n\n\n\n\n\n\nstart: \nr1 = addr v[tid]\nf1 = load r1\np1 = set.lt f0, 0.0\n\n@p1? less: f2 = div f1, 2\n@p1? less2: jmp Bstore\n\n!@p1? ge: f2 = 0.0\n\nBstore: store r1, f2",
+    "text": "cfg\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nstart --&gt; less\nless--&gt; less2\nless2  --&gt; bstore\nless2 --&gt; ge\nge--&gt; bstore\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nstart --&gt; less\nless--&gt; less2\nless2  --&gt; bstore\nless2 --&gt; ge\nge--&gt; bstore\n\n\n\n\n\n\n\nstart: \nr1 = addr v[tid]\nf1 = load r1\np1 = set.lt f0, 0.0\n\n@p1? less: f2 = div f1, 2\n@p1? less2: jmp Bstore\n\n!@p1? ge: f2 = 0.0\n\nBstore: store r1, f2\n\n\n\nsimt\n##simple if -\nassume warp size is 4\nexecution mask per thread - if 1 perform instruction if 0 do nothing \n\noperation                active \nif      cond             r r r r  assume first two threads get true\nreset active to cond     r r - -\nthen statements          r r - - \ninvert active cond       --  r r \nelse statements          - - r r \njoin                     r r r r \nrestore active \ncontrol is uniform when all threads in warp - take the same path\ncontrol is divergent when different threads take different paths\nsuppose all threads take the same path",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2321,11 +2321,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#what-happens-to-implement-this",
-    "href": "lectures/diverg.html#what-happens-to-implement-this",
+    "objectID": "lectures/diverg.html#nested-if",
+    "href": "lectures/diverg.html#nested-if",
     "title": "divergent flow",
-    "section": "what happens to implement this?",
-    "text": "what happens to implement this?\nhardware version 1 (pre volta Nvidia chips)\nThere is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reaches an if- push 3 entries\n\npc then, mask for then\npc else, mask for else\npc reconvergence point, mask for reconvergence",
+    "section": "nested if",
+    "text": "nested if\noperation                active \nif      cond             r r r r \nreset active to cond     r r - -\ninner if                 r r - -   assume first thread gets true \nreset active             r - - - \ninner then               r - - - \ninvert mask              - r - -\ninner else               - r - - \njoin                     r r - - \ninvert active cond       --  r r \nelse statements          - - r r \njoin                     r r r r \nrestore active \nWhen we start the then we need to know the new mask\nWhen we change from then to else - we need the new mask and we need to know the pc (for else)\nwhen we change from the else to the endif we need the new mask and we need to know the pc (for reconvergance)",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2333,11 +2333,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#simt-stack-for-4-wide-warp",
-    "href": "lectures/diverg.html#simt-stack-for-4-wide-warp",
+    "objectID": "lectures/diverg.html#stack-verison",
+    "href": "lectures/diverg.html#stack-verison",
     "title": "divergent flow",
-    "section": "simt stack for 4 wide warp",
-    "text": "simt stack for 4 wide warp\n\n                          t0 t1 t2 t3    stack\na:                        r  r  r  r      a: 1111\n--------------------------------------------------------\n  if (cond      ) {       r  r  r  r      b  1100\n                                          c  0011\n                                          f  1111\n----------------------------------------------------------\n    b:                    r r   -  -      c 0011\n    c:                    r r   -  -      f  1111\n-------------------------------------------------\n  } else {                \n    d:                    - -   r r \n    e:                    - -   r r\n  }\n  f:                                    stack is empty    \nat the else pc matches tos at convergance pc matches tos",
+    "section": "stack verison",
+    "text": "stack verison\nhow do we do this in general\none way is a stack of masks\neach stack entry has 3 parts - reconvergence pc, next pc, mask when current pc == reconvergence pc, set pc to next pc, set mask, pop the stack\nwhen we have a branch\n\npush reconverge, next pc of then, mask\npush reconverge, next pc of else, mask\n\nwhen pc matches the reconverge point at tos, go to next pc and pop the stack",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2345,11 +2345,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#rules",
-    "href": "lectures/diverg.html#rules",
+    "objectID": "lectures/diverg.html#another-option",
+    "href": "lectures/diverg.html#another-option",
     "title": "divergent flow",
-    "section": "rules:",
-    "text": "rules:\n\ndivergent paths execute serially\nthreads execute in lock step\nreconverge at immediate post dominator\n\neasy to find post dominator for reducible control flow, hard for other cases- could turn into end of program",
+    "section": "another option",
+    "text": "another option\nuse a scalar processor with scalar registers that hold the mask",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2357,11 +2357,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#volta-and-newer",
-    "href": "lectures/diverg.html#volta-and-newer",
+    "objectID": "lectures/diverg.html#special-cases",
+    "href": "lectures/diverg.html#special-cases",
     "title": "divergent flow",
-    "section": "volta and newer",
-    "text": "volta and newer\npossible structure\nHandles unstructured code nicely always makes forward progress\n\n                          t0 t1 t2 t3    \na:                        r  r  r  r      \n--------------------------------------------------------\n  if (cond) {             r  r  r  r    \n                                                                           \n----------------------------------------------------------\n    b:                    r r   -  -    \n    d:                    - -   r r  \n    c:                    r r   -  -  \n    e:                    - -   r r    \n-------------------------------------------------\n                \n  f:                      r r  --\n                          - -  r r \n   _syncthreads()         r r r r \n  g:",
+    "section": "special cases",
+    "text": "special cases\nspecial case if all threads go the same way, one of the masks has to be zero, ignore it",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2369,11 +2369,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#changes",
-    "href": "lectures/diverg.html#changes",
+    "objectID": "lectures/diverg.html#loop-case",
+    "href": "lectures/diverg.html#loop-case",
     "title": "divergent flow",
-    "section": "changes",
-    "text": "changes\nadds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize\nnew instructions:\n\nbssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point\nbmov copies between barrier registers and regular registers\nbsync forces threads in the mask to wait\nbbreak removes threads from mask",
+    "section": "loop case",
+    "text": "loop case\nloops - keep looping till all threads exit the loop\ni = 0\nwile (i &lt; tid){\n  i++\n}\nprint(i)\nfour threads\ni = 0  i&lt; tid      0 r r r \n       i           0 0 0 0\n\ni++    i &lt; tid     0 0  1 1\n       i           0 1 1 1 \n\ni++     i          0 1 2 2 \n        i&lt; tid     0 0 0  1\ni++     i          0 1 2 3 \n        i&lt; tid     0 0 0 0 \nno active threads restore mask and exit loop\nprint(i)   i   0 1 2 3 \nmask           1 1 1 1",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2381,11 +2381,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#what-does-this-solve",
-    "href": "lectures/diverg.html#what-does-this-solve",
+    "objectID": "lectures/diverg.html#kinds-of-flow",
+    "href": "lectures/diverg.html#kinds-of-flow",
     "title": "divergent flow",
-    "section": "what does this solve",
-    "text": "what does this solve\nThe Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity of previous hardware architectures.",
+    "section": "kinds of flow",
+    "text": "kinds of flow\nStructured control flow:\n\nsingle-entry, single exit\nproperly nested Conditionals: if-then-else\nSingle-entry, single-exit loops: while, do-while, for…\nFunction call-return\n\nUnstructured control flow:\n\nbreak,\ncontinue\n&& || short-circuit evaluation",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2393,83 +2393,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#changes-1",
-    "href": "lectures/diverg.html#changes-1",
+    "objectID": "lectures/diverg.html#short-circuit-if",
+    "href": "lectures/diverg.html#short-circuit-if",
     "title": "divergent flow",
-    "section": "changes",
-    "text": "changes\nWhen porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "divergent flow"
-    ]
-  },
-  {
-    "objectID": "lectures/diverg.html#cross-warp-operations",
-    "href": "lectures/diverg.html#cross-warp-operations",
-    "title": "divergent flow",
-    "section": "cross warp operations",
-    "text": "cross warp operations\nTo avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "divergent flow"
-    ]
-  },
-  {
-    "objectID": "lectures/diverg.html#memory-access",
-    "href": "lectures/diverg.html#memory-access",
-    "title": "divergent flow",
-    "section": "memory access",
-    "text": "memory access\nApplications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "divergent flow"
-    ]
-  },
-  {
-    "objectID": "lectures/diverg.html#barriers",
-    "href": "lectures/diverg.html#barriers",
-    "title": "divergent flow",
-    "section": "barriers",
-    "text": "barriers\nApplications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "divergent flow"
-    ]
-  },
-  {
-    "objectID": "lectures/diverg.html#amd",
-    "href": "lectures/diverg.html#amd",
-    "title": "divergent flow",
-    "section": "AMD",
-    "text": "AMD\nAMD implemented something betweene the two versions. There is a scalar processor to figure out masks. S calar registers are used as an ‘exec mask’ to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions\nsave the exec mask\nset exect mask to running threads\ndo the then \ninvert the exec mask if there is an else \ndo the else \nrestore the exec mask",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "divergent flow"
-    ]
-  },
-  {
-    "objectID": "lectures/diverg.html#compiler-challenge",
-    "href": "lectures/diverg.html#compiler-challenge",
-    "title": "divergent flow",
-    "section": "compiler challenge",
-    "text": "compiler challenge\nprograming language does not talk about scalar processor. Compiler has to figure out where to use it.",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "divergent flow"
-    ]
-  },
-  {
-    "objectID": "lectures/diverg.html#what-does-this-do-to-control-flow-graph",
-    "href": "lectures/diverg.html#what-does-this-do-to-control-flow-graph",
-    "title": "divergent flow",
-    "section": "what does this do to control flow graph",
-    "text": "what does this do to control flow graph\ntwo kinds of edges- vector view and scalar view.\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nif--&gt; then \nif--&gt; else\nthen --&gt; join\nelse --&gt; join\nif .-&gt; then\nthen.-&gt; else\nelse.-&gt; join\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nif--&gt; then \nif--&gt; else\nthen --&gt; join\nelse --&gt; join\nif .-&gt; then\nthen.-&gt; else\nelse.-&gt; join",
+    "section": "short circuit if",
+    "text": "short circuit if\nif (c || d) {\n   S1; \n   } else { \n   S2; \n   } \nS3;\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nc -- t1 t2 --&gt; s1\nd -- t3 --&gt; s1\nd  --t4 --&gt; s2\ns1 -- t1 t2 t3 --&gt; s3\ns2 -- t4--&gt; s3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nc -- t1 t2 --&gt; s1\nd -- t3 --&gt; s1\nd  --t4 --&gt; s2\ns1 -- t1 t2 t3 --&gt; s3\ns2 -- t4--&gt; s3\n\n\n\n\n\n\nc has a post dominator at s3\nforces s1 to run twice\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nd  --t4 --&gt; s2 \nc -- t1 t2 --&gt; ptest\nd -- t3 --&gt; p1[p1=1]\n\ns2--&gt; p2[p1=0]\np1--&gt; null\np2--&gt; null\nnull --&gt; ptest\nptest -- t1 t2 t3 --&gt; s1\nptest --t4 --&gt; s3\ns1 -- t1 t2 t3 --&gt; s3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nd  --t4 --&gt; s2 \nc -- t1 t2 --&gt; ptest\nd -- t3 --&gt; p1[p1=1]\n\ns2--&gt; p2[p1=0]\np1--&gt; null\np2--&gt; null\nnull --&gt; ptest\nptest -- t1 t2 t3 --&gt; s1\nptest --t4 --&gt; s3\ns1 -- t1 t2 t3 --&gt; s3\n\n\n\n\n\n\nexpansion by adding flags to get to reducible flow\nThe basic idea is to insert predicate assignments (p:=0and p :=1) and branches (p?) such that all splits and joins are properly nested, and the resultingCFG is structured. This\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nc1 --&gt; stmt1\nstmt1--&gt; past\nstmt2--&gt; past\nc1 --&gt; c2\nc2 --&gt; stmt2\nc2 --&gt; past\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nc1 --&gt; stmt1\nstmt1--&gt; past\nstmt2--&gt; past\nc1 --&gt; c2\nc2 --&gt; stmt2\nc2 --&gt; past\n\n\n\n\n\n\n\nstmt runs twice for different threads \n\n\n## simt deadlock problems\n\n\nforward progress cases \n\nproducer consummer cases \n\nhow can threads syncronize- \n\n1: *mutex = 0; 2: while(!atomicCAS(mutex,0,1)); 3: // Critical Section 4: atomicExch(mutex,0);\n\nNothing make sure threads make forward progress\n\n\n1. for a critical section- thread0 gets the lock\n2. other threads keep looping waiting for the lock to be released \n1, thread 0 never runs again- lock is never released \n\n\n\n## mask stacks vs per-thread pc\n\nstacks:\n1. O(n) memory \n1. structured control flow only \n\nper threadd pc:\n1. o(1) memory \n1. more expensive to implement \n\n\nnested control flow and skipped control flow \n\n\n\n\n\n# when does threading model break down?\n\nsome code deadlocks:\n\n\n\n## volta and newer \n\n[possible structure](https://arxiv.org/pdf/2407.02944)\n\nHandles unstructured code nicely \nalways makes forward progress \n\n\n## an example \n\nA: if (tid %4 &lt;2) { B C } else { D E } F\n\n\n## volta and later \n\nhardware keeps a pc for each thread\n\nat any time step, hardware picks an active pc and runs a step of all threads that have that pc\n\nstep    | mask  \n--|--|--\nA    | 1 1 1 \nB    |  1 1 00 \nD    |  00  11   \nc     |  1100 \nD   |    0011   \nF    | 1111   \n\n\n\n\n\n\n\n\n## what does this solve \n\nThe Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity of previous hardware architectures.\n\n\n## changes \n\nWhen porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.\n\n## cross warp operations \nTo avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.\n\n\n## memory access \n\nApplications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.\n\n## barriers \n\nApplications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.\n\n\n## AMD scalar processor compiler challenge \n\nprograming language does not talk about scalar processor. Compiler has to figure out where to use it.  \n\n## what does this do to control flow graph \n\ntwo kinds of edges- vector view and scalar view. \n\n```{mermaid}\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nif--&gt; then \nif--&gt; else\nthen --&gt; join\nelse --&gt; join\nif .-&gt; then\nthen.-&gt; else\nelse.-&gt; join",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2541,7 +2469,7 @@
     "href": "lectures/diverg.html#an-example",
     "title": "divergent flow",
     "section": "an example",
-    "text": "an example",
+    "text": "an example\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph\nb0[\"bo: i0 = ld v[tid]\\n j0 = 0\"]\nb1[\"b1: i = phi(i0,i1)\\nj=phi(j0,j3\\np0 = i &lt; 100\\n branch p0 B2\"]\nb0 --&gt; b1\nb1--&gt; b2\nb2[\"b2: i1= i +1\\n j1 = j +1\\n t0 = j1 mod2 \\n p1 = t0 ==0\\n branch b1, b4\"]\nb5[\"b5: sync\\np2 = j &lt; 100\\n, branch p2, b7\"]\nb2--&gt; b3[\"b3:j2 = j1 -3\"]\nb2 --&gt; b4[\"b4: j3= phi(j2, j1)\\n jump b1\"]\nb4 --&gt; b1\nb3--&gt; b4\nb1--&gt; b5\nb5--&gt; b6[\"b6:x0 =1\\n jump b8\"]\nb5--&gt; b7[x1 =2]\nb7 --&gt; b8\nb6--&gt; b8[\"b8:x = phi(x0,x1)\\n sync\\st v[tid] = x0\"]\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph\nb0[\"bo: i0 = ld v[tid]\\n j0 = 0\"]\nb1[\"b1: i = phi(i0,i1)\\nj=phi(j0,j3\\np0 = i &lt; 100\\n branch p0 B2\"]\nb0 --&gt; b1\nb1--&gt; b2\nb2[\"b2: i1= i +1\\n j1 = j +1\\n t0 = j1 mod2 \\n p1 = t0 ==0\\n branch b1, b4\"]\nb5[\"b5: sync\\np2 = j &lt; 100\\n, branch p2, b7\"]\nb2--&gt; b3[\"b3:j2 = j1 -3\"]\nb2 --&gt; b4[\"b4: j3= phi(j2, j1)\\n jump b1\"]\nb4 --&gt; b1\nb3--&gt; b4\nb1--&gt; b5\nb5--&gt; b6[\"b6:x0 =1\\n jump b8\"]\nb5--&gt; b7[x1 =2]\nb7 --&gt; b8\nb6--&gt; b8[\"b8:x = phi(x0,x1)\\n sync\\st v[tid] = x0\"]\n\n\n\n\n\n\n\nWe can construct the data dependenc graph\n\na node for each variable\nan edge from u to v, if v is data depedent on u",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2549,11 +2477,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#section",
-    "href": "lectures/diverg.html#section",
+    "objectID": "lectures/diverg.html#dd-graph",
+    "href": "lectures/diverg.html#dd-graph",
     "title": "divergent flow",
-    "section": "",
-    "text": "##",
+    "section": "dd graph",
+    "text": "dd graph\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph \ntid --&gt; i0\ni0--&gt; i\ni1--&gt; i\nj0--&gt; j\nj3--&gt; j\ni--&gt; p0\ni--&gt; i1\nj--&gt; j1\nj1--&gt; t0\nj--&gt; p2\nj1--&gt; j2\nj2--&gt; j3\nj1--&gt; j3\nx0--&gt; x\nx1--&gt; x \nt0--&gt; t1\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph \ntid --&gt; i0\ni0--&gt; i\ni1--&gt; i\nj0--&gt; j\nj3--&gt; j\ni--&gt; p0\ni--&gt; i1\nj--&gt; j1\nj1--&gt; t0\nj--&gt; p2\nj1--&gt; j2\nj2--&gt; j3\nj1--&gt; j3\nx0--&gt; x\nx1--&gt; x \nt0--&gt; t1\n\n\n\n\n\n\n\nThe data divergences show that not all the nodes are data dependent on tid\nis j in b5 divergent?\ni is divergent, p0 is divergent so threads go though the loop diferent number of times so j varies\nwhat about x in block 8? efected by p2 which depends of j",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2561,11 +2489,11 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#finding-control-dependences",
-    "href": "lectures/diverg.html#finding-control-dependences",
+    "objectID": "lectures/diverg.html#memory-operations",
+    "href": "lectures/diverg.html#memory-operations",
     "title": "divergent flow",
-    "section": "finding control dependences",
-    "text": "finding control dependences\nlet branch p, label be a branch instruction and \\(I_p\\) be its post dominator. A varable v is control dependent on p if\n\nv is defined inside the influence region of p\nv reaches \\(I_p\\)",
+    "section": "memory operations",
+    "text": "memory operations\nThe C semantics assume that (within a single thread) all loads and stores stay in order. That is is not allowed to re-order a store past a load of the same address.\nin ssa each argument of an instruction is a pointer to the source instruction. These edges force serialization of the code.\nWe want to apply this to loads and stores this will make ordering explicit\nIn Static Single Assignment (SSA) form, memory tokens, representing stores or loads to memory, are typically handled by introducing memory state variables\n\nload: dest = load addrs, memory_token\nstore memory_token = store value, address, memory_token\ncalls to functions that might modify memory also need to read and write memory tokens\n\ntreat a store as though it created a new copy of memory\nwe can use phi functions on memory tokens\nMaintaining Correct Memory Order: By tracking memory states explicitly in SSA form (through these memory tokens and versioning), SSA ensures that memory operations respect the correct order, even if the control flow of the program is complex. This helps compilers optimize code by making memory dependencies explicit.\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nstore1\nload1\nload2\nstore2\nload4\nload3\nstore1--&gt;load1\nstore1--&gt;load2\nstore1 --&gt; store2\nstore2 --&gt; load3\nstore2--&gt; load4\nstore2--&gt; exit\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nstore1\nload1\nload2\nstore2\nload4\nload3\nstore1--&gt;load1\nstore1--&gt;load2\nstore1 --&gt; store2\nstore2 --&gt; load3\nstore2--&gt; load4\nstore2--&gt; exit\n\n\n\n\n\n\nOptimize loads/stores\nwalk backwards - load from store\n\nif we can prove the load address is the same as the store address- remove the load\nif we can prove the load address is different move the load up a store\notherwise go on",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2573,11 +2501,263 @@
     ]
   },
   {
-    "objectID": "lectures/diverg.html#some-optimizations",
-    "href": "lectures/diverg.html#some-optimizations",
+    "objectID": "lectures/diverg.html#multi-threaded-programs",
+    "href": "lectures/diverg.html#multi-threaded-programs",
     "title": "divergent flow",
-    "section": "some optimizations",
-    "text": "some optimizations\n\non AMD use scalar processor\nif a branch condition is uniform no need for a sync in the post dominator\nplace uniform spills in shared memory",
+    "section": "multi-threaded programs",
+    "text": "multi-threaded programs\nCompilers started out assuming targets are single threaded. What optimizations change for multi-threaded code? How do users tell compiler that the target is multi-threaded?",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#shared-memory-multi-threading",
+    "href": "lectures/diverg.html#shared-memory-multi-threading",
+    "title": "divergent flow",
+    "section": "shared memory multi-threading",
+    "text": "shared memory multi-threading\nThe most common parallel system is\n\nA single big memory\nmultiple threads address that memory",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#what-is-sequential-consistency-sq",
+    "href": "lectures/diverg.html#what-is-sequential-consistency-sq",
+    "title": "divergent flow",
+    "section": "what is sequential consistency SQ",
+    "text": "what is sequential consistency SQ\nProgram Order is Maintained Within Threads:\nOperations (reads and writes) appear to occur in the order they are issued by each individual thread. If a thread performs a write followed by a read, the read cannot appear to happen before the write in the execution.\nGlobal Order of Operations Across Threads:\nAll threads see the effects of memory operations in the same sequential order. Every thread agrees on the order of reads and writes, though the specific order is not predefined—it just needs to be consistent across all threads. Interleaving of Operations:\nThe execution can be viewed as an interleaving of instructions from all threads. However, the interleaving must follow the program order within each thread.\nno real machine/compiler implements this",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#compiler-effects",
+    "href": "lectures/diverg.html#compiler-effects",
+    "title": "divergent flow",
+    "section": "compiler effects",
+    "text": "compiler effects\nCompiler transformations that break multi-thread sequential consistency (SC) often reorder or optimize instructions in ways that do not respect the original program order seen by other threads. These transformations can lead to subtle bugs in multithreaded programs where the expected interleaving of operations is violated.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#loadstore-reordering",
+    "href": "lectures/diverg.html#loadstore-reordering",
+    "title": "divergent flow",
+    "section": "Load/Store Reordering",
+    "text": "Load/Store Reordering\nTransformation: Compilers might reorder loads and stores to improve performance. Violation: In a multi-threaded environment, this can lead to a situation where one thread sees stale or unexpected data. Example:\nCopy code\n// Thread 1\nx = 1;     // Store\nr1 = y;    // Load\n\n// Thread 2\ny = 1;     // Store\nr2 = x;    // Load\nUnder sequential consistency, if thread 1’s x = 1 happens before thread 2’s r2 = x, then thread 2 should observe r2 == 1. But reordering could result in thread 2 reading x as 0.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#common-subexpression-elimination-cse",
+    "href": "lectures/diverg.html#common-subexpression-elimination-cse",
+    "title": "divergent flow",
+    "section": "Common Subexpression Elimination (CSE)",
+    "text": "Common Subexpression Elimination (CSE)\nTransformation: If a variable or expression is computed multiple times, the compiler may optimize by reusing the result of an earlier computation. Violation: This assumes that no other thread modifies shared variables between these uses. Example:\n// Original code\nr1 = x;\nr2 = x;\n\n// Transformed code (CSE applied)\ntemp = x;\nr1 = temp;\nr2 = temp;\nIf x is modified by another thread between the two reads, the transformed code will incorrectly assume the value of x hasn’t changed.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#dead-code-elimination-dce",
+    "href": "lectures/diverg.html#dead-code-elimination-dce",
+    "title": "divergent flow",
+    "section": "Dead Code Elimination (DCE)",
+    "text": "Dead Code Elimination (DCE)\nTransformation: The compiler may remove stores to variables that are not subsequently read in the same thread. Violation: If the variable is shared and accessed by other threads, removing the store could lead to unexpected behavior. Example:\n// Original code\nx = 1;\n\n// Transformed code (DCE applied)\n// x = 1 is removed because x is not used locally If another thread reads x, it expects the store to have happened, but DCE breaks this assumption.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#speculative-execution-out-of-order-execution",
+    "href": "lectures/diverg.html#speculative-execution-out-of-order-execution",
+    "title": "divergent flow",
+    "section": "Speculative Execution (Out-of-Order Execution)",
+    "text": "Speculative Execution (Out-of-Order Execution)\nTransformation: Compilers (or hardware) may execute instructions speculatively, assuming certain branches are likely to be taken. Violation: This can cause out-of-order writes or reads visible to other threads, breaking SC. Example:\nif (flag) {\n    r1 = x;\n}\nIf the compiler speculatively reads x before knowing the value of flag, another thread’s write to x might be missed or observed out-of-order.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#loop-invariant-code-motion",
+    "href": "lectures/diverg.html#loop-invariant-code-motion",
+    "title": "divergent flow",
+    "section": "Loop Invariant Code Motion",
+    "text": "Loop Invariant Code Motion\nTransformation: The compiler moves computations that are invariant inside a loop to outside the loop. Violation: If these computations involve shared variables modified by other threads within the loop, moving them outside could make the code see stale values. Example:\n// Original code\nwhile (condition) {\n    r = shared_variable;\n}\n\n// Transformed code (Loop Invariant Code Motion)\ntemp = shared_variable;\nwhile (condition) {\n    r = temp;\n}\nIf shared_variable is updated by another thread, the transformed code might keep using the old value.\n\nRegister Allocation (Caching Shared Variables in Registers)\nTransformation: Compilers can keep a shared variable in a register for efficiency rather than repeatedly loading it from memory. Violation: If another thread modifies that shared variable in memory, the compiler’s register optimization would cause the thread to read stale data. Example:\nwhile (flag == 0) {\n    // busy-wait\n}\nIf flag is cached in a register, updates to flag by another thread in memory won’t be reflected, breaking SC.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#instruction-fusion-combining-loadsstores",
+    "href": "lectures/diverg.html#instruction-fusion-combining-loadsstores",
+    "title": "divergent flow",
+    "section": "Instruction Fusion (Combining Loads/Stores)",
+    "text": "Instruction Fusion (Combining Loads/Stores)\nTransformation: The compiler may combine consecutive memory accesses into one, such as merging adjacent stores into a single store or combining two loads. Violation: If other threads expect these loads or stores to happen separately, they might see an inconsistent view of memory. Example:\n// Original code\nx = 1;\ny = 2;\n\n// Transformed code (store fusion)\n// x and y are stored together in a single transaction\nA thread expecting x and y to be updated separately might observe an inconsistent state if this transformation is applied.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#thread-libraries",
+    "href": "lectures/diverg.html#thread-libraries",
+    "title": "divergent flow",
+    "section": "thread libraries",
+    "text": "thread libraries\nstart out assuming single threaded, add a threads library like pthreads\nmultiple threads could access shared memory simultaneously, leading to race conditions, inconsistent data, and undefined behavior.\nModern CPUs and compilers perform optimizations like instruction reordering, which can break assumptions about the order of memory operations in multithreaded programs.\nMultithreaded code is harder to test because race conditions and bugs might only manifest under certain timing conditions.\nDebugging multithreaded programs is more difficult due to the unpredictable nature of thread execution and interactions.\nSome optimizations might reorder instructions in a way that is incompatible with multithreading, introducing subtle bugs or performance regressions.\nCaching, prefetching, or other memory optimizations need to account for the fact that multiple threads may be accessing the same memory, which a simple thread library does not handle.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#using-libraries",
+    "href": "lectures/diverg.html#using-libraries",
+    "title": "divergent flow",
+    "section": "using libraries",
+    "text": "using libraries\n\nFunctions such as pthread mutex lock() that are guaranteed by the standard to “synchronize memory” include hardware instructions (“memory barriers”) that prevent hardware reordering of memory operations around the call\nTo prevent the compiler from moving memory operations around calls to functions such as pthread mutex lock(), they are essentially treated as calls to opaque functions, about which the compiler has no information.\n\nThe compiler effectively assumes that pthread mutex lock() may read or write any global variable. Thus a memory reference cannot simply be moved across the call. This approach also ensures that transitive calls, e.g. a call to a function f() which then calls pthread mutex lock(), are handled in the same way more or less appropriately, i.e. memory operations are not moved across the call to f() either, whether or not the entire user program is being analyzed at once.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#adding-multi-threading-to-user-explaining-the-intent",
+    "href": "lectures/diverg.html#adding-multi-threading-to-user-explaining-the-intent",
+    "title": "divergent flow",
+    "section": "adding multi-threading to user explaining the intent",
+    "text": "adding multi-threading to user explaining the intent\nc++/c added atomics\nAtomic operations are operations that are completed as a single, uninterruptible action. No other thread can observe a partial update or interfere with the operation.\nThese operations ensure that read-modify-write sequences are safe without needing explicit locks.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#an-example-2",
+    "href": "lectures/diverg.html#an-example-2",
+    "title": "divergent flow",
+    "section": "an example",
+    "text": "an example\n#include &lt;atomic&gt;\n#include &lt;iostream&gt;\n#include &lt;thread&gt;\n\n// Global spinlock using atomic_flag\nstd::atomic_flag lock = ATOMIC_FLAG_INIT;\n\nvoid enter_critical_section() {\n    // Busy-wait (spin) until the lock is acquired\n    while (lock.test_and_set(std::memory_order_acquire)) {\n        // Spin and wait for the lock to become available\n    }\n}\n\nvoid leave_critical_section() {\n    // Release the lock\n    lock.clear(std::memory_order_release);\n}\n\n// Shared resource\nint shared_counter = 0;\n\nvoid critical_section_task(int num_increments) {\n    for (int i = 0; i &lt; num_increments; ++i) {\n        enter_critical_section();\n        // Begin critical section\n        ++shared_counter;\n        // End critical section\n        leave_critical_section();\n    }\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#load-acquire-needs-special-hardware",
+    "href": "lectures/diverg.html#load-acquire-needs-special-hardware",
+    "title": "divergent flow",
+    "section": "load acquire (needs special hardware )",
+    "text": "load acquire (needs special hardware )\nused by default with atomics not used for non-atomics\nall memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.\na one way fence - nothing can move up",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#write-release-needs-special-hardware",
+    "href": "lectures/diverg.html#write-release-needs-special-hardware",
+    "title": "divergent flow",
+    "section": "write release (needs special hardware )",
+    "text": "write release (needs special hardware )\nprevents the compiler or processor from reordering any memory operations (reads or writes) that appear before the release store. This guarantees that all operations that modify shared data before the release are visible to other threads that subsequently perform an acquire operation.\nalso a one way fence - nothing can move down\nload.acquire - \nloads and stores on non-atomics  - compiler picks the order for these operations \nstore.release",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#using-atomics",
+    "href": "lectures/diverg.html#using-atomics",
+    "title": "divergent flow",
+    "section": "using atomics",
+    "text": "using atomics\nAll operations appear to occur in a single total order that is consistent across all threads. This means that the results of operations are predictable and consistent as if all operations were executed in some sequential order.\nlimits the hardware and compiler because it prevents reordering",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#data-race-free",
+    "href": "lectures/diverg.html#data-race-free",
+    "title": "divergent flow",
+    "section": "Data Race Free",
+    "text": "Data Race Free\nData Race Free (DRF) means that a program is free from data races, which occur when:\n\nTwo or more threads access the same variable concurrently.\nAt least one of the accesses is a write.\n\nThere is no synchronization mechanism (like mutexes or atomic operations) to control the access. In a data race-free program, every shared variable is accessed in a way that ensures predictable results. C++ provides various synchronization primitives (such as mutexes and atomic types) to help developers write DRF code.\nAll shared variables must be accessed using synchronization to prevent concurrent threads from modifying shared data simultaneously without coordination.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#an-example-3",
+    "href": "lectures/diverg.html#an-example-3",
+    "title": "divergent flow",
+    "section": "an example",
+    "text": "an example\n#include &lt;iostream&gt;\n#include &lt;atomic&gt;\n#include &lt;thread&gt;\n\nint shared_counter1 = 0;                  // First non-atomic shared variable\nint shared_counter2 = 0;                  // Second non-atomic shared variable\nstd::atomic&lt;bool&gt; lock_flag(false);       // Atomic flag to control access\n\nvoid safe_increment() {\n    for (int i = 0; i &lt; 1000; ++i) {\n        // Spin until the lock is acquired\n        while (lock_flag.exchange(true)) {\n            // Busy-wait (spin) until the lock is free\n        }\n\n        // Critical section: update the non-atomic shared variables\n        ++shared_counter1;\n        ++shared_counter2;\n\n        // Release the lock\n        lock_flag.store(false);\n    }\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#language-rules",
+    "href": "lectures/diverg.html#language-rules",
+    "title": "divergent flow",
+    "section": "language rules",
+    "text": "language rules\nC and C++\ndo not define what happens in the presence of data races. If a program has data races (e.g., multiple threads concurrently reading and writing to the same variable without synchronization), the behavior is considered undefined. This means that the program may produce unexpected results, crash, or behave inconsistently across different executions or platforms.\nJava\ntries to define what happens but definition is very complex and maybe inconsistent\nRust\nCompile-Time Guarantees: Rust’s ownership and borrowing system prevents data races at compile time. If a program is not DRF, the Rust compiler will typically refuse to compile it, enforcing memory safety guarantees.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#can-the-compiler-add-a-race-to-a-drf-program",
+    "href": "lectures/diverg.html#can-the-compiler-add-a-race-to-a-drf-program",
+    "title": "divergent flow",
+    "section": "can the compiler add a race to a drf program",
+    "text": "can the compiler add a race to a drf program\nnew rule, compiler cannot add a write to a shared variable\nif (x ==1) y++\n\nto \ny++\nif (x!=1) y--",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "divergent flow"
+    ]
+  },
+  {
+    "objectID": "lectures/diverg.html#how-does-this-effect-hardware",
+    "href": "lectures/diverg.html#how-does-this-effect-hardware",
+    "title": "divergent flow",
+    "section": "how does this effect hardware?",
+    "text": "how does this effect hardware?\nstruct { char a; char b; char c; char d;} s;\ns.a = 1\ns.c = 3\n\ncan a compiler do \nchar temp[4] = s // load 32 bits \ntemp[0] = 1\ntemp[2] = 3\ns = temp\nnot allowed - reads/writes b and d, so compiler incorrectly added writes\noptions are either have byte addressable hardware, or pad so that each char gets 32 bits\nVendors forced to add 8 byte loads/stores",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -2641,95 +2821,53 @@
     "text": "cfg\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nstart --&gt; less\nless--&gt; less2\nless2  --&gt; bstore\nless2 --&gt; ge\nge--&gt; bstore\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nstart --&gt; less\nless--&gt; less2\nless2  --&gt; bstore\nless2 --&gt; ge\nge--&gt; bstore\n\n\n\n\n\n\n\nstart: \nr1 = addr v[tid]\nf1 = load r1\np1 = set.lt f0, 0.0\n\n@p1? less: f2 = div f1, 2\n@p1? less2: jmp Bstore\n\n!@p1? ge: f2 = 0.0\n\nBstore: store r1, f2"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#what-happens-to-implement-this",
-    "href": "lectures/revealjs_diverg.qmd.html#what-happens-to-implement-this",
+    "objectID": "lectures/revealjs_diverg.qmd.html#nested-if",
+    "href": "lectures/revealjs_diverg.qmd.html#nested-if",
     "title": "divergent flow",
-    "section": "what happens to implement this?",
-    "text": "what happens to implement this?\nhardware version 1 (pre volta Nvidia chips)\nThere is a hardware stack called the simt-stack, each entry is a pc and a 32 bit active mask. When hardware reaches an if- push 3 entries\n\npc then, mask for then\npc else, mask for else\npc reconvergence point, mask for reconvergence"
+    "section": "nested if",
+    "text": "nested if\noperation                active \nif      cond             r r r r \nreset active to cond     r r - -\ninner if                 r r - -   assume first thread gets true \nreset active             r - - - \ninner then               r - - - \ninvert mask              - r - -\ninner else               - r - - \njoin                     r r - - \ninvert active cond       --  r r \nelse statements          - - r r \njoin                     r r r r \nrestore active \nWhen we start the then we need to know the new mask\nWhen we change from then to else - we need the new mask and we need to know the pc (for else)\nwhen we change from the else to the endif we need the new mask and we need to know the pc (for reconvergance)"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#simt-stack-for-4-wide-warp",
-    "href": "lectures/revealjs_diverg.qmd.html#simt-stack-for-4-wide-warp",
+    "objectID": "lectures/revealjs_diverg.qmd.html#stack-verison",
+    "href": "lectures/revealjs_diverg.qmd.html#stack-verison",
     "title": "divergent flow",
-    "section": "simt stack for 4 wide warp",
-    "text": "simt stack for 4 wide warp\n\n                          t0 t1 t2 t3    stack\na:                        r  r  r  r      a: 1111\n--------------------------------------------------------\n  if (cond      ) {       r  r  r  r      b  1100\n                                          c  0011\n                                          f  1111\n----------------------------------------------------------\n    b:                    r r   -  -      c 0011\n    c:                    r r   -  -      f  1111\n-------------------------------------------------\n  } else {                \n    d:                    - -   r r \n    e:                    - -   r r\n  }\n  f:                                    stack is empty    \nat the else pc matches tos at convergance pc matches tos"
+    "section": "stack verison",
+    "text": "stack verison\nhow do we do this in general\none way is a stack of masks\neach stack entry has 3 parts - reconvergence pc, next pc, mask when current pc == reconvergence pc, set pc to next pc, set mask, pop the stack\nwhen we have a branch\n\npush reconverge, next pc of then, mask\npush reconverge, next pc of else, mask\n\nwhen pc matches the reconverge point at tos, go to next pc and pop the stack"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#rules",
-    "href": "lectures/revealjs_diverg.qmd.html#rules",
+    "objectID": "lectures/revealjs_diverg.qmd.html#another-option",
+    "href": "lectures/revealjs_diverg.qmd.html#another-option",
     "title": "divergent flow",
-    "section": "rules:",
-    "text": "rules:\n\ndivergent paths execute serially\nthreads execute in lock step\nreconverge at immediate post dominator\n\neasy to find post dominator for reducible control flow, hard for other cases- could turn into end of program"
+    "section": "another option",
+    "text": "another option\nuse a scalar processor with scalar registers that hold the mask"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#volta-and-newer",
-    "href": "lectures/revealjs_diverg.qmd.html#volta-and-newer",
+    "objectID": "lectures/revealjs_diverg.qmd.html#special-cases",
+    "href": "lectures/revealjs_diverg.qmd.html#special-cases",
     "title": "divergent flow",
-    "section": "volta and newer",
-    "text": "volta and newer\npossible structure\nHandles unstructured code nicely always makes forward progress\n\n                          t0 t1 t2 t3    \na:                        r  r  r  r      \n--------------------------------------------------------\n  if (cond) {             r  r  r  r    \n                                                                           \n----------------------------------------------------------\n    b:                    r r   -  -    \n    d:                    - -   r r  \n    c:                    r r   -  -  \n    e:                    - -   r r    \n-------------------------------------------------\n                \n  f:                      r r  --\n                          - -  r r \n   _syncthreads()         r r r r \n  g:"
+    "section": "special cases",
+    "text": "special cases\nspecial case if all threads go the same way, one of the masks has to be zero, ignore it"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#changes",
-    "href": "lectures/revealjs_diverg.qmd.html#changes",
+    "objectID": "lectures/revealjs_diverg.qmd.html#loop-case",
+    "href": "lectures/revealjs_diverg.qmd.html#loop-case",
     "title": "divergent flow",
-    "section": "changes",
-    "text": "changes\nadds a new set of registers called barrier registers, which hold the indexes of threads that will synchronize\nnew instructions:\n\nbssy sets a barrier register to a mask of the threads that will need to reconverge (recovergence mask) and specfies the reconvergence point\nbmov copies between barrier registers and regular registers\nbsync forces threads in the mask to wait\nbbreak removes threads from mask"
+    "section": "loop case",
+    "text": "loop case\nloops - keep looping till all threads exit the loop\ni = 0\nwile (i &lt; tid){\n  i++\n}\nprint(i)\nfour threads\ni = 0  i&lt; tid      0 r r r \n       i           0 0 0 0\n\ni++    i &lt; tid     0 0  1 1\n       i           0 1 1 1 \n\ni++     i          0 1 2 2 \n        i&lt; tid     0 0 0  1\ni++     i          0 1 2 3 \n        i&lt; tid     0 0 0 0 \nno active threads restore mask and exit loop\nprint(i)   i   0 1 2 3 \nmask           1 1 1 1"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#what-does-this-solve",
-    "href": "lectures/revealjs_diverg.qmd.html#what-does-this-solve",
+    "objectID": "lectures/revealjs_diverg.qmd.html#kinds-of-flow",
+    "href": "lectures/revealjs_diverg.qmd.html#kinds-of-flow",
     "title": "divergent flow",
-    "section": "what does this solve",
-    "text": "what does this solve\nThe Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity of previous hardware architectures."
+    "section": "kinds of flow",
+    "text": "kinds of flow\nStructured control flow:\n\nsingle-entry, single exit\nproperly nested Conditionals: if-then-else\nSingle-entry, single-exit loops: while, do-while, for…\nFunction call-return\n\nUnstructured control flow:\n\nbreak,\ncontinue\n&& || short-circuit evaluation"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#changes-1",
-    "href": "lectures/revealjs_diverg.qmd.html#changes-1",
+    "objectID": "lectures/revealjs_diverg.qmd.html#short-circuit-if",
+    "href": "lectures/revealjs_diverg.qmd.html#short-circuit-if",
     "title": "divergent flow",
-    "section": "changes",
-    "text": "changes\nWhen porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide."
-  },
-  {
-    "objectID": "lectures/revealjs_diverg.qmd.html#cross-warp-operations",
-    "href": "lectures/revealjs_diverg.qmd.html#cross-warp-operations",
-    "title": "divergent flow",
-    "section": "cross warp operations",
-    "text": "cross warp operations\nTo avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic."
-  },
-  {
-    "objectID": "lectures/revealjs_diverg.qmd.html#memory-access",
-    "href": "lectures/revealjs_diverg.qmd.html#memory-access",
-    "title": "divergent flow",
-    "section": "memory access",
-    "text": "memory access\nApplications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid."
-  },
-  {
-    "objectID": "lectures/revealjs_diverg.qmd.html#barriers",
-    "href": "lectures/revealjs_diverg.qmd.html#barriers",
-    "title": "divergent flow",
-    "section": "barriers",
-    "text": "barriers\nApplications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier."
-  },
-  {
-    "objectID": "lectures/revealjs_diverg.qmd.html#amd",
-    "href": "lectures/revealjs_diverg.qmd.html#amd",
-    "title": "divergent flow",
-    "section": "AMD",
-    "text": "AMD\nAMD implemented something betweene the two versions. There is a scalar processor to figure out masks. S calar registers are used as an ‘exec mask’ to indicate which vector lanes execute. The simt-stack can be done in software using scalar instructions\nsave the exec mask\nset exect mask to running threads\ndo the then \ninvert the exec mask if there is an else \ndo the else \nrestore the exec mask"
-  },
-  {
-    "objectID": "lectures/revealjs_diverg.qmd.html#compiler-challenge",
-    "href": "lectures/revealjs_diverg.qmd.html#compiler-challenge",
-    "title": "divergent flow",
-    "section": "compiler challenge",
-    "text": "compiler challenge\nprograming language does not talk about scalar processor. Compiler has to figure out where to use it."
-  },
-  {
-    "objectID": "lectures/revealjs_diverg.qmd.html#what-does-this-do-to-control-flow-graph",
-    "href": "lectures/revealjs_diverg.qmd.html#what-does-this-do-to-control-flow-graph",
-    "title": "divergent flow",
-    "section": "what does this do to control flow graph",
-    "text": "what does this do to control flow graph\ntwo kinds of edges- vector view and scalar view.\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nif--&gt; then \nif--&gt; else\nthen --&gt; join\nelse --&gt; join\nif .-&gt; then\nthen.-&gt; else\nelse.-&gt; join\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nif--&gt; then \nif--&gt; else\nthen --&gt; join\nelse --&gt; join\nif .-&gt; then\nthen.-&gt; else\nelse.-&gt; join"
+    "section": "short circuit if",
+    "text": "short circuit if\nif (c || d) {\n   S1; \n   } else { \n   S2; \n   } \nS3;\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nc -- t1 t2 --&gt; s1\nd -- t3 --&gt; s1\nd  --t4 --&gt; s2\ns1 -- t1 t2 t3 --&gt; s3\ns2 -- t4--&gt; s3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nc -- t1 t2 --&gt; s1\nd -- t3 --&gt; s1\nd  --t4 --&gt; s2\ns1 -- t1 t2 t3 --&gt; s3\ns2 -- t4--&gt; s3\n\n\n\n\n\n\nc has a post dominator at s3\nforces s1 to run twice\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nd  --t4 --&gt; s2 \nc -- t1 t2 --&gt; ptest\nd -- t3 --&gt; p1[p1=1]\n\ns2--&gt; p2[p1=0]\np1--&gt; null\np2--&gt; null\nnull --&gt; ptest\nptest -- t1 t2 t3 --&gt; s1\nptest --t4 --&gt; s3\ns1 -- t1 t2 t3 --&gt; s3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nentry-- t1 t2 t3 t4 --&gt; c[c?]  --t3 t4--&gt; d[d?]\nd  --t4 --&gt; s2 \nc -- t1 t2 --&gt; ptest\nd -- t3 --&gt; p1[p1=1]\n\ns2--&gt; p2[p1=0]\np1--&gt; null\np2--&gt; null\nnull --&gt; ptest\nptest -- t1 t2 t3 --&gt; s1\nptest --t4 --&gt; s3\ns1 -- t1 t2 t3 --&gt; s3\n\n\n\n\n\n\nexpansion by adding flags to get to reducible flow\nThe basic idea is to insert predicate assignments (p:=0and p :=1) and branches (p?) such that all splits and joins are properly nested, and the resultingCFG is structured. This\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nc1 --&gt; stmt1\nstmt1--&gt; past\nstmt2--&gt; past\nc1 --&gt; c2\nc2 --&gt; stmt2\nc2 --&gt; past\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nc1 --&gt; stmt1\nstmt1--&gt; past\nstmt2--&gt; past\nc1 --&gt; c2\nc2 --&gt; stmt2\nc2 --&gt; past\n\n\n\n\n\n\n\nstmt runs twice for different threads \n\n\n## simt deadlock problems\n\n\nforward progress cases \n\nproducer consummer cases \n\nhow can threads syncronize- \n\n1: *mutex = 0; 2: while(!atomicCAS(mutex,0,1)); 3: // Critical Section 4: atomicExch(mutex,0);\n\nNothing make sure threads make forward progress\n\n\n1. for a critical section- thread0 gets the lock\n2. other threads keep looping waiting for the lock to be released \n1, thread 0 never runs again- lock is never released \n\n\n\n## mask stacks vs per-thread pc\n\nstacks:\n1. O(n) memory \n1. structured control flow only \n\nper threadd pc:\n1. o(1) memory \n1. more expensive to implement \n\n\nnested control flow and skipped control flow \n\n\n\n\n\n# when does threading model break down?\n\nsome code deadlocks:\n\n\n\n## volta and newer \n\n[possible structure](https://arxiv.org/pdf/2407.02944)\n\nHandles unstructured code nicely \nalways makes forward progress \n\n\n## an example \n\nA: if (tid %4 &lt;2) { B C } else { D E } F\n\n\n## volta and later \n\nhardware keeps a pc for each thread\n\nat any time step, hardware picks an active pc and runs a step of all threads that have that pc\n\nstep    | mask  \n--|--|--\nA    | 1 1 1 \nB    |  1 1 00 \nD    |  00  11   \nc     |  1100 \nD   |    0011   \nF    | 1111   \n\n\n\n\n\n\n\n\n## what does this solve \n\nThe Volta architecture introduces Independent Thread Scheduling among threads in a warp. This feature enables intra-warp synchronization patterns previously unavailable and simplifies code changes when porting CPU code. However, Independent Thread Scheduling can also lead to a rather different set of threads participating in the executed code than intended if the developer made assumptions about warp-synchronicity of previous hardware architectures.\n\n\n## changes \n\nWhen porting existing codes to Volta, the following three code patterns need careful attention. For more details see the CUDA C++ Programming Guide.\n\n## cross warp operations \nTo avoid data corruption, applications using warp intrinsics (__shfl*, __any, __all, and __ballot) should transition to the new, safe, synchronizing counterparts, with the *_sync suffix. The new warp intrinsics take in a mask of threads that explicitly define which lanes (threads of a warp) must participate in the warp intrinsic.\n\n\n## memory access \n\nApplications that assume reads and writes are implicitly visible to other threads in the same warp need to insert the new __syncwarp() warp-wide barrier synchronization instruction between steps where data is exchanged between threads via global or shared memory. Assumptions that code is executed in lockstep or that reads/writes from separate threads are visible across a warp without synchronization are invalid.\n\n## barriers \n\nApplications using __syncthreads() or the PTX bar.sync (and their derivatives) in such a way that a barrier will not be reached by some non-exited thread in the thread block must be modified to ensure that all non-exited threads reach the barrier.\n\n\n## AMD scalar processor compiler challenge \n\nprograming language does not talk about scalar processor. Compiler has to figure out where to use it.  \n\n## what does this do to control flow graph \n\ntwo kinds of edges- vector view and scalar view. \n\n```{mermaid}\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nif--&gt; then \nif--&gt; else\nthen --&gt; join\nelse --&gt; join\nif .-&gt; then\nthen.-&gt; else\nelse.-&gt; join"
   },
   {
     "objectID": "lectures/revealjs_diverg.qmd.html#static-detection-of-divergences",
@@ -2771,28 +2909,175 @@
     "href": "lectures/revealjs_diverg.qmd.html#an-example",
     "title": "divergent flow",
     "section": "an example",
-    "text": "an example"
+    "text": "an example\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph\nb0[\"bo: i0 = ld v[tid]\\n j0 = 0\"]\nb1[\"b1: i = phi(i0,i1)\\nj=phi(j0,j3\\np0 = i &lt; 100\\n branch p0 B2\"]\nb0 --&gt; b1\nb1--&gt; b2\nb2[\"b2: i1= i +1\\n j1 = j +1\\n t0 = j1 mod2 \\n p1 = t0 ==0\\n branch b1, b4\"]\nb5[\"b5: sync\\np2 = j &lt; 100\\n, branch p2, b7\"]\nb2--&gt; b3[\"b3:j2 = j1 -3\"]\nb2 --&gt; b4[\"b4: j3= phi(j2, j1)\\n jump b1\"]\nb4 --&gt; b1\nb3--&gt; b4\nb1--&gt; b5\nb5--&gt; b6[\"b6:x0 =1\\n jump b8\"]\nb5--&gt; b7[x1 =2]\nb7 --&gt; b8\nb6--&gt; b8[\"b8:x = phi(x0,x1)\\n sync\\st v[tid] = x0\"]\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph\nb0[\"bo: i0 = ld v[tid]\\n j0 = 0\"]\nb1[\"b1: i = phi(i0,i1)\\nj=phi(j0,j3\\np0 = i &lt; 100\\n branch p0 B2\"]\nb0 --&gt; b1\nb1--&gt; b2\nb2[\"b2: i1= i +1\\n j1 = j +1\\n t0 = j1 mod2 \\n p1 = t0 ==0\\n branch b1, b4\"]\nb5[\"b5: sync\\np2 = j &lt; 100\\n, branch p2, b7\"]\nb2--&gt; b3[\"b3:j2 = j1 -3\"]\nb2 --&gt; b4[\"b4: j3= phi(j2, j1)\\n jump b1\"]\nb4 --&gt; b1\nb3--&gt; b4\nb1--&gt; b5\nb5--&gt; b6[\"b6:x0 =1\\n jump b8\"]\nb5--&gt; b7[x1 =2]\nb7 --&gt; b8\nb6--&gt; b8[\"b8:x = phi(x0,x1)\\n sync\\st v[tid] = x0\"]\n\n\n\n\n\n\n\nWe can construct the data dependenc graph\n\na node for each variable\nan edge from u to v, if v is data depedent on u"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#section",
-    "href": "lectures/revealjs_diverg.qmd.html#section",
+    "objectID": "lectures/revealjs_diverg.qmd.html#dd-graph",
+    "href": "lectures/revealjs_diverg.qmd.html#dd-graph",
     "title": "divergent flow",
-    "section": "",
-    "text": "##"
+    "section": "dd graph",
+    "text": "dd graph\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph \ntid --&gt; i0\ni0--&gt; i\ni1--&gt; i\nj0--&gt; j\nj3--&gt; j\ni--&gt; p0\ni--&gt; i1\nj--&gt; j1\nj1--&gt; t0\nj--&gt; p2\nj1--&gt; j2\nj2--&gt; j3\nj1--&gt; j3\nx0--&gt; x\nx1--&gt; x \nt0--&gt; t1\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph \ntid --&gt; i0\ni0--&gt; i\ni1--&gt; i\nj0--&gt; j\nj3--&gt; j\ni--&gt; p0\ni--&gt; i1\nj--&gt; j1\nj1--&gt; t0\nj--&gt; p2\nj1--&gt; j2\nj2--&gt; j3\nj1--&gt; j3\nx0--&gt; x\nx1--&gt; x \nt0--&gt; t1\n\n\n\n\n\n\n\nThe data divergences show that not all the nodes are data dependent on tid\nis j in b5 divergent?\ni is divergent, p0 is divergent so threads go though the loop diferent number of times so j varies\nwhat about x in block 8? efected by p2 which depends of j"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#finding-control-dependences",
-    "href": "lectures/revealjs_diverg.qmd.html#finding-control-dependences",
+    "objectID": "lectures/revealjs_diverg.qmd.html#memory-operations",
+    "href": "lectures/revealjs_diverg.qmd.html#memory-operations",
     "title": "divergent flow",
-    "section": "finding control dependences",
-    "text": "finding control dependences\nlet branch p, label be a branch instruction and \\(I_p\\) be its post dominator. A varable v is control dependent on p if\n\nv is defined inside the influence region of p\nv reaches \\(I_p\\)"
+    "section": "memory operations",
+    "text": "memory operations\nThe C semantics assume that (within a single thread) all loads and stores stay in order. That is is not allowed to re-order a store past a load of the same address.\nin ssa each argument of an instruction is a pointer to the source instruction. These edges force serialization of the code.\nWe want to apply this to loads and stores this will make ordering explicit\nIn Static Single Assignment (SSA) form, memory tokens, representing stores or loads to memory, are typically handled by introducing memory state variables\n\nload: dest = load addrs, memory_token\nstore memory_token = store value, address, memory_token\ncalls to functions that might modify memory also need to read and write memory tokens\n\ntreat a store as though it created a new copy of memory\nwe can use phi functions on memory tokens\nMaintaining Correct Memory Order: By tracking memory states explicitly in SSA form (through these memory tokens and versioning), SSA ensures that memory operations respect the correct order, even if the control flow of the program is complex. This helps compilers optimize code by making memory dependencies explicit.\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nstore1\nload1\nload2\nstore2\nload4\nload3\nstore1--&gt;load1\nstore1--&gt;load2\nstore1 --&gt; store2\nstore2 --&gt; load3\nstore2--&gt; load4\nstore2--&gt; exit\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nstore1\nload1\nload2\nstore2\nload4\nload3\nstore1--&gt;load1\nstore1--&gt;load2\nstore1 --&gt; store2\nstore2 --&gt; load3\nstore2--&gt; load4\nstore2--&gt; exit\n\n\n\n\n\n\nOptimize loads/stores\nwalk backwards - load from store\n\nif we can prove the load address is the same as the store address- remove the load\nif we can prove the load address is different move the load up a store\notherwise go on"
   },
   {
-    "objectID": "lectures/revealjs_diverg.qmd.html#some-optimizations",
-    "href": "lectures/revealjs_diverg.qmd.html#some-optimizations",
+    "objectID": "lectures/revealjs_diverg.qmd.html#multi-threaded-programs",
+    "href": "lectures/revealjs_diverg.qmd.html#multi-threaded-programs",
     "title": "divergent flow",
-    "section": "some optimizations",
-    "text": "some optimizations\n\non AMD use scalar processor\nif a branch condition is uniform no need for a sync in the post dominator\nplace uniform spills in shared memory"
+    "section": "multi-threaded programs",
+    "text": "multi-threaded programs\nCompilers started out assuming targets are single threaded. What optimizations change for multi-threaded code? How do users tell compiler that the target is multi-threaded?"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#shared-memory-multi-threading",
+    "href": "lectures/revealjs_diverg.qmd.html#shared-memory-multi-threading",
+    "title": "divergent flow",
+    "section": "shared memory multi-threading",
+    "text": "shared memory multi-threading\nThe most common parallel system is\n\nA single big memory\nmultiple threads address that memory"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#what-is-sequential-consistency-sq",
+    "href": "lectures/revealjs_diverg.qmd.html#what-is-sequential-consistency-sq",
+    "title": "divergent flow",
+    "section": "what is sequential consistency SQ",
+    "text": "what is sequential consistency SQ\nProgram Order is Maintained Within Threads:\nOperations (reads and writes) appear to occur in the order they are issued by each individual thread. If a thread performs a write followed by a read, the read cannot appear to happen before the write in the execution.\nGlobal Order of Operations Across Threads:\nAll threads see the effects of memory operations in the same sequential order. Every thread agrees on the order of reads and writes, though the specific order is not predefined—it just needs to be consistent across all threads. Interleaving of Operations:\nThe execution can be viewed as an interleaving of instructions from all threads. However, the interleaving must follow the program order within each thread.\nno real machine/compiler implements this"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#compiler-effects",
+    "href": "lectures/revealjs_diverg.qmd.html#compiler-effects",
+    "title": "divergent flow",
+    "section": "compiler effects",
+    "text": "compiler effects\nCompiler transformations that break multi-thread sequential consistency (SC) often reorder or optimize instructions in ways that do not respect the original program order seen by other threads. These transformations can lead to subtle bugs in multithreaded programs where the expected interleaving of operations is violated."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#loadstore-reordering",
+    "href": "lectures/revealjs_diverg.qmd.html#loadstore-reordering",
+    "title": "divergent flow",
+    "section": "Load/Store Reordering",
+    "text": "Load/Store Reordering\nTransformation: Compilers might reorder loads and stores to improve performance. Violation: In a multi-threaded environment, this can lead to a situation where one thread sees stale or unexpected data. Example:\nCopy code\n// Thread 1\nx = 1;     // Store\nr1 = y;    // Load\n\n// Thread 2\ny = 1;     // Store\nr2 = x;    // Load\nUnder sequential consistency, if thread 1’s x = 1 happens before thread 2’s r2 = x, then thread 2 should observe r2 == 1. But reordering could result in thread 2 reading x as 0."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#common-subexpression-elimination-cse",
+    "href": "lectures/revealjs_diverg.qmd.html#common-subexpression-elimination-cse",
+    "title": "divergent flow",
+    "section": "Common Subexpression Elimination (CSE)",
+    "text": "Common Subexpression Elimination (CSE)\nTransformation: If a variable or expression is computed multiple times, the compiler may optimize by reusing the result of an earlier computation. Violation: This assumes that no other thread modifies shared variables between these uses. Example:\n// Original code\nr1 = x;\nr2 = x;\n\n// Transformed code (CSE applied)\ntemp = x;\nr1 = temp;\nr2 = temp;\nIf x is modified by another thread between the two reads, the transformed code will incorrectly assume the value of x hasn’t changed."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#dead-code-elimination-dce",
+    "href": "lectures/revealjs_diverg.qmd.html#dead-code-elimination-dce",
+    "title": "divergent flow",
+    "section": "Dead Code Elimination (DCE)",
+    "text": "Dead Code Elimination (DCE)\nTransformation: The compiler may remove stores to variables that are not subsequently read in the same thread. Violation: If the variable is shared and accessed by other threads, removing the store could lead to unexpected behavior. Example:\n// Original code\nx = 1;\n\n// Transformed code (DCE applied)\n// x = 1 is removed because x is not used locally If another thread reads x, it expects the store to have happened, but DCE breaks this assumption."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#speculative-execution-out-of-order-execution",
+    "href": "lectures/revealjs_diverg.qmd.html#speculative-execution-out-of-order-execution",
+    "title": "divergent flow",
+    "section": "Speculative Execution (Out-of-Order Execution)",
+    "text": "Speculative Execution (Out-of-Order Execution)\nTransformation: Compilers (or hardware) may execute instructions speculatively, assuming certain branches are likely to be taken. Violation: This can cause out-of-order writes or reads visible to other threads, breaking SC. Example:\nif (flag) {\n    r1 = x;\n}\nIf the compiler speculatively reads x before knowing the value of flag, another thread’s write to x might be missed or observed out-of-order."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#loop-invariant-code-motion",
+    "href": "lectures/revealjs_diverg.qmd.html#loop-invariant-code-motion",
+    "title": "divergent flow",
+    "section": "Loop Invariant Code Motion",
+    "text": "Loop Invariant Code Motion\nTransformation: The compiler moves computations that are invariant inside a loop to outside the loop. Violation: If these computations involve shared variables modified by other threads within the loop, moving them outside could make the code see stale values. Example:\n// Original code\nwhile (condition) {\n    r = shared_variable;\n}\n\n// Transformed code (Loop Invariant Code Motion)\ntemp = shared_variable;\nwhile (condition) {\n    r = temp;\n}\nIf shared_variable is updated by another thread, the transformed code might keep using the old value.\nRegister Allocation (Caching Shared Variables in Registers)\nTransformation: Compilers can keep a shared variable in a register for efficiency rather than repeatedly loading it from memory. Violation: If another thread modifies that shared variable in memory, the compiler’s register optimization would cause the thread to read stale data. Example:\nwhile (flag == 0) {\n    // busy-wait\n}\nIf flag is cached in a register, updates to flag by another thread in memory won’t be reflected, breaking SC."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#instruction-fusion-combining-loadsstores",
+    "href": "lectures/revealjs_diverg.qmd.html#instruction-fusion-combining-loadsstores",
+    "title": "divergent flow",
+    "section": "Instruction Fusion (Combining Loads/Stores)",
+    "text": "Instruction Fusion (Combining Loads/Stores)\nTransformation: The compiler may combine consecutive memory accesses into one, such as merging adjacent stores into a single store or combining two loads. Violation: If other threads expect these loads or stores to happen separately, they might see an inconsistent view of memory. Example:\n// Original code\nx = 1;\ny = 2;\n\n// Transformed code (store fusion)\n// x and y are stored together in a single transaction\nA thread expecting x and y to be updated separately might observe an inconsistent state if this transformation is applied."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#thread-libraries",
+    "href": "lectures/revealjs_diverg.qmd.html#thread-libraries",
+    "title": "divergent flow",
+    "section": "thread libraries",
+    "text": "thread libraries\nstart out assuming single threaded, add a threads library like pthreads\nmultiple threads could access shared memory simultaneously, leading to race conditions, inconsistent data, and undefined behavior.\nModern CPUs and compilers perform optimizations like instruction reordering, which can break assumptions about the order of memory operations in multithreaded programs.\nMultithreaded code is harder to test because race conditions and bugs might only manifest under certain timing conditions.\nDebugging multithreaded programs is more difficult due to the unpredictable nature of thread execution and interactions.\nSome optimizations might reorder instructions in a way that is incompatible with multithreading, introducing subtle bugs or performance regressions.\nCaching, prefetching, or other memory optimizations need to account for the fact that multiple threads may be accessing the same memory, which a simple thread library does not handle."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#using-libraries",
+    "href": "lectures/revealjs_diverg.qmd.html#using-libraries",
+    "title": "divergent flow",
+    "section": "using libraries",
+    "text": "using libraries\n\nFunctions such as pthread mutex lock() that are guaranteed by the standard to “synchronize memory” include hardware instructions (“memory barriers”) that prevent hardware reordering of memory operations around the call\nTo prevent the compiler from moving memory operations around calls to functions such as pthread mutex lock(), they are essentially treated as calls to opaque functions, about which the compiler has no information.\n\nThe compiler effectively assumes that pthread mutex lock() may read or write any global variable. Thus a memory reference cannot simply be moved across the call. This approach also ensures that transitive calls, e.g. a call to a function f() which then calls pthread mutex lock(), are handled in the same way more or less appropriately, i.e. memory operations are not moved across the call to f() either, whether or not the entire user program is being analyzed at once."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#adding-multi-threading-to-user-explaining-the-intent",
+    "href": "lectures/revealjs_diverg.qmd.html#adding-multi-threading-to-user-explaining-the-intent",
+    "title": "divergent flow",
+    "section": "adding multi-threading to user explaining the intent",
+    "text": "adding multi-threading to user explaining the intent\nc++/c added atomics\nAtomic operations are operations that are completed as a single, uninterruptible action. No other thread can observe a partial update or interfere with the operation.\nThese operations ensure that read-modify-write sequences are safe without needing explicit locks."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#an-example-2",
+    "href": "lectures/revealjs_diverg.qmd.html#an-example-2",
+    "title": "divergent flow",
+    "section": "an example",
+    "text": "an example\n#include &lt;atomic&gt;\n#include &lt;iostream&gt;\n#include &lt;thread&gt;\n\n// Global spinlock using atomic_flag\nstd::atomic_flag lock = ATOMIC_FLAG_INIT;\n\nvoid enter_critical_section() {\n    // Busy-wait (spin) until the lock is acquired\n    while (lock.test_and_set(std::memory_order_acquire)) {\n        // Spin and wait for the lock to become available\n    }\n}\n\nvoid leave_critical_section() {\n    // Release the lock\n    lock.clear(std::memory_order_release);\n}\n\n// Shared resource\nint shared_counter = 0;\n\nvoid critical_section_task(int num_increments) {\n    for (int i = 0; i &lt; num_increments; ++i) {\n        enter_critical_section();\n        // Begin critical section\n        ++shared_counter;\n        // End critical section\n        leave_critical_section();\n    }\n}"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#load-acquire-needs-special-hardware",
+    "href": "lectures/revealjs_diverg.qmd.html#load-acquire-needs-special-hardware",
+    "title": "divergent flow",
+    "section": "load acquire (needs special hardware )",
+    "text": "load acquire (needs special hardware )\nused by default with atomics not used for non-atomics\nall memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.\na one way fence - nothing can move up"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#write-release-needs-special-hardware",
+    "href": "lectures/revealjs_diverg.qmd.html#write-release-needs-special-hardware",
+    "title": "divergent flow",
+    "section": "write release (needs special hardware )",
+    "text": "write release (needs special hardware )\nprevents the compiler or processor from reordering any memory operations (reads or writes) that appear before the release store. This guarantees that all operations that modify shared data before the release are visible to other threads that subsequently perform an acquire operation.\nalso a one way fence - nothing can move down\nload.acquire - \nloads and stores on non-atomics  - compiler picks the order for these operations \nstore.release"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#using-atomics",
+    "href": "lectures/revealjs_diverg.qmd.html#using-atomics",
+    "title": "divergent flow",
+    "section": "using atomics",
+    "text": "using atomics\nAll operations appear to occur in a single total order that is consistent across all threads. This means that the results of operations are predictable and consistent as if all operations were executed in some sequential order.\nlimits the hardware and compiler because it prevents reordering"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#data-race-free",
+    "href": "lectures/revealjs_diverg.qmd.html#data-race-free",
+    "title": "divergent flow",
+    "section": "Data Race Free",
+    "text": "Data Race Free\nData Race Free (DRF) means that a program is free from data races, which occur when:\n\nTwo or more threads access the same variable concurrently.\nAt least one of the accesses is a write.\n\nThere is no synchronization mechanism (like mutexes or atomic operations) to control the access. In a data race-free program, every shared variable is accessed in a way that ensures predictable results. C++ provides various synchronization primitives (such as mutexes and atomic types) to help developers write DRF code.\nAll shared variables must be accessed using synchronization to prevent concurrent threads from modifying shared data simultaneously without coordination."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#an-example-3",
+    "href": "lectures/revealjs_diverg.qmd.html#an-example-3",
+    "title": "divergent flow",
+    "section": "an example",
+    "text": "an example\n#include &lt;iostream&gt;\n#include &lt;atomic&gt;\n#include &lt;thread&gt;\n\nint shared_counter1 = 0;                  // First non-atomic shared variable\nint shared_counter2 = 0;                  // Second non-atomic shared variable\nstd::atomic&lt;bool&gt; lock_flag(false);       // Atomic flag to control access\n\nvoid safe_increment() {\n    for (int i = 0; i &lt; 1000; ++i) {\n        // Spin until the lock is acquired\n        while (lock_flag.exchange(true)) {\n            // Busy-wait (spin) until the lock is free\n        }\n\n        // Critical section: update the non-atomic shared variables\n        ++shared_counter1;\n        ++shared_counter2;\n\n        // Release the lock\n        lock_flag.store(false);\n    }\n}"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#language-rules",
+    "href": "lectures/revealjs_diverg.qmd.html#language-rules",
+    "title": "divergent flow",
+    "section": "language rules",
+    "text": "language rules\nC and C++\ndo not define what happens in the presence of data races. If a program has data races (e.g., multiple threads concurrently reading and writing to the same variable without synchronization), the behavior is considered undefined. This means that the program may produce unexpected results, crash, or behave inconsistently across different executions or platforms.\nJava\ntries to define what happens but definition is very complex and maybe inconsistent\nRust\nCompile-Time Guarantees: Rust’s ownership and borrowing system prevents data races at compile time. If a program is not DRF, the Rust compiler will typically refuse to compile it, enforcing memory safety guarantees."
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#can-the-compiler-add-a-race-to-a-drf-program",
+    "href": "lectures/revealjs_diverg.qmd.html#can-the-compiler-add-a-race-to-a-drf-program",
+    "title": "divergent flow",
+    "section": "can the compiler add a race to a drf program",
+    "text": "can the compiler add a race to a drf program\nnew rule, compiler cannot add a write to a shared variable\nif (x ==1) y++\n\nto \ny++\nif (x!=1) y--"
+  },
+  {
+    "objectID": "lectures/revealjs_diverg.qmd.html#how-does-this-effect-hardware",
+    "href": "lectures/revealjs_diverg.qmd.html#how-does-this-effect-hardware",
+    "title": "divergent flow",
+    "section": "how does this effect hardware?",
+    "text": "how does this effect hardware?\nstruct { char a; char b; char c; char d;} s;\ns.a = 1\ns.c = 3\n\ncan a compiler do \nchar temp[4] = s // load 32 bits \ntemp[0] = 1\ntemp[2] = 3\ns = temp\nnot allowed - reads/writes b and d, so compiler incorrectly added writes\noptions are either have byte addressable hardware, or pad so that each char gets 32 bits\nVendors forced to add 8 byte loads/stores"
   },
   {
     "objectID": "lectures/03b_local_value_numbering.html",
@@ -3395,7 +3680,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#e91d692d .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#f846e6e6 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7516,7 +7801,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1532\n-rw-r--r-- 1 runner docker 40847 Oct 23 14:55 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Oct 23 14:55 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Oct 23 14:55 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct 23 14:54 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Oct 23 14:55 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Oct 23 14:55 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Oct 23 14:55 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Oct 23 14:55 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Oct 23 14:55 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Oct 23 14:55 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23601 Oct 23 14:55 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Oct 23 14:55 03_local.html\n-rw-r--r-- 1 runner docker 12742 Oct 23 14:55 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Oct 23 14:55 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 56836 Oct 23 14:55 04_data_flow.html\n-rw-r--r-- 1 runner docker  9438 Oct 23 14:55 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Oct 23 14:55 05_global.qmd\n-rw-r--r-- 1 runner docker  4544 Oct 23 14:55 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Oct 23 14:55 05c_pre.qmd\n-rw-r--r-- 1 runner docker 20184 Oct 23 14:55 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25643 Oct 23 14:54 07_llvm.notebook\n-rw-r--r-- 1 runner docker 28320 Oct 23 14:55 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Oct 23 14:55 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Oct 23 14:55 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct 23 14:54 09_poly_files\n-rw-r--r-- 1 runner docker   302 Oct 23 14:55 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Oct 23 14:55 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Oct 23 14:55 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Oct 23 14:55 12_memory.html\n-rw-r--r-- 1 runner docker   316 Oct 23 14:55 12_memory.qmd\n-rw-r--r-- 1 runner docker 79398 Oct 23 14:55 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker 16077 Oct 23 14:55 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10117 Oct 23 14:55 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Oct 23 14:54 a.json\n-rw-r--r-- 1 runner docker   248 Oct 23 14:54 a.ts\ndrwxr-xr-x 2 runner docker  4096 Oct 23 14:54 df\n-rw-r--r-- 1 runner docker 10881 Oct 23 14:55 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Oct 23 14:54 errors\n-rw-r--r-- 1 runner docker  3623 Oct 23 14:54 foo.ll\n-rw-r--r-- 1 runner docker  2296 Oct 23 14:54 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Oct 23 14:54 images\n-rw-r--r-- 1 runner docker 30795 Oct 23 14:55 junk.html\n-rw-r--r-- 1 runner docker  2134 Oct 23 14:55 junk.qmd\n-rw-r--r-- 1 runner docker   905 Oct 23 14:54 junk.txt\n-rw-r--r-- 1 runner docker 51734 Oct 23 14:55 llvm.html\n-rw-r--r-- 1 runner docker 20713 Oct 23 14:55 llvm.qmd\n-rw-r--r-- 1 runner docker  7641 Oct 23 14:54 llvm.qmd.next\n-rw-r--r-- 1 runner docker 14847 Oct 23 14:55 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Oct 23 14:55 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Oct 23 14:54 papers\ndrwxr-xr-x 2 runner docker  4096 Oct 23 14:54 ra\n-rw-r--r-- 1 runner docker 39373 Oct 23 14:55 ra-checking.html\n-rw-r--r-- 1 runner docker  8226 Oct 23 14:55 ra-checking.qmd\n-rw-r--r-- 1 runner docker  8014 Oct 23 14:55 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Oct 23 14:55 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 46478 Oct 23 14:55 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Oct 23 14:55 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 62223 Oct 23 14:55 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Oct 23 14:55 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Oct 23 14:55 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Oct 23 14:55 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 77886 Oct 23 14:55 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker 41999 Oct 23 14:55 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker 63025 Oct 23 14:55 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 49639 Oct 23 14:55 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker 22316 Oct 23 14:54 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1548\n-rw-r--r-- 1 runner docker 40847 Oct 25 16:15 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Oct 25 16:15 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Oct 25 16:15 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct 25 16:14 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Oct 25 16:15 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Oct 25 16:15 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Oct 25 16:15 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Oct 25 16:15 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Oct 25 16:15 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Oct 25 16:15 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23601 Oct 25 16:15 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Oct 25 16:15 03_local.html\n-rw-r--r-- 1 runner docker 12742 Oct 25 16:15 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Oct 25 16:15 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 56836 Oct 25 16:15 04_data_flow.html\n-rw-r--r-- 1 runner docker  9438 Oct 25 16:15 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Oct 25 16:15 05_global.qmd\n-rw-r--r-- 1 runner docker  4544 Oct 25 16:15 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Oct 25 16:15 05c_pre.qmd\n-rw-r--r-- 1 runner docker 20184 Oct 25 16:15 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25643 Oct 25 16:14 07_llvm.notebook\n-rw-r--r-- 1 runner docker 28320 Oct 25 16:15 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Oct 25 16:15 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Oct 25 16:15 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Oct 25 16:14 09_poly_files\n-rw-r--r-- 1 runner docker   302 Oct 25 16:15 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Oct 25 16:15 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Oct 25 16:15 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Oct 25 16:15 12_memory.html\n-rw-r--r-- 1 runner docker   316 Oct 25 16:15 12_memory.qmd\n-rw-r--r-- 1 runner docker 79398 Oct 25 16:15 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker 16077 Oct 25 16:15 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10117 Oct 25 16:15 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Oct 25 16:14 a.json\n-rw-r--r-- 1 runner docker   248 Oct 25 16:14 a.ts\ndrwxr-xr-x 2 runner docker  4096 Oct 25 16:14 df\n-rw-r--r-- 1 runner docker 27477 Oct 25 16:15 diverg.qmd\n-rw-r--r-- 1 runner docker  4595 Oct 25 16:14 errors\n-rw-r--r-- 1 runner docker  3623 Oct 25 16:14 foo.ll\n-rw-r--r-- 1 runner docker  2296 Oct 25 16:14 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Oct 25 16:14 images\n-rw-r--r-- 1 runner docker 30795 Oct 25 16:15 junk.html\n-rw-r--r-- 1 runner docker  2134 Oct 25 16:15 junk.qmd\n-rw-r--r-- 1 runner docker   905 Oct 25 16:14 junk.txt\n-rw-r--r-- 1 runner docker 51734 Oct 25 16:15 llvm.html\n-rw-r--r-- 1 runner docker 20713 Oct 25 16:15 llvm.qmd\n-rw-r--r-- 1 runner docker  7641 Oct 25 16:14 llvm.qmd.next\n-rw-r--r-- 1 runner docker 14847 Oct 25 16:15 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Oct 25 16:15 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Oct 25 16:14 papers\ndrwxr-xr-x 2 runner docker  4096 Oct 25 16:14 ra\n-rw-r--r-- 1 runner docker 39373 Oct 25 16:15 ra-checking.html\n-rw-r--r-- 1 runner docker  8226 Oct 25 16:15 ra-checking.qmd\n-rw-r--r-- 1 runner docker  8014 Oct 25 16:15 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Oct 25 16:15 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 46478 Oct 25 16:15 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Oct 25 16:15 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 62223 Oct 25 16:15 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Oct 25 16:15 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Oct 25 16:15 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Oct 25 16:15 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 77886 Oct 25 16:15 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker 41999 Oct 25 16:15 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker 63025 Oct 25 16:15 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 49639 Oct 25 16:15 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker 22316 Oct 25 16:14 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
