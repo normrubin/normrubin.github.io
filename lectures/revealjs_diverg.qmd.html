@@ -1371,7 +1371,19 @@ y = 2;
      x = ... x ...
      if (mt) pthread_mutex_unlock(...)
     }</code></pre>
-<p>r = x; for (…) { … if (mt) { x = r; pthread_mutex_lock(…); r = x; } r = … r … if (mt) { x = r; pthread_mutex_unlock(…); r = x; } } x = r;</p>
+<p>ok to transform to</p>
+<pre><code>r = x; 
+for (...) {
+     ... 
+     if (mt) {
+         x = r; pthread_mutex_lock(...); r = x; 
+         } 
+     r = ... r ... 
+     if (mt) {
+         x = r; pthread_mutex_unlock(...); r = x; 
+     }
+} 
+x = r;</code></pre>
 </section>
 <section id="adding-multi-threading-to-user-explaining-the-intent" class="slide level2">
 <h2>adding multi-threading to user explaining the intent</h2>
