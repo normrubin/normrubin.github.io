@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="norm">
+<meta name="author" content="Aymane El Jerari">
 
-<title>How to submit assignments – EECE7398 Fall 2024</title>
+<title>Project Presentation - The MLIR Transform Dialect – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -24,24 +24,24 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" rel="next">
-<link href="../weekly.html" rel="prev">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../blogs/aymane/readme.html" rel="next">
+<link href="../../blogs/junk.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -69,37 +69,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<meta property="og:title" content="sample blog – EECE7398 Fall 2024">
+<meta property="og:title" content="Project Presentation - The MLIR Transform Dialect – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -113,7 +84,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../Class_Overview/What_to_do.html">How to submit assignments</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/mlir-transform-dialect.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/mlir-transform-dialect.html">Project Presentation - The MLIR Transform Dialect</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -128,7 +99,7 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-center sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../">EECE7398 Fall 2024</a> 
+      <a href="../../">EECE7398 Fall 2024</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -149,79 +120,79 @@ window.Quarto = {
       <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../weekly.html" class="sidebar-item-text sidebar-link">
+  <a href="../../weekly.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Weekly Schedule</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">How to submit assignments</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Blogs</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework1 - Sana</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/junk_dir/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">sample blog with an image and a graph</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/junk.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/junk.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">sample blog</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">Aymane</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/aymane/mlir-transform-dialect.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/aymane/mlir-transform-dialect.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Project Presentation - The MLIR Transform Dialect</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/aymane/readme2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/aymane/readme2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2 – Implementing DCE and LVN</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/aymane/readme3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/aymane/readme3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 3 – Implementing Liveness Dataflow Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/aymane/readme4.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/aymane/readme4.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 4 – Implementing Dominance Algorithms</span></a>
   </div>
 </li>
@@ -238,13 +209,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/matin/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/matin/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/matin/2024-09-28-HW2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/matin/2024-09-28-HW2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2: Trivial Dead Code Elimination and Local Value Numbering Passes</span></a>
   </div>
 </li>
@@ -261,25 +232,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 1 – Trying Out Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 2 – Local Optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 3 – Data Flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 4 – Dominance</span></a>
   </div>
 </li>
@@ -296,19 +267,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HW1 - Trying Out Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/oscar/2024-09-27-HW2-Kellner.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/oscar/2024-09-27-HW2-Kellner.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HW2 - Minor Local Optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/oscar/2024-10-11-HW3-Kellner.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HW3 - Data Flow Analysis</span></a>
   </div>
 </li>
@@ -325,25 +296,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1: Exploring Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2: Optimizing with DCE and LVN</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 3: Data Flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Qucheng/2024-10-11-Qucheng-HW4.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW4.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 4: Dominance</span></a>
   </div>
 </li>
@@ -360,25 +331,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/rohit/2024-09-20-Rohit-HW1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/rohit/2024-09-28-Rohit-HW2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/rohit/2024-09-28-Rohit-HW2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/rohit/2024-10-17-Rohit-HW3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/rohit/2024-10-17-Rohit-HW3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 3</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/rohit/2024-10-18-Rohit-HW4.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/rohit/2024-10-18-Rohit-HW4.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 4</span></a>
   </div>
 </li>
@@ -395,19 +366,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework2 - local optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework3 - data flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/Sana/10-18-2024-HW4-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Sana/10-18-2024-HW4-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework4 - dominance</span></a>
   </div>
 </li>
@@ -424,25 +395,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Homework 01 - Trying Out Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Homework 02 - Local Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/sharmila/2024-10-15-Sharmila-HW03.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Homework 03 - Data Flow Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Homework 04 - Implementing Dominance Utilities</span></a>
   </div>
 </li>
@@ -459,25 +430,25 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework1 - Yashaswini</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/yashaswini/09-27-2024-HW2-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/yashaswini/09-27-2024-HW2-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework2 - Yashaswini</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/yashaswini/10-11-2024-HW3-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/yashaswini/10-11-2024-HW3-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework3 - Yashaswini</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../blogs/yashaswini/10-18-2024-HW4-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/yashaswini/10-18-2024-HW4-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework4 - Yashaswini</span></a>
   </div>
 </li>
@@ -496,61 +467,61 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/1.hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/1.hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1 trying out bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/2_hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/2_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 2 local optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/3_hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/3_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 4 data flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/4_hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/4_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homework - dominance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/5_hw.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/5_hw.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 5 ssa</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 6 loop optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/dynamic.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/dynamic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homework 7 dynamic compile</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/hw0.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/hw0.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">homework 0</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/hw5_llvm.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/hw5_llvm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hw 5 llvm</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../homework/project.html" class="sidebar-item-text sidebar-link">
+  <a href="../../homework/project.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">project</span></a>
   </div>
 </li>
@@ -567,163 +538,163 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Overview</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement part 1</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Performance and Measurement part 2</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Representation of programs</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview of Bril</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/03_local.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/03_local.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Local Analysis &amp; Optimization</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">local value numbering</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Data Flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/05_global.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05_global.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">5 Global Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">loop invariant code motion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">_ partial_redundancy elimination</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Static Single Assignment</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">8 classic loop optimizations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Polyhedral Analysis</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">10 MLIR</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">11 Whole program</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Dynamic Memory Management</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Dynamic Compilers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">GPU Compilers</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/diverg.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/diverg.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">divergent flow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/junk.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/junk.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">test</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/llvm.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/llvm.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">using llvm</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/mem_consistancy.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/mem_consistancy.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">memory consistancy</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/mlir.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/mlir.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Polyhedral Compilation Opportunities in MLIR</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Testing Register allocators</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
+  <a href="../../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Register Allocation</span></a>
   </div>
 </li>
@@ -758,9 +729,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../Class_Overview/What_to_do.html">How to submit assignments</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/mlir-transform-dialect.html">Aymane</a></li><li class="breadcrumb-item"><a href="../../blogs/aymane/mlir-transform-dialect.html">Project Presentation - The MLIR Transform Dialect</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">How to submit assignments</h1>
+<h1 class="title">Project Presentation - The MLIR Transform Dialect</h1>
 </div>
 
 
@@ -770,7 +741,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>norm </p>
+             <p>Aymane El Jerari </p>
           </div>
   </div>
     
@@ -783,106 +754,47 @@ window.Quarto = {
 </header>
 
 
-<section id="mechanics-of-writing-a-blog" class="level2">
-<h2 class="anchored" data-anchor-id="mechanics-of-writing-a-blog">Mechanics of writing a blog</h2>
-<p>Assignments get submitted as blog postings. In setting up the class web site I used <a href="https://quarto.org/">quarto</a> which lets you write a blog post in markdown (no messy html required). I recommend you use it as well. quarto converts markdown files to html and revealjs (for slides)</p>
+<p>I recently explored the MLIR (Multi-Level Intermediate Representation) Transform dialect. The framework enables control over compiler transformations, at different levels of abstraction. It also utilizes the concept of a <em>schedule</em> to manage complex transformation sequences within the IR. This approach provides engineers with fine grained control over transformations enabling the optimization of code for a wide range of architectures.</p>
+<section id="what-is-the-transform-dialect" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-the-transform-dialect">What is the Transform Dialect?</h2>
+<p>The MLIR transform dialect is designed to enable precise control over compiler transformations by using the compiler IR itself. This approach allows transformations to be embedded with the IR being transformed, an approach that doesn’t require rebuilding the compiler.</p>
+<p>The main goal of the Transform dialect is to orchestrate fine-grain transformations on individual operations or sets of operations within the IR. Traditional compiler passes can be thought of as a “monolithic black box” that apply transformations to the entire program. Whereas the Transform dialect enables finer control over optimizations for a more targeted approach.</p>
 </section>
-<section id="submitting-via-pull-requests" class="level2">
-<h2 class="anchored" data-anchor-id="submitting-via-pull-requests">Submitting via pull requests</h2>
-<p>To add a blog post (which you must do for homework, discussion leading, and project reports), use a pull request.</p>
-<p>You’ll want to create a text file in the blog directory with your new post. Use a filename like YYYY-MM-DD-title.qmd, where the date is the discussion day or the project deadline and the title is up to you.</p>
-<p>Each quarto file starts with some meta data. For example the sample file has</p>
-<pre><code>---
-format:
-
-
-
-
----
-author: norm
-format:
- html: default
-title: sample blog
----
-
-
-
-
-</code></pre>
-<p>The rest of the text file is the Markdown text of your blog post.</p>
-<p>If you want to use math in your blog post, you can use latex dollar signs like <code>$\pi$</code> for <span class="math inline">\(\pi\)</span> for inline math and <code>$$ e^{i\pi} + 1 = 0 $$</code> for <span class="math display">\[ e^{i\pi} + 1 = 0 \]</span>.</p>
-<p>To include images or other resources in your post, make your post into a directory. That is, make a new directory called YYYY-MM-DD-title inside blog. Then, put your text in a file called index.qmd inside that. Put your images in the same directory and refer to them with relative paths. See the QUARTO docs on for more details.</p>
-<p>You can preview your writing with any Markdown renderer. To see what it will look like when published, install quarto and type quarto render to preview the entire site. Visual code has a really nice quarto extension that can preview pages.</p>
+<section id="why-the-transform-dialect" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-transform-dialect">Why the Transform Dialect?</h2>
+<p>In order to fully utilize the hardware capabilities, target specific compiler optimizations must be leveraged. During compilation, domain specific knowledge can be incorporated to squeeze even more performance out of the hardware. Nowadays, programmers are mostly limited to using high level compiler directives like <code>pragmas</code> to influence passes. This rigid approach lacks modularity and extensibility, meaning that low level program optimizations must be performed for each and every target platform. Additionally, the Transform dialect incurs less than 2.6% compile time overhead while providing robust and scalable features.</p>
 </section>
-<section id="homework" class="level2">
-<h2 class="anchored" data-anchor-id="homework">Homework</h2>
-<p>To reinforce the specific compiler techniques we cover in class, you will implement them on your own. In lessons, we will discuss the high-level ideas and provide pseudo-code; your task is to translate these into working code and collect empirical evidence to demonstrate their effectiveness. Completing these implementations will reveal practical challenges that are not apparent from a high-level overview.</p>
-<p>Testing your implementation is crucial. Your goal is to provide convincing evidence that your implementation performs as intended. For instance, an optimization should generally make programs faster without causing any errors. While formal proofs of these properties are likely out of scope, you will need to find alternative ways to gather evidence. Avoid relying solely on existing test cases in the Bril repository, as they are typically insufficient. instead, consider using all the benchmarks available in the repo.</p>
-<p>You may work individually or in groups of 2–3 students. Upon completing an implementation, follow these steps:</p>
-<ol type="1">
-<li><p>Consider putting all your code online in an open-source repository, such as GitHub (optional but recommended). Create a fork of the class repository if desired.</p></li>
-<li><p>Submit the assignment on Canvas by providing a text file with a URL to your open-source implementation. If you prefer not to open-source your code, you can upload the code itself.</p></li>
-<li><p>Write a brief post in the lesson’s associated GitHub Discussions thread, covering the following topics (one paragraph each is sufficient):</p>
-<ol type="a">
-<li>Summarize what you did.</li>
-<li>Explain how you tested your implementation. What test inputs did you use? Do you have any quantitative results?</li>
-<li>Describe the hardest part of the task and how you addressed this challenge.</li>
-</ol></li>
-</ol>
-<p>Ensure all implementation tasks are your own work or done with your group. Although sample implementations for many tasks are available in the GitHub repository, you are not allowed to use this code. Similarly, you may not use implementations open-sourced by past students. I recommend not looking at these implementations while working on your tasks to ensure you genuinely learn the material. However, if you absolutely need to refer to them, you are responsible for managing your own learning process.</p>
+<section id="the-end-of-moores-law" class="level2">
+<h2 class="anchored" data-anchor-id="the-end-of-moores-law">The End of Moore’s Law</h2>
+<p>For decades, computer performance was riding the transistor shrinking wave. As transistors got smaller, chips could pack more and more transistors per unit area. The slowing down of Moore’s law has left engineers looking for new ways of obtaining more performance improvements.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./mlir-transform-img/acceleration.png" class="img-fluid figure-img"></p>
+<figcaption>computing_landscape</figcaption>
+</figure>
+</div>
+<p>The end of Moore’s law paves the way for specialization and hardware acceleration. Since general purpose hardware is at a saturation point, computing systems now offload certain tasks and workloads to specialized units called accelerators. As opposed to general purpose processing units, accelerators are built with a single specific usage in mind. For example, we are experiencing firsthand the rise of SoCs that integrate all kinds of processors and different heterogeneous systems tailored for domain specific workloads.</p>
+<p>The complexity needed to manage this ever growing compute platform diversity is not trivial. However, with the help of the compiler, we can bridge the gap between high level software constructs and lower level platform specific implementations. Given the current landscape, frameworks such as LLVM and MLIR aim to consolidate, standardize and solve many of the problems caused by the ever increasing number of specialized architectures.</p>
 </section>
-<section id="paper-reading-discussion" class="level2">
-<h2 class="anchored" data-anchor-id="paper-reading-discussion">Paper Reading &amp; Discussion</h2>
-<p>Paper discussions are on GitHub Discussions.</p>
-<p>Another part of this course involves reading and discussing research papers. For each paper (see the schedule), everyone will participate in the discussion in two ways: asynchronously on GitHub Discussions threads before class, and synchronously in class. For every paper, there will be a Discussions topic; post at least one message with your thoughts on the paper before the class discussion. Your comment doesn’t need to be long—just a couple of sentences is fine. You can also respond to others’ thoughts on the thread.</p>
-<p>For some papers, you will be the discussion leader. Leaders have three extra responsibilities: monitoring and replying to the asynchronous discussion, moderating and guiding the in-class discussion, and synthesizing ideas into a blog post afterward.</p>
-<p><strong><em>Leader Responsibilities</em></strong></p>
-<p>At least a week before the discussion day:</p>
-<pre><code>1) Create a GitHub Discussions thread in the Reading category for your topic.</code></pre>
-<p>During the lead-up to the discussion day:</p>
-<pre><code>1) Monitor the GitHub Discussions thread for your topic. Answer questions and offer additional insights as needed.
-1) Collect a list of questions for the in-class discussion. You can create your own or select the best from the online discussion.</code></pre>
-<p>On the discussion day:</p>
-<p>Moderate the discussion. Provide enough background to get to the discussion questions and facilitate the conversation.</p>
-<p>Due one week after the discussion day:</p>
-<ol type="1">
-<li><p>Write a post about the paper for our course blog. The post should include:</p>
-<ol type="a">
-<li>Background information necessary to understand the paper.</li>
-<li>A detailed summary of the main contributions.</li>
-<li>Critical analysis of the merits and shortcomings of the work.</li>
-<li>Discussion of the paper’s role in history and its connections to the current computing landscape.</li>
-</ol>
-<ol type="A">
-<li>Incorporate the best ideas from the online and in-class discussions. You can present your own opinions, the class consensus, or both.</li>
-</ol></li>
-</ol>
-<p>Writing the Blog Post</p>
-<p>While summarizing the paper, avoid letting direct summary dominate your post. Keep the technical explanation to about a quarter of the length. Prioritize breadth over depth in your summary, and highlight specific contributions instead of covering the entire paper.</p>
-<p>Focus most of your writing on your own commentary: context, criticism, and discussion. Choose a title for your blog post that reflects the main point you want to make about the paper, rather than just the paper’s title.</p>
-<p>For inspiration, check out previous cs6120 blog posts. However, avoid reading posts about your paper, if they exist.</p>
-<p>Publishing</p>
-<p>Publish the post to the course GitHub repository by opening a pull request. Once your PR is open, announce it on the appropriate Discussions thread to let others know.</p>
+<section id="payload-and-schedule-approach" class="level2">
+<h2 class="anchored" data-anchor-id="payload-and-schedule-approach">Payload and Schedule Approach</h2>
+<p>The transform dialect is not the first to separate the payload (ie. program) from the schedule (ie. the transformations performed on the program), in fact frameworks such as Halide, TVM, and TACO have been using this concept before the existence of the Transform dialect. Although, they seperate the schedule from the payload, these frameworks focus on domain specific optimizations, have predefined software stacks and are not well integrated into a generic compiler unlike the Transform dialect. The goal is to provide a general purpose solution that can be deployed for various envrionments and targets.</p>
 </section>
-<section id="project-proposal" class="level2">
-<h2 class="anchored" data-anchor-id="project-proposal">project Proposal</h2>
-<p>The first deadline is the project proposal. Open a GitHub issue answering these three questions:</p>
-<p>What will you do? How will you do it? How will you empirically measure success?</p>
-<p>You should also list the GitHub usernames of everyone in the group. After you send the PR, submit its URL to the “Project Proposal” assignment on canvas.</p>
-<p>The instructor will have feedback on how to approach your project.</p>
-<p>Implementation</p>
-<p>The main phase, of course, is implementing the thing you said you would implement. I recommend you keep a “lab notebook” to log your thoughts, attempts, and frustrations—this will come in handy for the report you’ll write about the project.</p>
-<p>I strongly recommend that you develop your code as an open-source project. Use a publicly-visible version control repository on a host like GitHub, and include an open source license. When you create your repository, comment on your proposal GitHub issue with a link. (If you have a specific objection to open-sourcing your code, that’s OK—include a description of how you’ll share your code privately with me.)</p>
-<p>Evaluation</p>
-<p>A major part of your project is an empirical evaluation. To design your evaluation strategy, you will need to consider at least these things:</p>
-<p>Where will you get the input code you’ll use in your evaluation? How will you check the correctness of your implementation? If you’ve implemented an optimization, for example, “correctness” means that the transformed programs behave the same way as the original programs. How will you measure the benefit (in performance, energy, complexity, etc.) of your implementation?</p>
-<p>How will you present the data you collect from your empirical evaluation? Other questions may be relevant depending on the project you choose. Consider the SIGPLAN empirical evaluation guidelines when you design your methodology.</p>
+<section id="modularity-and-extensibility" class="level2">
+<h2 class="anchored" data-anchor-id="modularity-and-extensibility">Modularity and Extensibility</h2>
+<p>The MLIR Transform dialect is designed with modularity at its core. Users have the ability to define new transformations that can integrate seamlessly into existing workflows. One of the standout features is its extensibility. Users can inject additional operations into the dialect using mechanisms like <code>TransformDialectExtension</code>, allowing for custom transformations without altering the core dialect. Additionally, users can compose new transformations by combining existing ones or creating entirely new operations. This allows for precise control over compiler transformations and facilitates the highly iterative workflows needed for research purposes.</p>
 </section>
-<section id="project-experience-report" class="level2">
-<h2 class="anchored" data-anchor-id="project-experience-report">project Experience Report</h2>
-<p>For the main project deadline, you will write up the project’s outcomes in the form of a post on the course blog. Your writeup should answer these questions in excruciating, exhaustive detail:</p>
-<p>What was the goal? What did you do? (Include both the design and the implementation.) What were the hardest parts to get right? Were you successful? (Report rigorously on your empirical evaluation.) As with paper discussions, you can optionally include a video to go along with your blog post.</p>
-<p>To submit your report, open a pull request in the course’s GitHub repository to add your post to the blog. In your PR description, please include “closes #N” where N is the issue number for your proposal</p>
+<section id="hardware-specific-optimizations-and-search-methods" class="level2">
+<h2 class="anchored" data-anchor-id="hardware-specific-optimizations-and-search-methods">Hardware Specific Optimizations and Search Methods</h2>
+<p>In practice, the transform dialect can be used to perform a sequence of optimizations that result in efficient code generation for MLIR operations. The Transform Dialect is particularly effective in optimizing linear algebra computations such as matrix multiplication and convolution.</p>
+<p>Composing existing transformations can lead to highly efficient code tailored to specific architectures. Furthermore, the Transform dialect allows for the customization of compiler transformations to best use the characteristics of the target hardware such as the cache block size or the number of registers. This flexibility is crucial for maximizing performance across a wide range of accelerators.</p>
+<p>The separation of the payload and schedule allows for the use of search methods to explore optimization spaces effectively. This enables autotuning transformation parameters with the goal of finding the most optimal set of parameters on specific workloads and for specific targets.</p>
+</section>
+<section id="challenges-and-learning-curve" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-and-learning-curve">Challenges and Learning Curve</h2>
+<p>While the transform dialect offers powerful capabilities, it requires a solid understanding of MLIR’s infrastructure. Familiarity with existing transformation patterns and how they interact with the transform dialect is crucial for effectively leveraging its potential.</p>
+<p>For most of my time, I have treated compilers as a black box, passing in an input file and getting a binary in return. Taking a compiler course has sparked my interest even further. More recently, I have been spending time reading about LLVM and MLIR. Despite the steep learning curve, I believe these to be important and promising frameworks I need to add to my arsenal.</p>
+<p>For those interested in diving deeper, I recommend starting with MLIR’s basic tutorials before tackling the transform dialect. It’s a rewarding journey that opens up new possibilities in compiler design and optimization.</p>
 
 
 </section>
@@ -1310,13 +1222,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../weekly.html" class="pagination-link" aria-label="Weekly Schedule">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Weekly Schedule</span>
+      <a href="../../blogs/junk.html" class="pagination-link" aria-label="sample blog">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">sample blog</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html" class="pagination-link" aria-label="Homework1 - Sana">
-        <span class="nav-page-text">Homework1 - Sana</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/aymane/readme.html" class="pagination-link" aria-label="Homework 1 -- Trying Out Bril">
+        <span class="nav-page-text">Homework 1 – Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
