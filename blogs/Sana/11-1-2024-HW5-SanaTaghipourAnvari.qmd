@@ -1,0 +1,105 @@
+ ---
+author: Sana Taghipour Anvari
+format:
+  html: default
+title: Homework5 - LLVM
+
+---
+
+link for the implementation: [llvm-pass-allocsize](https://github.com/sanatgp/llvm-pass-allocsize)
+
+## Explanation of the code 
+For this homework, I tried to implement `AllocSizePass` which is an LLVM pass that identifies alloca instructions within a function (representing stack allocations) and inserts a runtime printf statement after each allocation. This printf call outputs the size of each allocation in bytes, allowing users to observe the memory usage of each stack allocation during program execution. The pass traverses each function in the LLVM module, calculating the size of each allocation based on the data layout, then injects instrumentation code to print these sizes.
+
+
+## How It Is Tested
+The pass was tested by:
+
+- Compiling a C Program: A C program with multiple allocations was compiled with the pass plugin enabled, which allowed the pass to analyze and instrument the code.
+- Runtime Execution: After compilation, the generated binary was executed. The output was inspected for runtime printf statements that reported the size of each allocation. This confirmed that the pass inserted the necessary instrumentation and altered the program’s runtime behavior as expected.
+The expected output included Allocation size: X bytes statements printed for each allocation, verifying that the pass correctly identified and instrumented allocations.
+
+```c
+#include <stdio.h>
+
+int calculate(int a, int b) {
+    int result;
+    if (a > b) {
+        result = a - b;
+    } else {
+        result = a + b;
+    }
+    return result;
+}
+
+int main() {
+    int x[10];
+    int sum = 0;
+
+    for (int i = 0; i < 10; i++) {
+        x[i] = i * 2;
+        sum += x[i];
+    }
+
+    int result1 = calculate(sum, 15);
+    int result2 = calculate(sum, 25);
+
+    printf("Result 1: %d\n", result1);
+    printf("Result 2: %d\n", result2);
+
+    return 0;
+}
+
+```
+
+Output:
+
+```c++
+clang -fpass-plugin=build/alloc_size_pass.dylib test.c -o test_alloc_out 
+Function: calculate
+  Basic Block: %2
+    Allocation of type i32 with size: 4 bytes
+    Allocation of type i32 with size: 4 bytes
+    Allocation of type i32 with size: 4 bytes
+  Basic Block: %9
+  Basic Block: %13
+  Basic Block: %17
+Function: main
+  Basic Block: %0
+    Allocation of type i32 with size: 4 bytes
+    Allocation of type [10 x i32] with size: 40 bytes
+    Allocation of type i32 with size: 4 bytes
+    Allocation of type i32 with size: 4 bytes
+    Allocation of type i32 with size: 4 bytes
+    Allocation of type i32 with size: 4 bytes
+  Basic Block: %7
+  Basic Block: %10
+  Basic Block: %22
+  Basic Block: %25
+Function: printf
+```
+
+```c++
+./test_alloc_out 
+Allocation size: 4 bytes
+Allocation size: 40 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Allocation size: 4 bytes
+Result 1: 75
+Result 2: 65
+```
+
+## What Was Challenging During Implementation
+
+Adding a `printf` call required defining `printf` in the LLVM IR, creating or referencing a global format string, and ensuring correct argument types. Missteps in the function type, format string handling, or argument casting could lead to compilation or runtime errors.
+Solution: I used `getOrInsertFunction` to declare `printf`, which ensured that the function was only added if it didn’t already exist. To handle arguments, I used `IRBuilder` for consistent type casting and format string handling, carefully matching printf’s arguments in LLVM IR.
+
+This project specifically targets `alloca` instructions, if we want the pass to also detect other types of allocations, we should probably identify calls to other available allocation instructions as well for this to become a comprehensive project.
