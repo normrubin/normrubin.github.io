@@ -1,0 +1,111 @@
+---
+title: "Homework 4"
+author: Rohit Gurusamy Anandakumar
+format: html
+---
+
+## LLVM: Division Check Pass Implementation
+
+### Explanation of the code
+For this homework, I implemented `DivCheckPass` which is an LLVM pass that identifies division instructions within functions. When a division instruction is found, the pass prints information about:
+
+- The function containing the division
+- The basic block containing the division
+- The division instruction itself
+
+The pass is implemented as a Function Pass, meaning it operates on one function at a time. It uses LLVM's instruction visitor pattern to examine each instruction and uses `dyn_cast` to identify binary operations that are specifically division operations.
+
+### How It Is Tested
+The pass was tested by:
+
+- Compiling a C++ Program: A test program (test.cpp) containing division operations was compiled with the pass plugin enabled.
+- Pass Output Analysis: The compilation output was examined to verify that the pass correctly identified and reported division instructions.
+- Multiple Test Cases: The program included both safe divisions and potential divide-by-zero scenarios.
+
+#### Test program (test.cpp):
+
+```{cpp}
+#include <stdio.h>
+int divide(int a, int b) {
+    return a / b;
+}
+int main() {
+    int x = 10;
+    int y = 0;
+    return divide(x, y);
+}
+```
+
+
+#### Test with these commands
+##### 1. Show LLVM IR with pass instrumentation
+clang -Xclang -load -Xclang ./DivCheckPass.so -S -emit-llvm ../test.cpp -o - 
+
+```{out}
+Analyzing Function: _Z6divideii
+  Basic Block: %2
+    Found division instruction:   %7 = sdiv i32 %5, %6
+Analyzing Function: main
+  Basic Block: %0
+; ModuleID = '../test.cpp'
+source_filename = "../test.cpp"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @_Z6divideii(i32 %0, i32 %1) #0 {
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  store i32 %0, i32* %3, align 4
+  store i32 %1, i32* %4, align 4
+  %5 = load i32, i32* %3, align 4
+  %6 = load i32, i32* %4, align 4
+  %7 = sdiv i32 %5, %6
+  ret i32 %7
+}
+
+; Function Attrs: noinline norecurse nounwind optnone uwtable
+define dso_local i32 @main() #1 {
+  %1 = alloca i32, align 4
+  %2 = alloca i32, align 4
+  %3 = alloca i32, align 4
+  store i32 0, i32* %1, align 4
+  store i32 10, i32* %2, align 4
+  store i32 0, i32* %3, align 4
+  %4 = load i32, i32* %2, align 4
+  %5 = load i32, i32* %3, align 4
+  %6 = call i32 @_Z6divideii(i32 %4, i32 %5)
+  ret i32 %6
+}
+
+attributes #0 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { noinline norecurse nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+```
+
+
+##### 2. Compile and run:
+clang -Xclang -load -Xclang ./DivCheckPass.so ../test.cpp -o test
+./test
+
+```{output}
+Analyzing Function: _Z6divideii
+  Basic Block: %2
+    Found division instruction:   %7 = sdiv i32 %5, %6
+Analyzing Function: main
+  Basic Block: %0
+```
+
+
+#### The output shows that:
+
+- The pass successfully identified the division operation in the divide function
+- It correctly located the basic block containing the division
+- It properly printed the LLVM IR representation of the division instruction
+
+
+### Challenges and Future Improvements
+
+- Implementing the pass presented several challenges, including understanding LLVM's Intermediate Representation (IR) and the translation of high-level C++ constructs into LLVM IR. 
+- Integrating the pass involved setting up the CMake build system, registering the pass correctly, and managing the pass loading mechanisms. Navigating LLVM's type system to identify division operations and using dyn_cast for type safety also proved challenging. Currently, the implementation only detects division operations. 
+- Future improvements could include inserting runtime checks for divide-by-zero, adding instrumentation for division operation statistics, handling floating-point divisions, and generating warnings for potential divide-by-zero scenarios.
+
