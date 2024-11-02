@@ -27,7 +27,7 @@ title: Homework4 - Yashaswini
 
 - The dominance frontier of a node is the set of nodes where the node dominates one of their predecessors but does not strictly dominate the node itself.
 - This is computed using the reverse of the CFG and the dominator sets.
-'''
+```
 import json
 from collections import defaultdict
 
@@ -148,16 +148,16 @@ def main():
 # Run the main function
 if __name__ == "__main__":
     main()
-'''
+```
 ## Testing:
 
 I implemented 8 test cases each targeting a different type of CFG.  I then manually checked the against the outputs produced by the code.
-I had to make some changes when the code was unable to handle empty sets but after the output seems to be work sorrectsly
+I had to make some changes when the code was unable to handle empty sets but after the output seems to be work correctly
 
 ## Challanges
 
-The hardest part of this task was understanding ensuring that the algortimm i used could handle various datat flow types.  
-Once i was able to get the code to word for both independent banches and nested branches it became much easier.
+The hardest part of this task was understanding ensuring that the algorithm i used could handle various data flow types.  
+Once I was able to get the code to work for both independent branches and nested branches it became much easier.
 
 ## Test Cases and Output
 
@@ -165,7 +165,7 @@ Here are the test cases used and the output from the function after running all 
 
 #Simple Linear Sequence
 A program with a single linear sequence of instructions. No branches or loops.
-'''
+```
 {
   "functions": [
     {
@@ -181,11 +181,11 @@ A program with a single linear sequence of instructions. No branches or loops.
   ]
 }
 
-'''
+```
 
 #Simple Branch
 - A conditional branch leading to two different paths and joining back together.
-'''
+```
 {
   "functions": [
     {
@@ -207,10 +207,10 @@ A program with a single linear sequence of instructions. No branches or loops.
   ]
 }
 
-'''
+```
 #Loop with Back Edge
 -A basic loop where a variable is incremented until a condition is met.
-'''
+```
 {
   "functions": [
     {
@@ -229,11 +229,11 @@ A program with a single linear sequence of instructions. No branches or loops.
     }
   ]
 }
-'''
+```
 
 #Nested Branches
 -Two nested conditional branches.
-'''
+```
 {
   "functions": [
     {
@@ -254,10 +254,10 @@ A program with a single linear sequence of instructions. No branches or loops.
     }
   ]
 }
-'''
+```
 #Multiple Independent Branches
 - A program with two independent branches and a join.
-'''
+```
 {
   "functions": [
     {
@@ -279,10 +279,10 @@ A program with a single linear sequence of instructions. No branches or loops.
     }
   ]
 }
-'''
+```
 #Simple Two-Way Loop
 - A loop with a branch that exits early based on a condition.
-'''
+```
 {
   "functions": [
     {
@@ -302,10 +302,10 @@ A program with a single linear sequence of instructions. No branches or loops.
     }
   ]
 }
-'''
+```
 # Loop with Nested Branch
 - A loop that includes a nested branch with its own exit condition.
-'''
+```
 {
   "functions": [
     {
@@ -330,10 +330,10 @@ A program with a single linear sequence of instructions. No branches or loops.
     }
   ]
 }
-'''
+```
 #Multiple Loops
 - A program with two independent loops.
-'''
+```
 {
   "functions": [
     {
@@ -361,11 +361,11 @@ A program with a single linear sequence of instructions. No branches or loops.
   ]
 }
 
-'''
+```
 
 # Output
 
-'''
+```
 Testing function: linear
 Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}}
 Dominance Tree: defaultdict(<class 'list'>, {0: [1], 1: [2], 2: [3]})
@@ -398,4 +398,4 @@ Testing function: multiple_loops
 Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 8}, 9: {0, 1, 2, 3, 4, 8, 9}, 10: {0, 1, 2, 3, 4, 8, 9, 10}, 11: {0, 1, 2, 3, 4, 8, 9, 10, 11}, 12: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12}, 13: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13}, 14: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14}, 15: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14, 15}}
 Dominance Tree: defaultdict(<class 'list'>, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5, 8], 5: [6], 6: [7], 8: [9], 9: [10], 10: [11], 11: [12], 12: [13], 13: [14], 14: [15]})
 Dominance Frontier: defaultdict(<class 'set'>, {7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}, 15: {10}, 14: {10}, 13: {10}, 12: {10}, 11: {10}})
-'''
+```
