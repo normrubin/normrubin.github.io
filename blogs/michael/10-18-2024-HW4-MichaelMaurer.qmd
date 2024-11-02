@@ -1,0 +1,339 @@
+---
+author: Michael Maurer
+execute:
+  enabled: false
+format:
+  html: default
+title: EECE7309 Homework 4 -- Dominance
+
+---
+
+## Introduction
+
+This assignment asks us to develop code to find the dominators for a basic block, construct the dominance tree, and compute the dominance frontier for each basic block in the program. 
+
+## Dominance
+
+A basic block `A` dominates another basic block `B` when there is no path in the program which reaches `B` and does not pass through `A`. Understanding the dominance relationship between basic blocks can be quite useful for program analysis, and so it is useful to have this tool with which we may determine the dominance relationships in a given program. Additionally, it's useful to know where a basic block's dominance "ends" for program analysis techniques. Dominance relationships can further be represented in a graph, which we call a dominance tree. The dominance tree does not always indicate the dominance frontier, particularly in the case of loops. Here, we will show these graphs as Mermaid diagrams. 
+
+## Implementation
+The implementation for this program is a set of short python scripts, which can be found using the link at the bottom of this page. 
+To do this effectively, we defined a class for a control flow graph, and gave it four important methods.
+The first identifies the dominators of a block (`compute_dominators()`). 
+The dominators of a block are the intersection of all blocks which dominate the predecessors of said block, as well as the block itself.
+To do this algorithmically, we must iterate at least once through all nodes in the graph. We may iterate more times particularly if there are loops in the control flow, and we can iterate util we reach convergence at an answer.
+The second identifies the strict dominators of a block (`compute_strict_dominators()`). Strict dominance is simply dominance but without the property of reflexivity. 
+We compute the strict dominators of a block by taking its dominators and removing itself.
+The third identifies the immediate dominators of a block. Immediate dominators are the direct parents of blocks in the dominator tree, and indicate when a block strictly dominates another block, but does not dominate any other node which strictly dominates this block.
+The fourth is a method for computing the dominance frontier of a block.
+This is done by taking a block, and first investigating whether its successors are dominated by this block. If they are not, then they are included in the dominance frontier. If they are, then we need to investigate the successors of said block. 
+We continue this until we've investigated all blocks.
+
+## Challenges Faced
+One challenge I faced was simply in understanding how to efficiently compute the dominators of a basic block. It is fairly clear when considering the physical representation of a graph what the dominators of a node are, however it took me a moment to determine it using mathematical representations of graphs. 
+Another challenge I faced was when computing the dominance frontiers, I at first implemented an algorithm which did not properly allow nodes to be their own dominance frontiers in certain scenarios. However, this proved to be a relatively easy fix. 
+
+## Testing
+I tested my program on five different program inputs, generated in part courtesy of large language models. The programs which I used as test cases have varying types of control flow, and appear to give good coverage of possible program inputs. 
+
+The first, and most basic code I tested was a program containing a simple if statement.
+```{bril}
+@main {
+  x: int = const 5;
+  zero: int = const 0;
+  cond: bool = gt x zero;
+  br cond .true .continue;
+.true:
+  one: int = const 1;
+  x: int = add x one;
+.continue:
+  one: int = const 1;
+  x: int = sub x one;
+  ret x;
+}
+
+```
+
+Which has the following CFG:
+```{mermaid}
+graph TD
+    true --> continue
+    .start --> continue
+    .start --> true
+```
+
+Here, we expect that .start strictly dominates both true and continue, and neither true nor continue strictly dominate any nodes. Further, the dominance frontier for all nodes should be empty.
+
+This generated the following output:
+```
+Nodes and their dominators:
+{'true': {'.start', 'true'}, 'continue': {'continue', '.start'}, '.start': {'.start'}}
+
+Nodes and their strict dominators:
+{'true': {'.start'}, 'continue': {'.start'}, '.start': set()}
+
+Nodes and their immediate dominators:
+{'true': '.start', 'continue': '.start', '.start': None}
+
+Nodes and their dominance frontiers:
+{'true': {'continue'}, 'continue': set(), '.start': set()}
+```
+
+And the following dominance tree:
+```{mermaid}
+graph TD
+    .start --> true
+    .start --> continue
+```
+
+These results are as expected. One note, is in the printed results from this program, an empty set (`set()`) and `None` are used interchangably.
+
+Next, I examined a program with control flow similar to a switch statement, shown below:
+
+```{bril}
+@main {
+  x: int = const 2;
+  one: int = const 1;
+  two: int = const 2;
+  cond1: bool = eq x one;
+  br cond1 .case1 .check_case2;
+.check_case2:
+  cond2: bool = eq x two;
+  br cond2 .case2 .default;
+.case1:
+  ret one;
+.case2:
+  ret two;
+.default:
+  zero: int = const 0;
+  ret zero;
+}
+```
+
+With the following CFG:
+
+```{mermaid}
+graph TD
+    check_case2 --> default
+    check_case2 --> case2
+    .start --> case1
+    .start --> check_case2
+```
+
+What's interesting here is we expect the dominance graph to look the same as the CFG, because there is no re-connection of branches. Using this as input, we get the following results:
+
+```
+Nodes and their dominators:
+{'case1': {'case1', '.start'}, 'check_case2': {'.start', 'check_case2'}, '.start': {'.start'}, 'case2': {'case2', '.start', 'check_case2'}, 'default': {'default', '.start', 'check_case2'}}
+
+Nodes and their strict dominators:
+{'case1': {'.start'}, 'check_case2': {'.start'}, '.start': set(), 'case2': {'.start', 'check_case2'}, 'default': {'.start', 'check_case2'}}
+
+Nodes and their immediate dominators:
+{'case1': '.start', 'check_case2': '.start', '.start': None, 'case2': 'check_case2', 'default': 'check_case2'}
+
+Nodes and their dominance frontiers:
+{'case1': set(), 'check_case2': set(), '.start': set(), 'case2': set(), 'default': set()}
+```
+
+With the dominance graph:
+```{mermaid}
+graph TD
+    .start --> case1
+    .start --> check_case2
+    check_case2 --> case2
+    check_case2 --> default
+```
+As we can see, this graph is the same as the CFG (though mirrored on the vertical axis in this case).
+
+
+The next program I examined was that of a while loop:
+
+```{bril}
+@main {
+  x: int = const 0;
+.loop:
+  ten: int = const 10;
+  cond: bool = lt x ten;
+  br cond .body .exit;
+.body:
+  one: int = const 1;
+  x: int = add x one;
+  jmp .loop;
+.exit:
+  ret x;
+}
+```
+
+Which has the CFG:
+```{mermaid}
+graph TD
+    .start --> loop
+    loop --> exit
+    loop --> body
+    body --> loop
+```
+
+Here, we expect that .start dominates all nodes, loop dominates all nodes but .start, and exit and body do not strictly dominate any nodes. Further, the dominance frontier for .start and exit should be no nodes, however loop and body should both have a dominance frontier of loop. This is due to the loop structure of this function. Analyizing this program, we get the following results:
+
+```
+Nodes and their dominators:
+{'.start': {'.start'}, 'loop': {'.start', 'loop'}, 'body': {'.start', 'body', 'loop'}, 'exit': {'.start', 'exit', 'loop'}}
+
+Nodes and their strict dominators:
+{'.start': set(), 'loop': {'.start'}, 'body': {'.start', 'loop'}, 'exit': {'.start', 'loop'}}
+
+Nodes and their immediate dominators:
+{'.start': None, 'loop': '.start', 'body': 'loop', 'exit': 'loop'}
+
+Nodes and their dominance frontiers:
+{'.start': set(), 'loop': {'loop'}, 'body': {'loop'}, 'exit': set()}
+```
+
+```{mermaid}
+graph TD
+    .start --> loop
+    loop --> body
+    loop --> exit
+```
+
+These results align with what we expect. 
+
+Now for a more complex looping program, we investigate a program with a loop which contains a branch internally, seen below:
+
+```{bril}
+@main {
+  x: int = const 0;
+.loop:
+  ten: int = const 10;
+  cond: bool = lt x ten;
+  br cond .body .exit;
+.body:
+  two: int = const 2;
+  mod: int = mod x two;
+  zero: int = const 0;
+  cond2: bool = eq mod zero;
+  br cond2 .even .odd;
+.even:
+  two: int = const 2;
+  x: int = add x two;
+  jmp .merge;
+.odd:
+  one: int = const 1;
+  x: int = add x one;
+  jmp .merge;
+.merge:
+  jmp .loop;
+.exit:
+  ret x;
+}
+```
+
+```{mermaid}
+graph TD
+    .start --> loop
+    loop --> body
+    loop --> exit
+    body --> odd
+    body --> even
+    even --> merge
+    odd --> merge
+    merge --> loop
+```
+
+Here we expect that start dominates all directly connected successors, as do loop and body. Even, odd, and merge  should strictly dominate no nodes, and should all have the immediate dominator of body. The dominance frontier of start and exit should both be empty, whereas body, loop, and merge should have a dominance frontier of only loop. Even and odd should contain merge as their dominance frontier.
+
+We generate the following results, which align with our expectations:
+
+```
+Nodes and their dominators:
+{'.start': {'.start'}, 'loop': {'.start', 'loop'}, 'body': {'.start', 'loop', 'body'}, 'exit': {'exit', '.start', 'loop'}, 'even': {'even', '.start', 'loop', 'body'}, 'odd': {'odd', '.start', 'loop', 'body'}, 'merge': {'merge', '.start', 'loop', 'body'}}
+
+Nodes and their strict dominators:
+{'.start': set(), 'loop': {'.start'}, 'body': {'.start', 'loop'}, 'exit': {'.start', 'loop'}, 'even': {'.start', 'loop', 'body'}, 'odd': {'.start', 'loop', 'body'}, 'merge': {'.start', 'loop', 'body'}}
+
+Nodes and their immediate dominators:
+{'.start': None, 'loop': '.start', 'body': 'loop', 'exit': 'loop', 'even': 'body', 'odd': 'body', 'merge': 'body'}
+
+Nodes and their dominance frontiers:
+{'.start': set(), 'loop': {'loop'}, 'body': {'loop'}, 'exit': set(), 'even': {'merge'}, 'odd': {'merge'}, 'merge': {'loop'}}
+```
+
+```{mermaid}
+graph TD
+    .start --> loop
+    loop --> body
+    loop --> exit
+    body --> even
+    body --> odd
+    body --> merge
+```
+
+Now, finally, we investigate a program which contains a nested loop:
+
+```{bril}
+@main {
+  x: int = const 0;
+  y: int = const 0;
+.outer_loop:
+  ten: int = const 10;
+  cond_outer: bool = lt x ten;
+  br cond_outer .inner_loop .exit;
+.inner_loop:
+  five: int = const 5;
+  cond_inner: bool = lt y five;
+  br cond_inner .inner_body .increment_outer;
+.inner_body:
+  one: int = const 1;
+  y: int = add y one;
+  jmp .inner_loop;
+.increment_outer:
+  one: int = const 1;
+  x: int = add x one;
+  y: int = const 0;
+  jmp .outer_loop;
+.exit:
+  ret x;
+}
+```
+
+```{mermaid}
+graph TD
+    .start --> outer_loop
+    outer_loop --> inner_loop
+    outer_loop --> exit
+    inner_loop --> inner_body
+    inner_loop --> increment_outer
+    inner_body --> inner_loop
+    increment_outer --> outer_loop
+```
+
+Here, we expect that start and outer_loop strictly dominate all successor nodes, and the successors of those nodes. Exit should only dominate itself, as should inner_body and increment_outer. inner_loop should strictly dominate inner_body and increment_outer. .start and exit should have an empty dominance frontier. inner_loop, increment_outer, and outer_loop should contain outer_loop in their dominance frontiers. inner_body should have inner_loop as its dominance frontier. The results of our program are shown below:
+
+```
+Nodes and their dominators:
+{'.start': {'.start'}, 'outer_loop': {'.start', 'outer_loop'}, 'inner_loop': {'inner_loop', '.start', 'outer_loop'}, 'exit': {'.start', 'exit', 'outer_loop'}, 'inner_body': {'inner_body', 'inner_loop', '.start', 'outer_loop'}, 'increment_outer': {'inner_loop', '.start', 'increment_outer', 'outer_loop'}}
+
+Nodes and their strict dominators:
+{'.start': set(), 'outer_loop': {'.start'}, 'inner_loop': {'.start', 'outer_loop'}, 'exit': {'.start', 'outer_loop'}, 'inner_body': {'inner_loop', '.start', 'outer_loop'}, 'increment_outer': {'inner_loop', '.start', 'outer_loop'}}
+
+Nodes and their immediate dominators:
+{'.start': None, 'outer_loop': '.start', 'inner_loop': 'outer_loop', 'exit': 'outer_loop', 'inner_body': 'inner_loop', 'increment_outer': 'inner_loop'}
+
+Nodes and their dominance frontiers:
+{'.start': set(), 'outer_loop': {'outer_loop'}, 'inner_loop': {'inner_loop', 'outer_loop'}, 'exit': set(), 'inner_body': {'inner_loop'}, 'increment_outer': {'outer_loop'}}
+```
+
+```{mermaid}
+graph TD
+    .start --> outer_loop
+    outer_loop --> inner_loop
+    outer_loop --> exit
+    inner_loop --> inner_body
+    inner_loop --> increment_outer
+```
+
+
+## Code
+
+The code used to generate the above results can be found [here](https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw4). Some of the test cases were initially generated by ChatGPT, but were modified to create better test cases (and for correctness).

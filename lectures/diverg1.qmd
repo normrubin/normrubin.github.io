@@ -1,0 +1,168 @@
+---
+execute:
+  echo: true
+format:
+  html: default
+  revealjs:
+    chalkboard: true
+    code-fold: true
+    code-line-numbers: true
+    echo: true
+    output-file: revealjs_diverg1.qmd
+    scrollable: true
+    slideNumber: c/t
+sidebar: false
+title: divergent flow PART TWO
+
+---
+
+## continuing on branch divergence 
+
+At a branch- we turn off some threads, when do we go to the other threads, when do we reconverge?
+
+Reconverge at the post-dominator of the branch. Closest point that must be reached by all paths from the branch.
+
+Some numbers from Fung micro 2007
+
+1. reconverge at post dominator vs never reconverge  93% speedup
+1. reconverge dynamically at best place 140% speedup
+1. estimate 5% chip area for simt-stack
+
+## latency hiding 
+
+Execute lots of warps, cache hit rates are low, do not stall the pipeline on a miss.
+
+When a load misses, remove warp  from an active list, in the next cycle run another warp  from the active list.   
+
+To make the switch fast, and hide the latency,  start each warp with all the resources it needs, (registers/shared mem etc) switching a warp, is just changed the pointers to the active resources.  
+ 
+
+## stack reconvergence an example
+
+::: {.columns}
+
+::: {.column}
+
+```{C}
+__managed__ int *a, *b, *c;
+
+__global__ void kern() {
+  int t = threadIdx.x;
+
+
+
+  if (t < 5) {
+
+
+    a[t] = 1;
+    b[t] = 2;
+    c[t] = 3;
+
+
+  } else {
+    a[t + 6] = 5;
+    b[t + 6] = 7;
+    c[t + 6] = 9;
+  }
+  a[6] = 99;
+}
+```
+
+
+:::
+
+::: {.column}
+
+<div class="fragment">
+```{C}
+
+
+  SSY `(.L_x_0)
+
+
+    @!P0 BRA `(.L_x_1) ToTarget 
+    // fallthrough
+
+    SYNC  <  finish one side-
+  
+    .L_x_1:   < branch target 
+  
+    SYNC   < finish one side 
+
+
+  .L_x_0: <  post dominator 
+  
+
+```
+</div>
+:::
+
+::: 
+
+
+## stack control 
+
+
+
+When a kernel is launched, a stack is allocated for each corresponding warp. 
+
+stack entry: 
+
+1. a 32-bit mask is stored
+1. the address of the next instruction to execute (next program counter or npc) and
+1. address of the instruction at which the threads must wait for reconvergence (reconvergence program counter or rpc). 
+
+The next pc to execute is the address on the stack, as each instruction executes this address advances 
+
+
+Each stack is initialized with an entry composed of: 
+
+a mask in which all the threads in the warp are active, 
+the start address of the program as npc and the last address in memory as rpc (note that it does not need to be a valid instruction address). 
+
+
+
+## ssy instruction 
+
+
+The SSY  instruction prepare the stack for a possible divergence
+
+adds two entries- what to do after the if-then-else, what to do on a branch
+
+
+When SSY @addr  is executed, the top entry of the stack is popped. A new entry is pushed to handle the execution after reconvergence: 
+
+The npc is the reconvergence address (@addr), and the rpc and the mask are copied from the popped entry. 
+
+
+A second new entry is then pushed to handle the potentially diverging portion of code: the npc is the actual next instruction (the npc of the popped entry + 8, since instructions are encoded in 64 bits), the rpc is the reconvergence address (@addr) and the mask is the same as in the popped entry.
+
+The top entry is used to let all active threads execute the next instruction. Note that these instructions do not create divergence but instead prepare the stack for a possible upcoming divergence, which is why the mask remains unchanged at this point.
+
+
+
+[reference](https://ut3-toulouseinp.hal.science/hal-03684680/document)
+
+
+## Actual Divergence
+
+Actual divergence happens when a branch (BRA @addr) instruction is executed conditionally by only a subset of the threads of a warp. When this happens, the top entry of the corresponding stack is popped. Two new entries are then pushed:
+
+1. The first pushed entry concerns the threads which do not take the branch:
+   - The rpc is the same as in the popped entry.
+   - The npc corresponds to the next instruction in the code (i.e., the current npc + 8).
+   - The mask activates only the threads that do not take the branch (the ones for which the condition is false).
+
+2. The second entry has the target address of the branch as npc and the same rpc as the popped entry:
+   - Its mask activates only the threads that take the branch
+    (the ones for which the condition is true).
+
+As a consequence, the GPU first executes the threads that take the branch until they reach a reconvergence instruction added by the compiler: SYNC or BRK (depending on whether an SSY or a PBK was executed before).
+
+## sync
+
+The reconvergence instruction sync  pops the top entry from the stack. 
+
+The GPU then resumes execution with the group of threads active in the mask of the new entry at the top of the stack: the threads that do not take the branch. When they reach a SYNC instruction, their corresponding entry is popped from the stack: the reconvergence is done and the execution flow resumes at the reconvergence address (which is the npc of the entry at the top of the stack at this point).
+
+
