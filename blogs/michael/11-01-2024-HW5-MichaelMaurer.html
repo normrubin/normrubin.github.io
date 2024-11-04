@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Qucheng Jiang">
+<meta name="author" content="Michael Maurer">
 
-<title>Homework 1: Exploring Bril – EECE7398 Fall 2024</title>
+<title>EECE7309 Homework 5 – LLVM – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" rel="next">
-<link href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" rel="prev">
+<link href="../../blogs/oscar/2024-09-20-HW1.html" rel="next">
+<link href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1: Exploring Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="EECE7309 Homework 5 – LLVM – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html">EECE7309 Homework 5 – LLVM</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -229,13 +229,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Michael</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
@@ -262,7 +262,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">EECE7309 Homework 5 – LLVM</span></a>
   </div>
 </li>
@@ -299,16 +299,16 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Qucheng</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1: Exploring Bril</span></a>
   </div>
 </li>
@@ -777,9 +777,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html">EECE7309 Homework 5 – LLVM</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1: Exploring Bril</h1>
+<h1 class="title">EECE7309 Homework 5 – LLVM</h1>
 </div>
 
 
@@ -789,7 +789,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Qucheng Jiang </p>
+             <p>Michael Maurer </p>
           </div>
   </div>
     
@@ -804,22 +804,540 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.</p>
+<p>This assignment prompts us to explore LLVM, and to write a basic pass which either analyzes or modifies some input source code.</p>
 </section>
-<section id="detail-design" class="level2">
-<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
-<p>The homework was divided into two main parts. I’ll walk through the details of my implementation, challenges faced, and the testing process.</p>
-<ul>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part1"><strong>Part 1</strong></a>: Creating and Running a New Benchmark</li>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part2"><strong>Part 2</strong></a>: Implementing a Bril Program Stub-Analyzer</li>
-</ul>
+<section id="llvm" class="level2">
+<h2 class="anchored" data-anchor-id="llvm">LLVM</h2>
+<p>We are interested in hacking the LLVM compiler in this assignment, specificially by writing a pass. LLVM gives interested developers a straightforward interface by which to do this, namely by building a shared library object which users can prompt clang/LLVM to dynamically link against. One of the reasons LLVM has become so popular is because of this ability, as well as being used by the largest company in the world.</p>
 </section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>This assignment provided a comprehensive introduction to Bril and its tooling ecosystem. By creating benchmarks and developing a custom analyzer, I gained insights into compiler design and intermediate representations.</p>
-<p><strong>Hardest Part</strong>: The most challenging aspect was managing dependencies and environment setup for the Bril toolchain. Careful attention to the <code>makefile</code> and troubleshooting through GitHub Discussions helped overcome these issues.</p>
-<p><strong>Testing and Results</strong>: I validated my benchmarks and analyzer using various Bril programs. The tools successfully transformed and analyzed the input programs, demonstrating the utility of Bril in simple code analysis and transformation tasks.</p>
-<p>This experience has equipped me with practical skills in working with compiler tools and representations, paving the way for more complex analyses in future assignments.</p>
+<section id="design" class="level2">
+<h2 class="anchored" data-anchor-id="design">Design</h2>
+<p>Here, I developed a llvm pass which identifies all floating-point arithmetic operations in the llvm-IR. It simply prints these out to stdout. This is not a complex pass by any means, but it does require understanding how to use the LLVM libraries to develop a pass.</p>
+</section>
+<section id="challenges-faced" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-faced">Challenges Faced</h2>
+<p>One challenge I faced was when attempting to implement constant folding. I wrote up the appropriate llvm library to perform constant folding, but was not seeing any code modifications no matter what input I provided. Shortly after, I learned that Clang does <a href="https://stackoverflow.com/questions/54300860/how-to-turn-off-the-constant-folding-optimization-in-llvm">constant folding automatically</a> in the frontend, and this feature cannot be turned off.</p>
+<p>A second challenge I faced was when performing the extension of constant folding, which was to put together a constant propagation optimizer. The problem here, unfortunately, I believe lies between chair and keyboard, as I was having issues which I believe are related to my pointer usage. Admittedly, I think I could have finished this (and still may in the future), but ran out of steam to get it done by this assignment deadline.</p>
+</section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">Testing</h2>
+<p>I tested my program on five different programatic inputs, all which contain a handful of floating point operations. These programs included one addition heavy program, one which had subtraction and division, one which had many multiplications, and two which had floating point arithmetic but also more complex control flow. These programs were largely created by ChatGPT and edited by myself for usefulness and correctness.</p>
+<p>Additionally, I generated expected test results by writing a basic python text parsing tool, which isolated all floating point arithmetic instructions from the program’s emmitted LLVM. This digest was then directed into <code>.out</code> files, which could be used with <code>turnt</code>. This allowed for easy automated testing, comparing the results delivered by the compiler pass to those delivered by the python script (which is easier to confirm by hand).</p>
+<p>The test results are shown in the Appendix rather than here, as the program itself is fairly trivial and results are as well. The code can be further verified using the link in the next section.</p>
+</section>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<p>The code used to generate the above results, as well as the test cases and tooling, can be found <a href="https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw5-llvm">here</a>.</p>
+</section>
+<section id="appendix-test-results" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-test-results">Appendix: Test Results</h2>
+<p>Below, we will review the test cases and expected results.</p>
+<p>First, let’s look at a simple program which does a floating point addition and a floating point multiplication.</p>
+<p><code>addition.c</code></p>
+<pre class="{c}"><code>#include &lt;stdio.h&gt;
+
+int main() {
+    float a = 3.5, b = 2.5, c;
+    c = a + b;
+    c = c * 1.5;
+    printf("Result: %f\n", c);
+    return 0;
+}</code></pre>
+<p>With the resulting llvm.</p>
+<p><code>addition.s</code></p>
+<pre class="{assembly}"><code>; ModuleID = 'tests/addition.c'
+source_filename = "tests/addition.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [12 x i8] c"Result: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 3.500000e+00, ptr %2, align 4
+  store float 2.500000e+00, ptr %3, align 4
+  %5 = load float, ptr %2, align 4
+  %6 = load float, ptr %3, align 4
+  %7 = fadd float %5, %6
+  store float %7, ptr %4, align 4
+  %8 = load float, ptr %4, align 4
+  %9 = fpext float %8 to double
+  %10 = fmul double %9, 1.500000e+00
+  %11 = fptrunc double %10 to float
+  store float %11, ptr %4, align 4
+  %12 = load float, ptr %4, align 4
+  %13 = fpext float %12 to double
+  %14 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %13)
+  ret i32 0
+}
+
+declare i32 @printf(ptr noundef, ...) #1
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}</code></pre>
+<p>This gives the following result, as expected given that there are only two floating point operations.</p>
+<p><code>addition.out</code></p>
+<pre class="{text}"><code>  %7 = fadd float %5, %6
+  %10 = fmul double %9, 1.500000e+00</code></pre>
+<p>Now for a program with floating point division and subtraction:</p>
+<p><code>division.c</code></p>
+<pre class="{c}"><code>#include &lt;stdio.h&gt;
+
+int main() {
+    float a = 10.0, b = 4.0, result;
+    result = a / b;
+    result = result - 1.5;
+    printf("Result: %f\n", result);
+    return 0;
+}</code></pre>
+<p>which has the following llvm:</p>
+<p><code>division.s</code></p>
+<pre class="{llvm}"><code>; ModuleID = 'tests/division.c'
+source_filename = "tests/division.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [12 x i8] c"Result: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 1.000000e+01, ptr %2, align 4
+  store float 4.000000e+00, ptr %3, align 4
+  %5 = load float, ptr %2, align 4
+  %6 = load float, ptr %3, align 4
+  %7 = fdiv float %5, %6
+  store float %7, ptr %4, align 4
+  %8 = load float, ptr %4, align 4
+  %9 = fpext float %8 to double
+  %10 = fsub double %9, 1.500000e+00
+  %11 = fptrunc double %10 to float
+  store float %11, ptr %4, align 4
+  %12 = load float, ptr %4, align 4
+  %13 = fpext float %12 to double
+  %14 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %13)
+  ret i32 0
+}
+
+declare i32 @printf(ptr noundef, ...) #1
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}</code></pre>
+<p>Again, we see quickly that there are only two floating point arithmetic operations. We do see that there are a few floating point operations that are not arithmetic, such as fpext and fptrunc, but these were not omitted in our analysis. That said, it would be trivial to add them to our analysis, as it just expands the size of the switch statement in use.</p>
+<p><code>division.out</code></p>
+<pre class="{text}"><code>  %7 = fdiv float %5, %6
+  %10 = fsub double %9, 1.500000e+00</code></pre>
+<p>Next, we can try a program which has nested conditionals, to see if this analysis works even with multiple basic blocks.</p>
+<p><code>nested-conditionals.c</code></p>
+<pre class="{c}"><code>#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+
+int main() {
+    float a = 3.7, b = 2.5, result = 0.0;
+
+    if (a &gt; b) {
+        result = pow(a, 2) - sqrt(b);
+    } else {
+        result = log(a + b) * sin(a);
+    }
+
+    if (result &gt; 5.0) {
+        result /= 2.0;
+    } else if (result &lt; -5.0) {
+        result *= -1.0;
+    } else {
+        result += 1.5;
+    }
+
+    printf("Final result: %f\n", result);
+    return 0;
+}</code></pre>
+<p><code>nested-conditionals.s</code></p>
+<pre class="{assembly}"><code>; ModuleID = 'tests/nested-conditionals.c'
+source_filename = "tests/nested-conditionals.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [18 x i8] c"Final result: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 0x400D9999A0000000, ptr %2, align 4
+  store float 2.500000e+00, ptr %3, align 4
+  store float 0.000000e+00, ptr %4, align 4
+  %5 = load float, ptr %2, align 4
+  %6 = load float, ptr %3, align 4
+  %7 = fcmp ogt float %5, %6
+  br i1 %7, label %8, label %17
+
+8:                                                ; preds = %0
+  %9 = load float, ptr %2, align 4
+  %10 = fpext float %9 to double
+  %11 = call double @llvm.pow.f64(double %10, double 2.000000e+00)
+  %12 = load float, ptr %3, align 4
+  %13 = fpext float %12 to double
+  %14 = call double @llvm.sqrt.f64(double %13)
+  %15 = fsub double %11, %14    
+  %16 = fptrunc double %15 to float
+  store float %16, ptr %4, align 4
+  br label %28
+
+17:                                               ; preds = %0
+  %18 = load float, ptr %2, align 4
+  %19 = load float, ptr %3, align 4
+  %20 = fadd float %18, %19
+  %21 = fpext float %20 to double
+  %22 = call double @llvm.log.f64(double %21)
+  %23 = load float, ptr %2, align 4
+  %24 = fpext float %23 to double
+  %25 = call double @llvm.sin.f64(double %24)
+  %26 = fmul double %22, %25
+  %27 = fptrunc double %26 to float
+  store float %27, ptr %4, align 4
+  br label %28
+
+28:                                               ; preds = %17, %8
+  %29 = load float, ptr %4, align 4
+  %30 = fpext float %29 to double
+  %31 = fcmp ogt double %30, 5.000000e+00
+  br i1 %31, label %32, label %37
+
+32:                                               ; preds = %28
+  %33 = load float, ptr %4, align 4
+  %34 = fpext float %33 to double
+  %35 = fdiv double %34, 2.000000e+00
+  %36 = fptrunc double %35 to float
+  store float %36, ptr %4, align 4
+  br label %52
+
+37:                                               ; preds = %28
+  %38 = load float, ptr %4, align 4
+  %39 = fpext float %38 to double
+  %40 = fcmp olt double %39, -5.000000e+00
+  br i1 %40, label %41, label %46
+
+41:                                               ; preds = %37
+  %42 = load float, ptr %4, align 4
+  %43 = fpext float %42 to double
+  %44 = fmul double %43, -1.000000e+00
+  %45 = fptrunc double %44 to float
+  store float %45, ptr %4, align 4
+  br label %51
+
+46:                                               ; preds = %37
+  %47 = load float, ptr %4, align 4
+  %48 = fpext float %47 to double
+  %49 = fadd double %48, 1.500000e+00
+  %50 = fptrunc double %49 to float
+  store float %50, ptr %4, align 4
+  br label %51
+
+51:                                               ; preds = %46, %41
+  br label %52
+
+52:                                               ; preds = %51, %32
+  %53 = load float, ptr %4, align 4
+  %54 = fpext float %53 to double
+  %55 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %54)
+  ret i32 0
+}
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.pow.f64(double, double) #1
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.sqrt.f64(double) #1
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.log.f64(double) #1
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.sin.f64(double) #1
+
+declare i32 @printf(ptr noundef, ...) #2
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #2 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}</code></pre>
+<p>And as we can see, the program finds the floating point arithmetic operations in question.</p>
+<p><code>nested-conditionals.out</code></p>
+<pre class="{text}"><code>  %15 = fsub double %11, %14
+  %20 = fadd float %18, %19
+  %26 = fmul double %22, %25
+  %35 = fdiv double %34, 2.000000e+00
+  %44 = fmul double %43, -1.000000e+00
+  %49 = fadd double %48, 1.500000e+00</code></pre>
+<p>The next program contains many multiplication operations, so we expect the result to contain ten fmul operations.</p>
+<p><code>multiplication.c</code></p>
+<pre class="{c}"><code>#include &lt;stdio.h&gt;
+
+int main()
+{
+    float a = 1.1, b = 2.2, c = 3.3, d = 4.4, e = 5.5;
+    float f = 6.6, g = 7.7, h = 8.8, i = 9.9, j = 10.1;
+
+    float result1 = a * b;
+    float result2 = c * d;
+    float result3 = e * f;
+    float result4 = g * h;
+    float result5 = i * j;
+
+    float result6 = a * c;
+    float result7 = e * g;
+    float result8 = i * a;
+    float result9 = b * f;
+    float result10 = d * h;
+
+    return 0;
+}</code></pre>
+<p><code>multiplication.s</code></p>
+<pre class="{assembly}"><code>; ModuleID = 'tests/multiplication.c'
+source_filename = "tests/multiplication.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  %5 = alloca float, align 4
+  %6 = alloca float, align 4
+  %7 = alloca float, align 4
+  %8 = alloca float, align 4
+  %9 = alloca float, align 4
+  %10 = alloca float, align 4
+  %11 = alloca float, align 4
+  %12 = alloca float, align 4
+  %13 = alloca float, align 4
+  %14 = alloca float, align 4
+  %15 = alloca float, align 4
+  %16 = alloca float, align 4
+  %17 = alloca float, align 4
+  %18 = alloca float, align 4
+  %19 = alloca float, align 4
+  %20 = alloca float, align 4
+  %21 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 0x3FF19999A0000000, ptr %2, align 4
+  store float 0x40019999A0000000, ptr %3, align 4
+  store float 0x400A666660000000, ptr %4, align 4
+  store float 0x40119999A0000000, ptr %5, align 4
+  store float 5.500000e+00, ptr %6, align 4
+  store float 0x401A666660000000, ptr %7, align 4
+  store float 0x401ECCCCC0000000, ptr %8, align 4
+  store float 0x40219999A0000000, ptr %9, align 4
+  store float 0x4023CCCCC0000000, ptr %10, align 4
+  store float 0x4024333340000000, ptr %11, align 4
+  %22 = load float, ptr %2, align 4
+  %23 = load float, ptr %3, align 4
+  %24 = fmul float %22, %23
+  store float %24, ptr %12, align 4
+  %25 = load float, ptr %4, align 4
+  %26 = load float, ptr %5, align 4
+  %27 = fmul float %25, %26
+  store float %27, ptr %13, align 4
+  %28 = load float, ptr %6, align 4
+  %29 = load float, ptr %7, align 4
+  %30 = fmul float %28, %29
+  store float %30, ptr %14, align 4
+  %31 = load float, ptr %8, align 4
+  %32 = load float, ptr %9, align 4
+  %33 = fmul float %31, %32
+  store float %33, ptr %15, align 4
+  %34 = load float, ptr %10, align 4
+  %35 = load float, ptr %11, align 4
+  %36 = fmul float %34, %35
+  store float %36, ptr %16, align 4
+  %37 = load float, ptr %2, align 4
+  %38 = load float, ptr %4, align 4
+  %39 = fmul float %37, %38
+  store float %39, ptr %17, align 4
+  %40 = load float, ptr %6, align 4
+  %41 = load float, ptr %8, align 4
+  %42 = fmul float %40, %41
+  store float %42, ptr %18, align 4
+  %43 = load float, ptr %10, align 4
+  %44 = load float, ptr %2, align 4
+  %45 = fmul float %43, %44
+  store float %45, ptr %19, align 4
+  %46 = load float, ptr %3, align 4
+  %47 = load float, ptr %7, align 4
+  %48 = fmul float %46, %47
+  store float %48, ptr %20, align 4
+  %49 = load float, ptr %5, align 4
+  %50 = load float, ptr %9, align 4
+  %51 = fmul float %49, %50
+  store float %51, ptr %21, align 4
+  ret i32 0
+}
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}</code></pre>
+<p>And we observe what is expected: <code>multiplication.out</code></p>
+<pre class="{text}"><code>  %24 = fmul float %22, %23
+  %27 = fmul float %25, %26
+  %30 = fmul float %28, %29
+  %33 = fmul float %31, %32
+  %36 = fmul float %34, %35
+  %39 = fmul float %37, %38
+  %42 = fmul float %40, %41
+  %45 = fmul float %43, %44
+  %48 = fmul float %46, %47
+  %51 = fmul float %49, %50</code></pre>
+<p>Finally, we look at a program with a looping control flow, whihc performs floating point divisions, additions, and multiplications. <code>looping_addition.c</code></p>
+<pre class="{c}"><code>#include &lt;stdio.h&gt;
+
+int main() {
+    float x = 1.0, sum = 0.0;
+    for (int i = 0; i &lt; 5; i++) {
+        sum += x / (i + 1);
+        if (sum &gt; 2.0) {
+            sum *= 0.5;
+        }
+        x += 1.0;
+    }
+    printf("Final sum: %f\n", sum);
+    return 0;
+}</code></pre>
+<p><code>looping_addition.s</code></p>
+<pre class="{assembly}"><code>; ModuleID = 'tests/looping_addition.c'
+source_filename = "tests/looping_addition.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [15 x i8] c"Final sum: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca i32, align 4
+  store i32 0, ptr %1, align 4
+  store float 1.000000e+00, ptr %2, align 4
+  store float 0.000000e+00, ptr %3, align 4
+  store i32 0, ptr %4, align 4
+  br label %5
+
+5:                                                ; preds = %29, %0
+  %6 = load i32, ptr %4, align 4
+  %7 = icmp slt i32 %6, 5
+  br i1 %7, label %8, label %32
+
+8:                                                ; preds = %5
+  %9 = load float, ptr %2, align 4
+  %10 = load i32, ptr %4, align 4
+  %11 = add nsw i32 %10, 1
+  %12 = sitofp i32 %11 to float
+  %13 = fdiv float %9, %12
+  %14 = load float, ptr %3, align 4
+  %15 = fadd float %14, %13
+  store float %15, ptr %3, align 4
+  %16 = load float, ptr %3, align 4
+  %17 = fpext float %16 to double
+  %18 = fcmp ogt double %17, 2.000000e+00
+  br i1 %18, label %19, label %24
+
+19:                                               ; preds = %8
+  %20 = load float, ptr %3, align 4
+  %21 = fpext float %20 to double
+  %22 = fmul double %21, 5.000000e-01
+  %23 = fptrunc double %22 to float
+  store float %23, ptr %3, align 4
+  br label %24
+
+24:                                               ; preds = %19, %8
+  %25 = load float, ptr %2, align 4
+  %26 = fpext float %25 to double
+  %27 = fadd double %26, 1.000000e+00
+  %28 = fptrunc double %27 to float
+  store float %28, ptr %2, align 4
+  br label %29
+
+29:                                               ; preds = %24
+  %30 = load i32, ptr %4, align 4
+  %31 = add nsw i32 %30, 1
+  store i32 %31, ptr %4, align 4
+  br label %5, !llvm.loop !5
+
+32:                                               ; preds = %5
+  %33 = load float, ptr %3, align 4
+  %34 = fpext float %33 to double
+  %35 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %34)
+  ret i32 0
+}
+
+declare i32 @printf(ptr noundef, ...) #1
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}
+!5 = distinct !{!5, !6}
+!6 = !{!"llvm.loop.mustprogress"}</code></pre>
+<p>And we see all four floating point arithmetic operations are found. <code>looping_addition.out</code></p>
+<pre class="{text}"><code>  %13 = fdiv float %9, %12
+  %15 = fadd float %14, %13
+  %22 = fmul double %21, 5.000000e-01
+  %27 = fadd double %26, 1.000000e+00</code></pre>
 
 
 </section>
@@ -1247,13 +1765,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" class="pagination-link" aria-label="HW3 - Data Flow Analysis">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">HW3 - Data Flow Analysis</span>
+      <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="pagination-link" aria-label="EECE7309 Homework 4 -- Dominance">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">EECE7309 Homework 4 – Dominance</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="pagination-link" aria-label="Homework 2: Optimizing with DCE and LVN">
-        <span class="nav-page-text">Homework 2: Optimizing with DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/oscar/2024-09-20-HW1.html" class="pagination-link" aria-label="HW1 - Trying Out Bril">
+        <span class="nav-page-text">HW1 - Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

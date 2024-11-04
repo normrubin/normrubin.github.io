@@ -66,7 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
 <link href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" rel="next">
-<link href="../../blogs/rohit/2024-10-18-Rohit-HW4.html" rel="prev">
+<link href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -230,6 +230,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Homework 4 – Implementing Dominance Algorithms</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5 – Implementing a simple LLVM pass</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -286,6 +292,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 4 – Dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 5 – LLVM</span></a>
   </div>
 </li>
       </ul>
@@ -352,6 +364,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Homework 4: Dominance</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5: LLVM - Spinning Up</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -387,6 +405,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Homework 4</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -414,6 +438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/Sana/10-18-2024-HW4-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework4 - dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/11-1-2024-HW5-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - LLVM</span></a>
   </div>
 </li>
       </ul>
@@ -451,6 +481,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Compiler Homework 04 - Implementing Dominance Utilities</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 05 - LLVM Pass</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -484,6 +520,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/yashaswini/10-18-2024-HW4-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework4 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - Yashaswini</span></a>
   </div>
 </li>
       </ul>
@@ -801,7 +843,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="explanation-of-the-code">Explanation of the Code</h2>
 <p>The code I wrote for this question implements a trivial dead code elimination (DCE) optimization for Bril programs. It works by iterating through the instructions in reverse order, maintaining a set of used variables. Instructions that define variables not in this set are eliminated. The algorithm adds variables used as arguments to the set and removes variables when their defining instruction is processed. This approach ensures that instructions defining unused variables are removed while preserving the program’s essential structure and functionality.</p>
 <p>Output of the code with Example 1 as the input:</p>
-<div id="ef877f0b" class="cell" data-execution_count="1">
+<div id="991c3be7" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -935,7 +977,7 @@ Optimized program:
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="er">print</span> <span class="er">a;</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="er">print</span> <span class="er">d;</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="9e7c021e" class="cell" data-execution_count="2">
+<div id="efee4772" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1089,7 +1131,7 @@ Optimized program:
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="er">prod:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">mul</span> <span class="er">sum1</span> <span class="er">sum2;</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="er">print</span> <span class="er">prod;</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="6a4d0e2a" class="cell" data-execution_count="3">
+<div id="d9798c13" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1692,8 +1734,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/rohit/2024-10-18-Rohit-HW4.html" class="pagination-link" aria-label="Homework 4">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 4</span>
+      <a href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" class="pagination-link" aria-label="Homework 5">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 5</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

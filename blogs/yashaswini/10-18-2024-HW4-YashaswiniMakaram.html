@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../homework/1.hw.html" rel="next">
+<link href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" rel="next">
 <link href="../../blogs/yashaswini/10-11-2024-HW3-YashaswiniMakaram.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -196,6 +196,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Homework 4 – Implementing Dominance Algorithms</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5 – Implementing a simple LLVM pass</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -252,6 +258,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 4 – Dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 5 – LLVM</span></a>
   </div>
 </li>
       </ul>
@@ -318,6 +330,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Homework 4: Dominance</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5: LLVM - Spinning Up</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -353,6 +371,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Homework 4</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -380,6 +404,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/Sana/10-18-2024-HW4-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework4 - dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/11-1-2024-HW5-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - LLVM</span></a>
   </div>
 </li>
       </ul>
@@ -417,6 +447,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Compiler Homework 04 - Implementing Dominance Utilities</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 05 - LLVM Pass</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -450,6 +486,12 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/yashaswini/10-18-2024-HW4-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Homework4 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - Yashaswini</span></a>
   </div>
 </li>
       </ul>
@@ -778,96 +820,355 @@ ul.task-list li input[type="checkbox"] {
 <p>#Dominance Frontier Computation (compute_dominance_frontier):</p>
 <ul>
 <li>The dominance frontier of a node is the set of nodes where the node dominates one of their predecessors but does not strictly dominate the node itself.</li>
-<li>This is computed using the reverse of the CFG and the dominator sets. ’’’ import json from collections import defaultdict</li>
+<li>This is computed using the reverse of the CFG and the dominator sets.</li>
 </ul>
-<p>def load_bril_program(filename): “““Load the Bril program from a JSON file.”“” with open(filename, ‘r’) as file: return json.load(file)</p>
-<p>def build_cfg(function): “““Build the Control Flow Graph (CFG) for a given function.”“” instrs = function[‘instrs’] cfg = defaultdict(list) label_map = {}</p>
-<pre><code># Map labels to instruction indices
-for i, instr in enumerate(instrs):
-    if 'label' in instr:
-        label_map[instr['label']] = i
+<pre><code>import json
+from collections import defaultdict
 
-for i, instr in enumerate(instrs):
-    if 'op' in instr and instr['op'] == 'jmp':
-        target = label_map[instr['labels'][0]]
-        cfg[i].append(target)
-    elif 'op' in instr and instr['op'] == 'br':
-        target1 = label_map[instr['labels'][0]]
-        target2 = label_map[instr['labels'][1]]
-        cfg[i].extend([target1, target2])
-    else:
-        # Fall-through case: connect to the next instruction
-        if i + 1 &lt; len(instrs):
-            cfg[i].append(i + 1)
+def load_bril_program(filename):
+    """Load the Bril program from a JSON file."""
+    with open(filename, 'r') as file:
+        return json.load(file)
 
-return cfg</code></pre>
-<p>def reverse_cfg(cfg): “““Compute the reverse of the CFG.”“” reverse = defaultdict(list) for node, successors in cfg.items(): for succ in successors: reverse[succ].append(node) return reverse</p>
-<p>def find_dominators(function): “““Find the dominators for each node in the function.”“” cfg = build_cfg(function) nodes = set(cfg.keys()) entry = min(nodes)#0 # Assuming the entry node is at index 0 dom = {node: nodes.copy() for node in nodes} dom[entry] = {entry}</p>
-<pre><code>changed = True
-while changed:
-    changed = False
-    for node in nodes - {entry}:
-        #new_dom = set.intersection(*(dom[pred] for pred in reverse_cfg(cfg)[node])) | {node}
-        preds = reverse_cfg(cfg)[node]
-        if preds:
-            # Compute intersection only if there are predecessors
-            new_dom = set.intersection(*(dom[pred] for pred in preds)) | {node}
+def build_cfg(function):
+    """Build the Control Flow Graph (CFG) for a given function."""
+    instrs = function['instrs']
+    cfg = defaultdict(list)
+    label_map = {}
+
+    # Map labels to instruction indices
+    for i, instr in enumerate(instrs):
+        if 'label' in instr:
+            label_map[instr['label']] = i
+
+    for i, instr in enumerate(instrs):
+        if 'op' in instr and instr['op'] == 'jmp':
+            target = label_map[instr['labels'][0]]
+            cfg[i].append(target)
+        elif 'op' in instr and instr['op'] == 'br':
+            target1 = label_map[instr['labels'][0]]
+            target2 = label_map[instr['labels'][1]]
+            cfg[i].extend([target1, target2])
         else:
-            # If no predecessors, the dominators are just the node itself
-            new_dom = {node}
-        if dom[node] != new_dom:
-            dom[node] = new_dom
-            changed = True
+            # Fall-through case: connect to the next instruction
+            if i + 1 &lt; len(instrs):
+                cfg[i].append(i + 1)
 
-return dom</code></pre>
-<p>def construct_dominance_tree(dominators): “““Construct the dominance tree from the dominators.”“” tree = defaultdict(list) for node, dom_set in dominators.items(): if node != min(dom_set): idom = max(dom_set - {node}) tree[idom].append(node) return tree</p>
-<p>def compute_dominance_frontier(function, dominators): “““Compute the dominance frontier for each node.”“” cfg = build_cfg(function) df = defaultdict(set)</p>
-<pre><code>for node in cfg:
-    preds = reverse_cfg(cfg)[node]
-    if len(preds) &gt;= 2:
-        for pred in preds:
-            runner = pred
-            while runner not in dominators[node]:
-                df[runner].add(node)
-                #runner = max(dominators[runner] - {runner})
-                if dominators[runner] - {runner}:
-                    runner = max(dominators[runner] - {runner})
-                else:
-                    break  # If no other dominators, exit the loop
+    return cfg
 
-return df</code></pre>
-<p>def test_dominance_utilities(function): “““Test the dominance utilities for a given function.”“” print(f”Testing function: {function[‘name’]}“) dominators = find_dominators(function) print(f”Dominators: {dominators}“)</p>
-<pre><code>dominance_tree = construct_dominance_tree(dominators)
-print(f"Dominance Tree: {dominance_tree}")
+def reverse_cfg(cfg):
+    """Compute the reverse of the CFG."""
+    reverse = defaultdict(list)
+    for node, successors in cfg.items():
+        for succ in successors:
+            reverse[succ].append(node)
+    return reverse
 
-dominance_frontier = compute_dominance_frontier(function, dominators)
-print(f"Dominance Frontier: {dominance_frontier}")</code></pre>
-<p>def main(): # Load the Bril program from a file #bril_program = load_bril_program(‘input_bril.json’) for bril_program in bril_programs: # Run the tests for function in bril_program[‘functions’]: test_dominance_utilities(function)</p>
+def find_dominators(function):
+    """Find the dominators for each node in the function."""
+    cfg = build_cfg(function)
+    nodes = set(cfg.keys())
+    entry = min(nodes)#0  # Assuming the entry node is at index 0
+    dom = {node: nodes.copy() for node in nodes}
+    dom[entry] = {entry}
+
+    changed = True
+    while changed:
+        changed = False
+        for node in nodes - {entry}:
+            #new_dom = set.intersection(*(dom[pred] for pred in reverse_cfg(cfg)[node])) | {node}
+            preds = reverse_cfg(cfg)[node]
+            if preds:
+                # Compute intersection only if there are predecessors
+                new_dom = set.intersection(*(dom[pred] for pred in preds)) | {node}
+            else:
+                # If no predecessors, the dominators are just the node itself
+                new_dom = {node}
+            if dom[node] != new_dom:
+                dom[node] = new_dom
+                changed = True
+
+    return dom
+
+def construct_dominance_tree(dominators):
+    """Construct the dominance tree from the dominators."""
+    tree = defaultdict(list)
+    for node, dom_set in dominators.items():
+        if node != min(dom_set):
+            idom = max(dom_set - {node})
+            tree[idom].append(node)
+    return tree
+
+def compute_dominance_frontier(function, dominators):
+    """Compute the dominance frontier for each node."""
+    cfg = build_cfg(function)
+    df = defaultdict(set)
+
+    for node in cfg:
+        preds = reverse_cfg(cfg)[node]
+        if len(preds) &gt;= 2:
+            for pred in preds:
+                runner = pred
+                while runner not in dominators[node]:
+                    df[runner].add(node)
+                    #runner = max(dominators[runner] - {runner})
+                    if dominators[runner] - {runner}:
+                        runner = max(dominators[runner] - {runner})
+                    else:
+                        break  # If no other dominators, exit the loop
+
+    return df
+
+def test_dominance_utilities(function):
+    """Test the dominance utilities for a given function."""
+    print(f"Testing function: {function['name']}")
+    dominators = find_dominators(function)
+    print(f"Dominators: {dominators}")
+
+    dominance_tree = construct_dominance_tree(dominators)
+    print(f"Dominance Tree: {dominance_tree}")
+
+    dominance_frontier = compute_dominance_frontier(function, dominators)
+    print(f"Dominance Frontier: {dominance_frontier}")
+
+def main():
+    # Load the Bril program from a file
+    #bril_program = load_bril_program('input_bril.json')
+    for bril_program in bril_programs:
+    # Run the tests
+        for function in bril_program['functions']:
+            test_dominance_utilities(function)
+
+# Run the main function
+if __name__ == "__main__":
+    main()</code></pre>
 </section>
+<section id="testing" class="level2">
+<h2 class="anchored" data-anchor-id="testing">Testing:</h2>
+<p>I implemented 8 test cases each targeting a different type of CFG. I then manually checked the against the outputs produced by the code. I had to make some changes when the code was unable to handle empty sets but after the output seems to be work correctly</p>
 </section>
-<section id="run-the-main-function" class="level1">
-<h1>Run the main function</h1>
-<p>if <strong>name</strong> == “<strong>main</strong>”: main() ’’’ ## Testing:</p>
-<p>I implemented 8 test cases each targeting a different type of CFG. I then manually checked the against the outputs produced by the code. I had to make some changes when the code was unable to handle empty sets but after the output seems to be work sorrectsly</p>
 <section id="challanges" class="level2">
 <h2 class="anchored" data-anchor-id="challanges">Challanges</h2>
-<p>The hardest part of this task was understanding ensuring that the algortimm i used could handle various datat flow types.<br>
-Once i was able to get the code to word for both independent banches and nested branches it became much easier.</p>
+<p>The hardest part of this task was understanding ensuring that the algorithm i used could handle various data flow types.<br>
+Once I was able to get the code to work for both independent branches and nested branches it became much easier.</p>
 </section>
 <section id="test-cases-and-output" class="level2">
 <h2 class="anchored" data-anchor-id="test-cases-and-output">Test Cases and Output</h2>
 <p>Here are the test cases used and the output from the function after running all of the test cases.</p>
-<p>#Simple Linear Sequence A program with a single linear sequence of instructions. No branches or loops. ’’’ { “functions”: [ { “name”: “linear”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “a”, “type”: “int”, “value”: 1}, {“op”: “add”, “dest”: “b”, “type”: “int”, “args”: [“a”, “a”]}, {“op”: “mul”, “dest”: “c”, “type”: “int”, “args”: [“b”, “a”]}, {“label”: “exit”} ] } ] }</p>
-<p>’’’</p>
-<p>#Simple Branch - A conditional branch leading to two different paths and joining back together. ’’’ { “functions”: [ { “name”: “branch”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “x”, “type”: “int”, “value”: 5}, {“op”: “const”, “dest”: “y”, “type”: “int”, “value”: 10}, {“op”: “br”, “args”: [“x”], “labels”: [“true_branch”, “false_branch”]}, {“label”: “true_branch”}, {“op”: “add”, “dest”: “z”, “type”: “int”, “args”: [“x”, “y”]}, {“op”: “jmp”, “labels”: [“join”]}, {“label”: “false_branch”}, {“op”: “sub”, “dest”: “z”, “type”: “int”, “args”: [“y”, “x”]}, {“label”: “join”}, {“op”: “mul”, “dest”: “w”, “type”: “int”, “args”: [“z”, “x”]} ] } ] }</p>
-<p>’’’ #Loop with Back Edge -A basic loop where a variable is incremented until a condition is met. ’’’ { “functions”: [ { “name”: “loop”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “i”, “type”: “int”, “value”: 0}, {“label”: “loop_start”}, {“op”: “lt”, “dest”: “cond”, “type”: “bool”, “args”: [“i”, “10”]}, {“op”: “br”, “args”: [“cond”], “labels”: [“body”, “exit”]}, {“label”: “body”}, {“op”: “add”, “dest”: “i”, “type”: “int”, “args”: [“i”, “1”]}, {“op”: “jmp”, “labels”: [“loop_start”]}, {“label”: “exit”} ] } ] } ’’’</p>
-<p>#Nested Branches -Two nested conditional branches. ’’’ { “functions”: [ { “name”: “nested_branches”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “a”, “type”: “int”, “value”: 1}, {“op”: “const”, “dest”: “b”, “type”: “int”, “value”: 2}, {“op”: “br”, “args”: [“a”], “labels”: [“branch1”, “merge”]}, {“label”: “branch1”}, {“op”: “br”, “args”: [“b”], “labels”: [“branch2”, “merge”]}, {“label”: “branch2”}, {“op”: “mul”, “dest”: “x”, “type”: “int”, “args”: [“a”, “b”]}, {“op”: “jmp”, “labels”: [“merge”]}, {“label”: “merge”}, {“op”: “add”, “dest”: “c”, “type”: “int”, “args”: [“a”, “b”]} ] } ] } ’’’ #Multiple Independent Branches - A program with two independent branches and a join. ’’’ { “functions”: [ { “name”: “independent_branches”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “a”, “type”: “int”, “value”: 3}, {“op”: “const”, “dest”: “b”, “type”: “int”, “value”: 6}, {“op”: “br”, “args”: [“a”], “labels”: [“branch1”, “merge”]}, {“label”: “branch1”}, {“op”: “add”, “dest”: “c”, “type”: “int”, “args”: [“a”, “b”]}, {“op”: “jmp”, “labels”: [“merge”]}, {“label”: “branch2”}, {“op”: “sub”, “dest”: “c”, “type”: “int”, “args”: [“b”, “a”]}, {“op”: “jmp”, “labels”: [“merge”]}, {“label”: “merge”}, {“op”: “mul”, “dest”: “d”, “type”: “int”, “args”: [“c”, “a”]} ] } ] } ’’’ #Simple Two-Way Loop - A loop with a branch that exits early based on a condition. ’’’ { “functions”: [ { “name”: “two_way_loop”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “x”, “type”: “int”, “value”: 0}, {“label”: “loop_start”}, {“op”: “lt”, “dest”: “cond”, “type”: “bool”, “args”: [“x”, “5”]}, {“op”: “br”, “args”: [“cond”], “labels”: [“loop_body”, “exit”]}, {“label”: “loop_body”}, {“op”: “add”, “dest”: “x”, “type”: “int”, “args”: [“x”, “1”]}, {“op”: “jmp”, “labels”: [“loop_start”]}, {“label”: “exit”}, {“op”: “const”, “dest”: “y”, “type”: “int”, “value”: 1} ] } ] } ’’’ # Loop with Nested Branch - A loop that includes a nested branch with its own exit condition. ’’’ { “functions”: [ { “name”: “loop_with_branch”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “i”, “type”: “int”, “value”: 0}, {“label”: “loop_start”}, {“op”: “lt”, “dest”: “cond1”, “type”: “bool”, “args”: [“i”, “10”]}, {“op”: “br”, “args”: [“cond1”], “labels”: [“loop_body”, “exit”]}, {“label”: “loop_body”}, {“op”: “lt”, “dest”: “cond2”, “type”: “bool”, “args”: [“i”, “5”]}, {“op”: “br”, “args”: [“cond2”], “labels”: [“nested_branch”, “loop_continue”]}, {“label”: “nested_branch”}, {“op”: “add”, “dest”: “i”, “type”: “int”, “args”: [“i”, “2”]}, {“op”: “jmp”, “labels”: [“loop_start”]}, {“label”: “loop_continue”}, {“op”: “add”, “dest”: “i”, “type”: “int”, “args”: [“i”, “1”]}, {“op”: “jmp”, “labels”: [“loop_start”]}, {“label”: “exit”} ] } ] } ’’’ #Multiple Loops - A program with two independent loops. ’’’ { “functions”: [ { “name”: “multiple_loops”, “instrs”: [ {“label”: “entry”}, {“op”: “const”, “dest”: “a”, “type”: “int”, “value”: 0}, {“label”: “loop1”}, {“op”: “lt”, “dest”: “cond1”, “type”: “bool”, “args”: [“a”, “3”]}, {“op”: “br”, “args”: [“cond1”], “labels”: [“body1”, “loop2”]}, {“label”: “body1”}, {“op”: “add”, “dest”: “a”, “type”: “int”, “args”: [“a”, “1”]}, {“op”: “jmp”, “labels”: [“loop1”]}, {“label”: “loop2”}, {“op”: “const”, “dest”: “b”, “type”: “int”, “value”: 0}, {“label”: “loop2_start”}, {“op”: “lt”, “dest”: “cond2”, “type”: “bool”, “args”: [“b”, “2”]}, {“op”: “br”, “args”: [“cond2”], “labels”: [“body2”, “exit”]}, {“label”: “body2”}, {“op”: “add”, “dest”: “b”, “type”: “int”, “args”: [“b”, “1”]}, {“op”: “jmp”, “labels”: [“loop2_start”]}, {“label”: “exit”} ] } ] }</p>
-<p>’’’</p>
+<p>#Simple Linear Sequence A program with a single linear sequence of instructions. No branches or loops.</p>
+<pre><code>{
+  "functions": [
+    {
+      "name": "linear",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "a", "type": "int", "value": 1},
+        {"op": "add", "dest": "b", "type": "int", "args": ["a", "a"]},
+        {"op": "mul", "dest": "c", "type": "int", "args": ["b", "a"]},
+        {"label": "exit"}
+      ]
+    }
+  ]
+}
+</code></pre>
+<p>#Simple Branch - A conditional branch leading to two different paths and joining back together.</p>
+<pre><code>{
+  "functions": [
+    {
+      "name": "branch",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "x", "type": "int", "value": 5},
+        {"op": "const", "dest": "y", "type": "int", "value": 10},
+        {"op": "br", "args": ["x"], "labels": ["true_branch", "false_branch"]},
+        {"label": "true_branch"},
+        {"op": "add", "dest": "z", "type": "int", "args": ["x", "y"]},
+        {"op": "jmp", "labels": ["join"]},
+        {"label": "false_branch"},
+        {"op": "sub", "dest": "z", "type": "int", "args": ["y", "x"]},
+        {"label": "join"},
+        {"op": "mul", "dest": "w", "type": "int", "args": ["z", "x"]}
+      ]
+    }
+  ]
+}
+</code></pre>
+<p>#Loop with Back Edge -A basic loop where a variable is incremented until a condition is met.</p>
+<pre><code>{
+  "functions": [
+    {
+      "name": "loop",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "i", "type": "int", "value": 0},
+        {"label": "loop_start"},
+        {"op": "lt", "dest": "cond", "type": "bool", "args": ["i", "10"]},
+        {"op": "br", "args": ["cond"], "labels": ["body", "exit"]},
+        {"label": "body"},
+        {"op": "add", "dest": "i", "type": "int", "args": ["i", "1"]},
+        {"op": "jmp", "labels": ["loop_start"]},
+        {"label": "exit"}
+      ]
+    }
+  ]
+}</code></pre>
+<p>#Nested Branches -Two nested conditional branches.</p>
+<pre><code>{
+  "functions": [
+    {
+      "name": "nested_branches",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "a", "type": "int", "value": 1},
+        {"op": "const", "dest": "b", "type": "int", "value": 2},
+        {"op": "br", "args": ["a"], "labels": ["branch1", "merge"]},
+        {"label": "branch1"},
+        {"op": "br", "args": ["b"], "labels": ["branch2", "merge"]},
+        {"label": "branch2"},
+        {"op": "mul", "dest": "x", "type": "int", "args": ["a", "b"]},
+        {"op": "jmp", "labels": ["merge"]},
+        {"label": "merge"},
+        {"op": "add", "dest": "c", "type": "int", "args": ["a", "b"]}
+      ]
+    }
+  ]
+}</code></pre>
+<p>#Multiple Independent Branches - A program with two independent branches and a join.</p>
+<pre><code>{
+  "functions": [
+    {
+      "name": "independent_branches",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "a", "type": "int", "value": 3},
+        {"op": "const", "dest": "b", "type": "int", "value": 6},
+        {"op": "br", "args": ["a"], "labels": ["branch1", "merge"]},
+        {"label": "branch1"},
+        {"op": "add", "dest": "c", "type": "int", "args": ["a", "b"]},
+        {"op": "jmp", "labels": ["merge"]},
+        {"label": "branch2"},
+        {"op": "sub", "dest": "c", "type": "int", "args": ["b", "a"]},
+        {"op": "jmp", "labels": ["merge"]},
+        {"label": "merge"},
+        {"op": "mul", "dest": "d", "type": "int", "args": ["c", "a"]}
+      ]
+    }
+  ]
+}</code></pre>
+<p>#Simple Two-Way Loop - A loop with a branch that exits early based on a condition.</p>
+<pre><code>{
+  "functions": [
+    {
+      "name": "two_way_loop",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "x", "type": "int", "value": 0},
+        {"label": "loop_start"},
+        {"op": "lt", "dest": "cond", "type": "bool", "args": ["x", "5"]},
+        {"op": "br", "args": ["cond"], "labels": ["loop_body", "exit"]},
+        {"label": "loop_body"},
+        {"op": "add", "dest": "x", "type": "int", "args": ["x", "1"]},
+        {"op": "jmp", "labels": ["loop_start"]},
+        {"label": "exit"},
+        {"op": "const", "dest": "y", "type": "int", "value": 1}
+      ]
+    }
+  ]
+}</code></pre>
 </section>
+</section>
+<section id="loop-with-nested-branch" class="level1">
+<h1>Loop with Nested Branch</h1>
+<ul>
+<li>A loop that includes a nested branch with its own exit condition.</li>
+</ul>
+<pre><code>{
+  "functions": [
+    {
+      "name": "loop_with_branch",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "i", "type": "int", "value": 0},
+        {"label": "loop_start"},
+        {"op": "lt", "dest": "cond1", "type": "bool", "args": ["i", "10"]},
+        {"op": "br", "args": ["cond1"], "labels": ["loop_body", "exit"]},
+        {"label": "loop_body"},
+        {"op": "lt", "dest": "cond2", "type": "bool", "args": ["i", "5"]},
+        {"op": "br", "args": ["cond2"], "labels": ["nested_branch", "loop_continue"]},
+        {"label": "nested_branch"},
+        {"op": "add", "dest": "i", "type": "int", "args": ["i", "2"]},
+        {"op": "jmp", "labels": ["loop_start"]},
+        {"label": "loop_continue"},
+        {"op": "add", "dest": "i", "type": "int", "args": ["i", "1"]},
+        {"op": "jmp", "labels": ["loop_start"]},
+        {"label": "exit"}
+      ]
+    }
+  ]
+}</code></pre>
+<p>#Multiple Loops - A program with two independent loops.</p>
+<pre><code>{
+  "functions": [
+    {
+      "name": "multiple_loops",
+      "instrs": [
+        {"label": "entry"},
+        {"op": "const", "dest": "a", "type": "int", "value": 0},
+        {"label": "loop1"},
+        {"op": "lt", "dest": "cond1", "type": "bool", "args": ["a", "3"]},
+        {"op": "br", "args": ["cond1"], "labels": ["body1", "loop2"]},
+        {"label": "body1"},
+        {"op": "add", "dest": "a", "type": "int", "args": ["a", "1"]},
+        {"op": "jmp", "labels": ["loop1"]},
+        {"label": "loop2"},
+        {"op": "const", "dest": "b", "type": "int", "value": 0},
+        {"label": "loop2_start"},
+        {"op": "lt", "dest": "cond2", "type": "bool", "args": ["b", "2"]},
+        {"op": "br", "args": ["cond2"], "labels": ["body2", "exit"]},
+        {"label": "body2"},
+        {"op": "add", "dest": "b", "type": "int", "args": ["b", "1"]},
+        {"op": "jmp", "labels": ["loop2_start"]},
+        {"label": "exit"}
+      ]
+    }
+  ]
+}
+</code></pre>
 </section>
 <section id="output" class="level1">
 <h1>Output</h1>
-<p>’’’ Testing function: linear Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {}) Testing function: branch Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 7}, 8: {0, 1, 2, 3, 7, 8}, 9: {0, 1, 2, 3, 9}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3], 3: [4, 7, 9], 4: [5], 5: [6], 7: [8]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {6: {9}, 5: {9}, 4: {9}, 8: {9}, 7: {9}}) Testing function: loop Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5], 5: [6], 6: [7]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}}) Testing function: nested_branches Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 5, 6, 7, 8}, 9: {0, 1, 2, 3, 9}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3], 3: [4, 9], 4: [5], 5: [6], 6: [7], 7: [8]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {5: {9}, 4: {9}, 8: {9}, 7: {9}, 6: {9}}) Testing function: independent_branches Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {7}, 8: {8, 7}, 9: {8, 9, 7}, 10: {10}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5], 5: [6], 7: [8], 8: [9]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {3: {10}, 2: {10}, 1: {10}, 0: {10}, 6: {10}, 5: {10}, 4: {10}, 9: {10}, 8: {10}, 7: {10}}) Testing function: two_way_loop Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 8}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5, 8], 5: [6], 6: [7]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}}) Testing function: loop_with_branch Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 5, 6, 7, 8}, 9: {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 10: {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 11: {0, 1, 2, 3, 4, 5, 6, 7, 11}, 12: {0, 1, 2, 3, 4, 5, 6, 7, 11, 12}, 13: {0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5], 5: [6], 6: [7], 7: [8, 11], 8: [9], 9: [10], 11: [12], 12: [13]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {10: {2}, 9: {2}, 8: {2}, 7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}, 13: {2}, 12: {2}, 11: {2}}) Testing function: multiple_loops Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 8}, 9: {0, 1, 2, 3, 4, 8, 9}, 10: {0, 1, 2, 3, 4, 8, 9, 10}, 11: {0, 1, 2, 3, 4, 8, 9, 10, 11}, 12: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12}, 13: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13}, 14: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14}, 15: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14, 15}} Dominance Tree: defaultdict(&lt;class ‘list’&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5, 8], 5: [6], 6: [7], 8: [9], 9: [10], 10: [11], 11: [12], 12: [13], 13: [14], 14: [15]}) Dominance Frontier: defaultdict(&lt;class ‘set’&gt;, {7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}, 15: {10}, 14: {10}, 13: {10}, 12: {10}, 11: {10}}) ’’’</p>
+<pre><code>Testing function: linear
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {})
+Testing function: branch
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 7}, 8: {0, 1, 2, 3, 7, 8}, 9: {0, 1, 2, 3, 9}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3], 3: [4, 7, 9], 4: [5], 5: [6], 7: [8]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {6: {9}, 5: {9}, 4: {9}, 8: {9}, 7: {9}})
+Testing function: loop
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5], 5: [6], 6: [7]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}})
+Testing function: nested_branches
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 5, 6, 7, 8}, 9: {0, 1, 2, 3, 9}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3], 3: [4, 9], 4: [5], 5: [6], 6: [7], 7: [8]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {5: {9}, 4: {9}, 8: {9}, 7: {9}, 6: {9}})
+Testing function: independent_branches
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {7}, 8: {8, 7}, 9: {8, 9, 7}, 10: {10}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5], 5: [6], 7: [8], 8: [9]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {3: {10}, 2: {10}, 1: {10}, 0: {10}, 6: {10}, 5: {10}, 4: {10}, 9: {10}, 8: {10}, 7: {10}})
+Testing function: two_way_loop
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 8}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5, 8], 5: [6], 6: [7]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}})
+Testing function: loop_with_branch
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 5, 6, 7, 8}, 9: {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, 10: {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, 11: {0, 1, 2, 3, 4, 5, 6, 7, 11}, 12: {0, 1, 2, 3, 4, 5, 6, 7, 11, 12}, 13: {0, 1, 2, 3, 4, 5, 6, 7, 11, 12, 13}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5], 5: [6], 6: [7], 7: [8, 11], 8: [9], 9: [10], 11: [12], 12: [13]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {10: {2}, 9: {2}, 8: {2}, 7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}, 13: {2}, 12: {2}, 11: {2}})
+Testing function: multiple_loops
+Dominators: {0: {0}, 1: {0, 1}, 2: {0, 1, 2}, 3: {0, 1, 2, 3}, 4: {0, 1, 2, 3, 4}, 5: {0, 1, 2, 3, 4, 5}, 6: {0, 1, 2, 3, 4, 5, 6}, 7: {0, 1, 2, 3, 4, 5, 6, 7}, 8: {0, 1, 2, 3, 4, 8}, 9: {0, 1, 2, 3, 4, 8, 9}, 10: {0, 1, 2, 3, 4, 8, 9, 10}, 11: {0, 1, 2, 3, 4, 8, 9, 10, 11}, 12: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12}, 13: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13}, 14: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14}, 15: {0, 1, 2, 3, 4, 8, 9, 10, 11, 12, 13, 14, 15}}
+Dominance Tree: defaultdict(&lt;class 'list'&gt;, {0: [1], 1: [2], 2: [3], 3: [4], 4: [5, 8], 5: [6], 6: [7], 8: [9], 9: [10], 10: [11], 11: [12], 12: [13], 13: [14], 14: [15]})
+Dominance Frontier: defaultdict(&lt;class 'set'&gt;, {7: {2}, 6: {2}, 5: {2}, 4: {2}, 3: {2}, 15: {10}, 14: {10}, 13: {10}, 12: {10}, 11: {10}})</code></pre>
 
 
 </section>
@@ -1300,8 +1601,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../homework/1.hw.html" class="pagination-link" aria-label="Homework 1 trying out bril">
-        <span class="nav-page-text">Homework 1 trying out bril</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" class="pagination-link" aria-label="Homework5 - Yashaswini">
+        <span class="nav-page-text">Homework5 - Yashaswini</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

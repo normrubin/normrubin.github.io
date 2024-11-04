@@ -8,7 +8,7 @@
 
 <meta name="author" content="Qucheng Jiang">
 
-<title>Homework 1: Exploring Bril – EECE7398 Fall 2024</title>
+<title>Homework 5: LLVM - Spinning Up – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -31,8 +65,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" rel="next">
-<link href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" rel="prev">
+<link href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" rel="next">
+<link href="../../blogs/Qucheng/2024-10-11-Qucheng-HW4.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +104,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1: Exploring Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="Homework 5: LLVM - Spinning Up – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +118,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html">Homework 5: LLVM - Spinning Up</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -308,7 +342,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1: Exploring Bril</span></a>
   </div>
 </li>
@@ -332,7 +366,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Homework 5: LLVM - Spinning Up</span></a>
   </div>
 </li>
@@ -777,9 +811,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html">Homework 5: LLVM - Spinning Up</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1: Exploring Bril</h1>
+<h1 class="title">Homework 5: LLVM - Spinning Up</h1>
 </div>
 
 
@@ -802,26 +836,126 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.</p>
+<section id="env" class="level2">
+<h2 class="anchored" data-anchor-id="env">Env</h2>
+<section id="env-setup" class="level3">
+<h3 class="anchored" data-anchor-id="env-setup">Env setup</h3>
+<p>New dependency packages are required to build targets in this Homework. I choose using <code>conda</code> for clear isolation with the system build toolchain. However, things were much more difficult than ever if the idiot VSCode (and unreliable official plugins) came to the context: VSCode IntelliSense could not easily recognize the header file, although LSP had already found out where to go; copilot continued to ask me to fix the include path to clear these import error; and the corresponding items in setting panel I have specified and pointed to the correct direction is always ignored or overwritten by their default location, which is point to the system default path. After trying a bunch of suggestions posted in the VSCode community forum, I finally gave up on making the autocomplete and type-checking stuff work.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install conda-forge::clang</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install conda-forge::cmake</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge llvmdev<span class="kw">;</span>  <span class="co"># header file, cmake recipe</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After experiencing these kinds of frustrating config stuff, I strongly recommend installing/updating the system’s default LLVM toolchain to make VSCode find the definition of the functions and variables, and not draw red underlines to interrupt your mind.</p>
+</section>
+<section id="env-startup" class="level3">
+<h3 class="anchored" data-anchor-id="env-startup">Env startup</h3>
+<p>If the LLVM toolchain is installed in the system-level default location, there’s no need to do this extra step.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LLVM_DIR</span><span class="op">=</span><span class="va">$CONDA_PREFIX</span>/lib/cmake/llvm</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LD_LIBRARY_PATH</span><span class="op">=&lt;</span>PRJ_DIR<span class="op">&gt;</span>/HW5/llvm-passes/show-float-div/build:<span class="va">$LD_LIBRARY_PATH</span><span class="kw">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 </section>
 <section id="detail-design" class="level2">
 <h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
-<p>The homework was divided into two main parts. I’ll walk through the details of my implementation, challenges faced, and the testing process.</p>
-<ul>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part1"><strong>Part 1</strong></a>: Creating and Running a New Benchmark</li>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part2"><strong>Part 2</strong></a>: Implementing a Bril Program Stub-Analyzer</li>
-</ul>
+<p>There’re <strong>3</strong> passes implemented in this Homework: - <strong>loop-unroll</strong>: Implemented a straightforward loop unrolling pass, only unrolling once if it finds a valid loop. (An ambitious task as the instruction of this homework suggested.) - <strong>show-bin-op</strong>: Display when there is a binary operation, log it out when doing compile, and call a stab function in <code>rtlib</code> during runtime to print the value stored in the destination. - <strong>show-float-div</strong>: As the instruction of this homework suggested, this pass is an example of an unambitious task, which displays only the <code>fdiv</code> operation, and acts the very same as the <code>show-bin-op</code> pass does when encountering <code>fdiv</code> operation.</p>
+<p><em>* Check <a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW5/llvm-passes">Passes Source Code</a> for details.</em></p>
 </section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>This assignment provided a comprehensive introduction to Bril and its tooling ecosystem. By creating benchmarks and developing a custom analyzer, I gained insights into compiler design and intermediate representations.</p>
-<p><strong>Hardest Part</strong>: The most challenging aspect was managing dependencies and environment setup for the Bril toolchain. Careful attention to the <code>makefile</code> and troubleshooting through GitHub Discussions helped overcome these issues.</p>
-<p><strong>Testing and Results</strong>: I validated my benchmarks and analyzer using various Bril programs. The tools successfully transformed and analyzed the input programs, demonstrating the utility of Bril in simple code analysis and transformation tasks.</p>
-<p>This experience has equipped me with practical skills in working with compiler tools and representations, paving the way for more complex analyses in future assignments.</p>
+<section id="integration-testing" class="level2">
+<h2 class="anchored" data-anchor-id="integration-testing">Integration, Testing</h2>
+<p>Some examples of the <em>real-ish</em> C/C++ program are provided in this homework. - <code>example.c</code> in each pass: Unit Tests to make sure passes are performing the correct results as wished. - <code>matmul.cpp</code>: A square matrix multiply testbench, which would be a great scenario to test the loop unrolling pass, but also can test the other two display passes. - <code>projectile_motion.cpp</code>: Simulates the motion of a projectile launched at a given angle and initial velocity within finite N steps.</p>
+<p>To build the tests:</p>
+<p>For <code>examples.c</code> and the pass library, go to each pass folder, and run <code>make</code>. All the results will be generated, including: - <code>$(BUILD_DIR)/$(PASS_NAME)/$(PASS_NAME)Pass.so</code>: Pass plugin as a dynamic lib. - <code>$(BUILD_DIR)/lib$(RTLIB_LIB_NAME).so</code>: Additional Runtime functions (i.e.&nbsp;Stab call funcs). - <code>example</code>: Executable of <code>examples.c</code>. To run the <code>example</code>, use <code>make run</code> instead of <code>make</code>.</p>
+<p>For <code>matmul.cpp</code> and <code>projectile_motion.cpp</code>, go to the app folder, and run <code>make</code>. Executable will be generated in the same folder. Use <code>make run</code> to test the execution.</p>
+</section>
+<section id="results-and-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="results-and-analysis">Results and Analysis</h2>
+<section id="matrix-multiply---loop-unroll" class="level3">
+<h3 class="anchored" data-anchor-id="matrix-multiply---loop-unroll">Matrix Multiply - Loop Unroll</h3>
+<p>Slightly different in wall clock speed.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> make run</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Running</span> target with custom LLVM pass...</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> ./matmul_with_pass</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="va">C</span><span class="op">[</span><span class="dv">0</span><span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="ex">=</span> 200</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">0.02user</span> 0.00system 0:00.02elapsed 96%CPU <span class="er">(</span><span class="ex">0avgtext+0avgdata</span> 2772maxresident<span class="kw">)</span><span class="ex">k</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">0inputs+0outputs</span> <span class="er">(</span><span class="ex">0major+149minor</span><span class="kw">)</span><span class="ex">pagefaults</span> 0swaps</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Running</span> target without custom LLVM pass...</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> ./matmul_without_pass</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="va">C</span><span class="op">[</span><span class="dv">0</span><span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="ex">=</span> 200</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">0.01user</span> 0.00system 0:00.02elapsed 95%CPU <span class="er">(</span><span class="ex">0avgtext+0avgdata</span> 2896maxresident<span class="kw">)</span><span class="ex">k</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">0inputs+0outputs</span> <span class="er">(</span><span class="ex">0major+153minor</span><span class="kw">)</span><span class="ex">pagefaults</span> 0swaps</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="example---show-fdiv" class="level3">
+<h3 class="anchored" data-anchor-id="example---show-fdiv">Example - Show <code>FDiv</code></h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ~/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div    main !8 ?7      ✔  15s   course-eece7398-st-compiler   jiang@builder  04:29:01  </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> make clean</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">❯</span> make run</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> build</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Building</span> RTLib...</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> Entering directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div'</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> <span class="st">'build'</span> is up to date.</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> Leaving directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div'</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">clang</span> <span class="at">-fPIC</span> <span class="at">-shared</span> rtlib.c <span class="at">-o</span> build/librtlib.so</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ex">Building</span> LLVM Pass...</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> Entering directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div'</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> <span class="st">'build'</span> is up to date.</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> Leaving directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div'</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> build <span class="kw">&amp;&amp;</span> <span class="fu">cmake</span> .. <span class="kw">&amp;&amp;</span> <span class="fu">make</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> The C compiler identification is GNU 14.2.0</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> The CXX compiler identification is GNU 9.4.0</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting C compiler ABI info</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting C compiler ABI info <span class="at">-</span> done</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Check for working C compiler: /home/jiang/miniconda3/envs/course-eece7398-st-compiler/bin/cc <span class="at">-</span> skipped</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting C compile features</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting C compile features <span class="at">-</span> done</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting CXX compiler ABI info</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting CXX compiler ABI info <span class="at">-</span> done</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Check for working CXX compiler: /usr/bin/c++ <span class="at">-</span> skipped</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting CXX compile features</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Detecting CXX compile features <span class="at">-</span> done</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so <span class="er">(</span><span class="ex">found</span> version <span class="st">"1.2.11"</span><span class="kw">)</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Found zstd: /home/jiang/miniconda3/envs/course-eece7398-st-compiler/lib/libzstd.so</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Found LibXml2: /home/jiang/miniconda3/envs/course-eece7398-st-compiler/lib/libxml2.so <span class="er">(</span><span class="ex">found</span> version <span class="st">"2.13.1"</span><span class="kw">)</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Linker detection: GNU ld</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Registering ShowFDivPass as a pass plugin <span class="er">(</span><span class="ex">static</span> build: OFF<span class="kw">)</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Configuring done <span class="er">(</span><span class="ex">0.7s</span><span class="kw">)</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Generating done <span class="er">(</span><span class="ex">0.0s</span><span class="kw">)</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="ex">--</span> Build files have been written to: /home/jiang/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> Entering directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">2</span><span class="op">]</span><span class="ex">:</span> Entering directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">3</span><span class="op">]</span><span class="ex">:</span> Entering directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">3</span><span class="op">]</span><span class="ex">:</span> Leaving directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">3</span><span class="op">]</span><span class="ex">:</span> Entering directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="bu">[</span> 50%] Building CXX <span class="er">object</span> <span class="ex">ShowFDiv/CMakeFiles/ShowFDivPass.dir/ShowFDiv.cpp.o</span></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="ex">[100%]</span> Linking CXX shared module ShowFDivPass.so</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">3</span><span class="op">]</span><span class="ex">:</span> Leaving directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="ex">[100%]</span> Built target ShowFDivPass</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">2</span><span class="op">]</span><span class="ex">:</span> Leaving directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="va">make</span><span class="op">[</span><span class="dv">1</span><span class="op">]</span><span class="ex">:</span> Leaving directory <span class="st">'/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build'</span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="ex">Compiling</span> target...</span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu">clang</span> <span class="at">-fpass-plugin</span><span class="op">=</span>build/ShowFDiv/ShowFDivPass.so <span class="at">-c</span> example.c</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="ex">ShowFDiv.cpp:34:</span> Found FDiv operator:   %38 = fdiv double %37, 2.000000e+00</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>  <span class="ex">%38</span> = fdiv double %37, 2.000000e+00</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="ex">OpcodeName:</span> fdiv</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">clang</span> example.o <span class="at">-Lbuild</span> <span class="at">-lrtlib</span> <span class="at">-o</span> example</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-f</span> example.o</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="ex">Running</span> target...</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LD_LIBRARY_PATH</span><span class="op">=</span>/home/jiang/scratch/work/course/EECE7398_ST_Compiler/HW5/llvm-passes/show-float-div/build:<span class="va">$LD_LIBRARY_PATH</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="ex">./example</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="ex">Enter</span> a number: 123</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="ex">125</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="ex">121</span></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="ex">246</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="ex">61</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="ex">Enter</span> a float number: 123.456</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="ex">125.456001</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="ex">121.456001</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="ex">246.912003</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="ex">[logfdiv:</span> 61.728001 = 123.456001 / 2.000000]</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="ex">61.728001</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -1247,13 +1381,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" class="pagination-link" aria-label="HW3 - Data Flow Analysis">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">HW3 - Data Flow Analysis</span>
+      <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW4.html" class="pagination-link" aria-label="Homework 4: Dominance">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 4: Dominance</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="pagination-link" aria-label="Homework 2: Optimizing with DCE and LVN">
-        <span class="nav-page-text">Homework 2: Optimizing with DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="pagination-link" aria-label="Homework 1">
+        <span class="nav-page-text">Homework 1</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

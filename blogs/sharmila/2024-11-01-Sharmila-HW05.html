@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Qucheng Jiang">
+<meta name="author" content="Sharmila Sivalingam">
 
-<title>Homework 1: Exploring Bril – EECE7398 Fall 2024</title>
+<title>Compiler Homework 05 - LLVM Pass – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +31,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" rel="next">
-<link href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" rel="prev">
+<link href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" rel="next">
+<link href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<meta property="og:title" content="Homework 1: Exploring Bril – EECE7398 Fall 2024">
+<meta property="og:title" content="Compiler Homework 05 - LLVM Pass – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -84,7 +84,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html">Compiler Homework 05 - LLVM Pass</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -299,16 +299,16 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Qucheng</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework 1: Exploring Bril</span></a>
   </div>
 </li>
@@ -416,13 +416,13 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true">
  <span class="menu-text">Sharmila</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
@@ -449,7 +449,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Compiler Homework 05 - LLVM Pass</span></a>
   </div>
 </li>
@@ -777,9 +777,9 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Homework 1: Exploring Bril</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html">Sharmila</a></li><li class="breadcrumb-item"><a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html">Compiler Homework 05 - LLVM Pass</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework 1: Exploring Bril</h1>
+<h1 class="title">Compiler Homework 05 - LLVM Pass</h1>
 </div>
 
 
@@ -789,7 +789,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Qucheng Jiang </p>
+             <p>Sharmila Sivalingam </p>
           </div>
   </div>
     
@@ -802,24 +802,145 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>For this assignment, I explored the Bril intermediate representation and wrote a new benchmark along with a tool to analyze and transform Bril programs.</p>
+<p>In this blog, I’ll walk through the process of creating an LLVM pass to detect floating-point divisions within a C++ program. This project involves using the LLVM framework to analyze the Intermediate Representation (IR) code generated from a C++ program and detecting instances of floating-point division operations</p>
+<section id="implementation" class="level1">
+<h1>Implementation:</h1>
+<p>For each instruction in the basic block, we check if it’s a BinaryOperator with the opcode Instruction::FDiv, which represents a floating-point division in LLVM IR.</p>
 </section>
-<section id="detail-design" class="level2">
-<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
-<p>The homework was divided into two main parts. I’ll walk through the details of my implementation, challenges faced, and the testing process.</p>
-<ul>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part1"><strong>Part 1</strong></a>: Creating and Running a New Benchmark</li>
-<li><a href="https://github.com/jiangqucheng/EECE7398_ST_Compiler/tree/main/HW1/Part2"><strong>Part 2</strong></a>: Implementing a Bril Program Stub-Analyzer</li>
-</ul>
+<section id="testing" class="level1">
+<h1>Testing :</h1>
+<p>I tested my pass using the below example:</p>
+<pre class="{c++}"><code>#include &lt;iostream&gt;
+#include &lt;stdio.h&gt;
+
+double divide(double a, double b) {
+    return a / b;
+}
+
+int main() {
+    double result1 = divide(10.0, 2.0);
+    double result2 = divide(19.0, 3.0);
+
+    if (result1 &gt; result2) {
+        double result3 = divide(result1, result2);  // Division in if branch
+    } else {
+        double result4 = divide(result2, result1);  // Division in else branch
+    }
+
+    return 0;
+}</code></pre>
+<p>To look at LLVM IR of this example I used “clang -emit-llvm -S -o - test.cpp”</p>
+<pre class="{out}"><code>Analyzing Function: divided
+Floating point division detected in Basic Block: %0
+  Instruction:   %7 = fdiv double %5, %6
+Analyzing Function: main
+No floating point divisions found in function.
+Analyzing Function: _GLOBAL__sub_I_test.cpp
+No floating point divisions found in function.
+; ModuleID = '../test.cpp'
+source_filename = "../test.cpp"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+%"class.std::ios_base::Init" = type { i8 }
+
+@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
+@__dso_handle = external hidden global i8
+@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_test.cpp, i8* null }]
+
+; Function Attrs: noinline uwtable
+define internal void @__cxx_global_var_init() #0 section ".text.startup" {
+  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* @_ZStL8__ioinit)
+  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
+  ret void
+}
+
+declare dso_local void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"*) unnamed_addr #1
+
+; Function Attrs: nounwind
+declare dso_local void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"*) unnamed_addr #2
+
+; Function Attrs: nounwind
+declare dso_local i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local double @_Z6dividedd(double %0, double %1) #4 {
+  %3 = alloca double, align 8
+  %4 = alloca double, align 8
+  store double %0, double* %3, align 8
+  store double %1, double* %4, align 8
+  %5 = load double, double* %3, align 8
+  %6 = load double, double* %4, align 8
+  %7 = fdiv double %5, %6
+  ret double %7
+}
+
+; Function Attrs: noinline norecurse nounwind optnone uwtable
+define dso_local i32 @main() #5 {
+  %1 = alloca i32, align 4
+  %2 = alloca double, align 8
+  %3 = alloca double, align 8
+  %4 = alloca double, align 8
+  %5 = alloca double, align 8
+  store i32 0, i32* %1, align 4
+  %6 = call double @_Z6dividedd(double 1.000000e+01, double 2.000000e+00)
+  store double %6, double* %2, align 8
+  %7 = call double @_Z6dividedd(double 1.900000e+01, double 3.000000e+00)
+  store double %7, double* %3, align 8
+  %8 = load double, double* %2, align 8
+  %9 = load double, double* %3, align 8
+  %10 = fcmp ogt double %8, %9
+  br i1 %10, label %11, label %15
+
+11:                                               ; preds = %0
+  %12 = load double, double* %2, align 8
+  %13 = load double, double* %3, align 8
+  %14 = call double @_Z6dividedd(double %12, double %13)
+  store double %14, double* %4, align 8
+  br label %19
+
+15:                                               ; preds = %0
+  %16 = load double, double* %3, align 8
+  %17 = load double, double* %2, align 8
+  %18 = call double @_Z6dividedd(double %16, double %17)
+  store double %18, double* %5, align 8
+  br label %19
+
+19:                                               ; preds = %15, %11
+  ret i32 0
+}
+
+; Function Attrs: noinline uwtable
+define internal void @_GLOBAL__sub_I_test.cpp() #0 section ".text.startup" {
+  call void @__cxx_global_var_init()
+  ret void
+}
+
+attributes #0 = { noinline uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { nounwind }
+attributes #4 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #5 = { noinline norecurse nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{!"clang version 10.0.0-4ubuntu1 "}</code></pre>
+<p>To run this pass I used “clang -fpass-plugin=Homework5/build/FloatDivPass.so test.cpp”</p>
+<pre class="{output}"><code>No floating point divisions found in function.
+Analyzing Function: divided
+Floating point division detected in Basic Block: %0
+  Instruction:   %7 = fdiv double %5, %6
+Analyzing Function: main
+No floating point divisions found in function.
+Analyzing Function: _GLOBAL__sub_I_test.cpp
+No floating point divisions found in function.</code></pre>
 </section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>This assignment provided a comprehensive introduction to Bril and its tooling ecosystem. By creating benchmarks and developing a custom analyzer, I gained insights into compiler design and intermediate representations.</p>
-<p><strong>Hardest Part</strong>: The most challenging aspect was managing dependencies and environment setup for the Bril toolchain. Careful attention to the <code>makefile</code> and troubleshooting through GitHub Discussions helped overcome these issues.</p>
-<p><strong>Testing and Results</strong>: I validated my benchmarks and analyzer using various Bril programs. The tools successfully transformed and analyzed the input programs, demonstrating the utility of Bril in simple code analysis and transformation tasks.</p>
-<p>This experience has equipped me with practical skills in working with compiler tools and representations, paving the way for more complex analyses in future assignments.</p>
+<section id="challenges-faced" class="level1">
+<h1>Challenges Faced:</h1>
+<p>Initially, I faced many challenges while setting up the llvm and during build and cmake stage. Then, I fond it difficult in llvm pass code. Because even cout can’t be mentioned as it is instead errs(). Even while testing I was able to see the output of the test file but not the LLVM pass.</p>
 
 
 </section>
@@ -1247,13 +1368,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" class="pagination-link" aria-label="HW3 - Data Flow Analysis">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">HW3 - Data Flow Analysis</span>
+      <a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="pagination-link" aria-label="Compiler Homework 04 -  Implementing Dominance Utilities">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Compiler Homework 04 - Implementing Dominance Utilities</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="pagination-link" aria-label="Homework 2: Optimizing with DCE and LVN">
-        <span class="nav-page-text">Homework 2: Optimizing with DCE and LVN</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="pagination-link" aria-label="Homework1 - Yashaswini">
+        <span class="nav-page-text">Homework1 - Yashaswini</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

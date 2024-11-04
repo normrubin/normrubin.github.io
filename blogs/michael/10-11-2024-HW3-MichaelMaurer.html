@@ -230,6 +230,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Homework 4 – Implementing Dominance Algorithms</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5 – Implementing a simple LLVM pass</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -286,6 +292,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">EECE7309 Homework 4 – Dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 5 – LLVM</span></a>
   </div>
 </li>
       </ul>
@@ -352,6 +364,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Homework 4: Dominance</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5: LLVM - Spinning Up</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -387,6 +405,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Homework 4</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -414,6 +438,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/Sana/10-18-2024-HW4-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework4 - dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/11-1-2024-HW5-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - LLVM</span></a>
   </div>
 </li>
       </ul>
@@ -451,6 +481,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Compiler Homework 04 - Implementing Dominance Utilities</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 05 - LLVM Pass</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -484,6 +520,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/yashaswini/10-18-2024-HW4-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework4 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - Yashaswini</span></a>
   </div>
 </li>
       </ul>
@@ -812,7 +854,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>As mentioned above, this implementation analyzes whether a definiton reaches a particular part of the program. To do this, we define an algorithm which inspects every basic block in each function in the program. We determine, based on the definitions which enter the block, the definitions that exit the block.</p>
 <p>In more detail, we determine the definitions which enter the block as the union of all definitions exiting predecessor blocks to the given block (this is the <code>merge</code> step). Then, we determine what the outputs of the basic block are by overwriting any definitions found in <code>b_in</code> (the definitions which reach the block) of variables defined in the current block, which is to say that we overwrite the definitions killed by the current block. This is the <code>transfer</code> step. We iterate through all the basic blocks in the program, moving “forward” through the basic blocks, where forward is moving essentially forward through time in the program. At the end of each block’s analysis, if the outputs of the block have changed, we enqueue the successor blocks of the current block into our worklist. Once the outputs of the block cease to change, this analysis is complete and has converged (it is further provable that this algorithm always converges).</p>
 <p>The data structure in this analysis is a CFG, containing “Blocks” which are defined as follows:</p>
-<div id="6658a333" class="cell">
+<div id="0ced3baf" class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Block:</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, instrs: <span class="bu">list</span>, <span class="bu">id</span>, preds: <span class="bu">set</span>, succs: <span class="bu">set</span>):</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.instrs <span class="op">=</span> instrs</span>
@@ -821,7 +863,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.succs <span class="op">=</span> succs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Further, this code was designed to be compatible with other analyses. It does so by definining the following class:</p>
-<div id="7f8075ca" class="cell">
+<div id="ba83bdfe" class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Analysis():</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, forward: <span class="bu">bool</span>, merge: Callable[<span class="bu">list</span>, <span class="bu">list</span>], transfer: Callable[[<span class="bu">dict</span>, blocks.Block], <span class="bu">dict</span>]):</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.forward <span class="op">=</span> forward</span>
