@@ -1,0 +1,606 @@
+---
+author: Michael Maurer
+execute:
+  enabled: false
+format:
+  html: default
+title: EECE7309 Homework 5 -- LLVM
+
+---
+
+## Introduction
+
+This assignment prompts us to explore LLVM, and to write a basic pass which either analyzes or modifies some input source code. 
+
+## LLVM
+
+We are interested in hacking the LLVM compiler in this assignment, specificially by writing a pass. LLVM gives interested developers a straightforward interface by which to do this, namely by building a shared library object which users can prompt clang/LLVM to dynamically link against. One of the reasons LLVM has become so popular is because of this ability, as well as being used by the largest company in the world.  
+
+## Design
+Here, I developed a llvm pass which identifies all floating-point arithmetic operations in the llvm-IR. It simply prints these out to stdout. This is not a complex pass by any means, but it does require understanding how to use the LLVM libraries to develop a pass.
+
+## Challenges Faced
+One challenge I faced was when attempting to implement constant folding. I wrote up the appropriate llvm library to perform constant folding, but was not seeing any code modifications no matter what input I provided. Shortly after, I learned that Clang does [constant folding automatically](https://stackoverflow.com/questions/54300860/how-to-turn-off-the-constant-folding-optimization-in-llvm) in the frontend, and this feature cannot be turned off.
+
+A second challenge I faced was when performing the extension of constant folding, which was to put together a constant propagation optimizer. The problem here, unfortunately, I believe lies between chair and keyboard, as I was having issues which I believe are related to my pointer usage. Admittedly, I think I could have finished this (and still may in the future), but ran out of steam to get it done by this assignment deadline. 
+
+## Testing
+I tested my program on five different programatic inputs, all which contain a handful of floating point operations. These programs included one addition heavy program, one which had subtraction and division, one which had many multiplications, and two which had floating point arithmetic but also more complex control flow. These programs were largely created by ChatGPT and edited by myself for usefulness and correctness. 
+
+Additionally, I generated expected test results by writing a basic python text parsing tool, which isolated all floating point arithmetic instructions from the program's emmitted LLVM. This digest was then directed into `.out` files, which could be used with `turnt`. This allowed for easy automated testing, comparing the results delivered by the compiler pass to those delivered by the python script (which is easier to confirm by hand).
+
+The test results are shown in the Appendix rather than here, as the program itself is fairly trivial and results are as well. The code can be further verified using the link in the next section.
+
+## Code
+
+The code used to generate the above results, as well as the test cases and tooling, can be found [here](https://github.com/maurermi/eece7398-compilers-homework/tree/main/hw5-llvm).
+
+## Appendix: Test Results
+
+Below, we will review the test cases and expected results. 
+
+First, let's look at a simple program which does a floating point addition and a floating point multiplication.
+
+`addition.c`
+```{c}
+#include <stdio.h>
+
+int main() {
+    float a = 3.5, b = 2.5, c;
+    c = a + b;
+    c = c * 1.5;
+    printf("Result: %f\n", c);
+    return 0;
+}
+```
+
+With the resulting llvm.
+
+`addition.s`
+```{assembly}
+; ModuleID = 'tests/addition.c'
+source_filename = "tests/addition.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [12 x i8] c"Result: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 3.500000e+00, ptr %2, align 4
+  store float 2.500000e+00, ptr %3, align 4
+  %5 = load float, ptr %2, align 4
+  %6 = load float, ptr %3, align 4
+  %7 = fadd float %5, %6
+  store float %7, ptr %4, align 4
+  %8 = load float, ptr %4, align 4
+  %9 = fpext float %8 to double
+  %10 = fmul double %9, 1.500000e+00
+  %11 = fptrunc double %10 to float
+  store float %11, ptr %4, align 4
+  %12 = load float, ptr %4, align 4
+  %13 = fpext float %12 to double
+  %14 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %13)
+  ret i32 0
+}
+
+declare i32 @printf(ptr noundef, ...) #1
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}
+```
+
+This gives the following result, as expected given that there are only two floating point operations.
+
+`addition.out`
+```{text}
+  %7 = fadd float %5, %6
+  %10 = fmul double %9, 1.500000e+00
+```
+
+Now for a program with floating point division and subtraction:
+
+`division.c`
+```{c}
+#include <stdio.h>
+
+int main() {
+    float a = 10.0, b = 4.0, result;
+    result = a / b;
+    result = result - 1.5;
+    printf("Result: %f\n", result);
+    return 0;
+}
+```
+
+which has the following llvm:
+
+`division.s`
+```{llvm}
+; ModuleID = 'tests/division.c'
+source_filename = "tests/division.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [12 x i8] c"Result: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 1.000000e+01, ptr %2, align 4
+  store float 4.000000e+00, ptr %3, align 4
+  %5 = load float, ptr %2, align 4
+  %6 = load float, ptr %3, align 4
+  %7 = fdiv float %5, %6
+  store float %7, ptr %4, align 4
+  %8 = load float, ptr %4, align 4
+  %9 = fpext float %8 to double
+  %10 = fsub double %9, 1.500000e+00
+  %11 = fptrunc double %10 to float
+  store float %11, ptr %4, align 4
+  %12 = load float, ptr %4, align 4
+  %13 = fpext float %12 to double
+  %14 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %13)
+  ret i32 0
+}
+
+declare i32 @printf(ptr noundef, ...) #1
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}
+```
+
+Again, we see quickly that there are only two floating point arithmetic operations. We do see that there are a few floating point operations that are not arithmetic, such as fpext and fptrunc, but these were not omitted in our analysis. That said, it would be trivial to add them to our analysis, as it just expands the size of the switch statement in use. 
+
+`division.out`
+```{text}
+  %7 = fdiv float %5, %6
+  %10 = fsub double %9, 1.500000e+00
+```
+
+Next, we can try a program which has nested conditionals, to see if this analysis works even with multiple basic blocks.
+
+`nested-conditionals.c`
+```{c}
+#include <stdio.h>
+#include <math.h>
+
+int main() {
+    float a = 3.7, b = 2.5, result = 0.0;
+
+    if (a > b) {
+        result = pow(a, 2) - sqrt(b);
+    } else {
+        result = log(a + b) * sin(a);
+    }
+
+    if (result > 5.0) {
+        result /= 2.0;
+    } else if (result < -5.0) {
+        result *= -1.0;
+    } else {
+        result += 1.5;
+    }
+
+    printf("Final result: %f\n", result);
+    return 0;
+}
+```
+
+`nested-conditionals.s`
+```{assembly}
+; ModuleID = 'tests/nested-conditionals.c'
+source_filename = "tests/nested-conditionals.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [18 x i8] c"Final result: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 0x400D9999A0000000, ptr %2, align 4
+  store float 2.500000e+00, ptr %3, align 4
+  store float 0.000000e+00, ptr %4, align 4
+  %5 = load float, ptr %2, align 4
+  %6 = load float, ptr %3, align 4
+  %7 = fcmp ogt float %5, %6
+  br i1 %7, label %8, label %17
+
+8:                                                ; preds = %0
+  %9 = load float, ptr %2, align 4
+  %10 = fpext float %9 to double
+  %11 = call double @llvm.pow.f64(double %10, double 2.000000e+00)
+  %12 = load float, ptr %3, align 4
+  %13 = fpext float %12 to double
+  %14 = call double @llvm.sqrt.f64(double %13)
+  %15 = fsub double %11, %14    
+  %16 = fptrunc double %15 to float
+  store float %16, ptr %4, align 4
+  br label %28
+
+17:                                               ; preds = %0
+  %18 = load float, ptr %2, align 4
+  %19 = load float, ptr %3, align 4
+  %20 = fadd float %18, %19
+  %21 = fpext float %20 to double
+  %22 = call double @llvm.log.f64(double %21)
+  %23 = load float, ptr %2, align 4
+  %24 = fpext float %23 to double
+  %25 = call double @llvm.sin.f64(double %24)
+  %26 = fmul double %22, %25
+  %27 = fptrunc double %26 to float
+  store float %27, ptr %4, align 4
+  br label %28
+
+28:                                               ; preds = %17, %8
+  %29 = load float, ptr %4, align 4
+  %30 = fpext float %29 to double
+  %31 = fcmp ogt double %30, 5.000000e+00
+  br i1 %31, label %32, label %37
+
+32:                                               ; preds = %28
+  %33 = load float, ptr %4, align 4
+  %34 = fpext float %33 to double
+  %35 = fdiv double %34, 2.000000e+00
+  %36 = fptrunc double %35 to float
+  store float %36, ptr %4, align 4
+  br label %52
+
+37:                                               ; preds = %28
+  %38 = load float, ptr %4, align 4
+  %39 = fpext float %38 to double
+  %40 = fcmp olt double %39, -5.000000e+00
+  br i1 %40, label %41, label %46
+
+41:                                               ; preds = %37
+  %42 = load float, ptr %4, align 4
+  %43 = fpext float %42 to double
+  %44 = fmul double %43, -1.000000e+00
+  %45 = fptrunc double %44 to float
+  store float %45, ptr %4, align 4
+  br label %51
+
+46:                                               ; preds = %37
+  %47 = load float, ptr %4, align 4
+  %48 = fpext float %47 to double
+  %49 = fadd double %48, 1.500000e+00
+  %50 = fptrunc double %49 to float
+  store float %50, ptr %4, align 4
+  br label %51
+
+51:                                               ; preds = %46, %41
+  br label %52
+
+52:                                               ; preds = %51, %32
+  %53 = load float, ptr %4, align 4
+  %54 = fpext float %53 to double
+  %55 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %54)
+  ret i32 0
+}
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.pow.f64(double, double) #1
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.sqrt.f64(double) #1
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.log.f64(double) #1
+
+; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+declare double @llvm.sin.f64(double) #1
+
+declare i32 @printf(ptr noundef, ...) #2
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) }
+attributes #2 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}
+```
+
+
+And as we can see, the program finds the floating point arithmetic operations in question.
+
+`nested-conditionals.out`
+```{text}
+  %15 = fsub double %11, %14
+  %20 = fadd float %18, %19
+  %26 = fmul double %22, %25
+  %35 = fdiv double %34, 2.000000e+00
+  %44 = fmul double %43, -1.000000e+00
+  %49 = fadd double %48, 1.500000e+00
+```
+
+The next program contains many multiplication operations, so we expect the result to contain ten fmul operations.
+
+`multiplication.c`
+```{c}
+#include <stdio.h>
+
+int main()
+{
+    float a = 1.1, b = 2.2, c = 3.3, d = 4.4, e = 5.5;
+    float f = 6.6, g = 7.7, h = 8.8, i = 9.9, j = 10.1;
+
+    float result1 = a * b;
+    float result2 = c * d;
+    float result3 = e * f;
+    float result4 = g * h;
+    float result5 = i * j;
+
+    float result6 = a * c;
+    float result7 = e * g;
+    float result8 = i * a;
+    float result9 = b * f;
+    float result10 = d * h;
+
+    return 0;
+}
+```
+
+`multiplication.s`
+```{assembly}
+; ModuleID = 'tests/multiplication.c'
+source_filename = "tests/multiplication.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca float, align 4
+  %5 = alloca float, align 4
+  %6 = alloca float, align 4
+  %7 = alloca float, align 4
+  %8 = alloca float, align 4
+  %9 = alloca float, align 4
+  %10 = alloca float, align 4
+  %11 = alloca float, align 4
+  %12 = alloca float, align 4
+  %13 = alloca float, align 4
+  %14 = alloca float, align 4
+  %15 = alloca float, align 4
+  %16 = alloca float, align 4
+  %17 = alloca float, align 4
+  %18 = alloca float, align 4
+  %19 = alloca float, align 4
+  %20 = alloca float, align 4
+  %21 = alloca float, align 4
+  store i32 0, ptr %1, align 4
+  store float 0x3FF19999A0000000, ptr %2, align 4
+  store float 0x40019999A0000000, ptr %3, align 4
+  store float 0x400A666660000000, ptr %4, align 4
+  store float 0x40119999A0000000, ptr %5, align 4
+  store float 5.500000e+00, ptr %6, align 4
+  store float 0x401A666660000000, ptr %7, align 4
+  store float 0x401ECCCCC0000000, ptr %8, align 4
+  store float 0x40219999A0000000, ptr %9, align 4
+  store float 0x4023CCCCC0000000, ptr %10, align 4
+  store float 0x4024333340000000, ptr %11, align 4
+  %22 = load float, ptr %2, align 4
+  %23 = load float, ptr %3, align 4
+  %24 = fmul float %22, %23
+  store float %24, ptr %12, align 4
+  %25 = load float, ptr %4, align 4
+  %26 = load float, ptr %5, align 4
+  %27 = fmul float %25, %26
+  store float %27, ptr %13, align 4
+  %28 = load float, ptr %6, align 4
+  %29 = load float, ptr %7, align 4
+  %30 = fmul float %28, %29
+  store float %30, ptr %14, align 4
+  %31 = load float, ptr %8, align 4
+  %32 = load float, ptr %9, align 4
+  %33 = fmul float %31, %32
+  store float %33, ptr %15, align 4
+  %34 = load float, ptr %10, align 4
+  %35 = load float, ptr %11, align 4
+  %36 = fmul float %34, %35
+  store float %36, ptr %16, align 4
+  %37 = load float, ptr %2, align 4
+  %38 = load float, ptr %4, align 4
+  %39 = fmul float %37, %38
+  store float %39, ptr %17, align 4
+  %40 = load float, ptr %6, align 4
+  %41 = load float, ptr %8, align 4
+  %42 = fmul float %40, %41
+  store float %42, ptr %18, align 4
+  %43 = load float, ptr %10, align 4
+  %44 = load float, ptr %2, align 4
+  %45 = fmul float %43, %44
+  store float %45, ptr %19, align 4
+  %46 = load float, ptr %3, align 4
+  %47 = load float, ptr %7, align 4
+  %48 = fmul float %46, %47
+  store float %48, ptr %20, align 4
+  %49 = load float, ptr %5, align 4
+  %50 = load float, ptr %9, align 4
+  %51 = fmul float %49, %50
+  store float %51, ptr %21, align 4
+  ret i32 0
+}
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}
+```
+
+
+And we observe what is expected:
+`multiplication.out`
+```{text}
+  %24 = fmul float %22, %23
+  %27 = fmul float %25, %26
+  %30 = fmul float %28, %29
+  %33 = fmul float %31, %32
+  %36 = fmul float %34, %35
+  %39 = fmul float %37, %38
+  %42 = fmul float %40, %41
+  %45 = fmul float %43, %44
+  %48 = fmul float %46, %47
+  %51 = fmul float %49, %50
+```
+
+Finally, we look at a program with a looping control flow, whihc performs floating point divisions, additions, and multiplications. 
+`looping_addition.c`
+```{c}
+#include <stdio.h>
+
+int main() {
+    float x = 1.0, sum = 0.0;
+    for (int i = 0; i < 5; i++) {
+        sum += x / (i + 1);
+        if (sum > 2.0) {
+            sum *= 0.5;
+        }
+        x += 1.0;
+    }
+    printf("Final sum: %f\n", sum);
+    return 0;
+}
+```
+
+`looping_addition.s`
+```{assembly}
+; ModuleID = 'tests/looping_addition.c'
+source_filename = "tests/looping_addition.c"
+target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+target triple = "arm64-apple-macosx15.0.0"
+
+@.str = private unnamed_addr constant [15 x i8] c"Final sum: %f\0A\00", align 1
+
+; Function Attrs: noinline nounwind optnone ssp uwtable(sync)
+define i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca float, align 4
+  %3 = alloca float, align 4
+  %4 = alloca i32, align 4
+  store i32 0, ptr %1, align 4
+  store float 1.000000e+00, ptr %2, align 4
+  store float 0.000000e+00, ptr %3, align 4
+  store i32 0, ptr %4, align 4
+  br label %5
+
+5:                                                ; preds = %29, %0
+  %6 = load i32, ptr %4, align 4
+  %7 = icmp slt i32 %6, 5
+  br i1 %7, label %8, label %32
+
+8:                                                ; preds = %5
+  %9 = load float, ptr %2, align 4
+  %10 = load i32, ptr %4, align 4
+  %11 = add nsw i32 %10, 1
+  %12 = sitofp i32 %11 to float
+  %13 = fdiv float %9, %12
+  %14 = load float, ptr %3, align 4
+  %15 = fadd float %14, %13
+  store float %15, ptr %3, align 4
+  %16 = load float, ptr %3, align 4
+  %17 = fpext float %16 to double
+  %18 = fcmp ogt double %17, 2.000000e+00
+  br i1 %18, label %19, label %24
+
+19:                                               ; preds = %8
+  %20 = load float, ptr %3, align 4
+  %21 = fpext float %20 to double
+  %22 = fmul double %21, 5.000000e-01
+  %23 = fptrunc double %22 to float
+  store float %23, ptr %3, align 4
+  br label %24
+
+24:                                               ; preds = %19, %8
+  %25 = load float, ptr %2, align 4
+  %26 = fpext float %25 to double
+  %27 = fadd double %26, 1.000000e+00
+  %28 = fptrunc double %27 to float
+  store float %28, ptr %2, align 4
+  br label %29
+
+29:                                               ; preds = %24
+  %30 = load i32, ptr %4, align 4
+  %31 = add nsw i32 %30, 1
+  store i32 %31, ptr %4, align 4
+  br label %5, !llvm.loop !5
+
+32:                                               ; preds = %5
+  %33 = load float, ptr %3, align 4
+  %34 = fpext float %33 to double
+  %35 = call i32 (ptr, ...) @printf(ptr noundef @.str, double noundef %34)
+  ret i32 0
+}
+
+declare i32 @printf(ptr noundef, ...) #1
+
+attributes #0 = { noinline nounwind optnone ssp uwtable(sync) "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+attributes #1 = { "frame-pointer"="non-leaf" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="apple-m1" "target-features"="+aes,+complxnum,+crc,+dotprod,+fp-armv8,+fp16fml,+fullfp16,+jsconv,+lse,+neon,+pauth,+ras,+rcpc,+rdm,+sha2,+sha3,+v8.1a,+v8.2a,+v8.3a,+v8.4a,+v8.5a,+v8a,+zcm,+zcz" }
+
+!llvm.module.flags = !{!0, !1, !2, !3}
+!llvm.ident = !{!4}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 8, !"PIC Level", i32 2}
+!2 = !{i32 7, !"uwtable", i32 1}
+!3 = !{i32 7, !"frame-pointer", i32 1}
+!4 = !{!"Homebrew clang version 18.1.8"}
+!5 = distinct !{!5, !6}
+!6 = !{!"llvm.loop.mustprogress"}
+```
+
+
+And we see all four floating point arithmetic operations are found.
+`looping_addition.out`
+```{text}
+  %13 = fdiv float %9, %12
+  %15 = fadd float %14, %13
+  %22 = fmul double %21, 5.000000e-01
+  %27 = fadd double %26, 1.000000e+00
+```

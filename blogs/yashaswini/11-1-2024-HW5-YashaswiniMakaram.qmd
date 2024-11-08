@@ -1,0 +1,107 @@
+---
+author: Yashaswini Makaram
+execute:
+  enabled: false
+format:
+  html: default
+title: Homework5 - Yashaswini
+---
+
+# LLVM
+
+
+## About the Code:
+
+- This pass looks for floating-point division operations (FDivOperator) and injects a call to a function named log_float_division whenever such an instruction is found.
+- The log_float_division function needs to be defined separately (e.g., in a C file) to print a message or log data.
+
+```
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/Support/raw_ostream.h"
+
+using namespace llvm;
+
+namespace {
+class FloatDivLogger : public PassInfoMixin<FloatDivLogger> {
+public:
+  PreservedAnalyses run(Function &F, FunctionAnalysisManager &FAM) {
+    bool modified = false;
+
+    for (auto &BB : F) {
+      for (auto &I : BB) {
+        // Check if the instruction is a floating-point division
+        if (auto *op = dyn_cast<FDivOperator>(&I)) {
+          IRBuilder<> builder(&I);
+          FunctionCallee logFunc = F.getParent()->getOrInsertFunction(
+              "log_float_division", builder.getVoidTy());
+          builder.CreateCall(logFunc);
+
+          modified = true;
+        }
+      }
+    }
+
+    return (modified ? PreservedAnalyses::none() : PreservedAnalyses::all());
+  }
+};
+} // namespace
+
+// Register the pass with the LLVM Pass Manager
+llvm::PassPluginLibraryInfo getFloatDivLoggerPluginInfo() {
+  return {LLVM_PLUGIN_API_VERSION, "FloatDivLogger", LLVM_VERSION_STRING,
+          [](PassBuilder &PB) {
+            PB.registerPipelineParsingCallback(
+                [](StringRef Name, FunctionPassManager &FPM,
+                   ArrayRef<PassBuilder::PipelineElement>) {
+                  if (Name == "float-div-logger") {
+                    FPM.addPass(FloatDivLogger());
+                    return true;
+                  }
+                  return false;
+                });
+          }};
+}
+
+extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+  return getFloatDivLoggerPluginInfo();
+}
+```
+
+```
+#include <stdio.h>
+
+void log_float_division() {
+    printf("Floating-point division detected!\n");
+}
+
+```
+## Testing:
+
+A simple program that uses floating point division:
+
+```
+#include <stdio.h>
+
+int main() {
+    float a = 10.0;
+    float b = 2.0;
+    float c = a / b;
+    printf("Result: %f\n", c);
+    return 0;
+}
+```
+
+##Output
+
+The message: "Floating-point division detected!" is printed after every floating point division.
+
+## Challanges
+
+The most difficult part of this Homework was getting LLVM properly installed along with cmake and clang.  
+As I am using WSL, the cmake function does not update properly and was outof date for the llvm installation.  
+ensuring all installations worked and were properly linked together took some time.
+
+
