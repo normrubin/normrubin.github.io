@@ -3953,7 +3953,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#ddd6968a .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#be493a41 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4918,7 +4918,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1556\n-rw-r--r-- 1 runner docker 40847 Nov  4 13:41 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Nov  4 13:41 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Nov  4 13:41 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  4 13:40 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Nov  4 13:41 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Nov  4 13:41 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Nov  4 13:41 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Nov  4 13:41 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Nov  4 13:41 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Nov  4 13:41 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23601 Nov  4 13:41 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Nov  4 13:41 03_local.html\n-rw-r--r-- 1 runner docker 12742 Nov  4 13:41 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Nov  4 13:41 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 56836 Nov  4 13:41 04_data_flow.html\n-rw-r--r-- 1 runner docker  9438 Nov  4 13:41 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Nov  4 13:41 05_global.qmd\n-rw-r--r-- 1 runner docker  4544 Nov  4 13:41 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Nov  4 13:41 05c_pre.qmd\n-rw-r--r-- 1 runner docker 20184 Nov  4 13:41 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25643 Nov  4 13:40 07_llvm.notebook\n-rw-r--r-- 1 runner docker 28320 Nov  4 13:41 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Nov  4 13:41 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Nov  4 13:41 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  4 13:40 09_poly_files\n-rw-r--r-- 1 runner docker   302 Nov  4 13:41 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Nov  4 13:41 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Nov  4 13:41 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Nov  4 13:41 12_memory.html\n-rw-r--r-- 1 runner docker   316 Nov  4 13:41 12_memory.qmd\n-rw-r--r-- 1 runner docker 79398 Nov  4 13:41 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker 16077 Nov  4 13:41 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10117 Nov  4 13:41 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Nov  4 13:40 a.json\n-rw-r--r-- 1 runner docker   248 Nov  4 13:40 a.ts\ndrwxr-xr-x 2 runner docker  4096 Nov  4 13:40 df\n-rw-r--r-- 1 runner docker 27504 Nov  4 13:41 diverg.qmd\n-rw-r--r-- 1 runner docker  4983 Nov  4 13:41 diverg1.qmd\n-rw-r--r-- 1 runner docker  4595 Nov  4 13:40 errors\n-rw-r--r-- 1 runner docker  3623 Nov  4 13:40 foo.ll\n-rw-r--r-- 1 runner docker  2296 Nov  4 13:40 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Nov  4 13:40 images\n-rw-r--r-- 1 runner docker 30815 Nov  4 13:41 junk.html\n-rw-r--r-- 1 runner docker  2134 Nov  4 13:41 junk.qmd\n-rw-r--r-- 1 runner docker   905 Nov  4 13:40 junk.txt\n-rw-r--r-- 1 runner docker 51734 Nov  4 13:41 llvm.html\n-rw-r--r-- 1 runner docker 20713 Nov  4 13:41 llvm.qmd\n-rw-r--r-- 1 runner docker  7641 Nov  4 13:40 llvm.qmd.next\n-rw-r--r-- 1 runner docker 14847 Nov  4 13:41 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Nov  4 13:41 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Nov  4 13:40 papers\ndrwxr-xr-x 2 runner docker  4096 Nov  4 13:40 ra\n-rw-r--r-- 1 runner docker 39373 Nov  4 13:41 ra-checking.html\n-rw-r--r-- 1 runner docker  8226 Nov  4 13:41 ra-checking.qmd\n-rw-r--r-- 1 runner docker  8014 Nov  4 13:41 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Nov  4 13:41 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 46478 Nov  4 13:41 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Nov  4 13:41 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 62223 Nov  4 13:41 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Nov  4 13:41 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Nov  4 13:41 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Nov  4 13:41 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 77886 Nov  4 13:41 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker 41999 Nov  4 13:41 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker 63025 Nov  4 13:41 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 49639 Nov  4 13:41 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker 22316 Nov  4 13:40 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1564\n-rw-r--r-- 1 runner docker 40847 Nov  8 15:24 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Nov  8 15:24 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Nov  8 15:24 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 15:23 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Nov  8 15:24 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Nov  8 15:24 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Nov  8 15:24 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Nov  8 15:24 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Nov  8 15:24 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Nov  8 15:24 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23601 Nov  8 15:24 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Nov  8 15:24 03_local.html\n-rw-r--r-- 1 runner docker 12742 Nov  8 15:24 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Nov  8 15:24 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 56836 Nov  8 15:24 04_data_flow.html\n-rw-r--r-- 1 runner docker  9438 Nov  8 15:24 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Nov  8 15:24 05_global.qmd\n-rw-r--r-- 1 runner docker  4544 Nov  8 15:24 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Nov  8 15:24 05c_pre.qmd\n-rw-r--r-- 1 runner docker 20184 Nov  8 15:24 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25643 Nov  8 15:23 07_llvm.notebook\n-rw-r--r-- 1 runner docker 28320 Nov  8 15:24 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Nov  8 15:24 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Nov  8 15:24 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 15:23 09_poly_files\n-rw-r--r-- 1 runner docker   302 Nov  8 15:24 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Nov  8 15:24 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Nov  8 15:24 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Nov  8 15:24 12_memory.html\n-rw-r--r-- 1 runner docker   316 Nov  8 15:24 12_memory.qmd\n-rw-r--r-- 1 runner docker 79398 Nov  8 15:24 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker 16076 Nov  8 15:24 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10117 Nov  8 15:24 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Nov  8 15:23 a.json\n-rw-r--r-- 1 runner docker   248 Nov  8 15:23 a.ts\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 df\n-rw-r--r-- 1 runner docker 27504 Nov  8 15:24 diverg.qmd\n-rw-r--r-- 1 runner docker  4983 Nov  8 15:24 diverg1.qmd\n-rw-r--r-- 1 runner docker  4595 Nov  8 15:23 errors\n-rw-r--r-- 1 runner docker  3623 Nov  8 15:23 foo.ll\n-rw-r--r-- 1 runner docker  2296 Nov  8 15:23 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 images\n-rw-r--r-- 1 runner docker 30815 Nov  8 15:24 junk.html\n-rw-r--r-- 1 runner docker  2134 Nov  8 15:24 junk.qmd\n-rw-r--r-- 1 runner docker   905 Nov  8 15:23 junk.txt\n-rw-r--r-- 1 runner docker 51734 Nov  8 15:24 llvm.html\n-rw-r--r-- 1 runner docker 20713 Nov  8 15:24 llvm.qmd\n-rw-r--r-- 1 runner docker  7641 Nov  8 15:23 llvm.qmd.next\n-rw-r--r-- 1 runner docker 14847 Nov  8 15:24 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Nov  8 15:24 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 papers\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 ra\n-rw-r--r-- 1 runner docker 41910 Nov  8 15:24 ra-checking.html\n-rw-r--r-- 1 runner docker 15154 Nov  8 15:24 ra-checking.qmd\n-rw-r--r-- 1 runner docker  8014 Nov  8 15:24 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Nov  8 15:24 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 46478 Nov  8 15:24 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Nov  8 15:24 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 62223 Nov  8 15:24 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Nov  8 15:24 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Nov  8 15:24 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Nov  8 15:24 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 77886 Nov  8 15:24 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker 41999 Nov  8 15:24 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker 63025 Nov  8 15:24 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 51904 Nov  8 15:24 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker 22316 Nov  8 15:23 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6414,7 +6414,7 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tradeoffs",
     "title": "Dynamic Compilers",
     "section": "Tradeoffs",
-    "text": "Tradeoffs\n\nThe time to compile is part of the total execution time\nmight run less optimizations to speed up execution time\nmight look at run time info\nsame code might be compiled many times\n\nWt would the same code be compiled more than once?"
+    "text": "Tradeoffs\n\nThe time to compile is part of the total execution time\nmight run less optimizations to speed up execution time\nmight look at run time info\nsame code might be compiled many times\n\nWhy would the same code be compiled more than once?"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tiered-compilers",
@@ -6456,7 +6456,7 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#boxed-values",
     "title": "Dynamic Compilers",
     "section": "boxed values",
-    "text": "boxed values\nMany languages do not use strong static typeing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type"
+    "text": "boxed values\nMany languages do not use strong static typing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches",
@@ -6665,7 +6665,7 @@
     "href": "lectures/13_dynamic_compilers.html#tradeoffs",
     "title": "Dynamic Compilers",
     "section": "Tradeoffs",
-    "text": "Tradeoffs\n\nThe time to compile is part of the total execution time\nmight run less optimizations to speed up execution time\nmight look at run time info\nsame code might be compiled many times\n\nWt would the same code be compiled more than once?",
+    "text": "Tradeoffs\n\nThe time to compile is part of the total execution time\nmight run less optimizations to speed up execution time\nmight look at run time info\nsame code might be compiled many times\n\nWhy would the same code be compiled more than once?",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6737,7 +6737,7 @@
     "href": "lectures/13_dynamic_compilers.html#boxed-values",
     "title": "Dynamic Compilers",
     "section": "boxed values",
-    "text": "boxed values\nMany languages do not use strong static typeing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type",
+    "text": "boxed values\nMany languages do not use strong static typing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7012,8 +7012,8 @@
     "objectID": "lectures/revealjs_ra-checking.qmd.html#this-is-based-on-the-cranelift-compiler-used-for-web-assembly-and-rust",
     "href": "lectures/revealjs_ra-checking.qmd.html#this-is-based-on-the-cranelift-compiler-used-for-web-assembly-and-rust",
     "title": "Testing Register allocators",
-    "section": "this is based on the cranelift compiler used for web-assembly and rust",
-    "text": "this is based on the cranelift compiler used for web-assembly and rust"
+    "section": "This is based on the cranelift compiler used for web-assembly and rust",
+    "text": "This is based on the cranelift compiler used for web-assembly and rust\ncranelift register allocator"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#what-is-register-allocation",
@@ -7027,56 +7027,63 @@
     "href": "lectures/revealjs_ra-checking.qmd.html#storing-variables",
     "title": "Testing Register allocators",
     "section": "storing variables",
-    "text": "storing variables\none option\nAllocate a memory location for each local variable. All of the \\(x_N\\) variables above semantically live in memory. When the function is called, it allocates a nwe area on the stack called the stack frame and uses it to store local variables.\nThis means that adding two variables, takes two loads, one add, and one store so it is very slow\nCompiling code in this way is very fast because we need to make almost no decisions: a variable reference always becomes a memory load,\nOn computers we have a limited set of registers\nRegister allocation: is assigning a value in the program to a register for storage. The register allocator decides how to shuffle values between memory and registers, and between register.\nIn Bril and LLVM we have virtual registers - as many as you want. The register allocator has to rewrite the instructions to use physical registers. Since the number of physical registers is limited, The allocator might insert additional instructions:\n\nstores (called spills) to move a register to memory\nloads (called reloads) to move memory to a register\nmoves to copy from one register to another\n\nThe locations in memory are usually on the stack and are called spill-slots"
+    "text": "storing variables\none option\nAllocate a memory location for each local variable. All of the \\(x_N\\) variables live in memory.\nWhen the function is called, it allocates a new area on the stack called the stack frame and uses it to store local variables.\nThis means that adding two variables, takes two loads, one add, and one store so it is very slow .\nCompiling code in this way is very fast because we need to make almost no decisions: a variable reference always becomes a memory load,\nfaster would be to keep variables in registers but, we have a limited set of registers"
+  },
+  {
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#definitions",
+    "href": "lectures/revealjs_ra-checking.qmd.html#definitions",
+    "title": "Testing Register allocators",
+    "section": "Definitions",
+    "text": "Definitions\nRegister allocation: is assigning a value in the program to a register for storage. The register allocator decides how to shuffle values between memory and registers, and between register.\nIn Bril and LLVM we have virtual registers - as many as you want. The register allocator has to rewrite the instructions to use physical registers. Since the number of physical registers is limited, The allocator might insert additional instructions:"
+  },
+  {
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#spillsreloads",
+    "href": "lectures/revealjs_ra-checking.qmd.html#spillsreloads",
+    "title": "Testing Register allocators",
+    "section": "spills/reloads",
+    "text": "spills/reloads\n\nstores (called spills) to move a register to memory\nloads (called reloads) to move memory to a register\nmoves to copy from one register to another\n\nThe locations in memory are usually on the stack and are called spill-slots"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#example-of-register-allocation-on-a-machine-with-two-physical-registers",
     "href": "lectures/revealjs_ra-checking.qmd.html#example-of-register-allocation-on-a-machine-with-two-physical-registers",
     "title": "Testing Register allocators",
     "section": "example of register allocation on a machine with two physical registers",
-    "text": "example of register allocation on a machine with two physical registers\nvirtual register code          physical register code \n                               {v0 -&gt; r0, v1 -&gt; r1}\n                               store r1, [sp+0]  a spill\nadd v2, v0, v1                 add r1, r0, r1 \n                               {v0 -&gt; r0, v1-&gt; [sp+-0], v2-&gt; r1}\nsub v3, v2, v0                 sub r1, r1, r0\n                               load r0, [sp+0]  a reload \nmul  v4, v3, v1                mul r0, r1, r0\n                               {v4-&gt; r0}\nstore v4, [sp+48]              store r0, [sp+48]"
+    "text": "example of register allocation on a machine with two physical registers\n\n\n\n\n\n\n\n\nvirtual register code\nphysical register code\nassigments\n\n\n\n\n\n\n{v0 -&gt; r0, v1 -&gt; r1}\n\n\n\nstore r1, [sp+0]\n\n\n\nadd v2, v0, v1\nadd r1, r0, r1\n{v0 -&gt; r0, v1-&gt;[sp+0], v2-&gt;r1}\n\n\nsub v3, v2, v0\nsub r1, r1, r0\n\n\n\n\nload r0, [sp+0]\n\n\n\nmul v4, v3, v1\nmul r0, r1, r0\n{v4-&gt;r0}\n\n\nstore v4, [sp+48]\nstore r0, [sp+48]"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#complexity",
     "href": "lectures/revealjs_ra-checking.qmd.html#complexity",
     "title": "Testing Register allocators",
     "section": "complexity",
-    "text": "complexity\nif you do register allocation for code that is not in SSA, this is NP-complete But if you do it on code that is in SSA, the time complexity is polynomial.\nThere are lots of approximate algorithms- all complicated, lots of machines have extra constraints for instance there is a GPU load instruction that read 128 bits from memory and puts the value into 4 consecutive registers\nI’m not going to talk about these algorithms here"
+    "text": "complexity\nif you do register allocation for code that is not in SSA, this is NP-complete But if you do it on code that is in SSA, the time complexity is polynomial.\nThere are lots of approximate algorithms- all complicated, lots of machines have extra constraints for instance there is a GPU load instruction that read 128 bits from memory and puts the value into 4 consecutive registers\nhowever, there is no known fast algorithm for deciding which registers to spill\nI used this code\n    def select_spill_register(self, live: Set[str], interference_graph) -&gt; str:\n        # for each register in live set, that can be spilled, find the register with the most neighbors in the interference graph\n        max_neighbors = -1\n        spill_register = None\n        for reg in live:\n            if reg in self.spilled_registers:\n                continue\n            if can_spill(reg)\n                neighbors = len(interference_graph.graph[reg])\n                if neighbors &gt; max_neighbors:\n                    max_neighbors = neighbors\n                    spill_register = reg\n        self.spilled_registers.append(spill_register)\n        return spill_register\nnever spill the stack pointer"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#how-to-verify-correctness-of-an-allocator",
     "href": "lectures/revealjs_ra-checking.qmd.html#how-to-verify-correctness-of-an-allocator",
     "title": "Testing Register allocators",
     "section": "How to Verify Correctness of an allocator?",
-    "text": "How to Verify Correctness of an allocator?\nBefore and after the allocator, we have the same instructions (except for those added by the allocator)\nassume we have a machine with an infinite register set and a second machine with a finite register set.\nCorrect means both programs executed on these two machines get the same answer for all possible inputs"
+    "text": "How to Verify Correctness of an allocator?\nBefore and after the allocator, we have the same instructions (except for those added by the allocator)\nAssume we have a machine with an infinite register set and a second machine with a finite register set.\nCorrect means both programs executed on these two machines get the same answer for all possible inputs"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#how-do-we-test-this",
     "href": "lectures/revealjs_ra-checking.qmd.html#how-do-we-test-this",
     "title": "Testing Register allocators",
     "section": "how do we test this?",
-    "text": "how do we test this?\nHow do we test this equivalence?\npick a random program and a random input. interpret and see if the result is the same.\ncould try more random inputs, could generate more random programs (fuzzer tools)\nCould reasonably confident but not 100% and very expensive"
+    "text": "how do we test this?\nHow do we test this equivalence?\npick a random program and a random input. interpret and see if the result is the same.\nCould try more random inputs, could generate more random programs (fuzzer tools)\nCould reasonably confident but not 100% and very expensive"
   },
   {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#use-value-numbering-check-one-program-one-basic-block-all-possible-inputs",
-    "href": "lectures/revealjs_ra-checking.qmd.html#use-value-numbering-check-one-program-one-basic-block-all-possible-inputs",
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#use-value-numbering-check-one-program-all-possible-inputs",
+    "href": "lectures/revealjs_ra-checking.qmd.html#use-value-numbering-check-one-program-all-possible-inputs",
     "title": "Testing Register allocators",
-    "section": "use value numbering check one program, one basic block, all possible inputs",
-    "text": "use value numbering check one program, one basic block, all possible inputs\n// original               // allocated \nld v0, [A]                ld r0, [A]\nld v1, [B]                ld r1, [B]\nld v2, [C]                ld r2, [C]\nadd v3, v0, v1            add r0, r0, r1\nadd v4, v2, v3            add r0, r2, r0\nreturn v4                 return r0\n\nv0 -&gt; vn 1 ld [A]         r0 -&gt; vn 1 ld [A]\nv1 -&gt; vn 2 ld [B]         r1 -&gt; vn 2 ld [B]\nv2 -&gt; vn 3 ld [C]         r2 -&gt; vn 3 ld [C]\nv3 -&gt; vn 4 add 1,2        r0 -&gt; vn 4 add 1,2 \nv4 -&gt; vn 5 add 3,4        r0 -&gt; vn 5 add 3,4 \nreturn vn 5               return vn 5"
+    "section": "use value numbering check one program, all possible inputs",
+    "text": "use value numbering check one program, all possible inputs\n// original               // allocated \nld v0, [A]                ld r0, [A]\nld v1, [B]                ld r1, [B]\nld v2, [C]                ld r2, [C]\nadd v3, v0, v1            add r0, r0, r1\nadd v4, v2, v3            add r0, r2, r0\nreturn v4                 return r0\n\nv0 -&gt; vn 1 = ld [A]         r0 -&gt; vn 1 = ld [A]\nv1 -&gt; vn 2 = ld [B]         r1 -&gt; vn 2 = ld [B]\nv2 -&gt; vn 3 = ld [C]         r2 -&gt; vn 3 = ld [C]\nv3 -&gt; vn 4 = add 1,2        r0 -&gt; vn 4 = add 1,2 \nv4 -&gt; vn 5 = add 3,4        r0 -&gt; vn 5 = add 3,4 \nreturn vn 5               return vn 5"
   },
   {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#check-more-then-one-program-all-programs-at-once",
-    "href": "lectures/revealjs_ra-checking.qmd.html#check-more-then-one-program-all-programs-at-once",
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#weak-value-numbering",
+    "href": "lectures/revealjs_ra-checking.qmd.html#weak-value-numbering",
     "title": "Testing Register allocators",
-    "section": "check more then one program (all programs at once)",
-    "text": "check more then one program (all programs at once)\nThis requires a proof that the two programs get the same result - this is an active research question -\nsome success but not easy\nnot used in production"
-  },
-  {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#best-we-can-do-is-generate-lots-of-programs-check-each-one",
-    "href": "lectures/revealjs_ra-checking.qmd.html#best-we-can-do-is-generate-lots-of-programs-check-each-one",
-    "title": "Testing Register allocators",
-    "section": "best we can do is generate lots of programs check each one",
-    "text": "best we can do is generate lots of programs check each one\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n\n\nWe could use the fuzzer to generate random programs or we could use a test set"
+    "section": "weak value numbering",
+    "text": "weak value numbering\n// original               // allocated \nld v0, [A]                ld r0, [A]\n                          write r0 holds v0\nld v1, [B]                ld r1, [B]\n                          write r1 holds v1 \nld v2, [C]                ld r2, [C]\n                          write r2 holds v2\nadd v3, v0, v1            add r0, r0, r1\n                          read r0 - holds  v0 - match\n                          read r1 - holds  v1 - match\n                          write r0 holds v3\nadd v4, v2, v3            add r0, r2, r0\n                          read r2 holds v2 - match\n                          read r0 holds v3 - match\n                          write r0 holds v4 \nreturn v4                 return r0\n                          read r0 holds v4 match \n\n\n\n##  check more then one program  (all programs at once)\n\nThis requires a proof that the two programs get the same result - this is an active research question -  \n\nsome success but not easy \n\nnot used in production \n\n## best we can do is generate lots of programs check each one \n\n```{mermaid}\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\nWe could use a fuzzer to generate random programs or we could use a test set"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#algorithm-linear-in-number-of-instructions",
@@ -7086,46 +7093,63 @@
     "text": "algorithm (linear in number of instructions)\nfor each instruction we need to form pairs - virtual and physical register that holds the same value\nfor instruction v and p, check that the arguments are equal, if not fail add the pair dest of v == dest of p\ndoes not matter what the original op code was, just need register names"
   },
   {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#more-general",
-    "href": "lectures/revealjs_ra-checking.qmd.html#more-general",
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#state-for-each-physcial-register",
+    "href": "lectures/revealjs_ra-checking.qmd.html#state-for-each-physcial-register",
     "title": "Testing Register allocators",
-    "section": "more general",
-    "text": "more general\nTreat the allocated program as containing:\n\nSpill , : copy data (symbol representing virtual register) from a register to a spill slot.\nReload , : copy data from a spill slot to a register.\ncopy , : move data from one CPU register to another (N.B.: only regalloc-inserted moves are recognized as a Move, not moves in the original input program.)\nOp read:, read_orig: write: write_orig:: some arbitrary operation that reads some registers and writes some other registers.\n\nRun the value number over this:\nstate: for each physical register, and spill slot\nwe need either:\n\nthe virtual register name\nunknown -\n\nconflicted if it has more then one virtual register"
+    "section": "state (for each physcial register)",
+    "text": "state (for each physcial register)\nfor each physical-register | vertual register or Unknown for each spill slot | verturaL register or unknown\nTreat the allocated program as containing:\nSpill , : copy data (symbol representing virtual register) from a register to a spill slot.\nupdate spill slot state to virtual register if we know the target\nReload , : copy data from a spill slot to a register.\ncopy state from spill slot to physical register\n\ncopy , : move data from one CPU register to another (N.B.: only regalloc-inserted moves are recognized as a Move, not moves in the original input program.)\n\ncopy state from physical register to destination\n\nOp read:, read_orig: write: write_orig:: some arbitrary operation that reads some registers and writes some other registers.\n\nfor each read:\ncheck if the state of the physcial register is the corresponding virtual regster- if not we found a bug\nfor each dest, update the state of the physical dest to the virtural register"
   },
   {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#steps-still-no-control-flow",
-    "href": "lectures/revealjs_ra-checking.qmd.html#steps-still-no-control-flow",
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#an-example-in-bril",
+    "href": "lectures/revealjs_ra-checking.qmd.html#an-example-in-bril",
     "title": "Testing Register allocators",
-    "section": "steps (still no control flow )",
-    "text": "steps (still no control flow )\nWhen we see a Spill, Reload, or Move, we copy the symbolic state from the source location (register or spill slot) to the destination location.\nWhen we see an Op, we do some checks then some updates:\nFor each read (input) register, we examine the symbolic value stored in the given register.\nIf that symbol matches the virtual register that the original instruction used, then the allocator has properly conveyed the virtual register’s value to its use here, and thus the allocation is correct\nIf not, we can signal a checker error, and look for the bug in our register allocator. why are there no false positives?\nFor each write (output) register, we set the symbolic value stored in the given CPU register to be the given virtual register."
+    "section": "an example in Bril",
+    "text": "an example in Bril\n@main {\n  a: int = const 1;\n  b: int = const 2;\n  c: int = const 3;\n  d: int = const 4;\n  e: int = const 5;\n  f: int = const 6;\n  g: int = const 7;\n  h: int = add a b;\n  i: int = mul c d;\n  j: int = sub e f;\n  k: int = div g a;\n  l: int = add h i;\n  m: int = mul j k;\n  print l m;\n}\nAssume we have 5 registers (will need to spill)\nIn Bril we allocate a stack by:\n  pr1: int = const 7;              ## register that sets the size of the stack\n  pr3: ptr&lt;int&gt; = alloc pr1;       ## allocate a block of memory for the stack\nStore into the stack, at fixed offset 2, assume stack ptr is in pr3\n  pr2: int = const 2;\n  pr2 = ptradd pr3 pr2;\n  store pr2 pr1;\nload from the stack,\n  pr2: int = const 1;\n  pr2 = ptradd pr3 pr2;\n  pr2 = load pr2;"
+  },
+  {
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#register-allocated-code",
+    "href": "lectures/revealjs_ra-checking.qmd.html#register-allocated-code",
+    "title": "Testing Register allocators",
+    "section": "register allocated code",
+    "text": "register allocated code\n@main {\n               pr1: int = const 7;\n               pr3: ptr&lt;int&gt; = alloc pr1;  allocate stack with 7 ints \n  pr1: int = const 1;\n               pr2: int = const 2; \n               pr2 = ptradd pr3 pr2;   stack[2] = pr1\n              store pr2 pr1;\n  pr2: int = const 2;\n  pr4: int = const 3;\n  pr1: int = const 4;\n\n                pr5: int = const 6;\n                pr5 = ptradd pr3 pr5;  stack[6] = pr1\n                store pr5 pr1;\n  pr1: int = const 5;\n                pr5: int = const 4;\n                pr5 = ptradd pr3 pr5; stack[3] = pr1\n                store pr5 pr1;\n  pr1: int = const 6;\n                 pr5: int = const 5;\n                 pr5 = ptradd pr3 pr5; stack[5] = pr1 \n                 store pr5 pr1;\n  pr1: int = const 7;\n                 pr5: int = const 3;\n                 pr5 = ptradd pr3 pr5;  stack[3] = pr1\n                 store pr5 pr1;\n  \n                 pr5: int = const 2;\n                 pr5 = ptradd pr3 pr5;  pr5 = stack[2]\n                 pr5 = load pr5;\n  pr2: int = add pr5 pr2;\n                 pr5: int = const 0;\n                 pr5 = ptradd pr3 pr5; stack[0] = pr2\n                 store pr5 pr2;\n  \n                 pr1: int = const 6;\n                 pr1 = ptradd pr3 pr1; pr1 = stack[6]\n                 pr1 = load pr1;\n  pr2: int = mul pr4 pr1;\n                 pr4: int = const 1;\n                 pr4 = ptradd pr3 pr4; pr2 = stack[1] \n                 store pr4 pr2;\n  \n                 pr2: int = const 4;\n                 pr2 = ptradd pr3 pr2; pr2 = stack[4]\n                 pr2 = load pr2;\n  \n                 pr1: int = const 5;\n                 pr1 = ptradd pr3 pr1; pr1 = stack[5]\n                 pr1 = load pr1;\n\n  pr4: int = sub pr2 pr1;\n                 pr2: int = const 2;\n                 pr2 = ptradd pr3 pr2; pr3 = stack[2] \n                 pr2 = load pr2;\n  \n                 pr1: int = const 3;\n                 pr1 = ptradd pr3 pr1; pr1 = stack[3]\n                 pr1 = load pr1;\n  pr1: int = div pr1 pr2;\n                 pr5: int = const 0;\n                 pr5 = ptradd pr3 pr5; pr5 = stack[-]\n                 pr5 = load pr5;\n  \n                 pr2: int = const 1;\n                 pr2 = ptradd pr3 pr2; pr2 = stack[1]\n                 pr2 = load pr2;\n  pr2: int = add pr5 pr2;\n  pr1: int = mul pr4 pr1;\n  print pr2 pr1;\n  free pr3;      \n}"
+  },
+  {
+    "objectID": "lectures/revealjs_ra-checking.qmd.html#check",
+    "href": "lectures/revealjs_ra-checking.qmd.html#check",
+    "title": "Testing Register allocators",
+    "section": "check",
+    "text": "check\npr3 is the stack pointer\ncompiler has to mark all the spills and reloads\n\n\n\n\n\n\n\n\n\nvirtual\nphysical\nregs\nstack\n\n\n\n\na=const\npr1 = const\npr1=a\n\n\n\n\nstack[2]=pr1\npr1=a\nstack[2] = a\n\n\nb=const\npr2=const\npr1=a, pr2=b\nstack[2] = a\n\n\nc=const\npr1=const\npr1=c, pr2=b\nstack[2] = a\n\n\n\nstack[6]=pr1\npr1=c, pr2=b\nstack[2] = a, stack[6]=c\n\n\nd=const\npr4=const\npr1=c, pr2=b, pr4=d\nstack[2] = a, stack[6]=c\n\n\ne=const\npr1= const\npr1=e, pr2=b, pr4=d\nstack[2] = a, stack[6]=c\n\n\n\nstack[5]=pr1\npr1=e, pr2=b, pr4=d\nstack[2] = a, stack[5] = e, stack[6]=c\n\n\nf=const\npr1=const\npr1=f, pr2=b, pr4=d\nstack[2] = a, stack[5] = e, stack[6]=c\n\n\n\nstack[4]=pr1\npr1=f, pr2=b, pr4=d\nstack[2] = a, stack[4] = f, stack[5] = e, stack[6]=c\n\n\ng=const\npr1=const\npr1=g, pr2=b, pr4=d\nstack[2] = a, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\nstack[3] = pr1\npr1=g, pr2=b, pr4=d\nstack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\npr5= stack[2]\npr1=g, pr2=b, pr4=d, pr5=a\nstack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\nh=a+b\npr2=pr5+pr2\npr1=g, pr2=h, pr4=d, pr5=a\nstack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\nstack[0]=pr2\npr1=g, pr2=h, pr4=d, pr5=a\nstack[0]=h, stack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\npr1=stack[6]\npr1=c, pr2=h, pr4=d, pr5=a\nstack[0]=h, stack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\ni=c*d\npr2=pr1*pr4\npr1=c, pr2=i, pr4=d, pr5=a\nstack[0]=h, stack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\nstack[1]=pr2\npr1=c, pr2=i, pr4=d, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr2=stack[4]\npr1=c, pr2=f, pr4=d, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr1=stack[5]\npr1=e, pr2=f, pr4=d, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nj=e-f\npr4=pr1-pr2\npr1=e, pr2=f, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr2=stack[2]\npr1=e, pr2=a, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr1=stack[3]\npr1=g, pr2=a, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nk=g/a\npr1= pr1/pr2\npr1=k, pr2=a, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr5=stack[0]\npr1=k, pr2=a, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr2= stack[1]\npr1=k, pr2=i, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nl=h+i\npr2=pr5+pr2\npr1=k, pr2=l, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nm= j*k\npr1=pr4*pr1\npr1=m, pr2=l, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nprint l,m\nprint pr2,pr1"
   },
   {
     "objectID": "lectures/revealjs_ra-checking.qmd.html#control-flow",
     "href": "lectures/revealjs_ra-checking.qmd.html#control-flow",
     "title": "Testing Register allocators",
     "section": "control flow",
-    "text": "control flow\nWe can use data flow and a lattice\nhere is the lattice\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E"
+    "text": "control flow"
   },
   {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#now-for-the-data-flow",
-    "href": "lectures/revealjs_ra-checking.qmd.html#now-for-the-data-flow",
+    "objectID": "lectures/ra-checking.html",
+    "href": "lectures/ra-checking.html",
     "title": "Testing Register allocators",
-    "section": "now for the data flow",
-    "text": "now for the data flow\nWe start out with all physical registers and spill slots as ‘unknown’ At each join point move down the lattice\nconflicted is ok, so long as it is not used\nSince the number of physical registers and spill slots is finite we can can merge all of them at the top of each basic block.\nlike usual we might pick a good order to process basic blocks"
+    "section": "",
+    "text": "cranelift register allocator",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Testing Register allocators"
+    ]
   },
   {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#how-about-an-example",
-    "href": "lectures/revealjs_ra-checking.qmd.html#how-about-an-example",
+    "objectID": "lectures/ra-checking.html#this-is-based-on-the-cranelift-compiler-used-for-web-assembly-and-rust",
+    "href": "lectures/ra-checking.html#this-is-based-on-the-cranelift-compiler-used-for-web-assembly-and-rust",
     "title": "Testing Register allocators",
-    "section": "How about an example:",
-    "text": "How about an example:\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n\n\nat the top of C, we see that physical p0 is conflicted -\nbut that is not a error\nafter the reload we find it contains v2"
-  },
-  {
-    "objectID": "lectures/revealjs_ra-checking.qmd.html#tracing-pointers--",
-    "href": "lectures/revealjs_ra-checking.qmd.html#tracing-pointers--",
-    "title": "Testing Register allocators",
-    "section": "tracing pointers -",
-    "text": "tracing pointers -\nSince we know what virtual registers are in each spill-slot, and virtual registers have types we can tell which spill slots contain pointers\nsuppose we have a spot where we might call a gc, we could force spilling of all live vrs that contain a pointer and then tell the gc which spill locations to consider"
+    "section": "",
+    "text": "cranelift register allocator",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Testing Register allocators"
+    ]
   },
   {
     "objectID": "lectures/ra-checking.html#what-is-register-allocation",
@@ -7144,7 +7168,31 @@
     "href": "lectures/ra-checking.html#storing-variables",
     "title": "Testing Register allocators",
     "section": "storing variables",
-    "text": "storing variables\none option\nAllocate a memory location for each local variable. All of the \\(x_N\\) variables above semantically live in memory. When the function is called, it allocates a nwe area on the stack called the stack frame and uses it to store local variables.\nThis means that adding two variables, takes two loads, one add, and one store so it is very slow\nCompiling code in this way is very fast because we need to make almost no decisions: a variable reference always becomes a memory load,\nOn computers we have a limited set of registers\nRegister allocation: is assigning a value in the program to a register for storage. The register allocator decides how to shuffle values between memory and registers, and between register.\nIn Bril and LLVM we have virtual registers - as many as you want. The register allocator has to rewrite the instructions to use physical registers. Since the number of physical registers is limited, The allocator might insert additional instructions:\n\nstores (called spills) to move a register to memory\nloads (called reloads) to move memory to a register\nmoves to copy from one register to another\n\nThe locations in memory are usually on the stack and are called spill-slots",
+    "text": "storing variables\none option\nAllocate a memory location for each local variable. All of the \\(x_N\\) variables live in memory.\nWhen the function is called, it allocates a new area on the stack called the stack frame and uses it to store local variables.\nThis means that adding two variables, takes two loads, one add, and one store so it is very slow .\nCompiling code in this way is very fast because we need to make almost no decisions: a variable reference always becomes a memory load,\nfaster would be to keep variables in registers but, we have a limited set of registers",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Testing Register allocators"
+    ]
+  },
+  {
+    "objectID": "lectures/ra-checking.html#definitions",
+    "href": "lectures/ra-checking.html#definitions",
+    "title": "Testing Register allocators",
+    "section": "Definitions",
+    "text": "Definitions\nRegister allocation: is assigning a value in the program to a register for storage. The register allocator decides how to shuffle values between memory and registers, and between register.\nIn Bril and LLVM we have virtual registers - as many as you want. The register allocator has to rewrite the instructions to use physical registers. Since the number of physical registers is limited, The allocator might insert additional instructions:",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Testing Register allocators"
+    ]
+  },
+  {
+    "objectID": "lectures/ra-checking.html#spillsreloads",
+    "href": "lectures/ra-checking.html#spillsreloads",
+    "title": "Testing Register allocators",
+    "section": "spills/reloads",
+    "text": "spills/reloads\n\nstores (called spills) to move a register to memory\nloads (called reloads) to move memory to a register\nmoves to copy from one register to another\n\nThe locations in memory are usually on the stack and are called spill-slots",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7156,7 +7204,7 @@
     "href": "lectures/ra-checking.html#example-of-register-allocation-on-a-machine-with-two-physical-registers",
     "title": "Testing Register allocators",
     "section": "example of register allocation on a machine with two physical registers",
-    "text": "example of register allocation on a machine with two physical registers\nvirtual register code          physical register code \n                               {v0 -&gt; r0, v1 -&gt; r1}\n                               store r1, [sp+0]  a spill\nadd v2, v0, v1                 add r1, r0, r1 \n                               {v0 -&gt; r0, v1-&gt; [sp+-0], v2-&gt; r1}\nsub v3, v2, v0                 sub r1, r1, r0\n                               load r0, [sp+0]  a reload \nmul  v4, v3, v1                mul r0, r1, r0\n                               {v4-&gt; r0}\nstore v4, [sp+48]              store r0, [sp+48]",
+    "text": "example of register allocation on a machine with two physical registers\n\n\n\n\n\n\n\n\nvirtual register code\nphysical register code\nassigments\n\n\n\n\n\n\n{v0 -&gt; r0, v1 -&gt; r1}\n\n\n\nstore r1, [sp+0]\n\n\n\nadd v2, v0, v1\nadd r1, r0, r1\n{v0 -&gt; r0, v1-&gt;[sp+0], v2-&gt;r1}\n\n\nsub v3, v2, v0\nsub r1, r1, r0\n\n\n\n\nload r0, [sp+0]\n\n\n\nmul v4, v3, v1\nmul r0, r1, r0\n{v4-&gt;r0}\n\n\nstore v4, [sp+48]\nstore r0, [sp+48]",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7168,7 +7216,7 @@
     "href": "lectures/ra-checking.html#complexity",
     "title": "Testing Register allocators",
     "section": "complexity",
-    "text": "complexity\nif you do register allocation for code that is not in SSA, this is NP-complete But if you do it on code that is in SSA, the time complexity is polynomial.\nThere are lots of approximate algorithms- all complicated, lots of machines have extra constraints for instance there is a GPU load instruction that read 128 bits from memory and puts the value into 4 consecutive registers\nI’m not going to talk about these algorithms here",
+    "text": "complexity\nif you do register allocation for code that is not in SSA, this is NP-complete But if you do it on code that is in SSA, the time complexity is polynomial.\nThere are lots of approximate algorithms- all complicated, lots of machines have extra constraints for instance there is a GPU load instruction that read 128 bits from memory and puts the value into 4 consecutive registers\nhowever, there is no known fast algorithm for deciding which registers to spill\nI used this code\n    def select_spill_register(self, live: Set[str], interference_graph) -&gt; str:\n        # for each register in live set, that can be spilled, find the register with the most neighbors in the interference graph\n        max_neighbors = -1\n        spill_register = None\n        for reg in live:\n            if reg in self.spilled_registers:\n                continue\n            if can_spill(reg)\n                neighbors = len(interference_graph.graph[reg])\n                if neighbors &gt; max_neighbors:\n                    max_neighbors = neighbors\n                    spill_register = reg\n        self.spilled_registers.append(spill_register)\n        return spill_register\nnever spill the stack pointer",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7180,7 +7228,7 @@
     "href": "lectures/ra-checking.html#how-to-verify-correctness-of-an-allocator",
     "title": "Testing Register allocators",
     "section": "How to Verify Correctness of an allocator?",
-    "text": "How to Verify Correctness of an allocator?\nBefore and after the allocator, we have the same instructions (except for those added by the allocator)\nassume we have a machine with an infinite register set and a second machine with a finite register set.\nCorrect means both programs executed on these two machines get the same answer for all possible inputs",
+    "text": "How to Verify Correctness of an allocator?\nBefore and after the allocator, we have the same instructions (except for those added by the allocator)\nAssume we have a machine with an infinite register set and a second machine with a finite register set.\nCorrect means both programs executed on these two machines get the same answer for all possible inputs",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7192,7 +7240,7 @@
     "href": "lectures/ra-checking.html#how-do-we-test-this",
     "title": "Testing Register allocators",
     "section": "how do we test this?",
-    "text": "how do we test this?\nHow do we test this equivalence?\npick a random program and a random input. interpret and see if the result is the same.\ncould try more random inputs, could generate more random programs (fuzzer tools)\nCould reasonably confident but not 100% and very expensive",
+    "text": "how do we test this?\nHow do we test this equivalence?\npick a random program and a random input. interpret and see if the result is the same.\nCould try more random inputs, could generate more random programs (fuzzer tools)\nCould reasonably confident but not 100% and very expensive",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7200,11 +7248,11 @@
     ]
   },
   {
-    "objectID": "lectures/ra-checking.html#use-value-numbering-check-one-program-one-basic-block-all-possible-inputs",
-    "href": "lectures/ra-checking.html#use-value-numbering-check-one-program-one-basic-block-all-possible-inputs",
+    "objectID": "lectures/ra-checking.html#use-value-numbering-check-one-program-all-possible-inputs",
+    "href": "lectures/ra-checking.html#use-value-numbering-check-one-program-all-possible-inputs",
     "title": "Testing Register allocators",
-    "section": "use value numbering check one program, one basic block, all possible inputs",
-    "text": "use value numbering check one program, one basic block, all possible inputs\n// original               // allocated \nld v0, [A]                ld r0, [A]\nld v1, [B]                ld r1, [B]\nld v2, [C]                ld r2, [C]\nadd v3, v0, v1            add r0, r0, r1\nadd v4, v2, v3            add r0, r2, r0\nreturn v4                 return r0\n\nv0 -&gt; vn 1 ld [A]         r0 -&gt; vn 1 ld [A]\nv1 -&gt; vn 2 ld [B]         r1 -&gt; vn 2 ld [B]\nv2 -&gt; vn 3 ld [C]         r2 -&gt; vn 3 ld [C]\nv3 -&gt; vn 4 add 1,2        r0 -&gt; vn 4 add 1,2 \nv4 -&gt; vn 5 add 3,4        r0 -&gt; vn 5 add 3,4 \nreturn vn 5               return vn 5",
+    "section": "use value numbering check one program, all possible inputs",
+    "text": "use value numbering check one program, all possible inputs\n// original               // allocated \nld v0, [A]                ld r0, [A]\nld v1, [B]                ld r1, [B]\nld v2, [C]                ld r2, [C]\nadd v3, v0, v1            add r0, r0, r1\nadd v4, v2, v3            add r0, r2, r0\nreturn v4                 return r0\n\nv0 -&gt; vn 1 = ld [A]         r0 -&gt; vn 1 = ld [A]\nv1 -&gt; vn 2 = ld [B]         r1 -&gt; vn 2 = ld [B]\nv2 -&gt; vn 3 = ld [C]         r2 -&gt; vn 3 = ld [C]\nv3 -&gt; vn 4 = add 1,2        r0 -&gt; vn 4 = add 1,2 \nv4 -&gt; vn 5 = add 3,4        r0 -&gt; vn 5 = add 3,4 \nreturn vn 5               return vn 5",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7212,23 +7260,11 @@
     ]
   },
   {
-    "objectID": "lectures/ra-checking.html#check-more-then-one-program-all-programs-at-once",
-    "href": "lectures/ra-checking.html#check-more-then-one-program-all-programs-at-once",
+    "objectID": "lectures/ra-checking.html#weak-value-numbering",
+    "href": "lectures/ra-checking.html#weak-value-numbering",
     "title": "Testing Register allocators",
-    "section": "check more then one program (all programs at once)",
-    "text": "check more then one program (all programs at once)\nThis requires a proof that the two programs get the same result - this is an active research question -\nsome success but not easy\nnot used in production",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Testing Register allocators"
-    ]
-  },
-  {
-    "objectID": "lectures/ra-checking.html#best-we-can-do-is-generate-lots-of-programs-check-each-one",
-    "href": "lectures/ra-checking.html#best-we-can-do-is-generate-lots-of-programs-check-each-one",
-    "title": "Testing Register allocators",
-    "section": "best we can do is generate lots of programs check each one",
-    "text": "best we can do is generate lots of programs check each one\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\n\n\n\n\n\n\nWe could use the fuzzer to generate random programs or we could use a test set",
+    "section": "weak value numbering",
+    "text": "weak value numbering\n// original               // allocated \nld v0, [A]                ld r0, [A]\n                          write r0 holds v0\nld v1, [B]                ld r1, [B]\n                          write r1 holds v1 \nld v2, [C]                ld r2, [C]\n                          write r2 holds v2\nadd v3, v0, v1            add r0, r0, r1\n                          read r0 - holds  v0 - match\n                          read r1 - holds  v1 - match\n                          write r0 holds v3\nadd v4, v2, v3            add r0, r2, r0\n                          read r2 holds v2 - match\n                          read r0 holds v3 - match\n                          write r0 holds v4 \nreturn v4                 return r0\n                          read r0 holds v4 match \n\n\n\n##  check more then one program  (all programs at once)\n\nThis requires a proof that the two programs get the same result - this is an active research question -  \n\nsome success but not easy \n\nnot used in production \n\n## best we can do is generate lots of programs check each one \n\n```{mermaid}\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph LR\nA[Virtual code]\nB[Register allocator]\nC[Machine code]\nD[Checker]\nE[Fuzzing engine]\nA--&gt; B\nB--&gt; C\nC --&gt; D\nD --&gt; E\nE --&gt; A\nA --&gt; D\nWe could use a fuzzer to generate random programs or we could use a test set",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7248,11 +7284,11 @@
     ]
   },
   {
-    "objectID": "lectures/ra-checking.html#more-general",
-    "href": "lectures/ra-checking.html#more-general",
+    "objectID": "lectures/ra-checking.html#state-for-each-physcial-register",
+    "href": "lectures/ra-checking.html#state-for-each-physcial-register",
     "title": "Testing Register allocators",
-    "section": "more general",
-    "text": "more general\nTreat the allocated program as containing:\n\nSpill , : copy data (symbol representing virtual register) from a register to a spill slot.\nReload , : copy data from a spill slot to a register.\ncopy , : move data from one CPU register to another (N.B.: only regalloc-inserted moves are recognized as a Move, not moves in the original input program.)\nOp read:, read_orig: write: write_orig:: some arbitrary operation that reads some registers and writes some other registers.\n\nRun the value number over this:\nstate: for each physical register, and spill slot\nwe need either:\n\nthe virtual register name\nunknown -\n\nconflicted if it has more then one virtual register",
+    "section": "state (for each physcial register)",
+    "text": "state (for each physcial register)\nfor each physical-register | vertual register or Unknown for each spill slot | verturaL register or unknown\nTreat the allocated program as containing:\nSpill , : copy data (symbol representing virtual register) from a register to a spill slot.\nupdate spill slot state to virtual register if we know the target\nReload , : copy data from a spill slot to a register.\ncopy state from spill slot to physical register\n\ncopy , : move data from one CPU register to another (N.B.: only regalloc-inserted moves are recognized as a Move, not moves in the original input program.)\n\ncopy state from physical register to destination\n\nOp read:, read_orig: write: write_orig:: some arbitrary operation that reads some registers and writes some other registers.\n\nfor each read:\ncheck if the state of the physcial register is the corresponding virtual regster- if not we found a bug\nfor each dest, update the state of the physical dest to the virtural register",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7260,11 +7296,35 @@
     ]
   },
   {
-    "objectID": "lectures/ra-checking.html#steps-still-no-control-flow",
-    "href": "lectures/ra-checking.html#steps-still-no-control-flow",
+    "objectID": "lectures/ra-checking.html#an-example-in-bril",
+    "href": "lectures/ra-checking.html#an-example-in-bril",
     "title": "Testing Register allocators",
-    "section": "steps (still no control flow )",
-    "text": "steps (still no control flow )\nWhen we see a Spill, Reload, or Move, we copy the symbolic state from the source location (register or spill slot) to the destination location.\nWhen we see an Op, we do some checks then some updates:\nFor each read (input) register, we examine the symbolic value stored in the given register.\nIf that symbol matches the virtual register that the original instruction used, then the allocator has properly conveyed the virtual register’s value to its use here, and thus the allocation is correct\nIf not, we can signal a checker error, and look for the bug in our register allocator. why are there no false positives?\nFor each write (output) register, we set the symbolic value stored in the given CPU register to be the given virtual register.",
+    "section": "an example in Bril",
+    "text": "an example in Bril\n@main {\n  a: int = const 1;\n  b: int = const 2;\n  c: int = const 3;\n  d: int = const 4;\n  e: int = const 5;\n  f: int = const 6;\n  g: int = const 7;\n  h: int = add a b;\n  i: int = mul c d;\n  j: int = sub e f;\n  k: int = div g a;\n  l: int = add h i;\n  m: int = mul j k;\n  print l m;\n}\nAssume we have 5 registers (will need to spill)\nIn Bril we allocate a stack by:\n  pr1: int = const 7;              ## register that sets the size of the stack\n  pr3: ptr&lt;int&gt; = alloc pr1;       ## allocate a block of memory for the stack\nStore into the stack, at fixed offset 2, assume stack ptr is in pr3\n  pr2: int = const 2;\n  pr2 = ptradd pr3 pr2;\n  store pr2 pr1;\nload from the stack,\n  pr2: int = const 1;\n  pr2 = ptradd pr3 pr2;\n  pr2 = load pr2;",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Testing Register allocators"
+    ]
+  },
+  {
+    "objectID": "lectures/ra-checking.html#register-allocated-code",
+    "href": "lectures/ra-checking.html#register-allocated-code",
+    "title": "Testing Register allocators",
+    "section": "register allocated code",
+    "text": "register allocated code\n@main {\n               pr1: int = const 7;\n               pr3: ptr&lt;int&gt; = alloc pr1;  allocate stack with 7 ints \n  pr1: int = const 1;\n               pr2: int = const 2; \n               pr2 = ptradd pr3 pr2;   stack[2] = pr1\n              store pr2 pr1;\n  pr2: int = const 2;\n  pr4: int = const 3;\n  pr1: int = const 4;\n\n                pr5: int = const 6;\n                pr5 = ptradd pr3 pr5;  stack[6] = pr1\n                store pr5 pr1;\n  pr1: int = const 5;\n                pr5: int = const 4;\n                pr5 = ptradd pr3 pr5; stack[3] = pr1\n                store pr5 pr1;\n  pr1: int = const 6;\n                 pr5: int = const 5;\n                 pr5 = ptradd pr3 pr5; stack[5] = pr1 \n                 store pr5 pr1;\n  pr1: int = const 7;\n                 pr5: int = const 3;\n                 pr5 = ptradd pr3 pr5;  stack[3] = pr1\n                 store pr5 pr1;\n  \n                 pr5: int = const 2;\n                 pr5 = ptradd pr3 pr5;  pr5 = stack[2]\n                 pr5 = load pr5;\n  pr2: int = add pr5 pr2;\n                 pr5: int = const 0;\n                 pr5 = ptradd pr3 pr5; stack[0] = pr2\n                 store pr5 pr2;\n  \n                 pr1: int = const 6;\n                 pr1 = ptradd pr3 pr1; pr1 = stack[6]\n                 pr1 = load pr1;\n  pr2: int = mul pr4 pr1;\n                 pr4: int = const 1;\n                 pr4 = ptradd pr3 pr4; pr2 = stack[1] \n                 store pr4 pr2;\n  \n                 pr2: int = const 4;\n                 pr2 = ptradd pr3 pr2; pr2 = stack[4]\n                 pr2 = load pr2;\n  \n                 pr1: int = const 5;\n                 pr1 = ptradd pr3 pr1; pr1 = stack[5]\n                 pr1 = load pr1;\n\n  pr4: int = sub pr2 pr1;\n                 pr2: int = const 2;\n                 pr2 = ptradd pr3 pr2; pr3 = stack[2] \n                 pr2 = load pr2;\n  \n                 pr1: int = const 3;\n                 pr1 = ptradd pr3 pr1; pr1 = stack[3]\n                 pr1 = load pr1;\n  pr1: int = div pr1 pr2;\n                 pr5: int = const 0;\n                 pr5 = ptradd pr3 pr5; pr5 = stack[-]\n                 pr5 = load pr5;\n  \n                 pr2: int = const 1;\n                 pr2 = ptradd pr3 pr2; pr2 = stack[1]\n                 pr2 = load pr2;\n  pr2: int = add pr5 pr2;\n  pr1: int = mul pr4 pr1;\n  print pr2 pr1;\n  free pr3;      \n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Testing Register allocators"
+    ]
+  },
+  {
+    "objectID": "lectures/ra-checking.html#check",
+    "href": "lectures/ra-checking.html#check",
+    "title": "Testing Register allocators",
+    "section": "check",
+    "text": "check\npr3 is the stack pointer\ncompiler has to mark all the spills and reloads\n\n\n\n\n\n\n\n\n\nvirtual\nphysical\nregs\nstack\n\n\n\n\na=const\npr1 = const\npr1=a\n\n\n\n\nstack[2]=pr1\npr1=a\nstack[2] = a\n\n\nb=const\npr2=const\npr1=a, pr2=b\nstack[2] = a\n\n\nc=const\npr1=const\npr1=c, pr2=b\nstack[2] = a\n\n\n\nstack[6]=pr1\npr1=c, pr2=b\nstack[2] = a, stack[6]=c\n\n\nd=const\npr4=const\npr1=c, pr2=b, pr4=d\nstack[2] = a, stack[6]=c\n\n\ne=const\npr1= const\npr1=e, pr2=b, pr4=d\nstack[2] = a, stack[6]=c\n\n\n\nstack[5]=pr1\npr1=e, pr2=b, pr4=d\nstack[2] = a, stack[5] = e, stack[6]=c\n\n\nf=const\npr1=const\npr1=f, pr2=b, pr4=d\nstack[2] = a, stack[5] = e, stack[6]=c\n\n\n\nstack[4]=pr1\npr1=f, pr2=b, pr4=d\nstack[2] = a, stack[4] = f, stack[5] = e, stack[6]=c\n\n\ng=const\npr1=const\npr1=g, pr2=b, pr4=d\nstack[2] = a, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\nstack[3] = pr1\npr1=g, pr2=b, pr4=d\nstack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\npr5= stack[2]\npr1=g, pr2=b, pr4=d, pr5=a\nstack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\nh=a+b\npr2=pr5+pr2\npr1=g, pr2=h, pr4=d, pr5=a\nstack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\nstack[0]=pr2\npr1=g, pr2=h, pr4=d, pr5=a\nstack[0]=h, stack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\npr1=stack[6]\npr1=c, pr2=h, pr4=d, pr5=a\nstack[0]=h, stack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\ni=c*d\npr2=pr1*pr4\npr1=c, pr2=i, pr4=d, pr5=a\nstack[0]=h, stack[2] = a, stack[3]=g, stack[4] = f, stack[5] = e, stack[6]=c\n\n\n\nstack[1]=pr2\npr1=c, pr2=i, pr4=d, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr2=stack[4]\npr1=c, pr2=f, pr4=d, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr1=stack[5]\npr1=e, pr2=f, pr4=d, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nj=e-f\npr4=pr1-pr2\npr1=e, pr2=f, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr2=stack[2]\npr1=e, pr2=a, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr1=stack[3]\npr1=g, pr2=a, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nk=g/a\npr1= pr1/pr2\npr1=k, pr2=a, pr4=j, pr5=a\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr5=stack[0]\npr1=k, pr2=a, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\n\npr2= stack[1]\npr1=k, pr2=i, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nl=h+i\npr2=pr5+pr2\npr1=k, pr2=l, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nm= j*k\npr1=pr4*pr1\npr1=m, pr2=l, pr4=j, pr5=h\nstack[0]=h, stack[1]=i, stack[2]=a, stack[3]=g, stack[4]=f, stack[5]=e, stack[6]=c\n\n\nprint l,m\nprint pr2,pr1",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7276,43 +7336,7 @@
     "href": "lectures/ra-checking.html#control-flow",
     "title": "Testing Register allocators",
     "section": "control flow",
-    "text": "control flow\nWe can use data flow and a lattice\nhere is the lattice\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[Unknown]\nB[VR0]\nC[VR1]\nD[VR2]\nE[Conflicted]\nA--&gt;B\nA--&gt;C\nA--&gt;D\nB --&gt;E\nC--&gt; E\nD--&gt; E",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Testing Register allocators"
-    ]
-  },
-  {
-    "objectID": "lectures/ra-checking.html#now-for-the-data-flow",
-    "href": "lectures/ra-checking.html#now-for-the-data-flow",
-    "title": "Testing Register allocators",
-    "section": "now for the data flow",
-    "text": "now for the data flow\nWe start out with all physical registers and spill slots as ‘unknown’ At each join point move down the lattice\nconflicted is ok, so long as it is not used\nSince the number of physical registers and spill slots is finite we can can merge all of them at the top of each basic block.\nlike usual we might pick a good order to process basic blocks",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Testing Register allocators"
-    ]
-  },
-  {
-    "objectID": "lectures/ra-checking.html#how-about-an-example",
-    "href": "lectures/ra-checking.html#how-about-an-example",
-    "title": "Testing Register allocators",
-    "section": "How about an example:",
-    "text": "How about an example:\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nA[p0-&gt;v1, [sp+4] -&gt; v2]\nB[p0-&gt;v9, [sp+4] -&gt; v2]\nC[\"top,\n   reload p0 from  [sp+4]]\nA--&gt; C\nB --&gt; C\n\n\n\n\n\n\nat the top of C, we see that physical p0 is conflicted -\nbut that is not a error\nafter the reload we find it contains v2",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "Testing Register allocators"
-    ]
-  },
-  {
-    "objectID": "lectures/ra-checking.html#tracing-pointers--",
-    "href": "lectures/ra-checking.html#tracing-pointers--",
-    "title": "Testing Register allocators",
-    "section": "tracing pointers -",
-    "text": "tracing pointers -\nSince we know what virtual registers are in each spill-slot, and virtual registers have types we can tell which spill slots contain pointers\nsuppose we have a spot where we might call a gc, we could force spilling of all live vrs that contain a pointer and then tell the gc which spill locations to consider",
+    "text": "control flow",
     "crumbs": [
       "EECS 7398",
       "Lectures",
