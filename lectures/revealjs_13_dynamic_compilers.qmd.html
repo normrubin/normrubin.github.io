@@ -407,12 +407,18 @@
 <section id="jit-just-in-time-compilers-vs-aotahead-of-time-compilers" class="slide level2">
 <h2>jit (just in time) compilers vs aot(ahead of time) compilers</h2>
 <p>a jit compiler translates code into isa while the program executes</p>
-<p>some options</p>
+<p>pro:</p>
+<p>more information</p>
+<p>con:</p>
+<p>compile time slows down execution</p>
+</section>
+<section id="some-options" class="slide level2">
+<h2>some options</h2>
 <ul>
 <li>compile a function the first time it is called</li>
 <li>compile a function after it has been called a lot (needs an interpreter) We call these hot functions</li>
 <li>build a trace of instructions executed and compile the hot traces (a trace has no branches)</li>
-<li>A variation I used ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code</li>
+<li>A variation I used: ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code</li>
 </ul>
 </section>
 <section id="can-jit-compiled-code-run-faster-then-aot-code" class="slide level2">
@@ -489,7 +495,7 @@
 <section id="magic-numbers" class="slide level2">
 <h2>magic numbers</h2>
 <p>associate a counter with branches and functions if the counter reaches some magic number use one of the compilers</p>
-<p>if the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, so how do you insert the newly compiled code?</p>
+<p>if the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, how do you insert the newly compiled code?</p>
 </section>
 <section id="questions-when-building-a-jit" class="slide level2">
 <h2>questions when building a JIT</h2>
@@ -548,7 +554,7 @@ interpreter -- already_compiled --&gt; compiled_code
 <p>Many languages do not use strong static typing</p>
 <p>for example in python</p>
 <p>x = x + 1</p>
-<p>x could be an int/float/object</p>
+<p>x could be an int/float/object/string etc</p>
 <p>the value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value</p>
 <p>then to generate code for the plus we have to figure out what kind of add, based on the type</p>
 </section>
@@ -579,8 +585,8 @@ interpreter -- already_compiled --&gt; compiled_code
 <p>but method calls are expensive</p>
 <p>we want to make these calls cheaper</p>
 </section>
-<section id="inline-caches-at-te-call-site" class="slide level2">
-<h2>inline caches at te call site</h2>
+<section id="inline-caches-at-each-call-site" class="slide level2">
+<h2>inline caches at each call site</h2>
 <p>the first time we call a method, we know the type (because we are generating code at runtime)</p>
 <div class="columns">
 <div class="column">
@@ -589,7 +595,7 @@ interpreter -- already_compiled --&gt; compiled_code
      foo(a,b,c)</code></pre>
 </div><div class="column">
 <pre><code>def func(a,b,c):
-  for i in range(1):
+  for i in range(10):
     if isinstance(a, type1)
       body of foo  
     else:
@@ -1001,7 +1007,7 @@ l9--&gt; l3
 </section>
 <section id="dead-code-elimination" class="slide level2">
 <h2>dead code elimination</h2>
-<p>After this the all calls to the function assume these arguments so no need to keep the regular entry</p>
+<p>After this all calls to the function assume these arguments so no need to keep the regular entry</p>
 <div class="columns">
 <div class="column" style="width:30%;">
 <div class="cell" data-reveal="true" data-layout-align="default">
@@ -1358,7 +1364,7 @@ l9--&gt; l3
 </section>
 <section id="loop-inversion" class="slide level2">
 <h2>loop inversion</h2>
-<p>a general while loop</p>
+<p>a general while loop, loop might never run so cannot move code out of the loop</p>
 <pre><code>while(cond){
   ...
 }</code></pre>
@@ -1446,8 +1452,32 @@ l9--&gt; l4
 <p>specialized code is shorter and compiles faster</p>
 <p>since we know that the loop goes from 42 to 100, we could unroll the loop</p>
 </section>
-<section id="trace-compilation" class="slide level2">
-<h2>trace compilation</h2>
+<section id="dynamic-compilation-and-pgo-profile-guided-optimization" class="slide level2">
+<h2>dynamic compilation and pgo (profile guided optimization)</h2>
+<p>workload dependent – dynamically you only measure what you actually see – that can lead to sub-optimal choices if you make them “forever”</p>
+<p>If your program has phases, where it does some kind of behavior for a while, and then shifts to another behavior afterwards, then that workload that you originally measured isn’t representative anymore!</p>
+<p>When you do PGO you’re supposed to do it on the entire program and it’s supposed to be representative, whereas when you’re tracing you’re doing that live!</p>
+</section>
+<section id="confidence-vs-time" class="slide level2">
+<h2>confidence vs time</h2>
+<p>set the magic numbers high- run a long time slowly, but gather more info</p>
+<p>set the magic number low, quickly recompile based on less info</p>
+</section>
+<section id="trace-compilation-0" class="slide level2">
+<h2>trace compilation 0</h2>
+<p>In a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]</p>
+<p>If you have an always-taken control flow, e.g.&nbsp;some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straightline code</p>
+<p>Always-taken or always jumping to the same function, it’s like straightline code when you execute it dynamically! What it’s going to do dynamically is check on the trace whether that was a bad assumption</p>
+<p>execute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”</p>
+<p>On the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true</p>
+<p>Called a “bailout” [“bailing out” of the trace]</p>
+<p>At a bailout there is new information. something you didn’t observe when you were tracing</p>
+<p>You trust that everything you’ve trace is going to happen, it’s all going to well, and you’re going to be able to optimize for it</p>
+<p>But then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path</p>
+<p>So the hot path, the one you’re pretty sure is going to execute, is quite optimal</p>
+</section>
+<section id="trace-compilation2" class="slide level2">
+<h2>trace compilation2</h2>
 <p>tracing jit: extract a hot path (not a function)</p>
 <p>Hot paths are compiled as a single basic block, but the path might go through a call</p>
 <p>gamble: next execution starting at this point, go the same way, no branches leave the path</p>
@@ -1523,8 +1553,58 @@ function f(a){
 </ol>
 <p><a href="https://github.com/sampsyo/bril/blob/main/docs/lang/spec.md">speculative execution extension</a></p>
 <p>you can nest speculate</p>
-<p>it does not role back stores</p>
+<p>it does not roll back stores</p>
 <p>we can approximate trace compilation by running the program twice</p>
+</section>
+<section id="implementation" class="slide level2">
+<h2>implementation</h2>
+<p>you can add a tracer to an interpreter</p>
+<p>In a lot of language environments you’ll have an interpreter that’s executing “op at a time”</p>
+<p>hook in a tracer which observes what the interpreter is doing and “make some machine code on the side” based on how the interpreter ran</p>
+<p>you can implement just a subset of the operations [ed: you might call this property “compiler completeness” for your op set</p>
+</section>
+<section id="common-bytecode-operations" class="slide level2">
+<h2>common bytecode operations</h2>
+<p>implement only the common ones and simply end the trace when you hit one that was not implemented, because it was uncommon</p>
+<p>You can build up this trace JIT-ing capability over time, because the system is built with this assumption you can bail out of the trace for whatever reason and go back to thr interpreter</p>
+</section>
+<section id="an-example-1" class="slide level2">
+<h2>an example</h2>
+<p>Could imagine making a JIT that just: Covered MULs and ADDs and could make fused/composite MUL/ADD bytecode combinations</p>
+<p>Specialize that for one common type; e.g.&nbsp;if you have many types in your language, could support that just for integer types, or just for FP ops e.g.&nbsp;if it were numerical code, and then just bail if any other types showed up at runtime;</p>
+<p>trace invariants: suppose traces call to other traces;</p>
+<p>trace1 set of ops A, trace2 with set of ops B and we see a transfer from A to B</p>
+<p>make sure that the assumptions between those two things are lining up – called <strong><em>trace fusion</em></strong></p>
+<p>know the invariants (i.e.&nbsp;“what must be true”) on the exit from A and the entry to B are lining up / compatible with each other</p>
+</section>
+<section id="method-inlining" class="slide level2">
+<h2>method inlining</h2>
+<p>In trace compiler you just execute through methods</p>
+<p>Inlining kind of the natural path of compilation when doing trace compilation – just linear execution where the jumps/calls/returns simply disappear</p>
+</section>
+<section id="tail-duplication" class="slide level2">
+<h2>tail duplication</h2>
+<p>it is common that multiple traces have a common tail</p>
+<pre><code>for() {
+  if op_Eq{
+     op1 
+   } else {
+      op2
+   }
+}
+op_t
+op_a
+op_i
+op_l</code></pre>
+<pre><code>trace0:  op_eq quard\true  op1 op_t op_a op_i op_l 
+
+trace1:              \false op2 op_t op_a op_i op_l </code></pre>
+<p>two traces with the same ending, could generate</p>
+<p>one copy of the tail- with arguments showing the header</p>
+<p>two copies of the tail- frozen header</p>
+</section>
+<section id="adding-traces-to-bril" class="slide level2 scrollable">
+<h2>adding traces to bril</h2>
 <p>How to modify the reference interpreter (warning typescript!)</p>
 <p><a href="https://github.com/sampsyo/bril/blob/main/brili.ts">brili</a></p>
 <p>there are two functions to consider</p>
@@ -1532,12 +1612,22 @@ function f(a){
 <li>evalFunc interprets a function by calling evalInstr on each instruction</li>
 <li>evalInstr interprets one instruction, large case statement for each instruction</li>
 </ol>
-<p>you will need to print instructions as they execute</p>
+</section>
+<section id="print-instructions-as-they-execute" class="slide level2 scrollable">
+<h2>print instructions as they execute</h2>
 <ol type="1">
 <li>figure out when to start and when to stop</li>
 <li>how to print instructions (modify evalInstr by printing instructions) console.log(instr)</li>
 </ol>
 <p>you have to optimize the trace and put it back</p>
+</section>
+<section id="traces-and-users" class="slide level2">
+<h2>traces and users</h2>
+<p>when a trace works well- it looks amazing - it finds the inner loop and optimizes even through libraries</p>
+<p>but users find in hard to understand what the compiler did,</p>
+<p>a tiny source change can make a big trace change</p>
+<p>hard to fit in a debugger</p>
+<p>security is a problem</p>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">

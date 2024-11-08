@@ -3953,7 +3953,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#be493a41 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#41f60c81 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4918,7 +4918,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1564\n-rw-r--r-- 1 runner docker 40847 Nov  8 15:24 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Nov  8 15:24 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Nov  8 15:24 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 15:23 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Nov  8 15:24 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Nov  8 15:24 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Nov  8 15:24 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Nov  8 15:24 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Nov  8 15:24 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Nov  8 15:24 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23601 Nov  8 15:24 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Nov  8 15:24 03_local.html\n-rw-r--r-- 1 runner docker 12742 Nov  8 15:24 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Nov  8 15:24 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 56836 Nov  8 15:24 04_data_flow.html\n-rw-r--r-- 1 runner docker  9438 Nov  8 15:24 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Nov  8 15:24 05_global.qmd\n-rw-r--r-- 1 runner docker  4544 Nov  8 15:24 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Nov  8 15:24 05c_pre.qmd\n-rw-r--r-- 1 runner docker 20184 Nov  8 15:24 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25643 Nov  8 15:23 07_llvm.notebook\n-rw-r--r-- 1 runner docker 28320 Nov  8 15:24 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Nov  8 15:24 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Nov  8 15:24 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 15:23 09_poly_files\n-rw-r--r-- 1 runner docker   302 Nov  8 15:24 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Nov  8 15:24 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Nov  8 15:24 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Nov  8 15:24 12_memory.html\n-rw-r--r-- 1 runner docker   316 Nov  8 15:24 12_memory.qmd\n-rw-r--r-- 1 runner docker 79398 Nov  8 15:24 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker 16076 Nov  8 15:24 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10117 Nov  8 15:24 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Nov  8 15:23 a.json\n-rw-r--r-- 1 runner docker   248 Nov  8 15:23 a.ts\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 df\n-rw-r--r-- 1 runner docker 27504 Nov  8 15:24 diverg.qmd\n-rw-r--r-- 1 runner docker  4983 Nov  8 15:24 diverg1.qmd\n-rw-r--r-- 1 runner docker  4595 Nov  8 15:23 errors\n-rw-r--r-- 1 runner docker  3623 Nov  8 15:23 foo.ll\n-rw-r--r-- 1 runner docker  2296 Nov  8 15:23 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 images\n-rw-r--r-- 1 runner docker 30815 Nov  8 15:24 junk.html\n-rw-r--r-- 1 runner docker  2134 Nov  8 15:24 junk.qmd\n-rw-r--r-- 1 runner docker   905 Nov  8 15:23 junk.txt\n-rw-r--r-- 1 runner docker 51734 Nov  8 15:24 llvm.html\n-rw-r--r-- 1 runner docker 20713 Nov  8 15:24 llvm.qmd\n-rw-r--r-- 1 runner docker  7641 Nov  8 15:23 llvm.qmd.next\n-rw-r--r-- 1 runner docker 14847 Nov  8 15:24 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Nov  8 15:24 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 papers\ndrwxr-xr-x 2 runner docker  4096 Nov  8 15:23 ra\n-rw-r--r-- 1 runner docker 41910 Nov  8 15:24 ra-checking.html\n-rw-r--r-- 1 runner docker 15154 Nov  8 15:24 ra-checking.qmd\n-rw-r--r-- 1 runner docker  8014 Nov  8 15:24 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Nov  8 15:24 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 46478 Nov  8 15:24 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Nov  8 15:24 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 62223 Nov  8 15:24 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Nov  8 15:24 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Nov  8 15:24 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Nov  8 15:24 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 77886 Nov  8 15:24 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker 41999 Nov  8 15:24 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker 63025 Nov  8 15:24 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 51904 Nov  8 15:24 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker 22316 Nov  8 15:23 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1580\n-rw-r--r-- 1 runner docker 40847 Nov  8 16:43 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Nov  8 16:43 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Nov  8 16:43 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 16:42 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Nov  8 16:43 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Nov  8 16:43 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Nov  8 16:43 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Nov  8 16:43 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Nov  8 16:43 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Nov  8 16:43 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23601 Nov  8 16:43 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Nov  8 16:43 03_local.html\n-rw-r--r-- 1 runner docker 12742 Nov  8 16:43 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Nov  8 16:43 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 56836 Nov  8 16:43 04_data_flow.html\n-rw-r--r-- 1 runner docker  9438 Nov  8 16:43 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Nov  8 16:43 05_global.qmd\n-rw-r--r-- 1 runner docker  4544 Nov  8 16:43 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Nov  8 16:43 05c_pre.qmd\n-rw-r--r-- 1 runner docker 20184 Nov  8 16:43 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25643 Nov  8 16:42 07_llvm.notebook\n-rw-r--r-- 1 runner docker 28320 Nov  8 16:43 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Nov  8 16:43 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Nov  8 16:43 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 16:42 09_poly_files\n-rw-r--r-- 1 runner docker   302 Nov  8 16:43 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Nov  8 16:43 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Nov  8 16:43 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Nov  8 16:43 12_memory.html\n-rw-r--r-- 1 runner docker   316 Nov  8 16:43 12_memory.qmd\n-rw-r--r-- 1 runner docker 85915 Nov  8 16:43 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker 20739 Nov  8 16:43 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10117 Nov  8 16:43 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Nov  8 16:42 a.json\n-rw-r--r-- 1 runner docker   248 Nov  8 16:42 a.ts\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 df\n-rw-r--r-- 1 runner docker 27504 Nov  8 16:43 diverg.qmd\n-rw-r--r-- 1 runner docker  4983 Nov  8 16:43 diverg1.qmd\n-rw-r--r-- 1 runner docker  4595 Nov  8 16:42 errors\n-rw-r--r-- 1 runner docker  3623 Nov  8 16:42 foo.ll\n-rw-r--r-- 1 runner docker  2296 Nov  8 16:42 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 images\n-rw-r--r-- 1 runner docker 30815 Nov  8 16:43 junk.html\n-rw-r--r-- 1 runner docker  2134 Nov  8 16:43 junk.qmd\n-rw-r--r-- 1 runner docker   905 Nov  8 16:42 junk.txt\n-rw-r--r-- 1 runner docker 51734 Nov  8 16:43 llvm.html\n-rw-r--r-- 1 runner docker 20713 Nov  8 16:43 llvm.qmd\n-rw-r--r-- 1 runner docker  7641 Nov  8 16:42 llvm.qmd.next\n-rw-r--r-- 1 runner docker 14847 Nov  8 16:43 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Nov  8 16:43 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 papers\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 ra\n-rw-r--r-- 1 runner docker 41910 Nov  8 16:43 ra-checking.html\n-rw-r--r-- 1 runner docker 15154 Nov  8 16:43 ra-checking.qmd\n-rw-r--r-- 1 runner docker  8014 Nov  8 16:43 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Nov  8 16:43 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 46478 Nov  8 16:43 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Nov  8 16:43 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 62223 Nov  8 16:43 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Nov  8 16:43 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Nov  8 16:43 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Nov  8 16:43 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 83816 Nov  8 16:43 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker 41999 Nov  8 16:43 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker 63025 Nov  8 16:43 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 51904 Nov  8 16:43 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker 22316 Nov  8 16:42 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6393,7 +6393,14 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
     "title": "Dynamic Compilers",
     "section": "jit (just in time) compilers vs aot(ahead of time) compilers",
-    "text": "jit (just in time) compilers vs aot(ahead of time) compilers\na jit compiler translates code into isa while the program executes\nsome options\n\ncompile a function the first time it is called\ncompile a function after it has been called a lot (needs an interpreter) We call these hot functions\nbuild a trace of instructions executed and compile the hot traces (a trace has no branches)\nA variation I used ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code"
+    "text": "jit (just in time) compilers vs aot(ahead of time) compilers\na jit compiler translates code into isa while the program executes\npro:\nmore information\ncon:\ncompile time slows down execution"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#some-options",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#some-options",
+    "title": "Dynamic Compilers",
+    "section": "some options",
+    "text": "some options\n\ncompile a function the first time it is called\ncompile a function after it has been called a lot (needs an interpreter) We call these hot functions\nbuild a trace of instructions executed and compile the hot traces (a trace has no branches)\nA variation I used: ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#can-jit-compiled-code-run-faster-then-aot-code",
@@ -6428,7 +6435,7 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#magic-numbers",
     "title": "Dynamic Compilers",
     "section": "magic numbers",
-    "text": "magic numbers\nassociate a counter with branches and functions if the counter reaches some magic number use one of the compilers\nif the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, so how do you insert the newly compiled code?"
+    "text": "magic numbers\nassociate a counter with branches and functions if the counter reaches some magic number use one of the compilers\nif the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, how do you insert the newly compiled code?"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#questions-when-building-a-jit",
@@ -6456,7 +6463,7 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#boxed-values",
     "title": "Dynamic Compilers",
     "section": "boxed values",
-    "text": "boxed values\nMany languages do not use strong static typing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type"
+    "text": "boxed values\nMany languages do not use strong static typing\nfor example in python\nx = x + 1\nx could be an int/float/object/string etc\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches",
@@ -6487,11 +6494,11 @@
     "text": "tradeoffs\nIn a dynamically typed language like python we can add or remove methods easily\nbut method calls are expensive\nwe want to make these calls cheaper"
   },
   {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-te-call-site",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-te-call-site",
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-each-call-site",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-each-call-site",
     "title": "Dynamic Compilers",
-    "section": "inline caches at te call site",
-    "text": "inline caches at te call site\nthe first time we call a method, we know the type (because we are generating code at runtime)\n\n\ndef func(a,b,c):\n  for i in range(10):\n     foo(a,b,c)\n\ndef func(a,b,c):\n  for i in range(1):\n    if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in the hash\n      call other(a,b,c\n      )"
+    "section": "inline caches at each call site",
+    "text": "inline caches at each call site\nthe first time we call a method, we know the type (because we are generating code at runtime)\n\n\ndef func(a,b,c):\n  for i in range(10):\n     foo(a,b,c)\n\ndef func(a,b,c):\n  for i in range(10):\n    if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in the hash\n      call other(a,b,c\n      )"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#inline-caches-at-the-function-site",
@@ -6547,7 +6554,7 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#dead-code-elimination",
     "title": "Dynamic Compilers",
     "section": "dead code elimination",
-    "text": "dead code elimination\nAfter this the all calls to the function assume these arguments so no need to keep the regular entry\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3"
+    "text": "dead code elimination\nAfter this all calls to the function assume these arguments so no need to keep the regular entry\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#array-in-bounds-check",
@@ -6561,7 +6568,7 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#loop-inversion",
     "title": "Dynamic Compilers",
     "section": "loop inversion",
-    "text": "loop inversion\na general while loop\nwhile(cond){\n  ...\n}\ncan be changed into\nif (cond){\n  do {\n    ...\n  } while(cond)\n}\nfor this loop the first time around i = 40, n = 100 so the first condition is true"
+    "text": "loop inversion\na general while loop, loop might never run so cannot move code out of the loop\nwhile(cond){\n  ...\n}\ncan be changed into\nif (cond){\n  do {\n    ...\n  } while(cond)\n}\nfor this loop the first time around i = 40, n = 100 so the first condition is true"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#after-loop-inversion",
@@ -6578,11 +6585,32 @@
     "text": "results\nspecialized code is shorter and compiles faster\nsince we know that the loop goes from 42 to 100, we could unroll the loop"
   },
   {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation",
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#dynamic-compilation-and-pgo-profile-guided-optimization",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#dynamic-compilation-and-pgo-profile-guided-optimization",
     "title": "Dynamic Compilers",
-    "section": "trace compilation",
-    "text": "trace compilation\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values"
+    "section": "dynamic compilation and pgo (profile guided optimization)",
+    "text": "dynamic compilation and pgo (profile guided optimization)\nworkload dependent – dynamically you only measure what you actually see – that can lead to sub-optimal choices if you make them “forever”\nIf your program has phases, where it does some kind of behavior for a while, and then shifts to another behavior afterwards, then that workload that you originally measured isn’t representative anymore!\nWhen you do PGO you’re supposed to do it on the entire program and it’s supposed to be representative, whereas when you’re tracing you’re doing that live!"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#confidence-vs-time",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#confidence-vs-time",
+    "title": "Dynamic Compilers",
+    "section": "confidence vs time",
+    "text": "confidence vs time\nset the magic numbers high- run a long time slowly, but gather more info\nset the magic number low, quickly recompile based on less info"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation-0",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation-0",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation 0",
+    "text": "trace compilation 0\nIn a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]\nIf you have an always-taken control flow, e.g. some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straightline code\nAlways-taken or always jumping to the same function, it’s like straightline code when you execute it dynamically! What it’s going to do dynamically is check on the trace whether that was a bad assumption\nexecute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”\nOn the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true\nCalled a “bailout” [“bailing out” of the trace]\nAt a bailout there is new information. something you didn’t observe when you were tracing\nYou trust that everything you’ve trace is going to happen, it’s all going to well, and you’re going to be able to optimize for it\nBut then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path\nSo the hot path, the one you’re pretty sure is going to execute, is quite optimal"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation2",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation2",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation2",
+    "text": "trace compilation2\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-x-42",
@@ -6610,14 +6638,70 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-do-this-in-bril",
     "title": "Dynamic Compilers",
     "section": "how do this in Bril?",
-    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not role back stores\nwe can approximate trace compilation by running the program twice\nHow to modify the reference interpreter (warning typescript!)\nbrili\nthere are two functions to consider\n\nevalFunc interprets a function by calling evalInstr on each instruction\nevalInstr interprets one instruction, large case statement for each instruction\n\nyou will need to print instructions as they execute\n\nfigure out when to start and when to stop\nhow to print instructions (modify evalInstr by printing instructions) console.log(instr)\n\nyou have to optimize the trace and put it back"
+    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not roll back stores\nwe can approximate trace compilation by running the program twice"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation\nyou can add a tracer to an interpreter\nIn a lot of language environments you’ll have an interpreter that’s executing “op at a time”\nhook in a tracer which observes what the interpreter is doing and “make some machine code on the side” based on how the interpreter ran\nyou can implement just a subset of the operations [ed: you might call this property “compiler completeness” for your op set"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#common-bytecode-operations",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#common-bytecode-operations",
+    "title": "Dynamic Compilers",
+    "section": "common bytecode operations",
+    "text": "common bytecode operations\nimplement only the common ones and simply end the trace when you hit one that was not implemented, because it was uncommon\nYou can build up this trace JIT-ing capability over time, because the system is built with this assumption you can bail out of the trace for whatever reason and go back to thr interpreter"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-1",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-1",
+    "title": "Dynamic Compilers",
+    "section": "an example",
+    "text": "an example\nCould imagine making a JIT that just: Covered MULs and ADDs and could make fused/composite MUL/ADD bytecode combinations\nSpecialize that for one common type; e.g. if you have many types in your language, could support that just for integer types, or just for FP ops e.g. if it were numerical code, and then just bail if any other types showed up at runtime;\ntrace invariants: suppose traces call to other traces;\ntrace1 set of ops A, trace2 with set of ops B and we see a transfer from A to B\nmake sure that the assumptions between those two things are lining up – called trace fusion\nknow the invariants (i.e. “what must be true”) on the exit from A and the entry to B are lining up / compatible with each other"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#method-inlining",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#method-inlining",
+    "title": "Dynamic Compilers",
+    "section": "method inlining",
+    "text": "method inlining\nIn trace compiler you just execute through methods\nInlining kind of the natural path of compilation when doing trace compilation – just linear execution where the jumps/calls/returns simply disappear"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#tail-duplication",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#tail-duplication",
+    "title": "Dynamic Compilers",
+    "section": "tail duplication",
+    "text": "tail duplication\nit is common that multiple traces have a common tail\nfor() {\n  if op_Eq{\n     op1 \n   } else {\n      op2\n   }\n}\nop_t\nop_a\nop_i\nop_l\ntrace0:  op_eq quard\\true  op1 op_t op_a op_i op_l \n\ntrace1:              \\false op2 op_t op_a op_i op_l \ntwo traces with the same ending, could generate\none copy of the tail- with arguments showing the header\ntwo copies of the tail- frozen header"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#adding-traces-to-bril",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#adding-traces-to-bril",
+    "title": "Dynamic Compilers",
+    "section": "adding traces to bril",
+    "text": "adding traces to bril\nHow to modify the reference interpreter (warning typescript!)\nbrili\nthere are two functions to consider\n\nevalFunc interprets a function by calling evalInstr on each instruction\nevalInstr interprets one instruction, large case statement for each instruction"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#print-instructions-as-they-execute",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#print-instructions-as-they-execute",
+    "title": "Dynamic Compilers",
+    "section": "print instructions as they execute",
+    "text": "print instructions as they execute\n\nfigure out when to start and when to stop\nhow to print instructions (modify evalInstr by printing instructions) console.log(instr)\n\nyou have to optimize the trace and put it back"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#traces-and-users",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#traces-and-users",
+    "title": "Dynamic Compilers",
+    "section": "traces and users",
+    "text": "traces and users\nwhen a trace works well- it looks amazing - it finds the inner loop and optimizes even through libraries\nbut users find in hard to understand what the compiler did,\na tiny source change can make a big trace change\nhard to fit in a debugger\nsecurity is a problem"
   },
   {
     "objectID": "lectures/13_dynamic_compilers.html",
     "href": "lectures/13_dynamic_compilers.html",
     "title": "Dynamic Compilers",
     "section": "",
-    "text": "a jit compiler translates code into isa while the program executes\nsome options\n\ncompile a function the first time it is called\ncompile a function after it has been called a lot (needs an interpreter) We call these hot functions\nbuild a trace of instructions executed and compile the hot traces (a trace has no branches)\nA variation I used ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code",
+    "text": "a jit compiler translates code into isa while the program executes\npro:\nmore information\ncon:\ncompile time slows down execution",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6629,7 +6713,19 @@
     "href": "lectures/13_dynamic_compilers.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
     "title": "Dynamic Compilers",
     "section": "",
-    "text": "a jit compiler translates code into isa while the program executes\nsome options\n\ncompile a function the first time it is called\ncompile a function after it has been called a lot (needs an interpreter) We call these hot functions\nbuild a trace of instructions executed and compile the hot traces (a trace has no branches)\nA variation I used ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code",
+    "text": "a jit compiler translates code into isa while the program executes\npro:\nmore information\ncon:\ncompile time slows down execution",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#some-options",
+    "href": "lectures/13_dynamic_compilers.html#some-options",
+    "title": "Dynamic Compilers",
+    "section": "some options",
+    "text": "some options\n\ncompile a function the first time it is called\ncompile a function after it has been called a lot (needs an interpreter) We call these hot functions\nbuild a trace of instructions executed and compile the hot traces (a trace has no branches)\nA variation I used: ran the program to completion using a tracing interpreter, recompile off line, future execution is a mix of interpreter and compiled code",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6689,7 +6785,7 @@
     "href": "lectures/13_dynamic_compilers.html#magic-numbers",
     "title": "Dynamic Compilers",
     "section": "magic numbers",
-    "text": "magic numbers\nassociate a counter with branches and functions if the counter reaches some magic number use one of the compilers\nif the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, so how do you insert the newly compiled code?",
+    "text": "magic numbers\nassociate a counter with branches and functions if the counter reaches some magic number use one of the compilers\nif the counter for a backward branch, you recompile, but the code is executing in the middle of a loop, how do you insert the newly compiled code?",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6737,7 +6833,7 @@
     "href": "lectures/13_dynamic_compilers.html#boxed-values",
     "title": "Dynamic Compilers",
     "section": "boxed values",
-    "text": "boxed values\nMany languages do not use strong static typing\nfor example in python\nx = x + 1\nx could be an int/float/object\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type",
+    "text": "boxed values\nMany languages do not use strong static typing\nfor example in python\nx = x + 1\nx could be an int/float/object/string etc\nthe value of x needs to carry a type. Represent x as a pair (type, pointer or bits) The pair is called a boxed value\nthen to generate code for the plus we have to figure out what kind of add, based on the type",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6793,11 +6889,11 @@
     ]
   },
   {
-    "objectID": "lectures/13_dynamic_compilers.html#inline-caches-at-te-call-site",
-    "href": "lectures/13_dynamic_compilers.html#inline-caches-at-te-call-site",
+    "objectID": "lectures/13_dynamic_compilers.html#inline-caches-at-each-call-site",
+    "href": "lectures/13_dynamic_compilers.html#inline-caches-at-each-call-site",
     "title": "Dynamic Compilers",
-    "section": "inline caches at te call site",
-    "text": "inline caches at te call site\nthe first time we call a method, we know the type (because we are generating code at runtime)\n\n\ndef func(a,b,c):\n  for i in range(10):\n     foo(a,b,c)\n\ndef func(a,b,c):\n  for i in range(1):\n    if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in the hash\n      call other(a,b,c\n      )",
+    "section": "inline caches at each call site",
+    "text": "inline caches at each call site\nthe first time we call a method, we know the type (because we are generating code at runtime)\n\n\ndef func(a,b,c):\n  for i in range(10):\n     foo(a,b,c)\n\ndef func(a,b,c):\n  for i in range(10):\n    if isinstance(a, type1)\n      body of foo  \n    else:\n      other = lookup 'foo' in the hash\n      call other(a,b,c\n      )",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6893,7 +6989,7 @@
     "href": "lectures/13_dynamic_compilers.html#dead-code-elimination",
     "title": "Dynamic Compilers",
     "section": "dead code elimination",
-    "text": "dead code elimination\nAfter this the all calls to the function assume these arguments so no need to keep the regular entry\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3",
+    "text": "dead code elimination\nAfter this all calls to the function assume these arguments so no need to keep the regular entry\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nnormal_entry[\"function entry\n              v = load[0]\n              q = q = 42 \n              n = 100\n              if (n ==0) goto l1\"]\n\nl1[\"l1: throw error\"]\nl2[\" l2: i0 = 0\n     d = 0fffffff\"]\nnormal_entry --&gt; l1\nnormal_entry--&gt; l2\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(d3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nl2--&gt; l3\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\n\nl3[\"l3: i1 = phi(i2, i3)\n    d1 = phi(dd3, d4)\n    if (i1 &lt; n) go to l5\"  ]\nentry_on_stack_rep[\"start replace\n                   v = load [0]\n                  q = 42\n                  n = 100\n                  i3 = 40\n                  d4 = offfffff\"]\nentry_on_stack_rep --&gt; l3\nl5[\"l5: t0 = 4* i\n     t1 = v[t0]\n     notinbounds(t1, n) go to l8\"]\n\nl3 --&gt; l5 \nl3--&gt; l4\nl4[\"l4: return d1\"]\nl5--&gt; l7\nl7[\" l7: nd = abs(t1, q)\n   if (nd &gt; d1) go to l9\"]\n\nl9[\"l9: d3 = phi(d1, d2)\n   i2 = i1 + 1\n   goto l3\"]\nl7--&gt; l9\nl7--&gt; l6[\"l6: d2 = nd\"]\nl6--&gt; l9\nl8[\"l8: throw boundsError\"]\nl5 --&gt; l8\nl9--&gt; l3",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6917,7 +7013,7 @@
     "href": "lectures/13_dynamic_compilers.html#loop-inversion",
     "title": "Dynamic Compilers",
     "section": "loop inversion",
-    "text": "loop inversion\na general while loop\nwhile(cond){\n  ...\n}\ncan be changed into\nif (cond){\n  do {\n    ...\n  } while(cond)\n}\nfor this loop the first time around i = 40, n = 100 so the first condition is true",
+    "text": "loop inversion\na general while loop, loop might never run so cannot move code out of the loop\nwhile(cond){\n  ...\n}\ncan be changed into\nif (cond){\n  do {\n    ...\n  } while(cond)\n}\nfor this loop the first time around i = 40, n = 100 so the first condition is true",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6949,11 +7045,47 @@
     ]
   },
   {
-    "objectID": "lectures/13_dynamic_compilers.html#trace-compilation",
-    "href": "lectures/13_dynamic_compilers.html#trace-compilation",
+    "objectID": "lectures/13_dynamic_compilers.html#dynamic-compilation-and-pgo-profile-guided-optimization",
+    "href": "lectures/13_dynamic_compilers.html#dynamic-compilation-and-pgo-profile-guided-optimization",
     "title": "Dynamic Compilers",
-    "section": "trace compilation",
-    "text": "trace compilation\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values",
+    "section": "dynamic compilation and pgo (profile guided optimization)",
+    "text": "dynamic compilation and pgo (profile guided optimization)\nworkload dependent – dynamically you only measure what you actually see – that can lead to sub-optimal choices if you make them “forever”\nIf your program has phases, where it does some kind of behavior for a while, and then shifts to another behavior afterwards, then that workload that you originally measured isn’t representative anymore!\nWhen you do PGO you’re supposed to do it on the entire program and it’s supposed to be representative, whereas when you’re tracing you’re doing that live!",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#confidence-vs-time",
+    "href": "lectures/13_dynamic_compilers.html#confidence-vs-time",
+    "title": "Dynamic Compilers",
+    "section": "confidence vs time",
+    "text": "confidence vs time\nset the magic numbers high- run a long time slowly, but gather more info\nset the magic number low, quickly recompile based on less info",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#trace-compilation-0",
+    "href": "lectures/13_dynamic_compilers.html#trace-compilation-0",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation 0",
+    "text": "trace compilation 0\nIn a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]\nIf you have an always-taken control flow, e.g. some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straightline code\nAlways-taken or always jumping to the same function, it’s like straightline code when you execute it dynamically! What it’s going to do dynamically is check on the trace whether that was a bad assumption\nexecute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”\nOn the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true\nCalled a “bailout” [“bailing out” of the trace]\nAt a bailout there is new information. something you didn’t observe when you were tracing\nYou trust that everything you’ve trace is going to happen, it’s all going to well, and you’re going to be able to optimize for it\nBut then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path\nSo the hot path, the one you’re pretty sure is going to execute, is quite optimal",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#trace-compilation2",
+    "href": "lectures/13_dynamic_compilers.html#trace-compilation2",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation2",
+    "text": "trace compilation2\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7001,7 +7133,103 @@
     "href": "lectures/13_dynamic_compilers.html#how-do-this-in-bril",
     "title": "Dynamic Compilers",
     "section": "how do this in Bril?",
-    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not role back stores\nwe can approximate trace compilation by running the program twice\nHow to modify the reference interpreter (warning typescript!)\nbrili\nthere are two functions to consider\n\nevalFunc interprets a function by calling evalInstr on each instruction\nevalInstr interprets one instruction, large case statement for each instruction\n\nyou will need to print instructions as they execute\n\nfigure out when to start and when to stop\nhow to print instructions (modify evalInstr by printing instructions) console.log(instr)\n\nyou have to optimize the trace and put it back",
+    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not roll back stores\nwe can approximate trace compilation by running the program twice",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#implementation",
+    "href": "lectures/13_dynamic_compilers.html#implementation",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation\nyou can add a tracer to an interpreter\nIn a lot of language environments you’ll have an interpreter that’s executing “op at a time”\nhook in a tracer which observes what the interpreter is doing and “make some machine code on the side” based on how the interpreter ran\nyou can implement just a subset of the operations [ed: you might call this property “compiler completeness” for your op set",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#common-bytecode-operations",
+    "href": "lectures/13_dynamic_compilers.html#common-bytecode-operations",
+    "title": "Dynamic Compilers",
+    "section": "common bytecode operations",
+    "text": "common bytecode operations\nimplement only the common ones and simply end the trace when you hit one that was not implemented, because it was uncommon\nYou can build up this trace JIT-ing capability over time, because the system is built with this assumption you can bail out of the trace for whatever reason and go back to thr interpreter",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#an-example-1",
+    "href": "lectures/13_dynamic_compilers.html#an-example-1",
+    "title": "Dynamic Compilers",
+    "section": "an example",
+    "text": "an example\nCould imagine making a JIT that just: Covered MULs and ADDs and could make fused/composite MUL/ADD bytecode combinations\nSpecialize that for one common type; e.g. if you have many types in your language, could support that just for integer types, or just for FP ops e.g. if it were numerical code, and then just bail if any other types showed up at runtime;\ntrace invariants: suppose traces call to other traces;\ntrace1 set of ops A, trace2 with set of ops B and we see a transfer from A to B\nmake sure that the assumptions between those two things are lining up – called trace fusion\nknow the invariants (i.e. “what must be true”) on the exit from A and the entry to B are lining up / compatible with each other",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#method-inlining",
+    "href": "lectures/13_dynamic_compilers.html#method-inlining",
+    "title": "Dynamic Compilers",
+    "section": "method inlining",
+    "text": "method inlining\nIn trace compiler you just execute through methods\nInlining kind of the natural path of compilation when doing trace compilation – just linear execution where the jumps/calls/returns simply disappear",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#tail-duplication",
+    "href": "lectures/13_dynamic_compilers.html#tail-duplication",
+    "title": "Dynamic Compilers",
+    "section": "tail duplication",
+    "text": "tail duplication\nit is common that multiple traces have a common tail\nfor() {\n  if op_Eq{\n     op1 \n   } else {\n      op2\n   }\n}\nop_t\nop_a\nop_i\nop_l\ntrace0:  op_eq quard\\true  op1 op_t op_a op_i op_l \n\ntrace1:              \\false op2 op_t op_a op_i op_l \ntwo traces with the same ending, could generate\none copy of the tail- with arguments showing the header\ntwo copies of the tail- frozen header",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#adding-traces-to-bril",
+    "href": "lectures/13_dynamic_compilers.html#adding-traces-to-bril",
+    "title": "Dynamic Compilers",
+    "section": "adding traces to bril",
+    "text": "adding traces to bril\nHow to modify the reference interpreter (warning typescript!)\nbrili\nthere are two functions to consider\n\nevalFunc interprets a function by calling evalInstr on each instruction\nevalInstr interprets one instruction, large case statement for each instruction",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#print-instructions-as-they-execute",
+    "href": "lectures/13_dynamic_compilers.html#print-instructions-as-they-execute",
+    "title": "Dynamic Compilers",
+    "section": "print instructions as they execute",
+    "text": "print instructions as they execute\n\nfigure out when to start and when to stop\nhow to print instructions (modify evalInstr by printing instructions) console.log(instr)\n\nyou have to optimize the trace and put it back",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#traces-and-users",
+    "href": "lectures/13_dynamic_compilers.html#traces-and-users",
+    "title": "Dynamic Compilers",
+    "section": "traces and users",
+    "text": "traces and users\nwhen a trace works well- it looks amazing - it finds the inner loop and optimizes even through libraries\nbut users find in hard to understand what the compiler did,\na tiny source change can make a big trace change\nhard to fit in a debugger\nsecurity is a problem",
     "crumbs": [
       "EECS 7398",
       "Lectures",
