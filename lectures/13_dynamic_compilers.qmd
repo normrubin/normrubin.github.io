@@ -767,17 +767,79 @@ set the magic numbers high- run a long time slowly, but gather more info
 
 set the magic number low,  quickly recompile based on less info 
 
+# Dynamic Compilers part 2
+
+
+## C++ method call  
+
+each object has a pointer to a vtable, which is a table of function pointers to all the virtual functions 
+
+each derived object has its own vtable, which has the same offsets for all the common virtual functions 
+
+to find the code takes two dereferences
+
+1. find the vtable (one per class) (one load)
+1. at a fixed offset (determined by the virtual function name) find the code (second load)
+
+
+## a python example 
+
+more flexible 
+
+1. find the hash table (one per instance)
+1. lookup the virtual function in the hash table 
+
+```
+
+class Thing:
+    def __init__(self, kind):
+        self.kind = kind 
+
+thing = Thing('car')
+
+def honk(self):
+    print(f"{self.kind} says Honk")
+
+thing.honk = honk.__get__(thing)  ## add a method dynamically to one instance 
+
+thing.honk()  ## call it 
+
+```
+
+honk.__get__(thing) returns a bound method, when this method is called thing is passed as first argument 
+
+
+## dynamic chunks
+
+So far:
+
+1. run interpreter or tier 0 compiler 
+1. collect statistics on call counts or branch counts 
+1. when count is high enough recompile the hot functions 
+1. specialize the hot functions based on common values 
+
+## The unit of compilation is the static function  
+
+an alterative is called ***trace compilation***  
+
+1. run interpreter or tier 0 compiler 
+1. collect the statements executed (no not collect control flow)
+1. this produces a linear trace of instructions 
+1. recompile the trace using optimizations like value numbering 
+1. if the next time the code executes, it takes a different path, fix things up
+
+
+
 
 ## trace compilation 0
 
 In a linear trace the number of assumptions you're making accumulates as you execute [towards the end of the trace you have the most assumptions built up]
 
-If you have an always-taken control flow, e.g. some virtual function call that's always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straightline code
-
-Always-taken or always jumping to the same function, it's like straightline code when you execute it dynamically!
-What it's going to do dynamically is check on the trace whether that was a bad assumption
+If you have an always-taken control flow, e.g. some virtual function call that's always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straight line code
 
 execute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong"
+
+## cold path
 
 On the "cold path" -- again, when it's convenient undo all the inapplicable things if it turns out the branches weren't true
 
@@ -792,7 +854,7 @@ But then at runtime, when convenient, you're going to check, and then bail if yo
 So the hot path, the one you're pretty sure is going to execute, is quite optimal
 
 
-## trace compilation2
+## trace compilation 2
 
 tracing jit: extract a hot path (not a function)
 
@@ -881,18 +943,28 @@ why is this a good idea?
 
 3 new operations (sort of like out-of-order instructions)
 
-1. speculate
-1. commit 
-1. guard 
+1. speculate - Enter a speculative execution context. No arguments.
+1. commit -  End the current speculative context, committing the current speculative state as the "real" state. No arguments.
+1. guard  - Check a condition and possibly abort the current speculative context. One argument, the Boolean condition, and one label, to which control is transferred on abort.
+
+## speculate extension
 
 [speculative execution extension](https://github.com/sampsyo/bril/blob/main/docs/lang/spec.md)
 
 
-you can nest speculate 
+## example 
 
-it does not roll back stores 
+  b: bool = const false;      
 
-we can approximate trace compilation by running the program twice
+  v: int = const 4;            v == 4  
+  speculate;
+  v: int = const 2;            v == 2 (speculate state)
+  guard b .failed;             v == 2 (speculate state)
+  commit;                      
+
+.failed:
+  print v;                     v == 4
+
 
 
 ## implementation 
@@ -1003,3 +1075,335 @@ a tiny source change can make a big trace change
 hard to fit in a debugger 
 
 security is a problem 
+
+## pytorch 2.0
+
+ml frameworks have two modes 
+
+## Eager Mode
+
+- Preferred by users
+- Easier to use programming model
+- Easy to debug
+
+a + b + c executes two calls to torch.add (if they are tensors)
+
+no place to optimize, allows any kind of python, and any control flow 
+
+- PyTorch is a primarily an eager mode framework
+
+## Graph Mode
+
+- Preferred by backends and framework builders
+- Easier to optimize with a compiler
+- Easier to do automated transformations
+
+construct a graph with two add nodes and 3 input nodes, then execute the graph 
+
+easy to optimize, only graph nodes allowed, no control flow
+
+Main optimization is fusing operations to avoid memory copies 
+
+
+
+
+## PyTorch’s Many Attempts at Graph Modes
+
+torch.jit.trace
+
+1. Record + replay
+1.  Unsound
+1.  Can give incorrect results because it ignores Python part of program
+
+torch. jit.script
+
+1. AOT parses Python into graph format
+1.  Only works on ~45% of real world models
+1.  High effort to “TorchScript” models
+1. PyTorch Models Are Not Static Graphs
+
+PyTorch users write models where program graphs are impossible
+
+Convert tensors to native Python types (x.item(), x.tolist(), int(x), etc)
+
+Use other frameworks (numpy/xarray/etc) for part of their model
+
+Data dependent Python control flow or other dynamism
+Exceptions, closures, generators, classes, etc
+
+torch xla
+
+defered execution. rather then do the graph operation, just save it and execute as late as possible
+
+very slow, big performance cliffs 
+
+
+## torch.compile(model) -  converts a pytorch eager program to a graph 
+
+torch.dynamo - which dynamically captures Python code execution and creates a static computational graph.
+
+torch.Inductor- compiler that optimimzes static computation graphs
+
+
+## dynamo 
+
+traces through a program function given some inputs and records the pytorch operations that executed 
+
+## pytorch example 1
+
+```
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() < 0:
+        b  = b * -1
+    return x *b
+
+for _ in range(100):
+    toy_example(torch.randn(10), torch.randn(10))
+```
+
+sometimes the sum is negative but not always 
+
+## implementation
+
+
+at a call python builds a frame: 
+
+(codeObject, list of arguments)
+
+and calls a function evalFrame(frame)
+
+Torch.dynamo changes this to:
+
+1. uses the codeObject as a key into a hash table 
+1. hash table has guards (lookup fails if guards fail)
+1. if lookup fails
+   a. analysis of bytecode
+   a. generate a static graph (torch parts)
+   a. run the compiler to generate a function
+   a. generate a new codeObject (non-torch parts) calls function
+   a. add to hash
+1. evalFrame using the found codeObject
+
+
+## for the example 
+```
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() < 0:
+        b  = b * -1
+    return x *b
+```
+
+walk the bytecodes of the function up to control flow 
+
+```
+x = a / (torch.abs(a)+1)
+if b.sum() < 0:
+```
+
+graph
+   
+|opcode        |name    |target                                         |args         |
+|-------------  |------  |------------------------------------------------------  |-----------  |
+|placeholder    |l_a_    |L_a_                                                    |()          |
+|placeholder    |l_b_    |L_b_                                                    |()          |
+|call_function  |abs_1   |<built-in method abs of type object at 0x728736add8a0>  |(l_a_,)     |
+|call_function  |add     |<built-in function add>                                 |(abs_1, 1)   |
+|call_function  |x       |<built-in function truediv>                             |(l_a_, add)  |
+|call_method    |sum_1   |sum                                                     |(l_b_,)      |
+|call_function  |lt      |<built-in function lt>                                  |(sum_1, 0)   |
+|output         |output  |output                                                  |((x, lt),)   |
+
+def toy_example(a,b):
+   (x,lt) = call1(a,b)
+   if lt:
+      f1(b,x)
+   else:
+      f2(b,x)
+
+def f1(b, x):
+   b  = b * -1
+   return x *b
+
+def f2(b,x):
+   return x *b
+
+```
+
+guards: 
+
+check_tensor(L['a'], Tensor, torch.float32, size=[10], stride=[1])
+check_tensor(L['b'], Tensor, torch.float32, size=[10], stride=[1])
+
+walk the byte code again for f1
+
+b  = b * -1
+return x *b
+
+TRACED GRAPH
+opcode         name    target                   args         kwargs
+ -------------  ------  -----------------------  -----------  --------
+ placeholder    l_b_    L_b_                     ()           {}
+ placeholder    l_x_    L_x_                     ()           {}
+ call_function  b       <built-in function mul>  (l_b_, -1)   {}
+ call_function  mul_1   <built-in function mul>  (l_x_, b)    {}
+output         output  output                   ((mul_1,),)  {}
+
+
+guards: check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
+        check_tensor(L['x'], torch.float32, size=[10], stride=[1]) 
+
+TRACED GRAPH
+ opcode         name    target                   args          kwarg
+  -------------  ------  -----------------------  ------------  --------
+placeholder    l_x_    L_x_                     ()            {}
+placeholder    l_b_    L_b_                     ()            {}
+call_function  mul     <built-in function mul>  (l_x_, l_b_)  {}
+output         output  output                   ((mul,),)     {}
+
+check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
+check_tensor(L['x'], torch.float32, size=[10], stride=[1])  # return x *b  # mp/ipykernel_1179164/26
+
+
+
+
+
+
+the list of operations is a trace and is stored as a graph 
+
+.::: {.columns}
+
+::: {.column}
+
+import torch
+
+@torch.compile
+def mse(x,y):
+  z = (x -y) ** 2
+  return z.sum()
+
+x = torch.randn(200)
+y = torch.randn(200)
+
+mse(x,y)
+
+:::
+
+::: {.column}
+
+def forward(l_x_: torch.Tensor, 
+l_y_: torch.Tensor):
+   sub = l_x_ - l_y_
+   z = sum **2
+   sum_1 = z.sum()
+   return (sum_1,)
+
+:::
+
+::: 
+
+## linear traces 
+
+Dynamo removes all control flow, if/else, loops, exceptions 
+
+specializes (bakes in) all non-tensor objects (numbers, strings, classes )
+
+::: {.columns}
+
+::: {.column}
+@torch.compile
+def fn(f,n):
+  y = x ** 2
+  if n >= 0:
+    return (n +1)* y
+  else:
+    return x /y 
+
+x = torch.randn(200)
+fn(x,2)
+
+:::
+
+::: {.column}
+
+def forward(l_x_: torch.Tensor):
+   y = l_x_ ** 2
+   mul 3*x
+   return (mul,)
+
+:::
+
+::: 
+
+Trace integers symbolically 
+
+by default it specilizes on every integer in the graph but if a subsequent vall the value changes it traces symbolically 
+but 0 or 1 are always speciaized 
+
+
+
+
+
+## multiple traces 
+
+import torch
+from typing import List
+
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
+
+def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
+    print("my compiler() called with fx graph")
+    gm.graph.print_tabular()
+    return gm
+
+@torch.compile(backend=my_compiler)
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() < 0:
+        b  = b * -1
+    return x *b
+
+for _ in range(100):
+    toy_example(torch.randn(10), torch.randn(10))
+
+
+import torch
+from typing import List
+
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
+
+def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
+    print("my compiler() called with fx graph")
+    gm.graph.print_tabular()
+    return gm
+
+@torch.compile(backend=my_compiler)
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() < 0:
+        b  = b * -1
+    return x *b
+
+for _ in range(100):
+    toy_example(torch.randn(10), torch.randn(10))
+
+
+## implementation  
+
+pep 523,  allows python function to see unevaluated frames, function + arguments 
+
+normally just calls the function 
+
+in torch 
+
+1. calls guards - maybe reform graph and compile
+1. gets multiple graphs + functions 
+1. some functions may call the graph processor
+1. all control flow stays in the functions 
+
+
+
+example with 3 graphs 
