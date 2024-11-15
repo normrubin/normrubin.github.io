@@ -1298,7 +1298,7 @@ sometimes the sum is negative but not always
 
 ---
 
-graph
+## graph
    
 |opcode        |name    |target                                         |args         |
 |-------------  |------  |------------------------------------------------------  |-----------  |
@@ -1311,6 +1311,9 @@ graph
 |call_function  |lt      |<built-in function lt>                                  |(sum_1, 0)   |
 |output         |output  |output                                                  |((x, lt),)   |
 
+
+## code 
+```
 def toy_example(a,b):
    (x,lt) = call1(a,b)
    if lt:
@@ -1324,20 +1327,22 @@ def f1(b, x):
 
 def f2(b,x):
    return x *b
-
 ```
 
-guards: 
+
+## guards: 
 
 check_tensor(L['a'], Tensor, torch.float32, size=[10], stride=[1])
 check_tensor(L['b'], Tensor, torch.float32, size=[10], stride=[1])
 
 walk the byte code again for f1
-
+```
 b  = b * -1
 return x *b
+```
 
-TRACED GRAPH
+##  TRACED GRAPH
+
 opcode         name    target                   args         kwargs
  -------------  ------  -----------------------  -----------  --------
  placeholder    l_b_    L_b_                     ()           {}
@@ -1347,10 +1352,13 @@ opcode         name    target                   args         kwargs
 output         output  output                   ((mul_1,),)  {}
 
 
+## other branch
+```
 guards: check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
         check_tensor(L['x'], torch.float32, size=[10], stride=[1]) 
-
+```
 TRACED GRAPH
+
  opcode         name    target                   args          kwarg
   -------------  ------  -----------------------  ------------  --------
 placeholder    l_x_    L_x_                     ()            {}
@@ -1363,41 +1371,6 @@ check_tensor(L['x'], torch.float32, size=[10], stride=[1])  # return x *b  # mp/
 
 
 
-
-
-
-the list of operations is a trace and is stored as a graph 
-
-.::: {.columns}
-
-::: {.column}
-```
-import torch
-@torch.compile
-def mse(x,y):
-  z = (x -y) ** 2
-  return z.sum()
-
-x = torch.randn(200)
-y = torch.randn(200)
-
-mse(x,y)
-```
-:::
-
-::: {.column}
-```
-def forward(l_x_: torch.Tensor, 
-l_y_: torch.Tensor):
-   sub = l_x_ - l_y_
-   z = sum **2
-   sum_1 = z.sum()
-   return (sum_1,)
-```
-:::
-
-::: 
-
 ## linear traces 
 
 Dynamo removes all control flow, if/else, loops, exceptions 
@@ -1407,7 +1380,9 @@ specializes (bakes in) all non-tensor objects (numbers, strings, classes )
 ::: {.columns}
 
 ::: {.column}
+
 ```
+
 @torch.compile
 def fn(f,n):
   y = x ** 2
@@ -1422,6 +1397,7 @@ fn(x,2)
 :::
 
 ::: {.column}
+
 ```
 def forward(l_x_: torch.Tensor):
    y = l_x_ ** 2
@@ -1431,6 +1407,8 @@ def forward(l_x_: torch.Tensor):
 :::
 
 ::: 
+
+## special cases
 
 Trace integers symbolically 
 
@@ -1481,12 +1459,7 @@ pep 523,  allows python function to see unevaluated frames, function + arguments
 
 normally just calls the function 
 
-in torch 
 
-1. calls guards - maybe reform graph and compile
-1. gets multiple graphs + functions 
-1. some functions may call the graph processor
-1. all control flow stays in the functions 
 
 
 
