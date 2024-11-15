@@ -1106,6 +1106,14 @@ Main optimization is fusing operations to avoid memory copies
 
 
 
+## how does the compiler fit
+
+in Eager mode there is only a library - no compiler
+
+if you have a matmul followed by an activation function, it is up to the developer to notice that the memory traffic is more expensive then the activation and its up to the developer to know there is another pytorch call (2000 different calls) which does the combined operation and it is up to the developer to change the code 
+
+if graph mode (compiler writers call this defered or late) the operations get recorded (not executed) and only get executed when we need the result 
+
 
 ## PyTorch’s Many Attempts at Graph Modes
 
@@ -1147,7 +1155,92 @@ torch.Inductor- compiler that optimimzes static computation graphs
 
 ## dynamo 
 
-traces through a program function given some inputs and records the pytorch operations that executed 
+```
+import torch
+from typing import List
+
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
+
+def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
+    print("my compiler() called with fx graph")
+    gm.graph.print_tabular()
+    return gm
+
+@torch.compile(backend=my_compiler)
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() < 0:
+        b  = b * -1
+    return x *b
+
+for _ in range(100):
+    toy_example(torch.randn(10), torch.randn(10))
+
+```
+
+
+## output 
+
+::: {.columns}
+
+::: {.column width="35%"}
+
+```
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() < 0:
+        b  = b * -1
+    return x *b
+```
+
+:::
+
+::: {.column width="65%"}
+```
+opcode         name    target        args      
+------       ------  ---------    -----------
+placeholder    l_a_    L_a_         ()         
+placeholder    l_b_    L_b_         ()         
+call_function  abs_1   <abs>        (l_a_,)   
+call_function  add     <add>        (abs_1, 1) 
+call_function  x       <truediv>    (l_a_, add)
+call_method    sum_1   sum          (l_b_,)   
+call_function  lt      <lt>         (sum_1, 0) 
+output         output  output       ((x, lt),)
+------       ------  ---------    -----------
+placeholder    l_b_    L_b_         ()           
+placeholder    l_x_    L_x_         ()           
+call_function  b       <mul>        (l_b_, -1)   
+call_function  mul_1   <mul>        (l_x_, b)    
+output         output  output       ((mul_1,),) 
+------       ------  ---------    -----------        
+placeholder    l_x_    L_x_         ()            
+placeholder    l_b_    L_b_         ()            
+call_function  mul     <mul>        (l_x_, l_b_)  
+output         output  output       ((mul,),)     
+```
+
+:::
+
+::: 
+
+
+## implementation  
+
+
+python builds a frameObject (pointer to codeObject + arguments)
+
+passes this to eval 
+
+codeObject allows for extra user data and for a user function to be called between the frameObject and eval 
+
+This makes it easy to add a custom JIT
+
+split the function into two parts -  the python part and the torch part
+
+This is reused if the guards pass 
+
 
 ## pytorch example 1
 
@@ -1165,42 +1258,45 @@ for _ in range(100):
 sometimes the sum is negative but not always 
 
 ## implementation
+![](pytorch/s1.png)
+---
+
+![](pytorch/s2.png)
+---
+
+![](pytorch/s3.png)
+---
+
+![](pytorch/s4.png)
+---
+
+![](pytorch/s5.png)
+---
+
+![](pytorch/s6.png)
+---
+
+![](pytorch/s7.png)
+---
+
+![](pytorch/s8.png)
+---
+
+![](pytorch/s9.png)
+---
+
+![](pytorch/s10.png)
+
+---
+
+![](pytorch/s11.png)
+
+---
+
+![](pytorch/s12.png)
 
 
-at a call python builds a frame: 
-
-(codeObject, list of arguments)
-
-and calls a function evalFrame(frame)
-
-Torch.dynamo changes this to:
-
-1. uses the codeObject as a key into a hash table 
-1. hash table has guards (lookup fails if guards fail)
-1. if lookup fails
-   a. analysis of bytecode
-   a. generate a static graph (torch parts)
-   a. run the compiler to generate a function
-   a. generate a new codeObject (non-torch parts) calls function
-   a. add to hash
-1. evalFrame using the found codeObject
-
-
-## for the example 
-```
-def toy_example(a,b):
-    x = a / (torch.abs(a)+1)
-    if b.sum() < 0:
-        b  = b * -1
-    return x *b
-```
-
-walk the bytecodes of the function up to control flow 
-
-```
-x = a / (torch.abs(a)+1)
-if b.sum() < 0:
-```
+---
 
 graph
    
@@ -1275,9 +1371,8 @@ the list of operations is a trace and is stored as a graph
 .::: {.columns}
 
 ::: {.column}
-
+```
 import torch
-
 @torch.compile
 def mse(x,y):
   z = (x -y) ** 2
@@ -1287,18 +1382,18 @@ x = torch.randn(200)
 y = torch.randn(200)
 
 mse(x,y)
-
+```
 :::
 
 ::: {.column}
-
+```
 def forward(l_x_: torch.Tensor, 
 l_y_: torch.Tensor):
    sub = l_x_ - l_y_
    z = sum **2
    sum_1 = z.sum()
    return (sum_1,)
-
+```
 :::
 
 ::: 
@@ -1312,6 +1407,7 @@ specializes (bakes in) all non-tensor objects (numbers, strings, classes )
 ::: {.columns}
 
 ::: {.column}
+```
 @torch.compile
 def fn(f,n):
   y = x ** 2
@@ -1322,16 +1418,16 @@ def fn(f,n):
 
 x = torch.randn(200)
 fn(x,2)
-
+```
 :::
 
 ::: {.column}
-
+```
 def forward(l_x_: torch.Tensor):
    y = l_x_ ** 2
    mul 3*x
    return (mul,)
-
+```
 :::
 
 ::: 
@@ -1343,10 +1439,8 @@ but 0 or 1 are always speciaized
 
 
 
-
-
 ## multiple traces 
-
+```
 import torch
 from typing import List
 
@@ -1379,17 +1473,7 @@ def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
     print("my compiler() called with fx graph")
     gm.graph.print_tabular()
     return gm
-
-@torch.compile(backend=my_compiler)
-def toy_example(a,b):
-    x = a / (torch.abs(a)+1)
-    if b.sum() < 0:
-        b  = b * -1
-    return x *b
-
-for _ in range(100):
-    toy_example(torch.randn(10), torch.randn(10))
-
+```
 
 ## implementation  
 
@@ -1406,4 +1490,3 @@ in torch
 
 
 
-example with 3 graphs 
