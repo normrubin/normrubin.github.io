@@ -1885,9 +1885,8 @@ for _ in range(100):
 
 
 <img data-src="pytorch/s12.png" class="r-stretch"></section>
-<section class="slide level2">
-
-<p>graph</p>
+<section id="graph" class="slide level2">
+<h2>graph</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 15%">
@@ -1954,112 +1953,197 @@ for _ in range(100):
 </tr>
 </tbody>
 </table>
-<p>def toy_example(a,b): (x,lt) = call1(a,b) if lt: f1(b,x) else: f2(b,x)</p>
-<p>def f1(b, x): b = b * -1 return x *b</p>
-<p>def f2(b,x): return x *b</p>
-<pre><code>
-guards: 
-
-check_tensor(L['a'], Tensor, torch.float32, size=[10], stride=[1])
-check_tensor(L['b'], Tensor, torch.float32, size=[10], stride=[1])
-
-walk the byte code again for f1
-
-b  = b * -1
-return x *b
-
-TRACED GRAPH
-opcode         name    target                   args         kwargs
- -------------  ------  -----------------------  -----------  --------
- placeholder    l_b_    L_b_                     ()           {}
- placeholder    l_x_    L_x_                     ()           {}
- call_function  b       &lt;built-in function mul&gt;  (l_b_, -1)   {}
- call_function  mul_1   &lt;built-in function mul&gt;  (l_x_, b)    {}
-output         output  output                   ((mul_1,),)  {}
-
-
-guards: check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
-        check_tensor(L['x'], torch.float32, size=[10], stride=[1]) 
-
-TRACED GRAPH
- opcode         name    target                   args          kwarg
-  -------------  ------  -----------------------  ------------  --------
-placeholder    l_x_    L_x_                     ()            {}
-placeholder    l_b_    L_b_                     ()            {}
-call_function  mul     &lt;built-in function mul&gt;  (l_x_, l_b_)  {}
-output         output  output                   ((mul,),)     {}
-
-check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
-check_tensor(L['x'], torch.float32, size=[10], stride=[1])  # return x *b  # mp/ipykernel_1179164/26
-
-
-
-
-
-
-the list of operations is a trace and is stored as a graph 
-
-.::: {.columns}
-
-::: {.column}</code></pre>
-<p>import torch <span class="citation" data-cites="torch.compile">@torch.compile</span> def mse(x,y): z = (x -y) ** 2 return z.sum()</p>
-<p>x = torch.randn(200) y = torch.randn(200)</p>
-<p>mse(x,y)</p>
-<pre><code>:::
-
-::: {.column}</code></pre>
-<p>def forward(l_x_: torch.Tensor, l_y_: torch.Tensor): sub = l_x_ - l_y_ z = sum **2 sum_1 = z.sum() return (sum_1,)</p>
-<pre><code>:::
-
-::: 
-
-## linear traces 
-
-Dynamo removes all control flow, if/else, loops, exceptions 
-
-specializes (bakes in) all non-tensor objects (numbers, strings, classes )
-
-::: {.columns}
-
-::: {.column}</code></pre>
-<p><span class="citation" data-cites="torch.compile">@torch.compile</span> def fn(f,n): y = x ** 2 if n &gt;= 0: return (n +1)* y else: return x /y</p>
-<p>x = torch.randn(200) fn(x,2)</p>
-<pre><code>:::
-
-::: {.column}</code></pre>
-<p>def forward(l_x_: torch.Tensor): y = l_x_ ** 2 mul 3*x return (mul,)</p>
-<pre><code>:::
-
-::: 
-
-Trace integers symbolically 
-
-by default it specilizes on every integer in the graph but if a subsequent vall the value changes it traces symbolically 
-but 0 or 1 are always speciaized 
-
-
-
-## multiple traces </code></pre>
-<p>import torch from typing import List</p>
-<p>import torch._dynamo torch._dynamo.config.suppress_errors = True</p>
-<p>def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]): print(“my compiler() called with fx graph”) gm.graph.print_tabular() return gm</p>
-<p><span class="citation" data-cites="torch.compile">@torch.compile</span>(backend=my_compiler) def toy_example(a,b): x = a / (torch.abs(a)+1) if b.sum() &lt; 0: b = b * -1 return x *b</p>
-<p>for _ in range(100): toy_example(torch.randn(10), torch.randn(10))</p>
-<p>import torch from typing import List</p>
-<p>import torch._dynamo torch._dynamo.config.suppress_errors = True</p>
-<p>def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]): print(“my compiler() called with fx graph”) gm.graph.print_tabular() return gm ```</p>
 </section>
-<section id="implementation-3" class="slide level2 scrollable">
+<section id="code" class="slide level2">
+<h2>code</h2>
+<pre><code>def toy_example(a,b):
+   (x,lt) = call1(a,b)
+   if lt:
+      f1(b,x)
+   else:
+      f2(b,x)
+
+def f1(b, x):
+   b  = b * -1
+   return x *b
+
+def f2(b,x):
+   return x *b</code></pre>
+</section>
+<section id="guards" class="slide level2">
+<h2>guards:</h2>
+<p>check_tensor(L[‘a’], Tensor, torch.float32, size=[10], stride=[1]) check_tensor(L[‘b’], Tensor, torch.float32, size=[10], stride=[1])</p>
+<p>walk the byte code again for f1</p>
+<pre><code>b  = b * -1
+return x *b</code></pre>
+</section>
+<section id="traced-graph" class="slide level2">
+<h2>TRACED GRAPH</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>pcode n</th>
+<th>ame t</th>
+<th>arget a</th>
+<th>rgs k</th>
+<th style="text-align: left;">wargs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>placeholder</td>
+<td>l_b_</td>
+<td>L_b_</td>
+<td>()</td>
+<td style="text-align: left;">{}</td>
+</tr>
+<tr class="even">
+<td>placeholder</td>
+<td>l_x_</td>
+<td>L_x_</td>
+<td>()</td>
+<td style="text-align: left;">{}</td>
+</tr>
+<tr class="odd">
+<td>call_function</td>
+<td>b</td>
+<td><built-in function="" mul=""></built-in></td>
+<td>(l_b_, -1)</td>
+<td style="text-align: left;">{}</td>
+</tr>
+<tr class="even">
+<td>call_function</td>
+<td>mul_1</td>
+<td><built-in function="" mul=""></built-in></td>
+<td>(l_x_, b)</td>
+<td style="text-align: left;">{}</td>
+</tr>
+<tr class="odd">
+<td>utput o</td>
+<td>utput o</td>
+<td>utput (</td>
+<td>(mul_1,),) {</td>
+<td style="text-align: left;">}</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="other-branch" class="slide level2">
+<h2>other branch</h2>
+<pre><code>guards: check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
+        check_tensor(L['x'], torch.float32, size=[10], stride=[1]) </code></pre>
+<p>TRACED GRAPH</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>pcode n</th>
+<th>ame t</th>
+<th>arget a</th>
+<th>rgs k</th>
+<th style="text-align: left;">warg</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>aceholder l_</td>
+<td>x_ L_</td>
+<td>x_ ()</td>
+<td>{}</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td>aceholder l_</td>
+<td>b_ L_</td>
+<td>b_ ()</td>
+<td>{}</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td>ll_function mu</td>
+<td>l &lt;b</td>
+<td>uilt-in function mul&gt; (l</td>
+<td><em>x</em>, l_b_) {}</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td>tput ou</td>
+<td>tput ou</td>
+<td>tput ((</td>
+<td>mul,),) {}</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>check_tensor(L[‘b’], torch.float32, size=[10], stride=[1]) check_tensor(L[‘x’], torch.float32, size=[10], stride=[1]) # return x *b # mp/ipykernel_1179164/26</p>
+</section>
+<section id="linear-traces" class="slide level2">
+<h2>linear traces</h2>
+<p>Dynamo removes all control flow, if/else, loops, exceptions</p>
+<p>specializes (bakes in) all non-tensor objects (numbers, strings, classes )</p>
+<div class="columns">
+<div class="column">
+<pre><code>
+@torch.compile
+def fn(f,n):
+  y = x ** 2
+  if n &gt;= 0:
+    return (n +1)* y
+  else:
+    return x /y 
+
+x = torch.randn(200)
+fn(x,2)</code></pre>
+</div><div class="column">
+<pre><code>def forward(l_x_: torch.Tensor):
+   y = l_x_ ** 2
+   mul 3*x
+   return (mul,)</code></pre>
+</div></div>
+</section>
+<section id="special-cases" class="slide level2">
+<h2>special cases</h2>
+<p>Trace integers symbolically</p>
+<p>by default it specilizes on every integer in the graph but if a subsequent vall the value changes it traces symbolically but 0 or 1 are always speciaized</p>
+</section>
+<section id="multiple-traces" class="slide level2">
+<h2>multiple traces</h2>
+<pre><code>import torch
+from typing import List
+
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
+
+def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
+    print("my compiler() called with fx graph")
+    gm.graph.print_tabular()
+    return gm
+
+@torch.compile(backend=my_compiler)
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() &lt; 0:
+        b  = b * -1
+    return x *b
+
+for _ in range(100):
+    toy_example(torch.randn(10), torch.randn(10))
+
+
+import torch
+from typing import List
+
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
+
+def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
+    print("my compiler() called with fx graph")
+    gm.graph.print_tabular()
+    return gm</code></pre>
+</section>
+<section id="implementation-3" class="slide level2">
 <h2>implementation</h2>
 <p>pep 523, allows python function to see unevaluated frames, function + arguments</p>
 <p>normally just calls the function</p>
-<p>in torch</p>
-<ol type="1">
-<li>calls guards - maybe reform graph and compile</li>
-<li>gets multiple graphs + functions</li>
-<li>some functions may call the graph processor</li>
-<li>all control flow stays in the functions</li>
-</ol>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
