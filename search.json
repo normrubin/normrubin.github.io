@@ -3953,7 +3953,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#41f60c81 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#c4cbd3c0 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4918,7 +4918,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1580\n-rw-r--r-- 1 runner docker 40847 Nov  8 16:43 010_compiler_overview.html\n-rw-r--r-- 1 runner docker 11163 Nov  8 16:43 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker  3000 Nov  8 16:43 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 16:42 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker  3000 Nov  8 16:43 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker 33799 Nov  8 16:43 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker  4134 Nov  8 16:43 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker  4096 Nov  8 16:43 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker  7413 Nov  8 16:43 02a_representation.qmd\n-rw-r--r-- 1 runner docker 13777 Nov  8 16:43 02b_bril.qmd\n-rw-r--r-- 1 runner docker 23601 Nov  8 16:43 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker 75099 Nov  8 16:43 03_local.html\n-rw-r--r-- 1 runner docker 12742 Nov  8 16:43 03_local.qmd\n-rw-r--r-- 1 runner docker 13267 Nov  8 16:43 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker 56836 Nov  8 16:43 04_data_flow.html\n-rw-r--r-- 1 runner docker  9438 Nov  8 16:43 04_data_flow.qmd\n-rw-r--r-- 1 runner docker  9974 Nov  8 16:43 05_global.qmd\n-rw-r--r-- 1 runner docker  4544 Nov  8 16:43 05b_licm.qmd\n-rw-r--r-- 1 runner docker  3148 Nov  8 16:43 05c_pre.qmd\n-rw-r--r-- 1 runner docker 20184 Nov  8 16:43 06_ssa.qmd\n-rwxr-xr-x 1 runner docker 25643 Nov  8 16:42 07_llvm.notebook\n-rw-r--r-- 1 runner docker 28320 Nov  8 16:43 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker  5691 Nov  8 16:43 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker 32457 Nov  8 16:43 09_poly.qmd\ndrwxr-xr-x 3 runner docker  4096 Nov  8 16:42 09_poly_files\n-rw-r--r-- 1 runner docker   302 Nov  8 16:43 100_mlir.qmd\n-rw-r--r-- 1 runner docker 21170 Nov  8 16:43 110_whole_program.html\n-rw-r--r-- 1 runner docker   320 Nov  8 16:43 110_whole_program.qmd\n-rw-r--r-- 1 runner docker 21228 Nov  8 16:43 12_memory.html\n-rw-r--r-- 1 runner docker   316 Nov  8 16:43 12_memory.qmd\n-rw-r--r-- 1 runner docker 85915 Nov  8 16:43 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker 20739 Nov  8 16:43 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker 10117 Nov  8 16:43 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker  4682 Nov  8 16:42 a.json\n-rw-r--r-- 1 runner docker   248 Nov  8 16:42 a.ts\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 df\n-rw-r--r-- 1 runner docker 27504 Nov  8 16:43 diverg.qmd\n-rw-r--r-- 1 runner docker  4983 Nov  8 16:43 diverg1.qmd\n-rw-r--r-- 1 runner docker  4595 Nov  8 16:42 errors\n-rw-r--r-- 1 runner docker  3623 Nov  8 16:42 foo.ll\n-rw-r--r-- 1 runner docker  2296 Nov  8 16:42 identity.bc\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 images\n-rw-r--r-- 1 runner docker 30815 Nov  8 16:43 junk.html\n-rw-r--r-- 1 runner docker  2134 Nov  8 16:43 junk.qmd\n-rw-r--r-- 1 runner docker   905 Nov  8 16:42 junk.txt\n-rw-r--r-- 1 runner docker 51734 Nov  8 16:43 llvm.html\n-rw-r--r-- 1 runner docker 20713 Nov  8 16:43 llvm.qmd\n-rw-r--r-- 1 runner docker  7641 Nov  8 16:42 llvm.qmd.next\n-rw-r--r-- 1 runner docker 14847 Nov  8 16:43 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker  2260 Nov  8 16:43 mlir.qmd\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 papers\ndrwxr-xr-x 2 runner docker  4096 Nov  8 16:42 ra\n-rw-r--r-- 1 runner docker 41910 Nov  8 16:43 ra-checking.html\n-rw-r--r-- 1 runner docker 15154 Nov  8 16:43 ra-checking.qmd\n-rw-r--r-- 1 runner docker  8014 Nov  8 16:43 register_allocation.qmd\n-rw-r--r-- 1 runner docker 52254 Nov  8 16:43 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker 46478 Nov  8 16:43 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker 85290 Nov  8 16:43 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker 62223 Nov  8 16:43 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker 39234 Nov  8 16:43 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker 33153 Nov  8 16:43 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker 33176 Nov  8 16:43 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker 83816 Nov  8 16:43 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker 41999 Nov  8 16:43 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker 63025 Nov  8 16:43 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker 51904 Nov  8 16:43 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker 22316 Nov  8 16:42 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1624\n-rw-r--r-- 1 runner docker  40847 Nov 15 18:02 010_compiler_overview.html\n-rw-r--r-- 1 runner docker  11163 Nov 15 18:01 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker   3000 Nov 15 18:01 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 15 18:01 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker   3000 Nov 15 18:01 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  33799 Nov 15 18:02 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker   4134 Nov 15 18:01 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker   4096 Nov 15 18:02 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker   7413 Nov 15 18:01 02a_representation.qmd\n-rw-r--r-- 1 runner docker  13777 Nov 15 18:01 02b_bril.qmd\n-rw-r--r-- 1 runner docker  23601 Nov 15 18:02 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  75099 Nov 15 18:02 03_local.html\n-rw-r--r-- 1 runner docker  12742 Nov 15 18:01 03_local.qmd\n-rw-r--r-- 1 runner docker  13267 Nov 15 18:01 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  56836 Nov 15 18:02 04_data_flow.html\n-rw-r--r-- 1 runner docker   9438 Nov 15 18:01 04_data_flow.qmd\n-rw-r--r-- 1 runner docker   9974 Nov 15 18:01 05_global.qmd\n-rw-r--r-- 1 runner docker   4544 Nov 15 18:01 05b_licm.qmd\n-rw-r--r-- 1 runner docker   3148 Nov 15 18:01 05c_pre.qmd\n-rw-r--r-- 1 runner docker  20184 Nov 15 18:01 06_ssa.qmd\n-rwxr-xr-x 1 runner docker  25643 Nov 15 18:01 07_llvm.notebook\n-rw-r--r-- 1 runner docker  28320 Nov 15 18:02 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker   5691 Nov 15 18:01 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker  32457 Nov 15 18:01 09_poly.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 15 18:01 09_poly_files\n-rw-r--r-- 1 runner docker    302 Nov 15 18:01 100_mlir.qmd\n-rw-r--r-- 1 runner docker  21170 Nov 15 18:02 110_whole_program.html\n-rw-r--r-- 1 runner docker    320 Nov 15 18:01 110_whole_program.qmd\n-rw-r--r-- 1 runner docker  21228 Nov 15 18:02 12_memory.html\n-rw-r--r-- 1 runner docker    316 Nov 15 18:01 12_memory.qmd\n-rw-r--r-- 1 runner docker 101357 Nov 15 18:02 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker  32377 Nov 15 18:01 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker  10117 Nov 15 18:01 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker   4682 Nov 15 18:01 a.json\n-rw-r--r-- 1 runner docker    248 Nov 15 18:01 a.ts\ndrwxr-xr-x 2 runner docker   4096 Nov 15 18:01 df\n-rw-r--r-- 1 runner docker  27504 Nov 15 18:01 diverg.qmd\n-rw-r--r-- 1 runner docker   4983 Nov 15 18:01 diverg1.qmd\n-rw-r--r-- 1 runner docker   4595 Nov 15 18:01 errors\n-rw-r--r-- 1 runner docker   3623 Nov 15 18:01 foo.ll\n-rw-r--r-- 1 runner docker   2296 Nov 15 18:01 identity.bc\ndrwxr-xr-x 2 runner docker   4096 Nov 15 18:01 images\n-rw-r--r-- 1 runner docker  30815 Nov 15 18:02 junk.html\n-rw-r--r-- 1 runner docker   2134 Nov 15 18:01 junk.qmd\n-rw-r--r-- 1 runner docker    905 Nov 15 18:01 junk.txt\n-rw-r--r-- 1 runner docker  51734 Nov 15 18:02 llvm.html\n-rw-r--r-- 1 runner docker  20713 Nov 15 18:01 llvm.qmd\n-rw-r--r-- 1 runner docker   7641 Nov 15 18:01 llvm.qmd.next\n-rw-r--r-- 1 runner docker  14847 Nov 15 18:01 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker   2260 Nov 15 18:01 mlir.qmd\ndrwxr-xr-x 2 runner docker   4096 Nov 15 18:01 papers\ndrwxr-xr-x 2 runner docker   4096 Nov 15 18:01 pytorch\ndrwxr-xr-x 2 runner docker   4096 Nov 15 18:01 ra\n-rw-r--r-- 1 runner docker  41910 Nov 15 18:02 ra-checking.html\n-rw-r--r-- 1 runner docker  15154 Nov 15 18:01 ra-checking.qmd\n-rw-r--r-- 1 runner docker   8014 Nov 15 18:01 register_allocation.qmd\n-rw-r--r-- 1 runner docker  52254 Nov 15 18:02 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker  46478 Nov 15 18:02 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker  85290 Nov 15 18:02 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker  62223 Nov 15 18:02 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker  39234 Nov 15 18:02 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker  33153 Nov 15 18:02 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker  33176 Nov 15 18:02 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker  98885 Nov 15 18:02 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker  41999 Nov 15 18:02 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker  63025 Nov 15 18:02 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker  51904 Nov 15 18:02 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker  22316 Nov 15 18:01 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6599,18 +6599,53 @@
     "text": "confidence vs time\nset the magic numbers high- run a long time slowly, but gather more info\nset the magic number low, quickly recompile based on less info"
   },
   {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#c-method-call",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#c-method-call",
+    "title": "Dynamic Compilers",
+    "section": "C++ method call",
+    "text": "C++ method call\neach object has a pointer to a vtable, which is a table of function pointers to all the virtual functions\neach derived object has its own vtable, which has the same offsets for all the common virtual functions\nto find the code takes two dereferences\n\nfind the vtable (one per class) (one load)\nat a fixed offset (determined by the virtual function name) find the code (second load)"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#a-python-example",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#a-python-example",
+    "title": "Dynamic Compilers",
+    "section": "a python example",
+    "text": "a python example\nmore flexible\n\nfind the hash table (one per instance)\nlookup the virtual function in the hash table\n\n\nclass Thing:\n    def __init__(self, kind):\n        self.kind = kind \n\nthing = Thing('car')\n\ndef honk(self):\n    print(f\"{self.kind} says Honk\")\n\nthing.honk = honk.__get__(thing)  ## add a method dynamically to one instance \n\nthing.honk()  ## call it \n\nhonk.__get__(thing) returns a bound method, when this method is called thing is passed as first argument"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#dynamic-chunks",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#dynamic-chunks",
+    "title": "Dynamic Compilers",
+    "section": "dynamic chunks",
+    "text": "dynamic chunks\nSo far:\n\nrun interpreter or tier 0 compiler\ncollect statistics on call counts or branch counts\nwhen count is high enough recompile the hot functions\nspecialize the hot functions based on common values"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#the-unit-of-compilation-is-the-static-function",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#the-unit-of-compilation-is-the-static-function",
+    "title": "Dynamic Compilers",
+    "section": "The unit of compilation is the static function",
+    "text": "The unit of compilation is the static function\nan alterative is called trace compilation\n\nrun interpreter or tier 0 compiler\ncollect the statements executed (no not collect control flow)\nthis produces a linear trace of instructions\nrecompile the trace using optimizations like value numbering\nif the next time the code executes, it takes a different path, fix things up"
+  },
+  {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation-0",
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation-0",
     "title": "Dynamic Compilers",
     "section": "trace compilation 0",
-    "text": "trace compilation 0\nIn a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]\nIf you have an always-taken control flow, e.g. some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straightline code\nAlways-taken or always jumping to the same function, it’s like straightline code when you execute it dynamically! What it’s going to do dynamically is check on the trace whether that was a bad assumption\nexecute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”\nOn the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true\nCalled a “bailout” [“bailing out” of the trace]\nAt a bailout there is new information. something you didn’t observe when you were tracing\nYou trust that everything you’ve trace is going to happen, it’s all going to well, and you’re going to be able to optimize for it\nBut then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path\nSo the hot path, the one you’re pretty sure is going to execute, is quite optimal"
+    "text": "trace compilation 0\nIn a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]\nIf you have an always-taken control flow, e.g. some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straight line code\nexecute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”"
   },
   {
-    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation2",
-    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation2",
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#cold-path",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#cold-path",
     "title": "Dynamic Compilers",
-    "section": "trace compilation2",
-    "text": "trace compilation2\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values"
+    "section": "cold path",
+    "text": "cold path\nOn the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true\nCalled a “bailout” [“bailing out” of the trace]\nAt a bailout there is new information. something you didn’t observe when you were tracing\nYou trust that everything you’ve trace is going to happen, it’s all going to well, and you’re going to be able to optimize for it\nBut then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path\nSo the hot path, the one you’re pretty sure is going to execute, is quite optimal"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation-2",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#trace-compilation-2",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation 2",
+    "text": "trace compilation 2\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#an-example-x-42",
@@ -6638,7 +6673,21 @@
     "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-do-this-in-bril",
     "title": "Dynamic Compilers",
     "section": "how do this in Bril?",
-    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not roll back stores\nwe can approximate trace compilation by running the program twice"
+    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate - Enter a speculative execution context. No arguments.\ncommit - End the current speculative context, committing the current speculative state as the “real” state. No arguments.\nguard - Check a condition and possibly abort the current speculative context. One argument, the Boolean condition, and one label, to which control is transferred on abort."
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#speculate-extension",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#speculate-extension",
+    "title": "Dynamic Compilers",
+    "section": "speculate extension",
+    "text": "speculate extension\nspeculative execution extension"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#example",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#example",
+    "title": "Dynamic Compilers",
+    "section": "example",
+    "text": "example\nb: bool = const false;\nv: int = const 4; v == 4\nspeculate; v: int = const 2; v == 2 (speculate state) guard b .failed; v == 2 (speculate state) commit;\n.failed: print v; v == 4"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation",
@@ -6695,6 +6744,90 @@
     "title": "Dynamic Compilers",
     "section": "traces and users",
     "text": "traces and users\nwhen a trace works well- it looks amazing - it finds the inner loop and optimizes even through libraries\nbut users find in hard to understand what the compiler did,\na tiny source change can make a big trace change\nhard to fit in a debugger\nsecurity is a problem"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#pytorch-2.0",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#pytorch-2.0",
+    "title": "Dynamic Compilers",
+    "section": "pytorch 2.0",
+    "text": "pytorch 2.0\nml frameworks have two modes"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#eager-mode",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#eager-mode",
+    "title": "Dynamic Compilers",
+    "section": "Eager Mode",
+    "text": "Eager Mode\n\nPreferred by users\nEasier to use programming model\nEasy to debug\n\na + b + c executes two calls to torch.add (if they are tensors)\nno place to optimize, allows any kind of python, and any control flow\n\nPyTorch is a primarily an eager mode framework"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#graph-mode",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#graph-mode",
+    "title": "Dynamic Compilers",
+    "section": "Graph Mode",
+    "text": "Graph Mode\n\nPreferred by backends and framework builders\nEasier to optimize with a compiler\nEasier to do automated transformations\n\nconstruct a graph with two add nodes and 3 input nodes, then execute the graph\neasy to optimize, only graph nodes allowed, no control flow\nMain optimization is fusing operations to avoid memory copies"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-does-the-compiler-fit",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#how-does-the-compiler-fit",
+    "title": "Dynamic Compilers",
+    "section": "how does the compiler fit",
+    "text": "how does the compiler fit\nin Eager mode there is only a library - no compiler\nif you have a matmul followed by an activation function, it is up to the developer to notice that the memory traffic is more expensive then the activation and its up to the developer to know there is another pytorch call (2000 different calls) which does the combined operation and it is up to the developer to change the code\nif graph mode (compiler writers call this defered or late) the operations get recorded (not executed) and only get executed when we need the result"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#pytorchs-many-attempts-at-graph-modes",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#pytorchs-many-attempts-at-graph-modes",
+    "title": "Dynamic Compilers",
+    "section": "PyTorch’s Many Attempts at Graph Modes",
+    "text": "PyTorch’s Many Attempts at Graph Modes\ntorch.jit.trace\n\nRecord + replay\nUnsound\nCan give incorrect results because it ignores Python part of program\n\ntorch. jit.script\n\nAOT parses Python into graph format\nOnly works on ~45% of real world models\nHigh effort to “TorchScript” models\nPyTorch Models Are Not Static Graphs\n\nPyTorch users write models where program graphs are impossible\nConvert tensors to native Python types (x.item(), x.tolist(), int(x), etc)\nUse other frameworks (numpy/xarray/etc) for part of their model\nData dependent Python control flow or other dynamism Exceptions, closures, generators, classes, etc\ntorch xla\ndefered execution. rather then do the graph operation, just save it and execute as late as possible\nvery slow, big performance cliffs"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#torch.compilemodel---converts-a-pytorch-eager-program-to-a-graph",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#torch.compilemodel---converts-a-pytorch-eager-program-to-a-graph",
+    "title": "Dynamic Compilers",
+    "section": "torch.compile(model) - converts a pytorch eager program to a graph",
+    "text": "torch.compile(model) - converts a pytorch eager program to a graph\ntorch.dynamo - which dynamically captures Python code execution and creates a static computational graph.\ntorch.Inductor- compiler that optimimzes static computation graphs"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#dynamo",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#dynamo",
+    "title": "Dynamic Compilers",
+    "section": "dynamo",
+    "text": "dynamo\nimport torch\nfrom typing import List\n\nimport torch._dynamo\ntorch._dynamo.config.suppress_errors = True\n\ndef my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):\n    print(\"my compiler() called with fx graph\")\n    gm.graph.print_tabular()\n    return gm\n\n@torch.compile(backend=my_compiler)\ndef toy_example(a,b):\n    x = a / (torch.abs(a)+1)\n    if b.sum() &lt; 0:\n        b  = b * -1\n    return x *b\n\nfor _ in range(100):\n    toy_example(torch.randn(10), torch.randn(10))"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#output",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#output",
+    "title": "Dynamic Compilers",
+    "section": "output",
+    "text": "output\n\n\ndef toy_example(a,b):\n    x = a / (torch.abs(a)+1)\n    if b.sum() &lt; 0:\n        b  = b * -1\n    return x *b\n\nopcode         name    target        args      \n------       ------  ---------    -----------\nplaceholder    l_a_    L_a_         ()         \nplaceholder    l_b_    L_b_         ()         \ncall_function  abs_1   &lt;abs&gt;        (l_a_,)   \ncall_function  add     &lt;add&gt;        (abs_1, 1) \ncall_function  x       &lt;truediv&gt;    (l_a_, add)\ncall_method    sum_1   sum          (l_b_,)   \ncall_function  lt      &lt;lt&gt;         (sum_1, 0) \noutput         output  output       ((x, lt),)\n------       ------  ---------    -----------\nplaceholder    l_b_    L_b_         ()           \nplaceholder    l_x_    L_x_         ()           \ncall_function  b       &lt;mul&gt;        (l_b_, -1)   \ncall_function  mul_1   &lt;mul&gt;        (l_x_, b)    \noutput         output  output       ((mul_1,),) \n------       ------  ---------    -----------        \nplaceholder    l_x_    L_x_         ()            \nplaceholder    l_b_    L_b_         ()            \ncall_function  mul     &lt;mul&gt;        (l_x_, l_b_)  \noutput         output  output       ((mul,),)"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation-1",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation-1",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation\npython builds a frameObject (pointer to codeObject + arguments)\npasses this to eval\ncodeObject allows for extra user data and for a user function to be called between the frameObject and eval\nThis makes it easy to add a custom JIT\nsplit the function into two parts - the python part and the torch part\nThis is reused if the guards pass"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#pytorch-example-1",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#pytorch-example-1",
+    "title": "Dynamic Compilers",
+    "section": "pytorch example 1",
+    "text": "pytorch example 1\ndef toy_example(a,b):\n    x = a / (torch.abs(a)+1)\n    if b.sum() &lt; 0:\n        b  = b * -1\n    return x *b\n\nfor _ in range(100):\n    toy_example(torch.randn(10), torch.randn(10))\nsometimes the sum is negative but not always"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation-2",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation-2",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation"
+  },
+  {
+    "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation-3",
+    "href": "lectures/revealjs_13_dynamic_compilers.qmd.html#implementation-3",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation\npep 523, allows python function to see unevaluated frames, function + arguments\nnormally just calls the function\nin torch\n\ncalls guards - maybe reform graph and compile\ngets multiple graphs + functions\nsome functions may call the graph processor\nall control flow stays in the functions"
   },
   {
     "objectID": "lectures/13_dynamic_compilers.html",
@@ -7069,11 +7202,11 @@
     ]
   },
   {
-    "objectID": "lectures/13_dynamic_compilers.html#trace-compilation-0",
-    "href": "lectures/13_dynamic_compilers.html#trace-compilation-0",
+    "objectID": "lectures/13_dynamic_compilers.html#c-method-call",
+    "href": "lectures/13_dynamic_compilers.html#c-method-call",
     "title": "Dynamic Compilers",
-    "section": "trace compilation 0",
-    "text": "trace compilation 0\nIn a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]\nIf you have an always-taken control flow, e.g. some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straightline code\nAlways-taken or always jumping to the same function, it’s like straightline code when you execute it dynamically! What it’s going to do dynamically is check on the trace whether that was a bad assumption\nexecute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”\nOn the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true\nCalled a “bailout” [“bailing out” of the trace]\nAt a bailout there is new information. something you didn’t observe when you were tracing\nYou trust that everything you’ve trace is going to happen, it’s all going to well, and you’re going to be able to optimize for it\nBut then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path\nSo the hot path, the one you’re pretty sure is going to execute, is quite optimal",
+    "section": "C++ method call",
+    "text": "C++ method call\neach object has a pointer to a vtable, which is a table of function pointers to all the virtual functions\neach derived object has its own vtable, which has the same offsets for all the common virtual functions\nto find the code takes two dereferences\n\nfind the vtable (one per class) (one load)\nat a fixed offset (determined by the virtual function name) find the code (second load)",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7081,11 +7214,71 @@
     ]
   },
   {
-    "objectID": "lectures/13_dynamic_compilers.html#trace-compilation2",
-    "href": "lectures/13_dynamic_compilers.html#trace-compilation2",
+    "objectID": "lectures/13_dynamic_compilers.html#a-python-example",
+    "href": "lectures/13_dynamic_compilers.html#a-python-example",
     "title": "Dynamic Compilers",
-    "section": "trace compilation2",
-    "text": "trace compilation2\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values",
+    "section": "a python example",
+    "text": "a python example\nmore flexible\n\nfind the hash table (one per instance)\nlookup the virtual function in the hash table\n\n\nclass Thing:\n    def __init__(self, kind):\n        self.kind = kind \n\nthing = Thing('car')\n\ndef honk(self):\n    print(f\"{self.kind} says Honk\")\n\nthing.honk = honk.__get__(thing)  ## add a method dynamically to one instance \n\nthing.honk()  ## call it \n\nhonk.__get__(thing) returns a bound method, when this method is called thing is passed as first argument",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#dynamic-chunks",
+    "href": "lectures/13_dynamic_compilers.html#dynamic-chunks",
+    "title": "Dynamic Compilers",
+    "section": "dynamic chunks",
+    "text": "dynamic chunks\nSo far:\n\nrun interpreter or tier 0 compiler\ncollect statistics on call counts or branch counts\nwhen count is high enough recompile the hot functions\nspecialize the hot functions based on common values",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#the-unit-of-compilation-is-the-static-function",
+    "href": "lectures/13_dynamic_compilers.html#the-unit-of-compilation-is-the-static-function",
+    "title": "Dynamic Compilers",
+    "section": "The unit of compilation is the static function",
+    "text": "The unit of compilation is the static function\nan alterative is called trace compilation\n\nrun interpreter or tier 0 compiler\ncollect the statements executed (no not collect control flow)\nthis produces a linear trace of instructions\nrecompile the trace using optimizations like value numbering\nif the next time the code executes, it takes a different path, fix things up",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#trace-compilation-0",
+    "href": "lectures/13_dynamic_compilers.html#trace-compilation-0",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation 0",
+    "text": "trace compilation 0\nIn a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]\nIf you have an always-taken control flow, e.g. some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straight line code\nexecute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#cold-path",
+    "href": "lectures/13_dynamic_compilers.html#cold-path",
+    "title": "Dynamic Compilers",
+    "section": "cold path",
+    "text": "cold path\nOn the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true\nCalled a “bailout” [“bailing out” of the trace]\nAt a bailout there is new information. something you didn’t observe when you were tracing\nYou trust that everything you’ve trace is going to happen, it’s all going to well, and you’re going to be able to optimize for it\nBut then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path\nSo the hot path, the one you’re pretty sure is going to execute, is quite optimal",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#trace-compilation-2",
+    "href": "lectures/13_dynamic_compilers.html#trace-compilation-2",
+    "title": "Dynamic Compilers",
+    "section": "trace compilation 2",
+    "text": "trace compilation 2\ntracing jit: extract a hot path (not a function)\nHot paths are compiled as a single basic block, but the path might go through a call\ngamble: next execution starting at this point, go the same way, no branches leave the path\ngenerate machine code for hot paths interpret the rest of the program\nunlike specialization, tracing assumes the same path but not the same values",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7133,7 +7326,31 @@
     "href": "lectures/13_dynamic_compilers.html#how-do-this-in-bril",
     "title": "Dynamic Compilers",
     "section": "how do this in Bril?",
-    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate\ncommit\nguard\n\nspeculative execution extension\nyou can nest speculate\nit does not roll back stores\nwe can approximate trace compilation by running the program twice",
+    "text": "how do this in Bril?\n3 new operations (sort of like out-of-order instructions)\n\nspeculate - Enter a speculative execution context. No arguments.\ncommit - End the current speculative context, committing the current speculative state as the “real” state. No arguments.\nguard - Check a condition and possibly abort the current speculative context. One argument, the Boolean condition, and one label, to which control is transferred on abort.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#speculate-extension",
+    "href": "lectures/13_dynamic_compilers.html#speculate-extension",
+    "title": "Dynamic Compilers",
+    "section": "speculate extension",
+    "text": "speculate extension\nspeculative execution extension",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#example",
+    "href": "lectures/13_dynamic_compilers.html#example",
+    "title": "Dynamic Compilers",
+    "section": "example",
+    "text": "example\nb: bool = const false;\nv: int = const 4; v == 4\nspeculate; v: int = const 2; v == 2 (speculate state) guard b .failed; v == 2 (speculate state) commit;\n.failed: print v; v == 4",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -7230,6 +7447,150 @@
     "title": "Dynamic Compilers",
     "section": "traces and users",
     "text": "traces and users\nwhen a trace works well- it looks amazing - it finds the inner loop and optimizes even through libraries\nbut users find in hard to understand what the compiler did,\na tiny source change can make a big trace change\nhard to fit in a debugger\nsecurity is a problem",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#pytorch-2.0",
+    "href": "lectures/13_dynamic_compilers.html#pytorch-2.0",
+    "title": "Dynamic Compilers",
+    "section": "pytorch 2.0",
+    "text": "pytorch 2.0\nml frameworks have two modes",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#eager-mode",
+    "href": "lectures/13_dynamic_compilers.html#eager-mode",
+    "title": "Dynamic Compilers",
+    "section": "Eager Mode",
+    "text": "Eager Mode\n\nPreferred by users\nEasier to use programming model\nEasy to debug\n\na + b + c executes two calls to torch.add (if they are tensors)\nno place to optimize, allows any kind of python, and any control flow\n\nPyTorch is a primarily an eager mode framework",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#graph-mode",
+    "href": "lectures/13_dynamic_compilers.html#graph-mode",
+    "title": "Dynamic Compilers",
+    "section": "Graph Mode",
+    "text": "Graph Mode\n\nPreferred by backends and framework builders\nEasier to optimize with a compiler\nEasier to do automated transformations\n\nconstruct a graph with two add nodes and 3 input nodes, then execute the graph\neasy to optimize, only graph nodes allowed, no control flow\nMain optimization is fusing operations to avoid memory copies",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#how-does-the-compiler-fit",
+    "href": "lectures/13_dynamic_compilers.html#how-does-the-compiler-fit",
+    "title": "Dynamic Compilers",
+    "section": "how does the compiler fit",
+    "text": "how does the compiler fit\nin Eager mode there is only a library - no compiler\nif you have a matmul followed by an activation function, it is up to the developer to notice that the memory traffic is more expensive then the activation and its up to the developer to know there is another pytorch call (2000 different calls) which does the combined operation and it is up to the developer to change the code\nif graph mode (compiler writers call this defered or late) the operations get recorded (not executed) and only get executed when we need the result",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#pytorchs-many-attempts-at-graph-modes",
+    "href": "lectures/13_dynamic_compilers.html#pytorchs-many-attempts-at-graph-modes",
+    "title": "Dynamic Compilers",
+    "section": "PyTorch’s Many Attempts at Graph Modes",
+    "text": "PyTorch’s Many Attempts at Graph Modes\ntorch.jit.trace\n\nRecord + replay\nUnsound\nCan give incorrect results because it ignores Python part of program\n\ntorch. jit.script\n\nAOT parses Python into graph format\nOnly works on ~45% of real world models\nHigh effort to “TorchScript” models\nPyTorch Models Are Not Static Graphs\n\nPyTorch users write models where program graphs are impossible\nConvert tensors to native Python types (x.item(), x.tolist(), int(x), etc)\nUse other frameworks (numpy/xarray/etc) for part of their model\nData dependent Python control flow or other dynamism Exceptions, closures, generators, classes, etc\ntorch xla\ndefered execution. rather then do the graph operation, just save it and execute as late as possible\nvery slow, big performance cliffs",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#torch.compilemodel---converts-a-pytorch-eager-program-to-a-graph",
+    "href": "lectures/13_dynamic_compilers.html#torch.compilemodel---converts-a-pytorch-eager-program-to-a-graph",
+    "title": "Dynamic Compilers",
+    "section": "torch.compile(model) - converts a pytorch eager program to a graph",
+    "text": "torch.compile(model) - converts a pytorch eager program to a graph\ntorch.dynamo - which dynamically captures Python code execution and creates a static computational graph.\ntorch.Inductor- compiler that optimimzes static computation graphs",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#dynamo",
+    "href": "lectures/13_dynamic_compilers.html#dynamo",
+    "title": "Dynamic Compilers",
+    "section": "dynamo",
+    "text": "dynamo\nimport torch\nfrom typing import List\n\nimport torch._dynamo\ntorch._dynamo.config.suppress_errors = True\n\ndef my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):\n    print(\"my compiler() called with fx graph\")\n    gm.graph.print_tabular()\n    return gm\n\n@torch.compile(backend=my_compiler)\ndef toy_example(a,b):\n    x = a / (torch.abs(a)+1)\n    if b.sum() &lt; 0:\n        b  = b * -1\n    return x *b\n\nfor _ in range(100):\n    toy_example(torch.randn(10), torch.randn(10))",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#output",
+    "href": "lectures/13_dynamic_compilers.html#output",
+    "title": "Dynamic Compilers",
+    "section": "output",
+    "text": "output\n\n\ndef toy_example(a,b):\n    x = a / (torch.abs(a)+1)\n    if b.sum() &lt; 0:\n        b  = b * -1\n    return x *b\n\nopcode         name    target        args      \n------       ------  ---------    -----------\nplaceholder    l_a_    L_a_         ()         \nplaceholder    l_b_    L_b_         ()         \ncall_function  abs_1   &lt;abs&gt;        (l_a_,)   \ncall_function  add     &lt;add&gt;        (abs_1, 1) \ncall_function  x       &lt;truediv&gt;    (l_a_, add)\ncall_method    sum_1   sum          (l_b_,)   \ncall_function  lt      &lt;lt&gt;         (sum_1, 0) \noutput         output  output       ((x, lt),)\n------       ------  ---------    -----------\nplaceholder    l_b_    L_b_         ()           \nplaceholder    l_x_    L_x_         ()           \ncall_function  b       &lt;mul&gt;        (l_b_, -1)   \ncall_function  mul_1   &lt;mul&gt;        (l_x_, b)    \noutput         output  output       ((mul_1,),) \n------       ------  ---------    -----------        \nplaceholder    l_x_    L_x_         ()            \nplaceholder    l_b_    L_b_         ()            \ncall_function  mul     &lt;mul&gt;        (l_x_, l_b_)  \noutput         output  output       ((mul,),)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#implementation-1",
+    "href": "lectures/13_dynamic_compilers.html#implementation-1",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation\npython builds a frameObject (pointer to codeObject + arguments)\npasses this to eval\ncodeObject allows for extra user data and for a user function to be called between the frameObject and eval\nThis makes it easy to add a custom JIT\nsplit the function into two parts - the python part and the torch part\nThis is reused if the guards pass",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#pytorch-example-1",
+    "href": "lectures/13_dynamic_compilers.html#pytorch-example-1",
+    "title": "Dynamic Compilers",
+    "section": "pytorch example 1",
+    "text": "pytorch example 1\ndef toy_example(a,b):\n    x = a / (torch.abs(a)+1)\n    if b.sum() &lt; 0:\n        b  = b * -1\n    return x *b\n\nfor _ in range(100):\n    toy_example(torch.randn(10), torch.randn(10))\nsometimes the sum is negative but not always",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#implementation-2",
+    "href": "lectures/13_dynamic_compilers.html#implementation-2",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ngraph\n\n\n\n\n\n\n\n\n\nopcode\nname\ntarget\nargs\n\n\n\n\nplaceholder\nl_a_\nL_a_\n()\n\n\nplaceholder\nl_b_\nL_b_\n()\n\n\ncall_function\nabs_1\n&lt;built-in method abs of type object at 0x728736add8a0&gt;\n(l_a_,)\n\n\ncall_function\nadd\n\n(abs_1, 1)\n\n\ncall_function\nx\n\n(l_a_, add)\n\n\ncall_method\nsum_1\nsum\n(l_b_,)\n\n\ncall_function\nlt\n\n(sum_1, 0)\n\n\noutput\noutput\noutput\n((x, lt),)\n\n\n\ndef toy_example(a,b): (x,lt) = call1(a,b) if lt: f1(b,x) else: f2(b,x)\ndef f1(b, x): b = b * -1 return x *b\ndef f2(b,x): return x *b\n\nguards: \n\ncheck_tensor(L['a'], Tensor, torch.float32, size=[10], stride=[1])\ncheck_tensor(L['b'], Tensor, torch.float32, size=[10], stride=[1])\n\nwalk the byte code again for f1\n\nb  = b * -1\nreturn x *b\n\nTRACED GRAPH\nopcode         name    target                   args         kwargs\n -------------  ------  -----------------------  -----------  --------\n placeholder    l_b_    L_b_                     ()           {}\n placeholder    l_x_    L_x_                     ()           {}\n call_function  b       &lt;built-in function mul&gt;  (l_b_, -1)   {}\n call_function  mul_1   &lt;built-in function mul&gt;  (l_x_, b)    {}\noutput         output  output                   ((mul_1,),)  {}\n\n\nguards: check_tensor(L['b'], torch.float32, size=[10], stride=[1]) \n        check_tensor(L['x'], torch.float32, size=[10], stride=[1]) \n\nTRACED GRAPH\n opcode         name    target                   args          kwarg\n  -------------  ------  -----------------------  ------------  --------\nplaceholder    l_x_    L_x_                     ()            {}\nplaceholder    l_b_    L_b_                     ()            {}\ncall_function  mul     &lt;built-in function mul&gt;  (l_x_, l_b_)  {}\noutput         output  output                   ((mul,),)     {}\n\ncheck_tensor(L['b'], torch.float32, size=[10], stride=[1]) \ncheck_tensor(L['x'], torch.float32, size=[10], stride=[1])  # return x *b  # mp/ipykernel_1179164/26\n\n\n\n\n\n\nthe list of operations is a trace and is stored as a graph \n\n.::: {.columns}\n\n::: {.column}\nimport torch @torch.compile def mse(x,y): z = (x -y) ** 2 return z.sum()\nx = torch.randn(200) y = torch.randn(200)\nmse(x,y)\n:::\n\n::: {.column}\ndef forward(l_x_: torch.Tensor, l_y_: torch.Tensor): sub = l_x_ - l_y_ z = sum **2 sum_1 = z.sum() return (sum_1,)\n:::\n\n::: \n\n## linear traces \n\nDynamo removes all control flow, if/else, loops, exceptions \n\nspecializes (bakes in) all non-tensor objects (numbers, strings, classes )\n\n::: {.columns}\n\n::: {.column}\n@torch.compile def fn(f,n): y = x ** 2 if n &gt;= 0: return (n +1)* y else: return x /y\nx = torch.randn(200) fn(x,2)\n:::\n\n::: {.column}\ndef forward(l_x_: torch.Tensor): y = l_x_ ** 2 mul 3*x return (mul,)\n:::\n\n::: \n\nTrace integers symbolically \n\nby default it specilizes on every integer in the graph but if a subsequent vall the value changes it traces symbolically \nbut 0 or 1 are always speciaized \n\n\n\n## multiple traces \nimport torch from typing import List\nimport torch._dynamo torch._dynamo.config.suppress_errors = True\ndef my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]): print(“my compiler() called with fx graph”) gm.graph.print_tabular() return gm\n@torch.compile(backend=my_compiler) def toy_example(a,b): x = a / (torch.abs(a)+1) if b.sum() &lt; 0: b = b * -1 return x *b\nfor _ in range(100): toy_example(torch.randn(10), torch.randn(10))\nimport torch from typing import List\nimport torch._dynamo torch._dynamo.config.suppress_errors = True\ndef my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]): print(“my compiler() called with fx graph”) gm.graph.print_tabular() return gm ```",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Dynamic Compilers"
+    ]
+  },
+  {
+    "objectID": "lectures/13_dynamic_compilers.html#implementation-3",
+    "href": "lectures/13_dynamic_compilers.html#implementation-3",
+    "title": "Dynamic Compilers",
+    "section": "implementation",
+    "text": "implementation\npep 523, allows python function to see unevaluated frames, function + arguments\nnormally just calls the function\nin torch\n\ncalls guards - maybe reform graph and compile\ngets multiple graphs + functions\nsome functions may call the graph processor\nall control flow stays in the functions",
     "crumbs": [
       "EECS 7398",
       "Lectures",

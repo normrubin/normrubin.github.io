@@ -1463,12 +1463,73 @@ l9--&gt; l4
 <p>set the magic numbers high- run a long time slowly, but gather more info</p>
 <p>set the magic number low, quickly recompile based on less info</p>
 </section>
+<section>
+<section id="dynamic-compilers-part-2" class="title-slide slide level1 center">
+<h1>Dynamic Compilers part 2</h1>
+
+</section>
+<section id="c-method-call" class="slide level2 scrollable">
+<h2>C++ method call</h2>
+<p>each object has a pointer to a vtable, which is a table of function pointers to all the virtual functions</p>
+<p>each derived object has its own vtable, which has the same offsets for all the common virtual functions</p>
+<p>to find the code takes two dereferences</p>
+<ol type="1">
+<li>find the vtable (one per class) (one load)</li>
+<li>at a fixed offset (determined by the virtual function name) find the code (second load)</li>
+</ol>
+</section>
+<section id="a-python-example" class="slide level2 scrollable">
+<h2>a python example</h2>
+<p>more flexible</p>
+<ol type="1">
+<li>find the hash table (one per instance)</li>
+<li>lookup the virtual function in the hash table</li>
+</ol>
+<pre><code>
+class Thing:
+    def __init__(self, kind):
+        self.kind = kind 
+
+thing = Thing('car')
+
+def honk(self):
+    print(f"{self.kind} says Honk")
+
+thing.honk = honk.__get__(thing)  ## add a method dynamically to one instance 
+
+thing.honk()  ## call it 
+</code></pre>
+<p>honk.__get__(thing) returns a bound method, when this method is called thing is passed as first argument</p>
+</section>
+<section id="dynamic-chunks" class="slide level2 scrollable">
+<h2>dynamic chunks</h2>
+<p>So far:</p>
+<ol type="1">
+<li>run interpreter or tier 0 compiler</li>
+<li>collect statistics on call counts or branch counts</li>
+<li>when count is high enough recompile the hot functions</li>
+<li>specialize the hot functions based on common values</li>
+</ol>
+</section>
+<section id="the-unit-of-compilation-is-the-static-function" class="slide level2 scrollable">
+<h2>The unit of compilation is the static function</h2>
+<p>an alterative is called <strong><em>trace compilation</em></strong></p>
+<ol type="1">
+<li>run interpreter or tier 0 compiler</li>
+<li>collect the statements executed (no not collect control flow)</li>
+<li>this produces a linear trace of instructions</li>
+<li>recompile the trace using optimizations like value numbering</li>
+<li>if the next time the code executes, it takes a different path, fix things up</li>
+</ol>
+</section>
 <section id="trace-compilation-0" class="slide level2">
 <h2>trace compilation 0</h2>
 <p>In a linear trace the number of assumptions you’re making accumulates as you execute [towards the end of the trace you have the most assumptions built up]</p>
-<p>If you have an always-taken control flow, e.g.&nbsp;some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straightline code</p>
-<p>Always-taken or always jumping to the same function, it’s like straightline code when you execute it dynamically! What it’s going to do dynamically is check on the trace whether that was a bad assumption</p>
+<p>If you have an always-taken control flow, e.g.&nbsp;some virtual function call that’s always calling the same actual function, a tracing compiler will treat all back-to-back branches as one set of straight line code</p>
 <p>execute this all back to back, and, whenever convenient, check whether any of those assumptions were wrong”</p>
+</section>
+<section id="cold-path" class="slide level2">
+<h2>cold path</h2>
 <p>On the “cold path” – again, when it’s convenient undo all the inapplicable things if it turns out the branches weren’t true</p>
 <p>Called a “bailout” [“bailing out” of the trace]</p>
 <p>At a bailout there is new information. something you didn’t observe when you were tracing</p>
@@ -1476,8 +1537,8 @@ l9--&gt; l4
 <p>But then at runtime, when convenient, you’re going to check, and then bail if you were wrong, and have the rollback on the cold path</p>
 <p>So the hot path, the one you’re pretty sure is going to execute, is quite optimal</p>
 </section>
-<section id="trace-compilation2" class="slide level2">
-<h2>trace compilation2</h2>
+<section id="trace-compilation-2" class="slide level2">
+<h2>trace compilation 2</h2>
 <p>tracing jit: extract a hot path (not a function)</p>
 <p>Hot paths are compiled as a single basic block, but the path might go through a call</p>
 <p>gamble: next execution starting at this point, go the same way, no branches leave the path</p>
@@ -1547,14 +1608,21 @@ function f(a){
 <h2>how do this in Bril?</h2>
 <p>3 new operations (sort of like out-of-order instructions)</p>
 <ol type="1">
-<li>speculate</li>
-<li>commit</li>
-<li>guard</li>
+<li>speculate - Enter a speculative execution context. No arguments.</li>
+<li>commit - End the current speculative context, committing the current speculative state as the “real” state. No arguments.</li>
+<li>guard - Check a condition and possibly abort the current speculative context. One argument, the Boolean condition, and one label, to which control is transferred on abort.</li>
 </ol>
+</section>
+<section id="speculate-extension" class="slide level2">
+<h2>speculate extension</h2>
 <p><a href="https://github.com/sampsyo/bril/blob/main/docs/lang/spec.md">speculative execution extension</a></p>
-<p>you can nest speculate</p>
-<p>it does not roll back stores</p>
-<p>we can approximate trace compilation by running the program twice</p>
+</section>
+<section id="example" class="slide level2">
+<h2>example</h2>
+<p>b: bool = const false;</p>
+<p>v: int = const 4; v == 4<br>
+speculate; v: int = const 2; v == 2 (speculate state) guard b .failed; v == 2 (speculate state) commit;</p>
+<p>.failed: print v; v == 4</p>
 </section>
 <section id="implementation" class="slide level2">
 <h2>implementation</h2>
@@ -1628,13 +1696,377 @@ trace1:              \false op2 op_t op_a op_i op_l </code></pre>
 <p>a tiny source change can make a big trace change</p>
 <p>hard to fit in a debugger</p>
 <p>security is a problem</p>
+</section>
+<section id="pytorch-2.0" class="slide level2">
+<h2>pytorch 2.0</h2>
+<p>ml frameworks have two modes</p>
+</section>
+<section id="eager-mode" class="slide level2">
+<h2>Eager Mode</h2>
+<ul>
+<li>Preferred by users</li>
+<li>Easier to use programming model</li>
+<li>Easy to debug</li>
+</ul>
+<p>a + b + c executes two calls to torch.add (if they are tensors)</p>
+<p>no place to optimize, allows any kind of python, and any control flow</p>
+<ul>
+<li>PyTorch is a primarily an eager mode framework</li>
+</ul>
+</section>
+<section id="graph-mode" class="slide level2">
+<h2>Graph Mode</h2>
+<ul>
+<li>Preferred by backends and framework builders</li>
+<li>Easier to optimize with a compiler</li>
+<li>Easier to do automated transformations</li>
+</ul>
+<p>construct a graph with two add nodes and 3 input nodes, then execute the graph</p>
+<p>easy to optimize, only graph nodes allowed, no control flow</p>
+<p>Main optimization is fusing operations to avoid memory copies</p>
+</section>
+<section id="how-does-the-compiler-fit" class="slide level2">
+<h2>how does the compiler fit</h2>
+<p>in Eager mode there is only a library - no compiler</p>
+<p>if you have a matmul followed by an activation function, it is up to the developer to notice that the memory traffic is more expensive then the activation and its up to the developer to know there is another pytorch call (2000 different calls) which does the combined operation and it is up to the developer to change the code</p>
+<p>if graph mode (compiler writers call this defered or late) the operations get recorded (not executed) and only get executed when we need the result</p>
+</section>
+<section id="pytorchs-many-attempts-at-graph-modes" class="slide level2 scrollable">
+<h2>PyTorch’s Many Attempts at Graph Modes</h2>
+<p>torch.jit.trace</p>
+<ol type="1">
+<li>Record + replay</li>
+<li>Unsound</li>
+<li>Can give incorrect results because it ignores Python part of program</li>
+</ol>
+<p>torch. jit.script</p>
+<ol type="1">
+<li>AOT parses Python into graph format</li>
+<li>Only works on ~45% of real world models</li>
+<li>High effort to “TorchScript” models</li>
+<li>PyTorch Models Are Not Static Graphs</li>
+</ol>
+<p>PyTorch users write models where program graphs are impossible</p>
+<p>Convert tensors to native Python types (x.item(), x.tolist(), int(x), etc)</p>
+<p>Use other frameworks (numpy/xarray/etc) for part of their model</p>
+<p>Data dependent Python control flow or other dynamism Exceptions, closures, generators, classes, etc</p>
+<p>torch xla</p>
+<p>defered execution. rather then do the graph operation, just save it and execute as late as possible</p>
+<p>very slow, big performance cliffs</p>
+</section>
+<section id="torch.compilemodel---converts-a-pytorch-eager-program-to-a-graph" class="slide level2">
+<h2>torch.compile(model) - converts a pytorch eager program to a graph</h2>
+<p>torch.dynamo - which dynamically captures Python code execution and creates a static computational graph.</p>
+<p>torch.Inductor- compiler that optimimzes static computation graphs</p>
+</section>
+<section id="dynamo" class="slide level2">
+<h2>dynamo</h2>
+<pre><code>import torch
+from typing import List
+
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
+
+def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
+    print("my compiler() called with fx graph")
+    gm.graph.print_tabular()
+    return gm
+
+@torch.compile(backend=my_compiler)
+def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() &lt; 0:
+        b  = b * -1
+    return x *b
+
+for _ in range(100):
+    toy_example(torch.randn(10), torch.randn(10))
+</code></pre>
+</section>
+<section id="output" class="slide level2">
+<h2>output</h2>
+<div class="columns">
+<div class="column" style="width:35%;">
+<pre><code>def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() &lt; 0:
+        b  = b * -1
+    return x *b</code></pre>
+</div><div class="column" style="width:65%;">
+<pre><code>opcode         name    target        args      
+------       ------  ---------    -----------
+placeholder    l_a_    L_a_         ()         
+placeholder    l_b_    L_b_         ()         
+call_function  abs_1   &lt;abs&gt;        (l_a_,)   
+call_function  add     &lt;add&gt;        (abs_1, 1) 
+call_function  x       &lt;truediv&gt;    (l_a_, add)
+call_method    sum_1   sum          (l_b_,)   
+call_function  lt      &lt;lt&gt;         (sum_1, 0) 
+output         output  output       ((x, lt),)
+------       ------  ---------    -----------
+placeholder    l_b_    L_b_         ()           
+placeholder    l_x_    L_x_         ()           
+call_function  b       &lt;mul&gt;        (l_b_, -1)   
+call_function  mul_1   &lt;mul&gt;        (l_x_, b)    
+output         output  output       ((mul_1,),) 
+------       ------  ---------    -----------        
+placeholder    l_x_    L_x_         ()            
+placeholder    l_b_    L_b_         ()            
+call_function  mul     &lt;mul&gt;        (l_x_, l_b_)  
+output         output  output       ((mul,),)     </code></pre>
+</div></div>
+</section>
+<section id="implementation-1" class="slide level2">
+<h2>implementation</h2>
+<p>python builds a frameObject (pointer to codeObject + arguments)</p>
+<p>passes this to eval</p>
+<p>codeObject allows for extra user data and for a user function to be called between the frameObject and eval</p>
+<p>This makes it easy to add a custom JIT</p>
+<p>split the function into two parts - the python part and the torch part</p>
+<p>This is reused if the guards pass</p>
+</section>
+<section id="pytorch-example-1" class="slide level2">
+<h2>pytorch example 1</h2>
+<pre><code>def toy_example(a,b):
+    x = a / (torch.abs(a)+1)
+    if b.sum() &lt; 0:
+        b  = b * -1
+    return x *b
+
+for _ in range(100):
+    toy_example(torch.randn(10), torch.randn(10))</code></pre>
+<p>sometimes the sum is negative but not always</p>
+</section>
+<section id="implementation-2" class="slide level2">
+<h2>implementation</h2>
+
+<img data-src="pytorch/s1.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s2.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s3.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s4.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s5.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s6.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s7.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s8.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s9.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s10.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s11.png" class="r-stretch"></section>
+<section class="slide level2">
+
+
+<img data-src="pytorch/s12.png" class="r-stretch"></section>
+<section class="slide level2">
+
+<p>graph</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 7%">
+<col style="width: 64%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>opcode</th>
+<th>name</th>
+<th>target</th>
+<th>args</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>placeholder</td>
+<td>l_a_</td>
+<td>L_a_</td>
+<td>()</td>
+</tr>
+<tr class="even">
+<td>placeholder</td>
+<td>l_b_</td>
+<td>L_b_</td>
+<td>()</td>
+</tr>
+<tr class="odd">
+<td>call_function</td>
+<td>abs_1</td>
+<td>&lt;built-in method abs of type object at 0x728736add8a0&gt;</td>
+<td>(l_a_,)</td>
+</tr>
+<tr class="even">
+<td>call_function</td>
+<td>add</td>
+<td><built-in function="" add=""></built-in></td>
+<td>(abs_1, 1)</td>
+</tr>
+<tr class="odd">
+<td>call_function</td>
+<td>x</td>
+<td><built-in function="" truediv=""></built-in></td>
+<td>(l_a_, add)</td>
+</tr>
+<tr class="even">
+<td>call_method</td>
+<td>sum_1</td>
+<td>sum</td>
+<td>(l_b_,)</td>
+</tr>
+<tr class="odd">
+<td>call_function</td>
+<td>lt</td>
+<td><built-in function="" lt=""></built-in></td>
+<td>(sum_1, 0)</td>
+</tr>
+<tr class="even">
+<td>output</td>
+<td>output</td>
+<td>output</td>
+<td>((x, lt),)</td>
+</tr>
+</tbody>
+</table>
+<p>def toy_example(a,b): (x,lt) = call1(a,b) if lt: f1(b,x) else: f2(b,x)</p>
+<p>def f1(b, x): b = b * -1 return x *b</p>
+<p>def f2(b,x): return x *b</p>
+<pre><code>
+guards: 
+
+check_tensor(L['a'], Tensor, torch.float32, size=[10], stride=[1])
+check_tensor(L['b'], Tensor, torch.float32, size=[10], stride=[1])
+
+walk the byte code again for f1
+
+b  = b * -1
+return x *b
+
+TRACED GRAPH
+opcode         name    target                   args         kwargs
+ -------------  ------  -----------------------  -----------  --------
+ placeholder    l_b_    L_b_                     ()           {}
+ placeholder    l_x_    L_x_                     ()           {}
+ call_function  b       &lt;built-in function mul&gt;  (l_b_, -1)   {}
+ call_function  mul_1   &lt;built-in function mul&gt;  (l_x_, b)    {}
+output         output  output                   ((mul_1,),)  {}
+
+
+guards: check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
+        check_tensor(L['x'], torch.float32, size=[10], stride=[1]) 
+
+TRACED GRAPH
+ opcode         name    target                   args          kwarg
+  -------------  ------  -----------------------  ------------  --------
+placeholder    l_x_    L_x_                     ()            {}
+placeholder    l_b_    L_b_                     ()            {}
+call_function  mul     &lt;built-in function mul&gt;  (l_x_, l_b_)  {}
+output         output  output                   ((mul,),)     {}
+
+check_tensor(L['b'], torch.float32, size=[10], stride=[1]) 
+check_tensor(L['x'], torch.float32, size=[10], stride=[1])  # return x *b  # mp/ipykernel_1179164/26
+
+
+
+
+
+
+the list of operations is a trace and is stored as a graph 
+
+.::: {.columns}
+
+::: {.column}</code></pre>
+<p>import torch <span class="citation" data-cites="torch.compile">@torch.compile</span> def mse(x,y): z = (x -y) ** 2 return z.sum()</p>
+<p>x = torch.randn(200) y = torch.randn(200)</p>
+<p>mse(x,y)</p>
+<pre><code>:::
+
+::: {.column}</code></pre>
+<p>def forward(l_x_: torch.Tensor, l_y_: torch.Tensor): sub = l_x_ - l_y_ z = sum **2 sum_1 = z.sum() return (sum_1,)</p>
+<pre><code>:::
+
+::: 
+
+## linear traces 
+
+Dynamo removes all control flow, if/else, loops, exceptions 
+
+specializes (bakes in) all non-tensor objects (numbers, strings, classes )
+
+::: {.columns}
+
+::: {.column}</code></pre>
+<p><span class="citation" data-cites="torch.compile">@torch.compile</span> def fn(f,n): y = x ** 2 if n &gt;= 0: return (n +1)* y else: return x /y</p>
+<p>x = torch.randn(200) fn(x,2)</p>
+<pre><code>:::
+
+::: {.column}</code></pre>
+<p>def forward(l_x_: torch.Tensor): y = l_x_ ** 2 mul 3*x return (mul,)</p>
+<pre><code>:::
+
+::: 
+
+Trace integers symbolically 
+
+by default it specilizes on every integer in the graph but if a subsequent vall the value changes it traces symbolically 
+but 0 or 1 are always speciaized 
+
+
+
+## multiple traces </code></pre>
+<p>import torch from typing import List</p>
+<p>import torch._dynamo torch._dynamo.config.suppress_errors = True</p>
+<p>def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]): print(“my compiler() called with fx graph”) gm.graph.print_tabular() return gm</p>
+<p><span class="citation" data-cites="torch.compile">@torch.compile</span>(backend=my_compiler) def toy_example(a,b): x = a / (torch.abs(a)+1) if b.sum() &lt; 0: b = b * -1 return x *b</p>
+<p>for _ in range(100): toy_example(torch.randn(10), torch.randn(10))</p>
+<p>import torch from typing import List</p>
+<p>import torch._dynamo torch._dynamo.config.suppress_errors = True</p>
+<p>def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]): print(“my compiler() called with fx graph”) gm.graph.print_tabular() return gm ```</p>
+</section>
+<section id="implementation-3" class="slide level2 scrollable">
+<h2>implementation</h2>
+<p>pep 523, allows python function to see unevaluated frames, function + arguments</p>
+<p>normally just calls the function</p>
+<p>in torch</p>
+<ol type="1">
+<li>calls guards - maybe reform graph and compile</li>
+<li>gets multiple graphs + functions</li>
+<li>some functions may call the graph processor</li>
+<li>all control flow stays in the functions</li>
+</ol>
 
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>
 </div>
-</section>
+</section></section>
     </div>
   </div>
 
