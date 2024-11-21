@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Polyhedral Methods – EECE7398 Fall 2024</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../lectures/ra-checking.html" rel="next">
+<link href="../lectures/poly_final.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Polyhedral Methods – EECE7398 Fall 2024">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
+<meta property="og:site_name" content="EECE7398 Fall 2024">
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="revealjs_poly_next.qmd.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/poly_next.html">Polyhedral Methods</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Polyhedral Methods</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction-to-polyhedral-methods" class="level2">
+<h2 class="anchored" data-anchor-id="introduction-to-polyhedral-methods">Introduction to Polyhedral methods</h2>
+<p>Why Polyhedral Methods?</p>
+<p>Modern programs, especially in high-performance computing (HPC), GPU programming, and scientific applications, often rely on loops for performance-critical tasks.</p>
+<p>However, traditional compiler techniques struggle with:</p>
+<ol type="1">
+<li>Complex Loop Dependencies: Dependencies within and across loops limit optimization opportunities.</li>
+<li>Missed Parallelism: Insufficient analysis obscures opportunities for parallel execution.</li>
+<li>Poor Data Locality: Inefficient use of caches reduces performance.</li>
+</ol>
+<p>Polyhedral methods address these challenges by providing a precise mathematical framework for analyzing and optimizing loop nests.</p>
+</section>
+<section id="challenges-in-traditional-loop-optimization" class="level2">
+<h2 class="anchored" data-anchor-id="challenges-in-traditional-loop-optimization">Challenges in Traditional Loop Optimization</h2>
+<p>Consider this loop:</p>
+<pre><code>for (i = 0; i &lt; N; i++)  
+  for (j = 0; j &lt; N; j++)  
+    A[i][j] = A[i-1][j] + A[i][j-1];</code></pre>
+<ol type="1">
+<li>Dependencies between iterations (e.g., A[i][j] depends on A[i-1][j] and A[i][j-1]) prevent parallel execution.</li>
+<li>Performance Bottleneck: Lack of tiling leads to poor cache utilization.</li>
+</ol>
+<p>Transforming this loop into smaller tiles can improve cache reuse and enable parallelism, yielding significant performance gains.</p>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations?</h2>
+<p>Polyhedral methods apply to affine loops with:</p>
+<ol type="1">
+<li>Affine bounds and array accesses (e.g., linear expressions in loop indices).</li>
+<li>Static control flow (no recursion hiding loops).</li>
+<li>Extensions, such as wrapping loops like for (i = 0; i &lt; 1; i++), can help broaden applicability.</li>
+</ol>
+</section>
+<section id="two-key-problems-in-polyhedral-compilation" class="level2">
+<h2 class="anchored" data-anchor-id="two-key-problems-in-polyhedral-compilation">Two Key Problems in Polyhedral Compilation</h2>
+<ol type="1">
+<li><p>Polyhedral Analysis:</p>
+<ul>
+<li>Does a transformation preserve the loop’s semantics?</li>
+<li>What is the resulting loop structure after transformation?</li>
+</ul></li>
+<li><p>Polyhedral Scheduling:</p>
+<ul>
+<li>What transformation optimizes a desired property (e.g., parallelism or data locality)?</li>
+</ul></li>
+</ol>
+<p>In this lecture, we focus on polyhedral analysis</p>
+</section>
+<section id="what-do-polyhedral-methods-offer" class="level1">
+<h1>what do polyhedral methods offer?</h1>
+<ol type="1">
+<li><p>Mathematical Rigor: Use affine constraints to model and manipulate loops precisely.</p></li>
+<li><p>Advanced Optimizations: Enable transformations like:</p>
+<ul>
+<li>Loop Tiling (improves data locality).</li>
+<li>Loop Fusion (reduces overhead and enhances cache performance).</li>
+<li>Skewing and Parallelization (breaks complex dependencies).</li>
+</ul></li>
+</ol>
+<section id="statements-and-instances" class="level2">
+<h2 class="anchored" data-anchor-id="statements-and-instances">Statements and Instances</h2>
+<p>In a loop, a statement executes multiple times. Each execution is called an instance of the statement, and polyhedral methods track these instances explicitly.</p>
+<pre class="{c++}"><code> for i in [1,2,3]:
+s:    a[i] = 3      &lt;  --  # Statement `s` executes 3 times (3 instances)</code></pre>
+<p>Program Representation:</p>
+<p>A program has two key components:</p>
+<ol type="1">
+<li>Statements and Index Sets: Define what to compute and for which indices.</li>
+<li>Schedule: Specifies the order of execution for the indices.</li>
+</ol>
+</section>
+<section id="example-changing-the-order-of-iterations" class="level2">
+<h2 class="anchored" data-anchor-id="example-changing-the-order-of-iterations">Example: Changing the Order of Iterations</h2>
+<p>Problem: Can we reverse this loop’s execution order?</p>
+<pre><code>for i = [1,2,3,4]
+s:   a[i] = a[i-1]</code></pre>
+<p>Original schedule: i = 1, 2, 3, 4</p>
+<p>Reversed schedule: i = 4, 3, 2, 1</p>
+<p>Do these loops produce the same result?</p>
+<pre><code>for i = [1,2,3,4]               for i = [4,3,2,1]
+s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
+</section>
+<section id="execution-trace-and-data-access" class="level2">
+<h2 class="anchored" data-anchor-id="execution-trace-and-data-access">Execution Trace and Data Access</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 46%">
+<col style="width: 53%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Original Order</th>
+<th>Reversed Order</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Instance s(1): Reads a[0], Writes a[1]</td>
+<td>Instance s(4): Reads a[3], Writes a[4]</td>
+</tr>
+<tr class="even">
+<td>Instance s(2): Reads a[1], Writes a[2]</td>
+<td>Instance s(3): Reads a[2], Writes a[3]</td>
+</tr>
+<tr class="odd">
+<td>Instance s(3): Reads a[2], Writes a[3]</td>
+<td>Instance s(2): Reads a[1], Writes a[2]</td>
+</tr>
+<tr class="even">
+<td>Instance s(4): Reads a[3], Writes a[4]</td>
+<td>Instance s(1): Reads a[0], Writes a[1]</td>
+</tr>
+</tbody>
+</table>
+<p><strong><em>Dependency Analysis</em></strong></p>
+<p>Original schedule: (1 → 2), (2 → 3), (3 → 4)</p>
+<p>Does the reversed order respect these dependencies?</p>
+</section>
+<section id="schedules-and-valid-transformations" class="level2">
+<h2 class="anchored" data-anchor-id="schedules-and-valid-transformations">Schedules and Valid Transformations</h2>
+<p>Schedules:</p>
+<p>A schedule is a function:</p>
+<p>sc(iteration) = execution order(time)</p>
+<p>Example:</p>
+<p>Original order: sc(i) = i Reversed order: sr(i) = 5 - i</p>
+<p>Key Idea: Producers (e.g., s[i]) must execute before consumers (e.g., s[j]) for the transformation to be valid.</p>
+</section>
+<section id="checking-validity" class="level2">
+<h2 class="anchored" data-anchor-id="checking-validity">Checking Validity:</h2>
+<p>A transformation is valid if it preserves dependency relations: Producers must execute before their consumers.</p>
+<p>Example: Reversed Schedule Validity</p>
+<p>Dependency between s[1] (producer) and s[2] (consumer):</p>
+<p>In the reversed schedule:</p>
+<p>sr(2) &lt; sr(1) (3 &lt; 4) → Invalid!</p>
+<p>s[2] depends on a[1], but s[1] writes a[1].</p>
+<p>not valid: if there is a pair s[i] and s[j], s[i] produces a value, s[j] reads that value, and s[j] is first in the new schedule</p>
+<p>find an i,j where sr(i) &lt; sr(j) : i executes first</p>
+<p>i reads a value and j writes that value</p>
+<hr>
+</section>
+<section id="a-graphical-view" class="level2">
+<h2 class="anchored" data-anchor-id="a-graphical-view">a graphical view</h2>
+<p>forward order</p>
+<div id="a36597af" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>iteration_space <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dependences <span class="op">=</span> [(<span class="dv">1</span>,<span class="dv">2</span>), (<span class="dv">2</span>,<span class="dv">3</span>), (<span class="dv">3</span>,<span class="dv">4</span>)]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>schedule <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>draw_1d_iteration_space_and_dependence_graph(iteration_space, dependences, schedule)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Schedule:  [1, 2, 3, 4]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-3-output-2.png" width="1334" height="514" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="backward-order" class="level2">
+<h2 class="anchored" data-anchor-id="backward-order">backward order</h2>
+<div id="27153390" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define iteration space (e.g., for a 3x3 loop nest)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>iteration_space <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define dependences (e.g., data dependences)</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>dependences <span class="op">=</span> [(<span class="dv">1</span>,<span class="dv">2</span>), (<span class="dv">2</span>,<span class="dv">3</span>), (<span class="dv">3</span>,<span class="dv">4</span>)]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>schedule<span class="op">=</span> [<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">1</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>draw_1d_iteration_space_and_dependence_graph(iteration_space, dependences, schedule)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Schedule:  [4, 3, 2, 1]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-4-output-2.png" width="1334" height="514" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+<p>not legal if there is a pair where the arrows go in opposite directions</p>
+<p>observation 2- different schedules. instance -&gt; time</p>
+<p><span class="math display">\[
+\begin{align*}
+left \ schedule &amp;= \left\{ s[i] \rightarrow i \right\} \\
+right \ schedule &amp;= \left\{ s[i] \rightarrow 5-i \right\}
+\end{align*}
+\]</span></p>
+<p>data dependences (just the same as before but with bounds) <span class="math display">\[
+dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
+\]</span></p>
+<p>New schedule is legal, if it respects all data dependences, or <strong>set of violated data dependences is empty</strong></p>
+<hr>
+</section>
+<section id="what-is-a-violated-data-dependence" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-a-violated-data-dependence">what is a violated data dependence</h2>
+<p>a pair (p, c) where p produces data that c consumes and c comes before p in the new schedule</p>
+<p>data dependence <span class="math display">\[
+\left \{(s(i), s(i+1)) \mid 1 \le i \le 3 \right \}
+\]</span></p>
+<p>set of violated data dependences <span class="math display">\[
+\left \{(s(i), s(j)) \mid \ newSch(j) \ge newSch(i) \right \}
+\]</span></p>
+<hr>
+<p>Dependence is <span class="math inline">\(s[i] -&gt; s[i+1]\)</span></p>
+<p>set of violated data dependences <span class="math display">\[
+\left \{(s(i), s(j)) \mid \ newSch(j) \ge newSch(i) \right \}
+\]</span></p>
+<p><span class="math display">\[
+\left \{ (s(i), s(i+1)) \mid 1 \le i \le 3 \land 5-i+1 \ge 5-i  \right \}
+\]</span></p>
+<p>constraints are : <span class="math display">\[
+\begin{align*}
+1&lt;= i &lt;= 3 \\
+5-i +1  &gt;= 5-i
+\end{align*}
+\]</span></p>
+<hr>
+<p>Use an ilp solver to find a solution one solution is i = 1</p>
+<hr>
+</section>
+<section id="a-second-example-analyzing-parallelism" class="level2">
+<h2 class="anchored" data-anchor-id="a-second-example-analyzing-parallelism">A Second Example: Analyzing Parallelism</h2>
+<pre><code>for i in [1,2,3,4]
+  for j in [1,2,3,4]
+    a[i,j] = a[i,j-1]+ a[i-1,j]</code></pre>
+<p>Can this loop nest be executed in parallel?</p>
+</section>
+<section id="dependency-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="dependency-analysis">Dependency Analysis</h2>
+<p>There are two types of dependencies in this code:</p>
+</section>
+<section id="horizontal-dependency" class="level2">
+<h2 class="anchored" data-anchor-id="horizontal-dependency">Horizontal Dependency:</h2>
+<p>Each iteration (i, j) depends on (i, j-1) (the value to the left in the same row).</p>
+<pre><code>1. For example, a[1, 2] = a[1, 1] + a[0, 2], which means a[1, 2] depends on the value of a[1, 1] from the same row. 
+1. (1,1) -&gt; (1,2)</code></pre>
+</section>
+<section id="vertical-dependency" class="level2">
+<h2 class="anchored" data-anchor-id="vertical-dependency">Vertical Dependency:</h2>
+<p>Each iteration (i, j) depends on (i-1, j) (the value from the previous row in the same column).</p>
+<pre><code>1. For example, a[2, 1] = a[1, 1] + a[2, 0], meaning a[2, 1] depends on a[1, 1] from the row above
+1. (1,1) -&gt; (2,1)</code></pre>
+<p><strong><em>data dependence</em></strong> is a mapping: <span class="math inline">\(s(i) =&gt; s(i+1)\)</span> from iterations to time</p>
+<p>a valid schedule does not violate data dependence</p>
+</section>
+<section id="serial-schedule" class="level2">
+<h2 class="anchored" data-anchor-id="serial-schedule">serial schedule</h2>
+<p>In a serial execution, iterations proceed row by row, strictly respecting both horizontal and vertical dependencies. This schedule respects all dependencies but executes sequentially, limiting parallelism.</p>
+<div id="6e03b6f7" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>iteration_space <span class="op">=</span> [(<span class="dv">1</span>,<span class="dv">1</span>),(<span class="dv">1</span>,<span class="dv">2</span>),(<span class="dv">1</span>,<span class="dv">3</span>),(<span class="dv">1</span>,<span class="dv">4</span>),</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">2</span>,<span class="dv">1</span>),(<span class="dv">2</span>,<span class="dv">2</span>),(<span class="dv">2</span>,<span class="dv">3</span>),(<span class="dv">2</span>,<span class="dv">4</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">3</span>,<span class="dv">1</span>),(<span class="dv">3</span>,<span class="dv">2</span>),(<span class="dv">3</span>,<span class="dv">3</span>),(<span class="dv">3</span>,<span class="dv">4</span>),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">4</span>,<span class="dv">1</span>),(<span class="dv">4</span>,<span class="dv">2</span>),(<span class="dv">4</span>,<span class="dv">3</span>),(<span class="dv">4</span>,<span class="dv">4</span>)]</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>dependences <span class="op">=</span> []</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">5</span>):</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">5</span>):</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">&gt;</span> <span class="dv">1</span>:  <span class="co"># Horizontal dependency</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>            dependences.append(( (i, j<span class="op">-</span><span class="dv">1</span>),(i, j)))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="op">&gt;</span> <span class="dv">1</span>:  <span class="co"># Vertical dependency</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>            dependences.append(((i<span class="op">-</span><span class="dv">1</span>, j),(i, j) ))</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>schedule <span class="op">=</span> [(i, j) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">5</span>) <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">5</span>)]</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>draw_2d_iteration_space_and_dependence_graph(iteration_space, dependences, schedule)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Schedule:  [(1, 1), (1, 2), (1, 3), (1, 4), (2, 1), (2, 2), (2, 3), (2, 4), (3, 1), (3, 2), (3, 3), (3, 4), (4, 1), (4, 2), (4, 3), (4, 4)]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-5-output-2.png" width="1334" height="566" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="a-parallel-schedule" class="level2">
+<h2 class="anchored" data-anchor-id="a-parallel-schedule">a parallel schedule</h2>
+<p>To enable parallel execution, independent iterations must be executed simultaneously. One possible strategy is diagonal parallelism:</p>
+<p>Organize iterations by diagonals in the iteration space.</p>
+<p>Diagonal key: i + j (sum of indices).</p>
+<p>Iterations with the same diagonal key can execute in parallel since they are independent.</p>
+<p>Example diagonal schedule:</p>
+<div id="e998b2f8" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Organize the iteration space by diagonals</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>diagonals <span class="op">=</span> {}</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i, j) <span class="kw">in</span> iteration_space:</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    diag_key <span class="op">=</span> i <span class="op">+</span> j  <span class="co"># Diagonal key: sum of indices</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> diag_key <span class="kw">not</span> <span class="kw">in</span> diagonals:</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        diagonals[diag_key] <span class="op">=</span> []</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    diagonals[diag_key].append((i, j))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort the diagonals by diagonal key</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>sorted_diagonals <span class="op">=</span> <span class="bu">sorted</span>(diagonals.keys())</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the diagonal schedule</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Diagonal Schedule:"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(diagonals)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Diagonal Schedule:
+{2: [(1, 1)], 3: [(1, 2), (2, 1)], 4: [(1, 3), (2, 2), (3, 1)], 5: [(1, 4), (2, 3), (3, 2), (4, 1)], 6: [(2, 4), (3, 3), (4, 2)], 7: [(3, 4), (4, 3)], 8: [(4, 4)]}</code></pre>
+</div>
+</div>
+</section>
+<section id="visualizing-the-parallel-schedule" class="level2">
+<h2 class="anchored" data-anchor-id="visualizing-the-parallel-schedule">Visualizing the parallel schedule:</h2>
+<div id="d3f24800" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-stdout">
+<pre><code>Schedule:  [(1, 1), (1, 2), (2, 1), (1, 3), (2, 2), (3, 1), (1, 4), (2, 3), (3, 2), (4, 1), (2, 4), (3, 3), (4, 2), (3, 4), (4, 3), (4, 4)]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-7-output-2.png" width="1334" height="566" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="definitions" class="level2">
+<h2 class="anchored" data-anchor-id="definitions">Definitions</h2>
+</section>
+<section id="affine-functions-of-loop-indexes" class="level2">
+<h2 class="anchored" data-anchor-id="affine-functions-of-loop-indexes">Affine Functions of Loop Indexes</h2>
+<p>An affine function: <span class="math inline">\(f(\vec{v})\)</span> is defined as:<span class="math inline">\(f(\vec{v}) = M_f \vec{v} + \vec{f}_0\)</span></p>
+<p>where:</p>
+<p><span class="math display">\[
+\vec{v} = \begin{pmatrix} v_1 \\ \vdots \\ v_d \end{pmatrix}
+\]</span> is a <span class="math inline">\(d\)</span>-dimensional vector of loop indices,</p>
+<p><span class="math display">\[
+M_f \in \mathbb{z}^{k \times d}
+\]</span> is a matrix with <span class="math inline">\(k\)</span> rows and <span class="math inline">\(d\)</span> columns of integers ,</p>
+<p>and <span class="math inline">\(\vec{f}_0 \in \mathbb{z}^k\)</span> is a <span class="math inline">\(k\)</span>-dimensional vector or integers.</p>
+<p>notice its all integers</p>
+<p>Thus, an affine function is a linear transformation followed by a translation. For example, each loop iteration <span class="math inline">\(\vec{v}\)</span> (e.g., <span class="math inline">\((i, j)\)</span> in a 2D nested loop) can map iteration indices to dependence locations.</p>
+</section>
+<section id="loops" class="level2">
+<h2 class="anchored" data-anchor-id="loops">Loops:</h2>
+<p>Perfect loop nest contains all statements inside the body of the innermost loop.</p>
+<p>Imperfect Loop Nest contains statements outside the innermost loop.</p>
+<p>An affine loop nest is a sequence of (potentially imperfectly nested) loops where:</p>
+<ol type="1">
+<li>Loop bounds and array accesses are affine functions of outer loop variables and program parameters,</li>
+<li>Program parameters (e.g., <span class="math inline">\(N\)</span>, <span class="math inline">\(\beta\)</span>) are symbolic constants representing problem size.</li>
+</ol>
+</section>
+<section id="example-portion-of-the-gemver-kernel" class="level2">
+<h2 class="anchored" data-anchor-id="example-portion-of-the-gemver-kernel">Example (portion of the GEMVER kernel):</h2>
+<pre><code>for (i = 0; i &lt; N; i++)
+    for (j = 0; j &lt; N; j++)
+        S1: A[i, j] = A[i, j] + u1[i] * v1[j] + u2[i] * v2[j];
+
+for (k = 0; k &lt; N; k++)
+    for (l = 0; l &lt; N; l++)
+        S2: x[k] = x[k] + beta * A[l, k] * y[l];</code></pre>
+</section>
+<section id="affine-spaces" class="level2">
+<h2 class="anchored" data-anchor-id="affine-spaces">Affine Spaces</h2>
+<p>A set of vectors is an affine space if it is closed under affine combinations.</p>
+<p>For vectors <span class="math inline">\(\vec{x}\)</span> and <span class="math inline">\(\vec{y}\)</span> in the space, all points on the line joining <span class="math inline">\(\vec{x}\)</span> and $ $ are also in the space.</p>
+<p>An affine hyperplane is an <span class="math inline">\((n-1)\)</span>-dimensional affine subspace of an <span class="math inline">\(n\)</span>-dimensional space.</p>
+<p>For example, vectors <span class="math inline">\(\vec{v} \in \mathbb{Z}^n\)</span> satisfying:</p>
+<p><span class="math display">\[
+\mathbf{h} \cdot \vec{v} = k, \quad \text{where } \mathbf{h} \in \mathbb{Z}^n \text{ and } k \in \mathbb{Z},
+\]</span></p>
+<p>form an affine hyperplane. Two vectors <span class="math inline">\(\vec{v}_1\)</span> and <span class="math inline">\(\vec{v}_2\)</span> lie in the same hyperplane if:</p>
+<p><span class="math display">\[
+\mathbf{h} \cdot \vec{v}_1 = \mathbf{h} \cdot \vec{v}_2.
+\]</span></p>
+</section>
+<section id="polyhedron-and-polytope" class="level2">
+<h2 class="anchored" data-anchor-id="polyhedron-and-polytope">Polyhedron and Polytope</h2>
+<ol type="1">
+<li>A polyhedron is the intersection of a finite number of half-spaces.</li>
+<li>A polytope is a bounded polyhedron.<br>
+</li>
+</ol>
+<p>A polyhedron can be compactly represented as: <span class="math display">\[
+\{\vec{x} \in \mathbb{R}^n \mid A \vec{x} + \vec{b} \geq \vec{0}\},
+\]</span></p>
+<p>where <span class="math inline">\(A \in \mathbb{R}^{m \times n}\)</span> and <span class="math inline">\(\vec{b} \in \mathbb{R}^m\)</span>.</p>
+<p>For integer points (common in loop iteration spaces): ${ ^n A + },$ where <span class="math inline">\(A \in \mathbb{Z}^{m \times n}\)</span> and <span class="math inline">\(\vec{b} \in \mathbb{Z}^m\)</span>.</p>
+</section>
+<section id="iteration-vector" class="level2">
+<h2 class="anchored" data-anchor-id="iteration-vector">Iteration Vector</h2>
+<p>The iteration vector <span class="math inline">\(\vec{i}_S\)</span> for a statement <span class="math inline">\(S\)</span> is a vector of loop indices from outermost to innermost. It represents a dynamic instance of <span class="math inline">\(S\)</span> in a loop nest.</p>
+</section>
+<section id="domain-or-index-set" class="level2">
+<h2 class="anchored" data-anchor-id="domain-or-index-set">Domain or Index Set</h2>
+<p>The domain (or index set) of a statement <span class="math inline">\(S\)</span> is the set of all its iteration vectors.</p>
+<p><img src="https://cdn.mathpix.com/cropped/2024_08_15_37ce20a1c7fef7c8fca6g-04.jpg?height=589&amp;width=512&amp;top_left_y=528&amp;top_left_x=429" class="img-fluid"></p>
+<p>An affine hyperplane</p>
+<p><strong><em>Polyhedron, Polytope</em></strong>. A polyhedron is an intersection of a finite number of half-spaces. A polytope is a bounded polyhedron.</p>
+<p>Each of the half-spaces provides a face to the polyhedron. Hence, the set of affine inequalities, each representing a face, can be used to compactly represent the polyhedron. If there are <span class="math inline">\(m\)</span> inequalities, then the polyhedron is</p>
+<p><span class="math display">\[
+\left\{\vec{x} \in \mathbb{R}^{n} \mid A \vec{x}+\vec{b} \geq \overrightarrow{0}\right\}
+\]</span></p>
+<p>where <span class="math inline">\(A \in \mathbb{R}^{m \times n}\)</span> and <span class="math inline">\(\vec{b} \in \mathbb{R}^{m}\)</span>.</p>
+<p><img src="https://cdn.mathpix.com/cropped/2024_08_15_37ce20a1c7fef7c8fca6g-04.jpg?height=589&amp;width=746&amp;top_left_y=525&amp;top_left_x=972" class="img-fluid"></p>
+<p>In our context, we are always interested in the integer points inside a polyhedron since loop iterators typically have integer data types and traverse an integer space. The matrix <span class="math inline">\(A\)</span> and <span class="math inline">\(\vec{b}\)</span> for problems we will deal with also comprise only integers. So, we always have:</p>
+<p><span class="math display">\[
+\begin{equation*}
+\left\{\vec{x} \in \mathbb{Z}^{n} \mid A \vec{x}+\vec{b} \geq \overrightarrow{0}\right\}
+\end{equation*}
+\]</span></p>
+<p>where <span class="math inline">\(A \in \mathbb{Z}^{m \times n}\)</span> and <span class="math inline">\(\vec{b} \in \mathbb{Z}^{m}\)</span>.</p>
+<p><strong><em>Iteration vector</em></strong>. The iteration vector of a statement is the vector consisting of values of the indices of all loops surrounding the statement.</p>
+<p>Let <span class="math inline">\(S\)</span> be a statement of a program. The iteration vector is denoted by <span class="math inline">\(\vec{i}_{S}\)</span>. An iteration vector represents a dynamic instance of a statement appearing in a loop nest that may be nested perfectly or imperfectly.</p>
+<p><strong><em>Domain, Index set</em></strong>. The set of all iteration vectors for a given statement is the domain or the index set of the statement.</p>
+<p>A program comprises a sequence of statements, each statement surrounded by loops in a given order. We denote the domain of a statement <span class="math inline">\(S\)</span> by <span class="math inline">\(\mathcal{D}^{S}\)</span>. When the loop bounds and data accesses are affine functions of outer loop indices and other program parameters, and all conditionals are statically predictable, the domain of every statement is a polyhedron as defined in (. Again, conditionals that are affine functions of outer loop indices and program parameters are statically predictable.</p>
+<p>Each dynamic instance of a statement <span class="math inline">\(S\)</span>, in a program, is identified by its iteration vector <span class="math inline">\(\vec{i}_{S}\)</span> which contains values for the indices of the loops surrounding <span class="math inline">\(S\)</span>, from outermost to innermost. A statement <span class="math inline">\(S\)</span> is associated with a polytope <span class="math inline">\(\mathcal{D}^{S}\)</span> of dimensionality <span class="math inline">\(m_{S}\)</span>. Each point in the polytope is an <span class="math inline">\(m_{S}\)</span>-dimensional iteration vector.</p>
+<pre><code>for (i=0 ; i&lt;N ; i++)
+    for (j=0 ; j&lt;N ; j++) 
+        S1: A[i,j]=A[i,j]+  u1[i] * v1[j]+u2[i] * v2[j] ;
+</code></pre>
+<p><span class="math display">\[
+\begin{aligned}
+i &amp; \geq 0 \\
+j &amp; \geq 0 \\
+-i+N-1 &amp; \geq 0 \\
+-j+N-1 &amp; \geq 0
+\end{aligned} \quad \quad \mathcal{D}^{S_{1}}:\left(\begin{array}{cccc}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+-1 &amp; 0 &amp; 1 &amp; -1 \\
+0 &amp; -1 &amp; 1 &amp; -1
+\end{array}\right)\left(\begin{array}{c}
+i \\
+j \\
+N \\
+1
+\end{array}\right) \geq 0
+\]</span></p>
+</section>
+<section id="iteration-space-as-a-set-in-matrix-multiplication" class="level2">
+<h2 class="anchored" data-anchor-id="iteration-space-as-a-set-in-matrix-multiplication">Iteration space as a set in matrix multiplication</h2>
+<pre><code>for (i =0 ;i &lt; M ; i++)
+ for (j =0l j &lt; N; j++)
+   for (k= 0; k &lt; K, k++)
+     c[i,j] = c[i,j] + a[i,k]* B[k,j]</code></pre>
+<p>Iteration domain as a set:</p>
+<p><span class="math display">\[[M, N, K] -&gt; \{ S[i, j, k] : 0 &lt;= i &lt; M \land  0 &lt;= j &lt; N \land 0 &lt;= k &lt; K; \}\]</span></p>
+<p><span class="math inline">\(writes -&gt;  \{ S[i, j, k] -&gt; C[i, j] \}\)</span></p>
+<p><span class="math inline">\(reads := \{S[i, j, k] -&gt; B[k, j], S[i, j, k] -&gt; A[i, k], S[i, j, k] -&gt; C[i, j] \}\)</span></p>
+</section>
+<section id="dependence" class="level2">
+<h2 class="anchored" data-anchor-id="dependence">Dependence</h2>
+<p>Two instances are dependent if they access the same location and one of them is a write.</p>
+<p><strong><em>true dependence</em></strong> producer is a write, consumer is a read. Also called read after write to RAW, also called a flow dependence</p>
+<p><strong><em>anti dependence</em></strong> write after read. WAR</p>
+<p>*<strong>output dependence</strong> both writes WAW</p>
+</section>
+<section id="compiler-representation" class="level2">
+<h2 class="anchored" data-anchor-id="compiler-representation">compiler representation</h2>
+<p>Use a matrix form</p>
+<pre><code>for (i = 0; i &lt; 4; i++)
+  for (j = i; j &lt; 6; j++) 
+    S(i, j);</code></pre>
+<p>Mathematical Representation of Iteration Spaces</p>
+<p>Iteration Space:</p>
+<p><span class="math display">\[
+\mathcal{I} = \{ \vec{i} \in \mathbb{Z}^d \mid A\vec{i} \leq \vec{b} \}
+\]</span></p>
+<ul>
+<li>(): Loop indices (e.g., (i, j))).<br>
+</li>
+<li>(A): Constraint matrix.<br>
+</li>
+<li><span class="math inline">\(\vec{b}\)</span>: Vector of bounds.<br>
+</li>
+<li><strong>Affine constraints</strong>: Relations such as <span class="math inline">\((i + j \leq 6\)</span>.</li>
+</ul>
+</section>
+<section id="an-example" class="level2">
+<h2 class="anchored" data-anchor-id="an-example">an example</h2>
+<pre><code>for (i = 0; i &lt; 4; i++)
+  for (j = 0; j &lt; 4; j++)
+    S(i, j) = S(i - 1, j) + 1;</code></pre>
+<p>iteration space</p>
+<p><span class="math inline">\(\mathcal{D} = \left\{ \vec{x} = \begin{pmatrix} i \\ j \end{pmatrix} \, \middle| \, A \vec{x} \leq \vec{b} \right\}\)</span>,</p>
+<p>where: <span class="math inline">\(A =
+\begin{pmatrix}
+1 &amp; 0 \\ -1 &amp; 0 \\ 0 &amp; 1 \\ 0 &amp; -1
+\end{pmatrix},
+\quad
+\vec{b} =
+\begin{pmatrix}
+3 \\ 0 \\ 3 \\ 0
+\end{pmatrix}\)</span>.</p>
+<p>iteration and dependence</p>
+<p><span class="math inline">\(\mathcal{R} = \left\{
+\begin{pmatrix} i_{\text{src}} \\ j_{\text{src}} \\ i_{\text{dest}} \\ j_{\text{dest}} \end{pmatrix}
+\, \middle| \,
+A \begin{pmatrix} i_{\text{src}} \\ j_{\text{src}} \end{pmatrix} \leq \vec{b}, \,
+A \begin{pmatrix} i_{\text{dest}} \\ j_{\text{dest}} \end{pmatrix} \leq \vec{b}, \,
+i_{\text{dest}} = i_{\text{src}} + 1, \,
+j_{\text{dest}} = j_{\text{src}}
+\right\}\)</span>.</p>
+<p>as a ir:</p>
+<p><span class="math inline">\(\mathcal{R} = \left\{ \vec{x} \, \middle| \,
+\begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+-1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; 0 \\
+0 &amp; -1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0 \\
+0 &amp; 0 &amp; -1 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 1 \\
+0 &amp; 0 &amp; 0 &amp; -1 \\
+1 &amp; 0 &amp; -1 &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; -1
+\end{pmatrix}
+\begin{pmatrix}
+i_{\text{src}} \\ j_{\text{src}} \\ i_{\text{dest}} \\ j_{\text{dest}}
+\end{pmatrix}
+\leq
+\begin{pmatrix}
+3 \\ 0 \\ 3 \\ 0 \\ 3 \\ 0 \\ 3 \\ 0 \\ -1 \\ 0
+\end{pmatrix}
+\right\}\)</span>.</p>
+<ul>
+<li>The <strong>first four rows</strong> encode the iteration space constraints for <span class="math inline">\((i_{\text{src}}, j_{\text{src}})\)</span>.</li>
+<li>The <strong>next four rows</strong> encode the iteration space constraints for <span class="math inline">\((i_{\text{dest}}, j_{\text{dest}})\)</span>.</li>
+<li>The <strong>last two rows</strong> encode the dependence equations: <span class="math inline">\(i_{\text{dest}} = i_{\text{src}} + 1, \quad j_{\text{dest}} = j_{\text{src}}\)</span>.</li>
+</ul>
+</section>
+<section id="dependence-example" class="level2">
+<h2 class="anchored" data-anchor-id="dependence-example">dependence example</h2>
+<pre><code>for (i=0 ; i&lt;N ; i++)
+    for (j=0 ; j&lt;N ; j++) 
+        S1: A[i,j]=A[i,j]+  u1[i] * v1[j]+u2[i] * v2[j] ;
+
+for (k=0 ;k&lt;N; k++ )
+    for (l=0 ; l&lt;N ; l++)
+        S2: x[k]=x[k]+beta*A[l,k] *y[l] ;</code></pre>
+<p>A[i,j] same location as A[l,k]</p>
+<ul>
+<li><span class="math inline">\(0 \le i \lt N\)</span></li>
+<li><span class="math inline">\(0 \le j \lt N\)</span></li>
+<li><span class="math inline">\(0 \le k \lt N\)</span></li>
+<li><span class="math inline">\(0 \le 0 \lt N\)</span></li>
+</ul>
+<p>dependence when</p>
+<ul>
+<li><span class="math inline">\(i - l = 0\)</span></li>
+<li><span class="math inline">\(j - k = 0\)</span></li>
+</ul>
+</section>
+<section id="matrix-form" class="level2">
+<h2 class="anchored" data-anchor-id="matrix-form">matrix form</h2>
+<p><img src="https://cdn.mathpix.com/cropped/2024_08_15_37ce20a1c7fef7c8fca6g-10.jpg?height=426&amp;width=1341&amp;top_left_y=581&amp;top_left_x=426" class="img-fluid"></p>
+</section>
+<section id="loop-interchange-example" class="level2">
+<h2 class="anchored" data-anchor-id="loop-interchange-example">loop interchange example</h2>
+<p>can we reorder these loops</p>
+<pre><code>for (i = 0, i &lt; 9; i++)
+  for (j = i; j &lt; 7 &amp;&amp; j &lt; i+4; j++)
+     a[i,j] =  3
+</code></pre>
+<p>There is no dependence so we can reorder the loops but what are the new bounds?</p>
+<div id="e611eb7f" class="cell" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-8-output-1.png" width="576" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="reordered-loops" class="level2">
+<h2 class="anchored" data-anchor-id="reordered-loops">reordered loops</h2>
+<pre><code>original 
+for (i = 0, i &lt; 9; i++)
+  for (j = i; j &lt; 7 &amp;&amp; j &lt; i+4; j++)
+     a[i,j] =  3
+</code></pre>
+<pre><code>reordered 
+for (j = 0; j &lt;=6; j++)
+ for (i = max(j-3,0); i &lt;= j; i++)
+   a[i,j] = 3</code></pre>
+</section>
+<section id="fourier-motzkin-method" class="level2">
+<h2 class="anchored" data-anchor-id="fourier-motzkin-method">Fourier-Motzkin method</h2>
+<p>Fourier-Motzkin elimination is a method for eliminating variables from systems of linear inequalities. It is particularly used to project a polyhedron onto a lower-dimensional space.</p>
+<p>Fourier-Motzkin elimination works by <strong>eliminating variables</strong> from a system of linear inequalities, resulting in a projection of the polyhedron onto a lower-dimensional space.</p>
+<p>This method works for systems in <strong>higher dimensions</strong>, simplifying the system to fewer variables while preserving the feasibility of the solution.</p>
+<ol type="1">
+<li><strong>Identify a variable to eliminate</strong>: Choose one variable from the system to eliminate (say <span class="math inline">\(x_1\)</span>).</li>
+<li><strong>For each inequality</strong>, rearrange to solve for the chosen variable.</li>
+<li><strong>Eliminate the variable</strong> by combining inequalities to remove it from the system.</li>
+<li><strong>Repeat</strong> the process for other variables, until only the desired variables remain.</li>
+</ol>
+<p>This process iteratively reduces the dimensionality of the polyhedron.</p>
+</section>
+<section id="example-continued" class="level2">
+<h2 class="anchored" data-anchor-id="example-continued">example continued</h2>
+<p>Write i as a function of j</p>
+<p>original inequalities</p>
+<ol type="1">
+<li><span class="math inline">\(i \ge 0\)</span></li>
+<li><span class="math inline">\(i \le 8\)</span> (since <span class="math inline">\(i \lt 9\)</span>)</li>
+<li><span class="math inline">\(i \le j\)</span> (since loop starts at <span class="math inline">\(j =eq i\)</span>)</li>
+<li><span class="math inline">\(j \le 6\)</span></li>
+<li><span class="math inline">\(j \le i +3\)</span></li>
+</ol>
+<p>to find the bounds of j, we need to remove i</p>
+<p>find all the constrants using <span class="math inline">\(i\)</span>: <span class="math inline">\(L \le c_1 * i\)</span> and <span class="math inline">\(c_2*i \le U\)</span></p>
+<p>for each pair add <span class="math inline">\(c_2* L \le c_1 * U\)</span> and all constrants j only</p>
+<ul>
+<li>1,2 <span class="math inline">\(0 \le 8\)</span> ignore</li>
+<li>1,3 <span class="math inline">\(0 \le j\)</span></li>
+<li>2,5 <span class="math inline">\(j - 3 \le j\)</span> ignore -3,5 <span class="math inline">\(j -3 &lt;= 8\)</span> ==&gt; <span class="math inline">\(j \le 11\)</span> ignore</li>
+<li>4 <span class="math inline">\(j \le 6\)</span></li>
+</ul>
+<p>bounds for j are <span class="math inline">\(0 \le j \le 6\)</span></p>
+<p>for the inner loop - solve for i</p>
+<p><span class="math inline">\(i \le 0\)</span> and <span class="math inline">\(i \ge j - 3\)</span> =&gt; <span class="math inline">\(i \le \max(0, j-3)\)</span></p>
+<p><span class="math inline">\(i \le 8\)</span> and <span class="math inline">\(i \le j\)</span> =&gt; <span class="math inline">\(\min(8,j)\)</span> simplifes to <span class="math inline">\(j\)</span> since j is never more then 6</p>
+<section id="complexity-of-fourier-motzkin" class="level3">
+<h3 class="anchored" data-anchor-id="complexity-of-fourier-motzkin">Complexity of Fourier-Motzkin</h3>
+<p>Fourier-Motzkin elimination is <strong>computationally expensive</strong>, especially when the number of variables is large.</p>
+<ul>
+<li><strong>Worst-case complexity</strong>: The number of inequalities generated can grow exponentially with the number of variables, resulting in inefficient performance for high-dimensional systems.</li>
+<li>Despite this, it is still a useful tool for small to medium-dimensional systems where the elimination process can be computationally feasible.</li>
+</ul>
+</section>
+</section>
+<section id="how-much-of-a-limitation-is-affine-only" class="level2">
+<h2 class="anchored" data-anchor-id="how-much-of-a-limitation-is-affine-only">How much of a limitation is affine only</h2>
+<p>99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.</p>
+<p>over 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al.&nbsp;2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.</p>
+</section>
+<section id="ilp-solver-info" class="level2">
+<h2 class="anchored" data-anchor-id="ilp-solver-info">ilp solver info</h2>
+<p>can an ilp solver always work?</p>
+<p>Hilbert’s tenth problem is the tenth on the list of mathematical problems that the German mathematician David Hilbert posed in 1900. It is the challenge to provide a general algorithm that, for any given Diophantine equation (a polynomial equation with integer coefficients and a finite number of unknowns), can decide whether the equation has a solution with all unknowns taking integer values.</p>
+<p>sadly answer is no (found in 1970)</p>
+<p>But we can do this if we limit the kinds of inequalities</p>
+</section>
+<section id="affine-limitations" class="level2">
+<h2 class="anchored" data-anchor-id="affine-limitations">Affine limitations</h2>
+<p>affine functions, no multiplying unknowns, no quantifiers (for all, or exists) and is ok, or ok (if we change to two problems) just add/subtract/ multiply by a constant, can add minimize/maximize a function. division and remainder by a constant, max/min/ absolute</p>
+<p>Most scientific programs and ai programs fit, because array subscripts are often affine</p>
+<p>But lots of other kinds of programs do not.</p>
+<p>There is a lot of formal math background here, decidability in logic.</p>
+</section>
+<section id="complexity" class="level2">
+<h2 class="anchored" data-anchor-id="complexity">complexity</h2>
+<p>ilp is np-complete so it is slow, but often tractable for problems with up to several hundred variables.</p>
+<p>Some compiler writers feel that means can only do this for toy programs? What do you think?</p>
+</section>
+<section id="multiple-dimensions" class="level2">
+<h2 class="anchored" data-anchor-id="multiple-dimensions">multiple dimensions</h2>
+<pre><code>for (i=1; i&lt;=n; i++)
+for (j=1; j&lt;=n; j++)
+S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
+<div id="9f5ca899" class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-9-output-1.png" width="465" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="schedule" class="level2">
+<h2 class="anchored" data-anchor-id="schedule">schedule</h2>
+<p>The schedule goes up each column (the j values) going over the columns left to right (the i column)</p>
+<p>notice that this does not execute in parallel, but it could if pick a different schedule</p>
+<div id="b216d335" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-10-output-1.png" width="651" height="671" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="formalizing-the-schedule-lexicographic-ordering" class="level2">
+<h2 class="anchored" data-anchor-id="formalizing-the-schedule-lexicographic-ordering">formalizing the schedule, Lexicographic ordering</h2>
+<p>schedule s(i,j) -&gt; (i,j) statements -&gt; vector (should be a time)</p>
+<p>How do we interpret a vector as a time, e.g.&nbsp;hours, min, seconds.</p>
+<p>Usually written as <span class="math inline">\(\gg\)</span> Generalization of alphabetical order</p>
+<p><span class="math display">\[
+(i,j) \gg (m,n) \iff i &gt;  m \lor (i=m \land j&gt; n)
+\]</span></p>
+<p>Compare left to right if terms are equal, go to next term, or different so compare the terms</p>
+<p>Notice the or we will need to call the ilp solver more than once</p>
+<p>Checking for loop interchange</p>
+<pre><code>for i in [1,2,3,4]                     for j in [1,2,3]
+  for j in [1,2,3]                       for i in [1,2,3,4]
+s:   a(i,j) = a(i-1,j+1)                   a(i,j) = a(i-1,j+1)  
+
+
+s(i, j) -&gt; (i,j)                          s(i,j)=(j,i)</code></pre>
+<p>data flow</p>
+<pre><code>        read write
+s(1,1)  a(0,2)  a(1,1)
+s(1,2)  a(0,3)  a(1,2)
+s(1,3)  a(0,4)  a(1,3)
+s(1,4)  a(0,5)  a(1,4)
+s(2,1)  a(1,2)  a(2,1)   s(1,2)-&gt; s(2,1)
+s(2,2)  a(1,3)  a(2,2)   s(1,3)-&gt; s(2.2)</code></pre>
+<p><span class="math display">\[
+s(i,j) \rightarrow s(i+1, j-1)
+\]</span> constants:</p>
+<p>Does there exist a statement s(i,j) and a statement <span class="math inline">\(s(i',j')\)</span> where in the new schedule <span class="math inline">\(s(i',j')\)</span> executes first and data flows backward in time <span class="math display">\[
+\begin{align*}
+(i', j') \gg (j,i)   &amp;\text{ $i',j'$ is first} \\
+i' = 1+ i            &amp;\text{ data\  from \ i+1 to $i'$}\\
+j' = -1 +j           &amp;\text{ data\  from \ j-1 to $j'$}\\
+1 \le i \le 4 \\
+1 \le j \le 3  \\
+1 \le i' le 4 \\
+1 \le j' \leftrightarrows 3
+\end{align*}
+\]</span></p>
+<p>because of the lexicographic order we have two ilp problems one where <span class="math inline">\(i'\)</span> is greater then j, and one where <span class="math inline">\(i'\)</span> = j, and the other where <span class="math inline">\(j'\)</span> &gt; j</p>
+<p>i ran it through:</p>
+<p>https://online-optimizer.appspot.com</p>
+<p>which gave me a solution</p>
+<p>s(4,2) reads s(3,3) but s(4,2) executes first</p>
+</section>
+<section id="ir" class="level2">
+<h2 class="anchored" data-anchor-id="ir">ir</h2>
+<p>How do we represent these sets in the ir?</p>
+<pre><code>for i in [0,1,2,3,4,5]
+  for j from  i to 7
+     a(i,j) = 0
+</code></pre>
+<p>change the equations around so that they are … <span class="math inline">\(\ge 0\)</span></p>
+<p><span class="math display">\[
+\begin{align*}
+i \ge 0  &amp;\rightarrow  i \ge 0 \\
+i \le 5 &amp;\rightarrow -i + 5 \ge 0 \\
+j \ge i &amp;\rightarrow -i + j \ge 0 \\
+j \le 7 &amp;\rightarrow =j+7 \ge 0
+\end{align*}
+\]</span></p>
+<p>We can split off the constraints: <span class="math display">\[
+constraints  = \left\{ \vec{x} \mid B\vec{x} + \vec{b} &gt;= 0\right\}
+\]</span></p>
+<p>Where: <span class="math display">\[
+\begin{equation*}
+B =
+\begin{bmatrix} \begin{array}{rr}
+1 &amp;  0 \\
+-1 &amp;  0 \\
+-1 &amp;  1 \\
+0 &amp; -1
+\end{array} \end{bmatrix}
+\vec{b} =
+\begin{bmatrix}
+0 \\
+5  \\
+0   \\
+7
+\end{bmatrix}
+\vec{x} =
+\begin{bmatrix}
+i \\
+j
+\end{bmatrix}
+\end{equation*}
+\]</span></p>
+<p>This also works if the loop bounds are symbolic</p>
+<pre><code>for i in [L..U]
+  for j from  i to 7
+     a(i,j) = 0
+</code></pre>
+<p><span class="math display">\[
+\begin{equation*}
+B =
+\begin{bmatrix} \begin{array}{rr}
+1 &amp;  0 \\
+-1 &amp;  0 \\
+-1 &amp;  1 \\
+0 &amp; -1
+\end{array} \end{bmatrix}
+\vec{b} =
+\begin{bmatrix}
+L \\
+U\\
+0\\
+7
+\end{bmatrix}
+\end{equation*}
+\]</span></p>
+</section>
+<section id="suppose-we-want-to-run-the-an-example-in-parallel" class="level2">
+<h2 class="anchored" data-anchor-id="suppose-we-want-to-run-the-an-example-in-parallel">suppose we want to run the an example in parallel</h2>
+<pre><code>for i in [1,2,3,4]
+  for j in [1,2,3, 4]
+    s: a(i,j) = a(i-1, j+1) </code></pre>
+<p>reorder to run in parallel get new bounds, we want to run diagonally <span class="math inline">\(k= i-j\)</span>, we know the transformation that we want</p>
+<p>We replace <span class="math inline">\(i = k+j\)</span></p>
+<p>what are the loop bounds</p>
+<pre><code>for k = ??
+   for j = ?? 
+     s: a(j-k,j) = a(j-k-1, j+1)
+</code></pre>
+<p><span class="math display">\[
+\begin{align*}
+1 \le i \le 4 \\
+1 \le j \le 4 \\
+\end{align*}
+\]</span></p>
+<p><span class="math display">\[
+\begin{align*}
+1 \le &amp; k+j &amp;\le 4 \\
+1 \le &amp; j &amp;\le 4 \\
+\end{align*}
+\]</span></p>
+<p>now for mf <span class="math display">\[
+\begin{align*}
+1-k \le  4-k \\
+1-k  \le 4\\
+1 \le 4-k \\
+1 \le 4
+\end{align*}
+\]</span></p>
+<p>giving k bounds -3 to 3</p>
+<p>j bounds are max(1,1,k) to min(4, 4-k)</p>
+</section>
+</section>
+<section id="scheduling" class="level1">
+<h1>4 Scheduling</h1>
+<p>Up till now we assumed we know the transformation but now we consider can we find a schedule that is good in some way</p>
+<p>an example</p>
+<pre><code>for i in [0,1,2,3,4,5]
+   P:  a(i) = input(i) +1
+for j in [0,12,3,4,5]
+    c: b(j) = a(j) +2</code></pre>
+<p>This is not quite a loop nest - unless we picture an outer loop running one time.</p>
+<p>The new schedule has to be affine (restriction) schedule is a map from instances to time</p>
+<ul>
+<li><span class="math inline">\(P(i) = sp*i + dp\)</span></li>
+<li><span class="math inline">\(C(j) = sc*j + dc\)</span></li>
+</ul>
+<p>optimization pick sp, dp, sc, dc that optimizes the locality.</p>
+<p>constraint is for all i,j, p(i) writes data that c(j) reads, and i,j are in bounds</p>
+<p>For any legal schedule:</p>
+<p><span class="math display">\[
+\forall i,j \mid 0 \le i \le 5 \land 0 \le j \le 5 \land i = j
+\land sp * i + dp  \le sc * j + dc
+\]</span></p>
+<p>different values of sp, dp, sc, and dc give different schedules.<br>
+Since all these schedules are affine - None on them is the “best”. Some non-affine schedule might be better.</p>
+<p>This is not suitable for ilp, because of the <span class="math inline">\(sp * i\)</span></p>
+<p>Suppose we want to select one of the schedules that minimizes a cost function: <span class="math display">\[
+w(i,j)  = sc * j + dc - sp * i + dp
+\]</span></p>
+<p>w is the time the value is needed</p>
+<p>How we select a legal schedule that has the smallest w?</p>
+<p>if w is small, this minimizes locality, if w is large this maximizes parallelism</p>
+<p>The affine form of Farkas Lemma + sat solver can find a solution</p>
+<p>===================</p>
+<div id="0c6be73b" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="poly_next_files/figure-html/cell-11-output-1.png" width="449" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="common-transformatins" class="level2">
+<h2 class="anchored" data-anchor-id="common-transformatins">common transformatins</h2>
+<ul>
+<li>Tiling for cache efficiency.</li>
+<li>Fusion for reducing loop overhead.</li>
+<li>Skewing to enable parallelism.</li>
+</ul>
+<hr>
+<section id="example-loop-tiling" class="level3">
+<h3 class="anchored" data-anchor-id="example-loop-tiling">Example: Loop Tiling</h3>
+<p><strong>Original Code:</strong></p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> M<span class="op">;</span> j<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>        A<span class="op">[</span>i<span class="op">][</span>j<span class="op">]</span> <span class="op">=</span> B<span class="op">[</span>i<span class="op">][</span>j<span class="op">]</span> <span class="op">+</span> C<span class="op">[</span>i<span class="op">][</span>j<span class="op">];</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Tiled Code:</p>
+<pre><code>for (ii = 0; ii &lt; N; ii += T) {
+    for (jj = 0; jj &lt; M; jj += T) {
+        for (i = ii; i &lt; min(ii+T, N); i++) {
+            for (j = jj; j &lt; min(jj+T, M); j++) {
+                A[i][j] = B[i][j] + C[i][j];
+            }
+        }
+    }
+}</code></pre>
+<p>Benefits:</p>
+<ol type="1">
+<li>Improved data locality.</li>
+<li>Cache-friendly memory access patterns.</li>
+</ol>
+</section>
+</section>
+<section id="skewing-for-parallelism" class="level2">
+<h2 class="anchored" data-anchor-id="skewing-for-parallelism">Skewing for Parallelism</h2>
+<p>Original Code:</p>
+<pre><code>for (i = 0; i &lt; N; i++) {
+    for (j = 0; j &lt;= i; j++) {
+        A[i][j] = A[i-1][j] + A[i][j-1];
+    }
+}</code></pre>
+<p>Skewed Code:</p>
+<pre><code>Copy code
+for (i = 0; i &lt; N; i++) {
+    for (j = i; j &lt; N; j++) {
+        A[i][j-i] = A[i-1][j-i] + A[i][j-1-i];
+    }
+}</code></pre>
+</section>
+<section id="modern-compilers" class="level2">
+<h2 class="anchored" data-anchor-id="modern-compilers">Modern Compilers</h2>
+<ul>
+<li><strong>Polyhedral techniques</strong> are implemented in:
+<ul>
+<li>LLVM Polly<br>
+</li>
+<li>Pluto Compiler<br>
+</li>
+<li>GCC Graphite</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="example-matrix-multiplication" class="level2">
+<h2 class="anchored" data-anchor-id="example-matrix-multiplication">Example: Matrix Multiplication</h2>
+<div class="sourceCode" id="cb38"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> N<span class="op">;</span> j<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> <span class="op">(</span>k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> N<span class="op">;</span> k<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>            C<span class="op">[</span>i<span class="op">][</span>j<span class="op">]</span> <span class="op">+=</span> A<span class="op">[</span>i<span class="op">][</span>k<span class="op">]</span> <span class="op">*</span> B<span class="op">[</span>k<span class="op">][</span>j<span class="op">];</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Optimized with tiling and reordering for parallel execution.</p>
+<p>Automation: Automating transformations without developer intervention.</p>
+<p>Polyhedral Methods in Compilers</p>
+<p>1.1 Motivation (5 minutes) . 1.2 Core Concepts of the Polyhedral Model (8 minutes) Break down the foundational ideas:</p>
+<p>Iteration Domains:</p>
+<p>Definition: Represents all iterations of a loop as points in a multi-dimensional space. Example: For for (i = 0; i &lt; N; i++), the iteration domain is { i | 0 &lt;= i &lt; N }. Graphical Representation: Plot iteration points for a nested loop as a grid in a 2D space. Example for for (i = 0; i &lt; 3; i++) and for (j = 0; j &lt; 2; j++): scss Copy code (0,0) (0,1)<br>
+(1,0) (1,1)<br>
+(2,0) (2,1)<br>
+Affine Constraints:</p>
+<p>Definition: Constraints defined by linear inequalities or equalities. Represent bounds and dependencies using affine expressions like i + j &lt;= N. Example: For for (i = 0; i &lt; N; i++), i must satisfy 0 &lt;= i &lt; N. Dependence Relations:</p>
+<p>Describe how iterations depend on each other, allowing for analysis of legal transformations. Example: c Copy code A[i] = A[i-1] + B[i]; Dependency: Iteration i depends on i-1. Transformation Matrices:</p>
+<p>Transform loops using affine matrices that map iteration spaces to new spaces. Example: Loop skewing: Transform (i, j) to (i, i+j). 1.3 Simple Example: Representation in Polyhedral Model (5 minutes) Walk through a concrete example to ground the concepts:</p>
+<p>Example Code:</p>
+<p>c Copy code for (i = 0; i &lt; N; i++) {<br>
+for (j = 0; j &lt; N; j++) {<br>
+A[i][j] = A[i-1][j] + A[i][j-1];<br>
+}<br>
+} Step-by-Step Polyhedral Representation:</p>
+<p>Iteration Domain: Represent loop bounds as sets: css Copy code Domain: D(i, j) = { (i, j) | 0 &lt;= i &lt; N, 0 &lt;= j &lt; N }<br>
+Dependence Relations: Dependencies arise due to A[i-1][j] and A[i][j-1]. Dependence Polyhedron: css Copy code R(i, j, i’, j’) = { (i, j) -&gt; (i’, j’) | i’ = i-1, j’ = j } ∪ { i’ = i, j’ = j-1 }<br>
+Graphical Representation: Plot the iteration points and draw arrows indicating dependencies. Interactive Discussion:</p>
+<p>Ask students: What transformations can we apply here (e.g., tiling, skewing)? How would we optimize this for parallelism or locality? 1.4 Transition to Dependence Analysis (2 minutes) Conclude the introduction by previewing the next section:</p>
+<p>The polyhedral model’s power lies in its ability to analyze and transform loops based on dependencies. Dependence analysis is the foundation for determining legal and effective optimizations. Coming up: How to construct dependence polyhedra and use them for optimization. This expanded introduction provides a robust foundation, setting up students with both the motivation and basic understanding necessary to dive into the technical details of dependence analysis and transformations. 2. Dependence Analysis in the Polyhedral Model (20 minutes) Goal: Teach students how dependencies are analyzed in the polyhedral framework.</p>
+<p>Slides/Whiteboard: Dependence relations: Representation as affine constraints. Definition of dependence polyhedron. Illustration with graphical iteration spaces. Tools for dependence analysis: Dependence graph construction. Static vs.&nbsp;dynamic analysis in polyhedral methods. Hands-on Example: Example 1: Analyze dependencies for: c Copy code for (i = 0; i &lt; N; i++)<br>
+for (j = 0; j &lt; N; j++)<br>
+A[i][j] = A[i-1][j] + A[i][j-1]; Walk through the construction of the dependence polyhedron. 3. Transformations in the Polyhedral Model (25 minutes) Goal: Explain key transformations and how they improve performance.</p>
+<p>Slides/Whiteboard: Types of transformations: Loop interchange: Optimizing for data locality. Loop tiling: Partitioning iteration space into smaller tiles for parallelism and locality. Loop fusion/fission: Combining or splitting loops for better performance. Skewing and shifting: Handling dependencies for parallelization. Mathematical representation of transformations: Affine transformation matrices. Practical benefits and examples: GPU optimization, cache locality. Code Example: Original code: c Copy code for (i = 0; i &lt; N; i++)<br>
+for (j = 0; j &lt; N; j++)<br>
+A[i][j] = A[i-1][j] + A[i][j-1]; Tiled version: c Copy code for (ii = 0; ii &lt; N; ii += T)<br>
+for (jj = 0; jj &lt; N; jj += T)<br>
+for (i = ii; i &lt; min(ii+T, N); i++)<br>
+for (j = jj; j &lt; min(jj+T, N); j++)<br>
+A[i][j] = A[i-1][j] + A[i][j-1]; 4. Tools and Frameworks (10 minutes) Goal: Introduce students to practical tools for polyhedral methods.</p>
+<p>Slides: Overview of tools: Polly: LLVM-based loop optimizer using the polyhedral model. Pluto: Automatic parallelization and locality optimization tool. ISL (Integer Set Library): Core library for manipulation of polyhedral sets. Case studies: Applications in HPC and GPU programming. Demo (Optional): Show Polly or Pluto in action on a simple loop optimization problem. 5. Advanced Topics and Discussion (15 minutes) Goal: Explore advanced concepts and address questions.</p>
+<p>Slides/Whiteboard: Advanced Topics: Handling non-affine loops and imperfect nests. Integrating polyhedral methods with machine learning for optimization. Limitations: Scalability, non-affine constructs, and practical adoption in industry. Discussion Questions: What are the limitations of the polyhedral model? How does it compare to traditional loop optimization techniques? Applications in modern compilers (e.g., LLVM, GCC, TensorFlow). 6. Wrap-Up and Q&amp;A (5 minutes) Goal: Recap and address any remaining questions.</p>
+<p>Summary Slide: Key takeaways: The polyhedral model provides a mathematically rigorous framework for loop optimization. Enables parallelism, improves locality, and handles complex dependencies. Widely used in HPC, GPU programming, and compiler optimizations. Assignments/Readings: Papers: “The Polyhedral Model: A Comprehensive Framework for Loop Nest Optimization” by Pugh. “PLuTo: A Practical and Fully Automatic Polyhedral Parallelizer and Locality Optimizer.” Tools: Explore Polly or Pluto on a small loop example.</p>
+</section>
+<section id="locality" class="level2">
+<h2 class="anchored" data-anchor-id="locality">locality</h2>
+<p>for i in [0,5] p: a[i] = input[i] +1</p>
+<p>for j in [0,5] c: b[j] = a[j] * 3</p>
+<p>optimize some function that calculates the locality</p>
+<p>subject ot constrants that perserves the dependence</p>
+<p>since it is all affine</p>
+<p>SP(i) = sp*i + dp</p>
+<p>SC[j] = sc*j + dc</p>
+<p>pick four parameters</p>
+<p>constrants</p>
+<p>for all i,j p[i] sends data to c[j]. SP(i) &lt;= SC(j)</p>
+<p>forall 0 &lt;= i &lt;= 5, 0&lt;= j &lt;= 5 and i ==j SP(i) &lt;= SC(j)</p>
+<p>forall 0 &lt;= i &lt;= 5, 0&lt;= j &lt;= 5 and i ==j sp<em>i + dp &lt;= sc</em>j + dc</p>
+<p>non-linear sp*i not affine! use ilp (does not work for universal quants)</p>
+<p>farkas lemma</p>
+<p>forall x in { X| Ax+b &gt;= 0} . X^tx +d &gt;= 0</p>
+<p>exists p_0, p &gt; 0 for all x^T x +d = p^T(Ax_b) + p_0</p>
+<p>for all 0 &lt;= i &lt;=5 and 0 &lt;= j &lt;=5 anmd i ==j and sp<em>i+dp - sc</em>j-dc &lt;= 0</p>
+<p>for all 0 &lt;= i &lt;=5 and 0 &lt;= j &lt;=5 anmd i ==j and -sp<em>i + sc </em>j + (dc-d[]) &gt;= 0</p>
+<p>for i&gt;= 0, -i &gt;= -5 &amp;&amp; -j &gt;= -5 snmf J-i &gt;= 0 snd i-j &gt;-0 and -sp<em>i + sc </em>j + (dc-d[]) &gt;= 0</p>
+<p>for all i,j in poly affine form is &gt;= 0</p>
+<p>locality minimize w</p>
+<p>or all 0 &lt;= i &lt;=5 and 0 &lt;= j &lt;=5 anmd i ==j and sp<em>i + dp = sc</em>j -dc &lt;= w ) w is the longest time between production and consumption</p>
+<p>or maximize w to create parallelism</p>
+<p>## tiling</p>
+<pre><code> for i = 0 to N-1:
+    for j = 0 to N-1:
+        for k = 0 to N-1:
+            C[i,j] = sum(A[i,k] * B[k,j])</code></pre>
+<p><span class="math inline">\((i, j, k) \mid 0 \leq i, j, k &lt; N\)</span></p>
+</section>
+<section id="tile-size-calculation" class="level2">
+<h2 class="anchored" data-anchor-id="tile-size-calculation">Tile Size Calculation</h2>
+<p>The tile size is typically specified by a parameter, usually denoted by b, representing the tile/block dimension. The tile size determines how much of the iteration space is processed at once and how the iteration space is divided. Tiling introduces a new set of tile indices (t_i, t_j, etc.) that correspond to the tile indices within the iteration space.</p>
+<p>The tile size b is typically chosen based on:</p>
+<p><code>Cache size: A tile should fit into the processor’s cache.</code> Memory hierarchy: The tile size may depend on the memory level being optimized (L1, L2 cache, etc.). ` Parallelism: The tile size may also depend on the number of available processing units (e.g., cores or threads).</p>
+</section>
+<section id="transforming-the-space" class="level2">
+<h2 class="anchored" data-anchor-id="transforming-the-space">transforming the space</h2>
+<p>Once the tile size b is determined, the iteration space is divided into smaller sub-polyhedra (tiles). This is done by performing a transformation on the loop indices to group them into blocks. The transformation typically involves computing new loop indices based on the original indices and the tile size.</p>
+<p><span class="math inline">\(t_i = \left\lfloor \frac{i}{b} \right\rfloor, \quad t_j = \left\lfloor \frac{j}{b} \right\rfloor, \quad t_k = \left\lfloor \frac{k}{b} \right\rfloor\)</span></p>
+<p>This transformation partitions the iteration space into tiles of size b. The tile index t_i represents the block of iterations in the i-dimension, t_j represents the block in the j-dimension, and so on.</p>
+<p><span class="math display">\[
+\begin{algorithmic}
+\For{$t_i = 0$ \textbf{to} $\left\lfloor \frac{N}{b} \right\rfloor$}
+    \For{$t_j = 0$ \textbf{to} $\left\lfloor \frac{N}{b} \right\rfloor$}
+        \For{$t_k = 0$ \textbf{to} $\left\lfloor \frac{N}{b} \right\rfloor$}
+            \For{$i = t_i b$ \textbf{to} $\min\left( (t_i + 1) b - 1, N - 1 \right)$}
+                \For{$j = t_j b$ \textbf{to} $\min\left( (t_j + 1) b - 1, N - 1 \right)$}
+                    \For{$k = t_k b$ \textbf{to} $\min\left( (t_k + 1) b - 1, N - 1 \right)$}
+                        \State $C[i,j] = \sum_{k=0}^{N-1} A[i,k] \cdot B[k,j]$
+                    \EndFor
+                \EndFor
+            \EndFor
+        \EndFor
+    \EndFor
+\end{algorithmic}
+\]</span></p>
+<pre><code>for t_i = 0 to $\left\lfloor \frac{N}{b} \right\rfloor$:
+    for t_j = 0 to $\left\lfloor \frac{N}{b} \right\rfloor$:
+        for t_k = 0 to $\left\lfloor \frac{N}{b} \right\rfloor$:
+            for i = t_i * b to $\min((t_i + 1) * b - 1, N - 1)$:
+                for j = t_j * b to $\min((t_j + 1) * b - 1, N - 1)$:
+                    for k = t_k * b to $\min((t_k + 1) * b - 1, N - 1)$:
+                        C[i,j] = sum(A[i,k] * B[k,j])</code></pre>
+
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/normrubin\.github\.io\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../lectures/poly_final.html" class="pagination-link" aria-label="Introduction To Polyhedral Methods">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Introduction To Polyhedral Methods</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../lectures/ra-checking.html" class="pagination-link" aria-label="Testing Register allocators">
+        <span class="nav-page-text">Testing Register allocators</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><a href="https://normrubin.github.io/">EECS 7398 website</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

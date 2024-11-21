@@ -646,7 +646,19 @@ y = 2;
      x = ... x ...
      if (mt) pthread_mutex_unlock(...)
     }</code></pre>
-<p>r = x; for (…) { … if (mt) { x = r; pthread_mutex_lock(…); r = x; } r = … r … if (mt) { x = r; pthread_mutex_unlock(…); r = x; } } x = r;</p>
+<p>becomes</p>
+<pre><code>r = x; 
+for (...) {
+     ... 
+     if (mt) {
+         x = r; pthread_mutex_lock(...); r = x; 
+         } 
+     r = ... r ... 
+     if (mt) {
+         x = r; pthread_mutex_unlock(...); r = x; 
+     }
+} 
+x = r;</code></pre>
 </section>
 <section id="adding-multi-threading-to-user-explaining-the-intent" class="slide level2">
 <h2>adding multi-threading to user explaining the intent</h2>
@@ -690,7 +702,7 @@ void critical_section_task(int num_increments) {
 </section>
 <section id="load-acquire-needs-special-hardware" class="slide level2">
 <h2>load acquire (needs special hardware )</h2>
-<p>used by default with atomics not used for non-atomics</p>
+<p>used by default with atomics but not used for non-atomics</p>
 <p>all memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.</p>
 <p>a one way fence - nothing can move up</p>
 </section>
