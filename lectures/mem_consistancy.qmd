@@ -8,6 +8,7 @@ format:
     code-fold: true
     code-line-numbers: true
     echo: true
+    mathjax: true
     output-file: revealjs_mem_consistancy.qmd
     scrollable: true
     slideNumber: c/t
@@ -282,6 +283,7 @@ Caching, prefetching, or other memory optimizations need to account for the fact
 The compiler effectively assumes that pthread mutex lock() may read or write any global variable. Thus a memory reference cannot simply be moved across the call. This approach also ensures that transitive calls, e.g. a call to a function f() which then calls pthread mutex lock(), are handled in the same way more or less appropriately, i.e. memory operations are not moved across the call to f() either, whether or not the entire user program is being analyzed at once.
 
 # example 2
+
 ```
 for (...) {
      ... 
@@ -290,7 +292,8 @@ for (...) {
      if (mt) pthread_mutex_unlock(...)
     }
 ```
-
+becomes 
+```
 r = x; 
 for (...) {
      ... 
@@ -303,7 +306,7 @@ for (...) {
      }
 } 
 x = r;
-
+```
 
 
 
@@ -354,7 +357,7 @@ void critical_section_task(int num_increments) {
 
 ## load acquire (needs special hardware )
 
-used by default with atomics not used for non-atomics 
+used by default with atomics but not used for non-atomics 
 
 all memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.
 
