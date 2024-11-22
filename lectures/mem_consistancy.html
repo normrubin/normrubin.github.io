@@ -355,6 +355,28 @@ y = 2;
 // x and y are stored together in a single transaction</code></pre>
 <p>A thread expecting x and y to be updated separately might observe an inconsistent state if this transformation is applied.</p>
 </section>
+<section id="volatile" class="level2">
+<h2 class="anchored" data-anchor-id="volatile">volatile</h2>
+<p>volatile turns off some optimizations, so compiler writers don’t like it. lots of bugs in compilers around volatile.</p>
+<p>spec is confusing, developers think it means something not in the spec.</p>
+<p>Best for memory mapped hardware, not good for inter thread communication.</p>
+<p>Memory is allowed to tear. No synchronization.</p>
+<p>undefined: bitfields, unions, pre/post increment(not atomic), big objects (more then 1 transfer operation)</p>
+<p>volatile is like const: does not apply in constructors/destructors and it does not effect call conventions or returns</p>
+<pre><code>int i,j;
+volatile int vol;
+i = vol = j;</code></pre>
+<pre><code>volatile int buffer_ready; 
+char buffer[BUF_SIZE]; 
+void buffer_init() { 
+    int i;
+    for (i=0; i&lt;BUF_SIZE; i++) 
+        buffer[i] = 0; 
+    buffer_ready = 1; 
+    }
+    // ok to move buffer assignments below buffer_ready </code></pre>
+<p>In C++ using volatile for inter thread communication is a race, and is not a valid program, so the compiler is free to treat it as any way it wants.</p>
+</section>
 <section id="thread-libraries" class="level2">
 <h2 class="anchored" data-anchor-id="thread-libraries">thread libraries</h2>
 <p>start out assuming single threaded, add a threads library like pthreads</p>

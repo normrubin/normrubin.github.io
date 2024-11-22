@@ -312,7 +312,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 <section id="a-graphical-view" class="level2">
 <h2 class="anchored" data-anchor-id="a-graphical-view">a graphical view</h2>
 <p>forward order</p>
-<div id="a36597af" class="cell" data-execution_count="2">
+<div id="9050c6b5" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>iteration_space <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dependences <span class="op">=</span> [(<span class="dv">1</span>,<span class="dv">2</span>), (<span class="dv">2</span>,<span class="dv">3</span>), (<span class="dv">3</span>,<span class="dv">4</span>)]</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>schedule <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
@@ -331,7 +331,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section id="backward-order" class="level2">
 <h2 class="anchored" data-anchor-id="backward-order">backward order</h2>
-<div id="27153390" class="cell" data-execution_count="3">
+<div id="63a20cd3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define iteration space (e.g., for a 3x3 loop nest)</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>iteration_space <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -421,7 +421,7 @@ dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
 <section id="serial-schedule" class="level2">
 <h2 class="anchored" data-anchor-id="serial-schedule">serial schedule</h2>
 <p>In a serial execution, iterations proceed row by row, strictly respecting both horizontal and vertical dependencies. This schedule respects all dependencies but executes sequentially, limiting parallelism.</p>
-<div id="6e03b6f7" class="cell" data-execution_count="4">
+<div id="0c0b30f3" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>iteration_space <span class="op">=</span> [(<span class="dv">1</span>,<span class="dv">1</span>),(<span class="dv">1</span>,<span class="dv">2</span>),(<span class="dv">1</span>,<span class="dv">3</span>),(<span class="dv">1</span>,<span class="dv">4</span>),</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">2</span>,<span class="dv">1</span>),(<span class="dv">2</span>,<span class="dv">2</span>),(<span class="dv">2</span>,<span class="dv">3</span>),(<span class="dv">2</span>,<span class="dv">4</span>),</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">3</span>,<span class="dv">1</span>),(<span class="dv">3</span>,<span class="dv">2</span>),(<span class="dv">3</span>,<span class="dv">3</span>),(<span class="dv">3</span>,<span class="dv">4</span>),</span>
@@ -455,7 +455,7 @@ dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
 <p>Diagonal key: i + j (sum of indices).</p>
 <p>Iterations with the same diagonal key can execute in parallel since they are independent.</p>
 <p>Example diagonal schedule:</p>
-<div id="e998b2f8" class="cell" data-execution_count="5">
+<div id="ce98a615" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Organize the iteration space by diagonals</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>diagonals <span class="op">=</span> {}</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i, j) <span class="kw">in</span> iteration_space:</span>
@@ -478,7 +478,7 @@ dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
 </section>
 <section id="visualizing-the-parallel-schedule" class="level2">
 <h2 class="anchored" data-anchor-id="visualizing-the-parallel-schedule">Visualizing the parallel schedule:</h2>
-<div id="d3f24800" class="cell" data-execution_count="6">
+<div id="6b923728" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-stdout">
 <pre><code>Schedule:  [(1, 1), (1, 2), (2, 1), (1, 3), (2, 2), (3, 1), (1, 4), (2, 3), (3, 2), (4, 1), (2, 4), (3, 3), (4, 2), (3, 4), (4, 3), (4, 4)]</code></pre>
 </div>
@@ -732,7 +732,7 @@ for (k=0 ;k&lt;N; k++ )
      a[i,j] =  3
 </code></pre>
 <p>There is no dependence so we can reorder the loops but what are the new bounds?</p>
-<div id="e611eb7f" class="cell" data-execution_count="7">
+<div id="c375023a" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -829,7 +829,7 @@ for (j = 0; j &lt;=6; j++)
 <pre><code>for (i=1; i&lt;=n; i++)
 for (j=1; j&lt;=n; j++)
 S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
-<div id="9f5ca899" class="cell" data-execution_count="8">
+<div id="6a9b3db6" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -843,7 +843,7 @@ S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
 <h2 class="anchored" data-anchor-id="schedule">schedule</h2>
 <p>The schedule goes up each column (the j values) going over the columns left to right (the i column)</p>
 <p>notice that this does not execute in parallel, but it could if pick a different schedule</p>
-<div id="b216d335" class="cell" data-execution_count="9">
+<div id="8a42a3d5" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1032,7 +1032,7 @@ w(i,j)  = sc * j + dc - sp * i + dp
 <p>if w is small, this minimizes locality, if w is large this maximizes parallelism</p>
 <p>The affine form of Farkas Lemma + sat solver can find a solution</p>
 <p>===================</p>
-<div id="0c6be73b" class="cell" data-execution_count="10">
+<div id="16d3d03d" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
