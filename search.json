@@ -3971,7 +3971,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#b43f7e32 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#4fd6bb61 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4955,7 +4955,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1648\n-rw-r--r-- 1 runner docker  40847 Nov 23 14:41 010_compiler_overview.html\n-rw-r--r-- 1 runner docker  11181 Nov 23 14:40 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker   3018 Nov 23 14:40 01a1_performance_measurement.qmd\n-rw-r--r-- 1 runner docker   3018 Nov 23 14:40 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  33799 Nov 23 14:41 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker   4152 Nov 23 14:40 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker   4096 Nov 23 14:41 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker   7431 Nov 23 14:40 02a_representation.qmd\n-rw-r--r-- 1 runner docker  13795 Nov 23 14:40 02b_bril.qmd\n-rw-r--r-- 1 runner docker  23632 Nov 23 14:41 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  75099 Nov 23 14:41 03_local.html\n-rw-r--r-- 1 runner docker  12760 Nov 23 14:40 03_local.qmd\n-rw-r--r-- 1 runner docker  13285 Nov 23 14:40 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  56836 Nov 23 14:41 04_data_flow.html\n-rw-r--r-- 1 runner docker   9456 Nov 23 14:40 04_data_flow.qmd\n-rw-r--r-- 1 runner docker   9992 Nov 23 14:40 05_global.qmd\n-rw-r--r-- 1 runner docker   4562 Nov 23 14:40 05b_licm.qmd\n-rw-r--r-- 1 runner docker   3166 Nov 23 14:40 05c_pre.qmd\n-rw-r--r-- 1 runner docker  20202 Nov 23 14:40 06_ssa.qmd\n-rwxr-xr-x 1 runner docker  25643 Nov 23 14:40 07_llvm.notebook\n-rw-r--r-- 1 runner docker  28320 Nov 23 14:41 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker   5709 Nov 23 14:40 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker  32475 Nov 23 14:40 09_poly.qmd\n-rw-r--r-- 1 runner docker    320 Nov 23 14:40 100_mlir.qmd\n-rw-r--r-- 1 runner docker  21170 Nov 23 14:41 110_whole_program.html\n-rw-r--r-- 1 runner docker    338 Nov 23 14:40 110_whole_program.qmd\n-rw-r--r-- 1 runner docker  21228 Nov 23 14:41 12_memory.html\n-rw-r--r-- 1 runner docker    334 Nov 23 14:40 12_memory.qmd\n-rw-r--r-- 1 runner docker 102312 Nov 23 14:41 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker  31886 Nov 23 14:40 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker  10135 Nov 23 14:40 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker   4682 Nov 23 14:40 a.json\n-rw-r--r-- 1 runner docker    248 Nov 23 14:40 a.ts\ndrwxr-xr-x 2 runner docker   4096 Nov 23 14:40 df\n-rw-r--r-- 1 runner docker  27522 Nov 23 14:40 diverg.qmd\n-rw-r--r-- 1 runner docker   5001 Nov 23 14:40 diverg1.qmd\n-rw-r--r-- 1 runner docker   4595 Nov 23 14:40 errors\n-rw-r--r-- 1 runner docker   3623 Nov 23 14:40 foo.ll\n-rw-r--r-- 1 runner docker   2296 Nov 23 14:40 identity.bc\ndrwxr-xr-x 2 runner docker   4096 Nov 23 14:40 images\n-rw-r--r-- 1 runner docker  30815 Nov 23 14:41 junk.html\n-rw-r--r-- 1 runner docker   2152 Nov 23 14:40 junk.qmd\n-rw-r--r-- 1 runner docker    905 Nov 23 14:40 junk.txt\n-rw-r--r-- 1 runner docker  51734 Nov 23 14:41 llvm.html\n-rw-r--r-- 1 runner docker  20731 Nov 23 14:40 llvm.qmd\n-rw-r--r-- 1 runner docker   7732 Nov 23 14:40 llvm.qmd.next\n-rw-r--r-- 1 runner docker  15878 Nov 23 14:40 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker   2278 Nov 23 14:40 mlir.qmd\ndrwxr-xr-x 2 runner docker   4096 Nov 23 14:40 papers\n-rwxr-xr-x 1 runner docker  28903 Nov 23 14:40 poly_final.qmd\ndrwxr-xr-x 2 runner docker   4096 Nov 23 14:40 pytorch\ndrwxr-xr-x 2 runner docker   4096 Nov 23 14:40 ra\n-rw-r--r-- 1 runner docker  41902 Nov 23 14:41 ra-checking.html\n-rw-r--r-- 1 runner docker  15172 Nov 23 14:40 ra-checking.qmd\n-rw-r--r-- 1 runner docker   8032 Nov 23 14:40 register_allocation.qmd\n-rw-r--r-- 1 runner docker  52254 Nov 23 14:41 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker  46478 Nov 23 14:41 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker  85290 Nov 23 14:41 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker  62223 Nov 23 14:41 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker  39234 Nov 23 14:41 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker  33153 Nov 23 14:41 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker  33176 Nov 23 14:41 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker  99461 Nov 23 14:41 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker  41999 Nov 23 14:41 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker  63025 Nov 23 14:41 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker  51904 Nov 23 14:41 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker  22316 Nov 23 14:40 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1588\n-rw-r--r-- 1 runner docker  40847 Nov 23 16:32 010_compiler_overview.html\n-rw-r--r-- 1 runner docker  11181 Nov 23 16:32 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker   3018 Nov 23 16:32 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 23 16:31 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker   3018 Nov 23 16:32 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  33799 Nov 23 16:32 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker   4152 Nov 23 16:32 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker   4096 Nov 23 16:32 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker   7431 Nov 23 16:32 02a_representation.qmd\n-rw-r--r-- 1 runner docker  13795 Nov 23 16:32 02b_bril.qmd\n-rw-r--r-- 1 runner docker  23632 Nov 23 16:32 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  75099 Nov 23 16:32 03_local.html\n-rw-r--r-- 1 runner docker  12760 Nov 23 16:32 03_local.qmd\n-rw-r--r-- 1 runner docker  13285 Nov 23 16:32 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  56836 Nov 23 16:32 04_data_flow.html\n-rw-r--r-- 1 runner docker   9456 Nov 23 16:32 04_data_flow.qmd\n-rw-r--r-- 1 runner docker   9992 Nov 23 16:32 05_global.qmd\n-rw-r--r-- 1 runner docker   8730 Nov 23 16:32 05b_licm.qmd\n-rw-r--r-- 1 runner docker   3166 Nov 23 16:32 05c_pre.qmd\n-rw-r--r-- 1 runner docker  20202 Nov 23 16:32 06_ssa.qmd\n-rwxr-xr-x 1 runner docker  25643 Nov 23 16:31 07_llvm.notebook\n-rwxr-xr-x 1 runner docker  32475 Nov 23 16:32 09_poly.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 23 16:31 09_poly_files\n-rw-r--r-- 1 runner docker    320 Nov 23 16:32 100_mlir.qmd\n-rw-r--r-- 1 runner docker  21170 Nov 23 16:32 110_whole_program.html\n-rw-r--r-- 1 runner docker    338 Nov 23 16:32 110_whole_program.qmd\n-rw-r--r-- 1 runner docker  21228 Nov 23 16:32 12_memory.html\n-rw-r--r-- 1 runner docker    334 Nov 23 16:32 12_memory.qmd\n-rw-r--r-- 1 runner docker 102312 Nov 23 16:32 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker  31886 Nov 23 16:32 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker  10135 Nov 23 16:32 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker   4682 Nov 23 16:31 a.json\n-rw-r--r-- 1 runner docker    248 Nov 23 16:31 a.ts\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 df\n-rw-r--r-- 1 runner docker  27522 Nov 23 16:32 diverg.qmd\n-rw-r--r-- 1 runner docker   5001 Nov 23 16:32 diverg1.qmd\n-rw-r--r-- 1 runner docker   4595 Nov 23 16:31 errors\n-rw-r--r-- 1 runner docker   3623 Nov 23 16:31 foo.ll\n-rw-r--r-- 1 runner docker   2296 Nov 23 16:31 identity.bc\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 images\n-rw-r--r-- 1 runner docker  30815 Nov 23 16:32 junk.html\n-rw-r--r-- 1 runner docker   2152 Nov 23 16:32 junk.qmd\n-rw-r--r-- 1 runner docker    905 Nov 23 16:31 junk.txt\n-rw-r--r-- 1 runner docker  51734 Nov 23 16:32 llvm.html\n-rw-r--r-- 1 runner docker  20731 Nov 23 16:32 llvm.qmd\n-rw-r--r-- 1 runner docker   7659 Nov 23 16:31 llvm.qmd.next\n-rw-r--r-- 1 runner docker  15878 Nov 23 16:32 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker   2278 Nov 23 16:32 mlir.qmd\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 papers\n-rwxr-xr-x 1 runner docker  28903 Nov 23 16:32 poly_final.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 23 16:31 poly_final_files\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 pytorch\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 ra\n-rw-r--r-- 1 runner docker  41902 Nov 23 16:32 ra-checking.html\n-rw-r--r-- 1 runner docker  15172 Nov 23 16:32 ra-checking.qmd\n-rw-r--r-- 1 runner docker   8032 Nov 23 16:32 register_allocation.qmd\n-rw-r--r-- 1 runner docker  52254 Nov 23 16:32 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker  46478 Nov 23 16:32 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker  85290 Nov 23 16:32 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker  62223 Nov 23 16:32 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker  33153 Nov 23 16:32 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker  33176 Nov 23 16:32 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker  99461 Nov 23 16:32 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker  41999 Nov 23 16:32 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker  63025 Nov 23 16:32 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker  51904 Nov 23 16:32 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker  22316 Nov 23 16:31 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6288,84 +6288,6 @@
     "text": "effects of optimization\nRemove performance penalty for:\n\nusing higher level constructs\nsafety checks (e.g., array bounds checks)\nwriting clean, simple code (no benefit to applying loop unrolling by hand)\nEncourage ADT’s that are as efficient as primitive types"
   },
   {
-    "objectID": "lectures/08_classic_loop_ops.html",
-    "href": "lectures/08_classic_loop_ops.html",
-    "title": "8 classic loop optimizations",
-    "section": "",
-    "text": "Loops optimizations are important because\nWhat are classic loop optimizations?\nLess classic loop optimizations\nFirst recall natural loops\ndef of loop invariant for an instruction d = op a,b\nin SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop\nconditions when moving an instruction d = a op b is ok\ncan move d\nL0: d = 0 preheader L1: if (i&gt;=N) goto L2 i = i + 1 d = a ⊕ b = d goto L1 L2: x = d ```\nno good d used after the loop, would not be changed if the loop executes zero times\nno good d reassigned in the loop, do invar would be changed\nwhile (e) { j = loopinv // may never execute S }\nj = loopinv // always executes while (e) { S }\nif (e) { j = loopinv // may never execute while (e) { S }\n} ````",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "8 classic loop optimizations"
-    ]
-  },
-  {
-    "objectID": "lectures/08_classic_loop_ops.html#induction-variable-elimination",
-    "href": "lectures/08_classic_loop_ops.html#induction-variable-elimination",
-    "title": "8 classic loop optimizations",
-    "section": "induction variable elimination",
-    "text": "induction variable elimination\nfor (int i = 0; i &lt; 100; ++1){\n    f(a[i])\n}\ncalculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4\n\na_i = &a[0] before the loop\na_i = a_i + 4 (add the stride) in every iteration\nthe only remaining use of i is the test i &lt; 100, which could become a_i &lt; &a[0] + 4*100 (which is loop invariant)\n\nsteps\n1find basic induction variables i = i + e, where e is loop invariant\nwhat does this look like in ssa\nloop header:\n i1 = phi(i0, i2)\nloop body:\ni2 = i1 + e\nloop header:\n i1 = phi(i0, i2)\nloop body:\na0 = i1 + e\ni2 = a0 + e1\nfor each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions\nStep 2 find auxiliary induction variables\nj = basic_ind * loop inv + loop invar\nfor (int i = 0; i &lt; n; i++) {\n     j = 2*i + 1;     // Y \n     k = -i;          // Y \n     l = 2*i*i + 1;   // N \n     c = c + 5;       // Y* \n}\nstep 3 replace auxiliary induction variables (derived ) by new variables without the multiply\nstep4 if the only remaining use of the induction variable is the termination test, change the test to use the new variable\nsum = 0\nfor (i = 1, i &lt; 100; i++) {\n  sum = sum + a[i -1]\n}\nin SSA form:\n   sum0 = 0\n   i0 = 1\nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t10 = i1 -1 \n   t20 = t10 * 4\n   t30 = t20 + &a\n   t40 = load t30\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   if (i2 &lt;= 100)go to l\n\ni is a basic induction variable\nt10 is a aux induction variable\nt20 is an aux induction variable\nt30 is an aux induction variable\n\nt3 has a use in the load\nt3 = t20 + &a ==&gt; t10 * 4 + &a ==&gt; (i1-1)* 4+ &a\nt3 = 4* i1 + &a - 4\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   t52 = t50 + 4\n   if (i2 &lt;= 100)go to l\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   // i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   //i2 = i1 + 1\n   t52 = t50 + 4\n   if (t52 &lt;= 396 + &a )go to l",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "8 classic loop optimizations"
-    ]
-  },
-  {
-    "objectID": "lectures/08_classic_loop_ops.html#loop-un-switching",
-    "href": "lectures/08_classic_loop_ops.html#loop-un-switching",
-    "title": "8 classic loop optimizations",
-    "section": "loop un-switching",
-    "text": "loop un-switching\nfor (int i = 0 ; i &lt; 100; ++1){\n    if (c) {  // c is loop invariant \n        f(i)\n    } else {\n        g(i)\n    }\n}\nlook for special patterns and replace\nif (c) {  // c is loop invariant \n   for (int i = 0 ; i &lt; 100; ++1){\n        f(i)\n    } \n}else {\n    for (int i = 0 ; i &lt; 100; ++1){\n        g(i)\n    }\n}\nThis is often done before vectorization\nloop fusion\nfor (i = 0; i &lt; 100 ; ++){\n s0:   b[i] = f(a[i])\n}\nfor (i = 0; i &lt; 100 ; ++){\n s1:   c[i] = f(b[i])\n}\n\nwhen is it legal to do this?\nWhen can we get rid of the b array?\n\nThere is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors\nThese sort of loop optimizations would make good projects",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "8 classic loop optimizations"
-    ]
-  },
-  {
-    "objectID": "lectures/revealjs_08_classic_loop_ops.qmd.html#induction-variable-elimination",
-    "href": "lectures/revealjs_08_classic_loop_ops.qmd.html#induction-variable-elimination",
-    "title": "8 classic loop optimizations",
-    "section": "induction variable elimination",
-    "text": "induction variable elimination\nfor (int i = 0; i &lt; 100; ++1){\n    f(a[i])\n}\ncalculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4\n\na_i = &a[0] before the loop\na_i = a_i + 4 (add the stride) in every iteration\nthe only remaining use of i is the test i &lt; 100, which could become a_i &lt; &a[0] + 4*100 (which is loop invariant)\n\nsteps\n1find basic induction variables i = i + e, where e is loop invariant\nwhat does this look like in ssa\nloop header:\n i1 = phi(i0, i2)\nloop body:\ni2 = i1 + e\nloop header:\n i1 = phi(i0, i2)\nloop body:\na0 = i1 + e\ni2 = a0 + e1\nfor each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions\nStep 2 find auxiliary induction variables\nj = basic_ind * loop inv + loop invar\nfor (int i = 0; i &lt; n; i++) {\n     j = 2*i + 1;     // Y \n     k = -i;          // Y \n     l = 2*i*i + 1;   // N \n     c = c + 5;       // Y* \n}\nstep 3 replace auxiliary induction variables (derived ) by new variables without the multiply\nstep4 if the only remaining use of the induction variable is the termination test, change the test to use the new variable\nsum = 0\nfor (i = 1, i &lt; 100; i++) {\n  sum = sum + a[i -1]\n}\nin SSA form:\n   sum0 = 0\n   i0 = 1\nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t10 = i1 -1 \n   t20 = t10 * 4\n   t30 = t20 + &a\n   t40 = load t30\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   if (i2 &lt;= 100)go to l\n\ni is a basic induction variable\nt10 is a aux induction variable\nt20 is an aux induction variable\nt30 is an aux induction variable\n\nt3 has a use in the load\nt3 = t20 + &a ==&gt; t10 * 4 + &a ==&gt; (i1-1)* 4+ &a\nt3 = 4* i1 + &a - 4\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   t52 = t50 + 4\n   if (i2 &lt;= 100)go to l\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   // i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   //i2 = i1 + 1\n   t52 = t50 + 4\n   if (t52 &lt;= 396 + &a )go to l"
-  },
-  {
-    "objectID": "lectures/revealjs_08_classic_loop_ops.qmd.html#loop-un-switching",
-    "href": "lectures/revealjs_08_classic_loop_ops.qmd.html#loop-un-switching",
-    "title": "8 classic loop optimizations",
-    "section": "loop un-switching",
-    "text": "loop un-switching\nfor (int i = 0 ; i &lt; 100; ++1){\n    if (c) {  // c is loop invariant \n        f(i)\n    } else {\n        g(i)\n    }\n}\nlook for special patterns and replace\nif (c) {  // c is loop invariant \n   for (int i = 0 ; i &lt; 100; ++1){\n        f(i)\n    } \n}else {\n    for (int i = 0 ; i &lt; 100; ++1){\n        g(i)\n    }\n}\nThis is often done before vectorization\nloop fusion\nfor (i = 0; i &lt; 100 ; ++){\n s0:   b[i] = f(a[i])\n}\nfor (i = 0; i &lt; 100 ; ++){\n s1:   c[i] = f(b[i])\n}\n\nwhen is it legal to do this?\nWhen can we get rid of the b array?\n\nThere is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors\nThese sort of loop optimizations would make good projects"
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
-    "title": "Performance and Measurement",
-    "section": "example 1",
-    "text": "example 1\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\n445 references"
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
-    "title": "Performance and Measurement",
-    "section": "another example",
-    "text": "another example\nStrangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!\nSIGPLAN Empirical Evaluation Guidelines"
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
-    "title": "Performance and Measurement",
-    "section": "violin plots",
-    "text": "violin plots\ndata\nA dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle\n\n\nCode\n# library & dataset\nimport seaborn as sns\nimport pandas as pd\nimport numpy as np\n\n\ndf = pd.read_csv('images/chip_dataset.csv')\nprint(df.head())\n\nsns.set_palette(\"pastel\")\n\nsns.violinplot(x=df[\"Vendor\"], y=np.log(df[\"Freq (MHz)\"]), hue=df['Type'])\n\n\n   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \\\n0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   \n1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   \n2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   \n3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   \n4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   \n\n   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \\\n0     45.0             77.0                  122.0      2200.0  Unknown   \n1     35.0            192.0                 4800.0      3200.0  Unknown   \n2     28.0              NaN                    NaN      2600.0    Intel   \n3     80.0            160.0                 1400.0      1800.0    Intel   \n4    125.0            258.0                  758.0      3700.0  Unknown   \n\n  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  \n0    AMD          NaN          NaN          NaN  \n1    AMD          NaN          NaN          NaN  \n2  Intel          NaN          NaN          NaN  \n3  Intel          NaN          NaN          NaN  \n4    AMD          NaN          NaN          NaN  \n\n\n\n\n\n\n\n\n\napply np.log to the Freq (MHz) column. Because of wide range of values\nSet a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot\nHue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette\nData Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.\nI might want to take date into account in these plots"
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
-    "title": "Performance and Measurement",
-    "section": "error bars",
-    "text": "error bars\n\n\nCode\nprint(df.describe())\n\nimport pandas as pd\n\n# Assuming df is your DataFrame and 'Release Date' is the column\ndf['Release Date'] = pd.to_datetime(df['Release Date'], errors='coerce')\ndf['Release Year'] = ((df['Release Date'].dt.year) // 5) * 5\n\n# Now df['Release Year'] contains the year extracted from 'Release Date'\n\n\n# plot a bar chart\nax = sns.barplot(x=df['Release Year'], y=df[\"TDP (W)\"], hue =df['Type'], estimator=np.mean, errorbar=(\"sd\"))\n\n\n        Unnamed: 0  Process Size (nm)      TDP (W)  Die Size (mm^2)  \\\ncount  4854.000000        4845.000000  4228.000000      4139.000000   \nmean   2426.500000          55.109598    81.359981       188.440445   \nstd    1401.373433          44.998676    76.807808       126.189383   \nmin       0.000000           0.000000     1.000000         1.000000   \n25%    1213.250000          22.000000    33.000000       104.000000   \n50%    2426.500000          40.000000    65.000000       148.000000   \n75%    3639.750000          90.000000   100.000000       239.000000   \nmax    4853.000000         250.000000   900.000000       826.000000   \n\n       Transistors (million)   Freq (MHz)    FP16 GFLOPS   FP32 GFLOPS  \\\ncount            4143.000000  4854.000000     536.000000   1948.000000   \nmean             1929.922279  1484.406057    8397.459851   2134.756653   \nstd              4044.891098  1066.701523   13799.551131   3898.431487   \nmin                 8.000000   100.000000      10.020000     12.800000   \n25%               154.000000   590.000000     768.800000    257.300000   \n50%               624.000000  1073.500000    2965.500000    696.000000   \n75%              1550.000000  2400.000000   10600.000000   2116.750000   \nmax             54200.000000  4700.000000  184600.000000  40000.000000   \n\n        FP64 GFLOPS  \ncount   1306.000000  \nmean     363.670511  \nstd     1145.931856  \nmin        3.600000  \n25%       38.295000  \n50%       89.280000  \n75%      220.000000  \nmax    11540.000000"
-  },
-  {
     "objectID": "lectures/01a_performance_measurement.html",
     "href": "lectures/01a_performance_measurement.html",
     "title": "Performance and Measurement",
@@ -6424,6 +6346,34 @@
       "Lectures",
       "Performance and Measurement"
     ]
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
+    "title": "Performance and Measurement",
+    "section": "example 1",
+    "text": "example 1\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\n445 references"
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
+    "title": "Performance and Measurement",
+    "section": "another example",
+    "text": "another example\nStrangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!\nSIGPLAN Empirical Evaluation Guidelines"
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
+    "title": "Performance and Measurement",
+    "section": "violin plots",
+    "text": "violin plots\ndata\nA dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle\n\n\nCode\n# library & dataset\nimport seaborn as sns\nimport pandas as pd\nimport numpy as np\n\n\ndf = pd.read_csv('images/chip_dataset.csv')\nprint(df.head())\n\nsns.set_palette(\"pastel\")\n\nsns.violinplot(x=df[\"Vendor\"], y=np.log(df[\"Freq (MHz)\"]), hue=df['Type'])\n\n\n   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \\\n0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   \n1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   \n2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   \n3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   \n4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   \n\n   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \\\n0     45.0             77.0                  122.0      2200.0  Unknown   \n1     35.0            192.0                 4800.0      3200.0  Unknown   \n2     28.0              NaN                    NaN      2600.0    Intel   \n3     80.0            160.0                 1400.0      1800.0    Intel   \n4    125.0            258.0                  758.0      3700.0  Unknown   \n\n  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  \n0    AMD          NaN          NaN          NaN  \n1    AMD          NaN          NaN          NaN  \n2  Intel          NaN          NaN          NaN  \n3  Intel          NaN          NaN          NaN  \n4    AMD          NaN          NaN          NaN  \n\n\n\n\n\n\n\n\n\napply np.log to the Freq (MHz) column. Because of wide range of values\nSet a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot\nHue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette\nData Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.\nI might want to take date into account in these plots"
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
+    "title": "Performance and Measurement",
+    "section": "error bars",
+    "text": "error bars\n\n\nCode\nprint(df.describe())\n\nimport pandas as pd\n\n# Assuming df is your DataFrame and 'Release Date' is the column\ndf['Release Date'] = pd.to_datetime(df['Release Date'], errors='coerce')\ndf['Release Year'] = ((df['Release Date'].dt.year) // 5) * 5\n\n# Now df['Release Year'] contains the year extracted from 'Release Date'\n\n\n# plot a bar chart\nax = sns.barplot(x=df['Release Year'], y=df[\"TDP (W)\"], hue =df['Type'], estimator=np.mean, errorbar=(\"sd\"))\n\n\n        Unnamed: 0  Process Size (nm)      TDP (W)  Die Size (mm^2)  \\\ncount  4854.000000        4845.000000  4228.000000      4139.000000   \nmean   2426.500000          55.109598    81.359981       188.440445   \nstd    1401.373433          44.998676    76.807808       126.189383   \nmin       0.000000           0.000000     1.000000         1.000000   \n25%    1213.250000          22.000000    33.000000       104.000000   \n50%    2426.500000          40.000000    65.000000       148.000000   \n75%    3639.750000          90.000000   100.000000       239.000000   \nmax    4853.000000         250.000000   900.000000       826.000000   \n\n       Transistors (million)   Freq (MHz)    FP16 GFLOPS   FP32 GFLOPS  \\\ncount            4143.000000  4854.000000     536.000000   1948.000000   \nmean             1929.922279  1484.406057    8397.459851   2134.756653   \nstd              4044.891098  1066.701523   13799.551131   3898.431487   \nmin                 8.000000   100.000000      10.020000     12.800000   \n25%               154.000000   590.000000     768.800000    257.300000   \n50%               624.000000  1073.500000    2965.500000    696.000000   \n75%              1550.000000  2400.000000   10600.000000   2116.750000   \nmax             54200.000000  4700.000000  184600.000000  40000.000000   \n\n        FP64 GFLOPS  \ncount   1306.000000  \nmean     363.670511  \nstd     1145.931856  \nmin        3.600000  \n25%       38.295000  \n50%       89.280000  \n75%      220.000000  \nmax    11540.000000"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
@@ -12137,243 +12087,433 @@
     ]
   },
   {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#licm",
-    "href": "lectures/revealjs_05b_licm.qmd.html#licm",
-    "title": "loop invariant code motion",
-    "section": "licm",
-    "text": "licm\nLoop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop."
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#what-are-classic-loop-optimizations",
+    "href": "lectures/revealjs_05b_licm.qmd.html#what-are-classic-loop-optimizations",
+    "title": "classic loop optimizations",
+    "section": "What are classic loop optimizations?",
+    "text": "What are classic loop optimizations?\n\nLoop Invariant Code Motion\nInduction Variable Recognition\nStrength Reduction\nLinear Test Replacement\nLoop Unrolling"
   },
   {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#a-very-common-case-for-this-is-matrix-addressing",
-    "href": "lectures/revealjs_05b_licm.qmd.html#a-very-common-case-for-this-is-matrix-addressing",
-    "title": "loop invariant code motion",
-    "section": "A very common case for this is matrix addressing",
-    "text": "A very common case for this is matrix addressing\na[i,j] might expand to to \\(i*4*\\operatorname{stride_{a}} + j *4\\)\nfor j \n  a[i,j] = f(a[i,j+1])\nturns into\na = \nb = \nresult = 0\nfor (){\n    result += a*b\n}"
-  },
-  {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant",
-    "href": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant",
-    "title": "loop invariant code motion",
-    "section": "when is a computation loop invariant",
-    "text": "when is a computation loop invariant\nf(a,b)\n\na,b are constants\na,b are defined outside the loop,\na,b are loop invariant\n\nif in ssa there is only one reaching def\nfor non ssa, we need\n\nall reaching defs of a,b defined outside of the loop\nonly one def of a,b reaches the computation and that def is loop invariant"
-  },
-  {
-    "objectID": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant-1",
-    "href": "lectures/revealjs_05b_licm.qmd.html#when-is-a-computation-loop-invariant-1",
-    "title": "loop invariant code motion",
-    "section": "when is a computation loop invariant",
-    "text": "when is a computation loop invariant\na defined outside of the loop (need one definition or ssa )\n\nb = a*2 \n\nd = 5 + b is loop invariant if b\nIn ssa a variable is loop invariant if it does not have a phi function at the header of the loop, or it is defined by a phi function and all the inputs are loop constants\nSSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed"
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#loop-invariant-code-motion",
+    "href": "lectures/revealjs_05b_licm.qmd.html#loop-invariant-code-motion",
+    "title": "classic loop optimizations",
+    "section": "Loop Invariant Code Motion",
+    "text": "Loop Invariant Code Motion\nrecall natural loops\n\nstrongly connected region in the cfg\none entry point (dominates all the nodes in the loop)"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#pre-steps---reshape-the-cfg",
     "href": "lectures/revealjs_05b_licm.qmd.html#pre-steps---reshape-the-cfg",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "pre steps - reshape the cfg",
     "text": "pre steps - reshape the cfg\n\nfind the natural loops\nadd pre-header\n\nif we are going to move code we often need to add a special basic block which is called a landing pad or a pre-header create a new block b. change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#pre-header-can-change-phi-nodes",
     "href": "lectures/revealjs_05b_licm.qmd.html#pre-header-can-change-phi-nodes",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "pre-header can change phi nodes",
     "text": "pre-header can change phi nodes\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nC[\"x2=phi(x1,x3)\\ny3=phi(y1,y2,y3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt; C\nB2--&gt; C\nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nC[\"x2=phi(x1,x3)\\ny3=phi(y1,y2,y3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt; C\nB2--&gt; C\nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#while-loop-may-not-execute-we-can-restructure-into-a-do-while",
     "href": "lectures/revealjs_05b_licm.qmd.html#while-loop-may-not-execute-we-can-restructure-into-a-do-while",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "while loop may not execute, we can restructure into a do-while",
     "text": "while loop may not execute, we can restructure into a do-while\n\n\nwhile(e) {\n  s(j) \n}\n\nif (e) {\n  t  = j loopinv \n  do {\n    s\n  } while(e)\n}"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#check-for-zero-trip-count",
     "href": "lectures/revealjs_05b_licm.qmd.html#check-for-zero-trip-count",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "check for zero trip count",
-    "text": "check for zero trip count\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next"
+    "text": "check for zero trip count\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n\n\n\n\nIn ssa a variable is loop invariant if it does not have a phi function at the header of the loop, or it is defined by a phi function and all the inputs are loop constants\nSSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#licm",
+    "href": "lectures/revealjs_05b_licm.qmd.html#licm",
+    "title": "classic loop optimizations",
+    "section": "licm",
+    "text": "licm\nLoop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop."
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#a-very-common-case-for-this-is-matrix-addressing",
+    "href": "lectures/revealjs_05b_licm.qmd.html#a-very-common-case-for-this-is-matrix-addressing",
+    "title": "classic loop optimizations",
+    "section": "A very common case for this is matrix addressing",
+    "text": "A very common case for this is matrix addressing\na[i,j] might expand to to \\(i*4*\\operatorname{stride_{a}} + j *4\\)\nfor j \n  a[i,j] = f(a[i,j+1])\nturns into\na = \nb = \nresult = 0\nfor (){\n    result += a*b\n}"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#when-is-ok-to-move-a-computation",
     "href": "lectures/revealjs_05b_licm.qmd.html#when-is-ok-to-move-a-computation",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "when is ok to move a computation",
     "text": "when is ok to move a computation\n\nno side effects - cannot move alloc 10 outside of loop;\nin non ssa, computation d dominates all loop exits where d is live\nin non ssa only one def of d in the loop\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n\n\n\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#find-loop-invariant-instructions",
     "href": "lectures/revealjs_05b_licm.qmd.html#find-loop-invariant-instructions",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "find loop invariant instructions,",
     "text": "find loop invariant instructions,"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#naturally-iterative",
     "href": "lectures/revealjs_05b_licm.qmd.html#naturally-iterative",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "naturally iterative",
     "text": "naturally iterative\niterate to convergence\n for each instr in  the loop\n   see if it is loop invar \n   if it is - move it"
   },
   {
     "objectID": "lectures/revealjs_05b_licm.qmd.html#nested-loops",
     "href": "lectures/revealjs_05b_licm.qmd.html#nested-loops",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "nested loops",
     "text": "nested loops\nwe want to process inner loops first\n\nadd all the pre-headers\nwalk the dominator tree in reverse post order - saving all the loop headers"
   },
   {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#def-of-loop-invariant-for-an-instruction-d-op-ab",
+    "href": "lectures/revealjs_05b_licm.qmd.html#def-of-loop-invariant-for-an-instruction-d-op-ab",
+    "title": "classic loop optimizations",
+    "section": "def of loop invariant for an instruction d = op a,b",
+    "text": "def of loop invariant for an instruction d = op a,b\n\na,b are constants or,\na,b defined outside the loop\na,b are loop invariants\n\nin SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#test-at-the-bottom---loop-always-executes-at-least-once",
+    "href": "lectures/revealjs_05b_licm.qmd.html#test-at-the-bottom---loop-always-executes-at-least-once",
+    "title": "classic loop optimizations",
+    "section": "test at the bottom - loop always executes at least once",
+    "text": "test at the bottom - loop always executes at least once\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nl0[\"l0:\"]\npre[\"preheader\"]\nl1[\"l1: i = i +1\"]\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl0--&gt;pre\npre --&gt; l1\nl1--&gt; d1\nd1--&gt; d2\nd3[\"(i &lt; N) goto L1\"]\nd2--&gt; d3\nd3--&gt; l1\nd3--&gt; Next\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nl0[\"l0:\"]\npre[\"preheader\"]\nl1[\"l1: i = i +1\"]\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl0--&gt;pre\npre --&gt; l1\nl1--&gt; d1\nd1--&gt; d2\nd3[\"(i &lt; N) goto L1\"]\nd2--&gt; d3\nd3--&gt; l1\nd3--&gt; Next\n\n\n\n\n\n\ncan move d"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#test-at-the-top",
+    "href": "lectures/revealjs_05b_licm.qmd.html#test-at-the-top",
+    "title": "classic loop optimizations",
+    "section": "test at the top",
+    "text": "test at the top\n\n\nCode\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nl0[\"l0:d = 0\"]\npre[\"preheader\"]\nl1[\"if (i&gt;=N) goto L2 \\nl1: i = i +1\"]\nl0--&gt;pre\npre --&gt; l1\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl1--&gt; d1\nd1--&gt; d2\nd2--&gt; l1\nl1--&gt; l2\nl2--&gt; next\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nl0[\"l0:d = 0\"]\npre[\"preheader\"]\nl1[\"if (i&gt;=N) goto L2 \\nl1: i = i +1\"]\nl0--&gt;pre\npre --&gt; l1\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl1--&gt; d1\nd1--&gt; d2\nd2--&gt; l1\nl1--&gt; l2\nl2--&gt; next\n\n\n\n\n\n\n\nwe can always convert into\n\nloop test at top \n\n\nif (test) {\n  preheader\n  loop test at bottom\n}"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#induction-variable-elimination",
+    "href": "lectures/revealjs_05b_licm.qmd.html#induction-variable-elimination",
+    "title": "classic loop optimizations",
+    "section": "induction variable elimination",
+    "text": "induction variable elimination\nfor (int i = 0; i &lt; 100; ++1){\n    f(a[i])\n}\ncalculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4\nWe want to change the multiply and add to an add"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#transformation",
+    "href": "lectures/revealjs_05b_licm.qmd.html#transformation",
+    "title": "classic loop optimizations",
+    "section": "Transformation",
+    "text": "Transformation\n\na_i = &a[0] before the loop\na_i = a_i + 4 (add the stride) in every iteration\nthe only remaining use of i is the test i &lt; 100, which could become a_i &lt; &a[0] + 4*100 (which is loop invariant)"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#step-1",
+    "href": "lectures/revealjs_05b_licm.qmd.html#step-1",
+    "title": "classic loop optimizations",
+    "section": "step 1",
+    "text": "step 1\n\nfind basic induction variables i = i + e, where e is loop invariant\n\nwhat does this look like in ssa\nfor each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#step-2-find-auxiliary-induction-variables",
+    "href": "lectures/revealjs_05b_licm.qmd.html#step-2-find-auxiliary-induction-variables",
+    "title": "classic loop optimizations",
+    "section": "Step 2 find auxiliary induction variables",
+    "text": "Step 2 find auxiliary induction variables\nj = basic_ind * loop inv + loop invar\nfor (int i = 0; i &lt; n; i++) {\n     j = 2*i + 1;     // Y \n     k = -i;          // Y \n     l = 2*i*i + 1;   // N \n     c = c + 5;       // Y* \n}"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#step-3",
+    "href": "lectures/revealjs_05b_licm.qmd.html#step-3",
+    "title": "classic loop optimizations",
+    "section": "step 3",
+    "text": "step 3\nreplace auxiliary induction variables (derived ) by new variables without the multiply"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#step4",
+    "href": "lectures/revealjs_05b_licm.qmd.html#step4",
+    "title": "classic loop optimizations",
+    "section": "step4",
+    "text": "step4\nif the only remaining use of the induction variable is the termination test, change the test to use the new variable\nsum = 0\nfor (i = 1, i &lt; 100; i++) {\n  sum = sum + a[i -1]\n}\nin SSA form:\n   sum0 = 0\n   i0 = 1\nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t10 = i1 -1 \n   t20 = t10 * 4\n   t30 = t20 + &a\n   t40 = load t30\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   if (i2 &lt;= 100)go to l\n\ni is a basic induction variable\nt10 is a aux induction variable\nt20 is an aux induction variable\nt30 is an aux induction variable\n\nt3 has a use in the load\nt3 = t20 + &a ==&gt; t10 * 4 + &a ==&gt; (i1-1)* 4+ &a\nt3 = 4* i1 + &a - 4\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   t52 = t50 + 4\n   if (i2 &lt;= 100)go to l\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   // i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   //i2 = i1 + 1\n   t52 = t50 + 4\n   if (t52 &lt;= 396 + &a )go to l"
+  },
+  {
+    "objectID": "lectures/revealjs_05b_licm.qmd.html#loop-un-switching",
+    "href": "lectures/revealjs_05b_licm.qmd.html#loop-un-switching",
+    "title": "classic loop optimizations",
+    "section": "loop un-switching",
+    "text": "loop un-switching\nfor (int i = 0 ; i &lt; 100; ++1){\n    if (c) {  // c is loop invariant \n        f(i)\n    } else {\n        g(i)\n    }\n}\nlook for special patterns and replace\nif (c) {  // c is loop invariant \n   for (int i = 0 ; i &lt; 100; ++1){\n        f(i)\n    } \n}else {\n    for (int i = 0 ; i &lt; 100; ++1){\n        g(i)\n    }\n}\nThis is often done before vectorization\nloop fusion\nfor (i = 0; i &lt; 100 ; ++){\n s0:   b[i] = f(a[i])\n}\nfor (i = 0; i &lt; 100 ; ++){\n s1:   c[i] = f(b[i])\n}\n\nwhen is it legal to do this?\nWhen can we get rid of the b array?\n\nThere is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors"
+  },
+  {
     "objectID": "lectures/05b_licm.html",
     "href": "lectures/05b_licm.html",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "",
-    "text": "Loop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop.",
+    "text": "Loop optimizations are important because",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
-    "objectID": "lectures/05b_licm.html#licm",
-    "href": "lectures/05b_licm.html#licm",
-    "title": "loop invariant code motion",
-    "section": "",
-    "text": "Loop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop.",
+    "objectID": "lectures/05b_licm.html#what-are-classic-loop-optimizations",
+    "href": "lectures/05b_licm.html#what-are-classic-loop-optimizations",
+    "title": "classic loop optimizations",
+    "section": "What are classic loop optimizations?",
+    "text": "What are classic loop optimizations?\n\nLoop Invariant Code Motion\nInduction Variable Recognition\nStrength Reduction\nLinear Test Replacement\nLoop Unrolling",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
-    "objectID": "lectures/05b_licm.html#a-very-common-case-for-this-is-matrix-addressing",
-    "href": "lectures/05b_licm.html#a-very-common-case-for-this-is-matrix-addressing",
-    "title": "loop invariant code motion",
-    "section": "A very common case for this is matrix addressing",
-    "text": "A very common case for this is matrix addressing\na[i,j] might expand to to \\(i*4*\\operatorname{stride_{a}} + j *4\\)\nfor j \n  a[i,j] = f(a[i,j+1])\nturns into\na = \nb = \nresult = 0\nfor (){\n    result += a*b\n}",
+    "objectID": "lectures/05b_licm.html#loop-invariant-code-motion",
+    "href": "lectures/05b_licm.html#loop-invariant-code-motion",
+    "title": "classic loop optimizations",
+    "section": "Loop Invariant Code Motion",
+    "text": "Loop Invariant Code Motion\nrecall natural loops\n\nstrongly connected region in the cfg\none entry point (dominates all the nodes in the loop)",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
-    ]
-  },
-  {
-    "objectID": "lectures/05b_licm.html#when-is-a-computation-loop-invariant",
-    "href": "lectures/05b_licm.html#when-is-a-computation-loop-invariant",
-    "title": "loop invariant code motion",
-    "section": "when is a computation loop invariant",
-    "text": "when is a computation loop invariant\nf(a,b)\n\na,b are constants\na,b are defined outside the loop,\na,b are loop invariant\n\nif in ssa there is only one reaching def\nfor non ssa, we need\n\nall reaching defs of a,b defined outside of the loop\nonly one def of a,b reaches the computation and that def is loop invariant",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "loop invariant code motion"
-    ]
-  },
-  {
-    "objectID": "lectures/05b_licm.html#when-is-a-computation-loop-invariant-1",
-    "href": "lectures/05b_licm.html#when-is-a-computation-loop-invariant-1",
-    "title": "loop invariant code motion",
-    "section": "when is a computation loop invariant",
-    "text": "when is a computation loop invariant\na defined outside of the loop (need one definition or ssa )\n\nb = a*2 \n\nd = 5 + b is loop invariant if b\nIn ssa a variable is loop invariant if it does not have a phi function at the header of the loop, or it is defined by a phi function and all the inputs are loop constants\nSSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed",
-    "crumbs": [
-      "EECS 7398",
-      "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#pre-steps---reshape-the-cfg",
     "href": "lectures/05b_licm.html#pre-steps---reshape-the-cfg",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "pre steps - reshape the cfg",
     "text": "pre steps - reshape the cfg\n\nfind the natural loops\nadd pre-header\n\nif we are going to move code we often need to add a special basic block which is called a landing pad or a pre-header create a new block b. change all the preds of the loop header to point to the pre-header, add an edge from b to the loop header",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#pre-header-can-change-phi-nodes",
     "href": "lectures/05b_licm.html#pre-header-can-change-phi-nodes",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "pre-header can change phi nodes",
     "text": "pre-header can change phi nodes\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nC[\"x2=phi(x1,x3)\\ny3=phi(y1,y2,y3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt; C\nB2--&gt; C\nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nC[\"x2=phi(x1,x3)\\ny3=phi(y1,y2,y3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt; C\nB2--&gt; C\nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\nA[\"x1 = 3\"]\nB1[\"y1 = 4\"]\nB2[\"y2 = 5\"]\nLP[\"y3=phi(y1,y2)\"]\nC[\"x2=phi(x1,x3)\\nz1=x2*x3\\nq1=y3*y3\\nw1=y3+2\"]\nD[\"w2=w1+5\"]\nE[\"w3=phi(w1,w2)\\np1=w3+y3\\nx3=x2+1\\nq2=q1+1\"]\nA--&gt; B1\nA--&gt; B2\nB1--&gt;LP --&gt; C\nB2--&gt;LP \nC--&gt;D\nD--&gt; E\nC--&gt; E\nE--&gt; C\nE--&gt; After",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#while-loop-may-not-execute-we-can-restructure-into-a-do-while",
     "href": "lectures/05b_licm.html#while-loop-may-not-execute-we-can-restructure-into-a-do-while",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "while loop may not execute, we can restructure into a do-while",
     "text": "while loop may not execute, we can restructure into a do-while\n\n\nwhile(e) {\n  s(j) \n}\n\nif (e) {\n  t  = j loopinv \n  do {\n    s\n  } while(e)\n}",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#check-for-zero-trip-count",
     "href": "lectures/05b_licm.html#check-for-zero-trip-count",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "check for zero trip count",
-    "text": "check for zero trip count\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next",
+    "text": "check for zero trip count\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TB\nA;\nB[\"if e\"]\nS\nendloop\nnext\nA--&gt; B\nB--&gt; next\nB--&gt; S\nS--&gt; endloop\nendloop --&gt; B\n\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npretest[\"if e\"]\npretest--&gt;next \ndo\ns\nendloop\nposttest[\"if e\"]\nnext\npretest--&gt;do\ndo --&gt; s\ns--&gt; endloop\nendloop--&gt; posttest\nposttest --&gt; do\nposttest --&gt; next\n\n\n\n\n\n\n\n\n\nIn ssa a variable is loop invariant if it does not have a phi function at the header of the loop, or it is defined by a phi function and all the inputs are loop constants\nSSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#licm",
+    "href": "lectures/05b_licm.html#licm",
+    "title": "classic loop optimizations",
+    "section": "licm",
+    "text": "licm\nLoop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop.",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#a-very-common-case-for-this-is-matrix-addressing",
+    "href": "lectures/05b_licm.html#a-very-common-case-for-this-is-matrix-addressing",
+    "title": "classic loop optimizations",
+    "section": "A very common case for this is matrix addressing",
+    "text": "A very common case for this is matrix addressing\na[i,j] might expand to to \\(i*4*\\operatorname{stride_{a}} + j *4\\)\nfor j \n  a[i,j] = f(a[i,j+1])\nturns into\na = \nb = \nresult = 0\nfor (){\n    result += a*b\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#when-is-ok-to-move-a-computation",
     "href": "lectures/05b_licm.html#when-is-ok-to-move-a-computation",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "when is ok to move a computation",
     "text": "when is ok to move a computation\n\nno side effects - cannot move alloc 10 outside of loop;\nin non ssa, computation d dominates all loop exits where d is live\nin non ssa only one def of d in the loop\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"if i &gt; n\" ]\nloop1[\"i = i +1\"]\nd[\"d = a op b\"]\nuse[\"  =d \"]\nnext[\" = d\"]\n\npre--&gt; L1\nL1--&gt; loop1\nloop1--&gt; d\nd--&gt; use \nuse --&gt; L1\nL1 --&gt; next\n\n\n\n\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TB\npre[\"d = 0\"]\nL1[\"i = i +1\\n d= a op b\\n use d\"]\nL2[\"d = 2\\n use d\"]\nL3[\"if (i &lt; n)\"]\npre--&gt; L1\nL1--&gt; L2\nL2--&gt; L3\nL3--&gt; after\nL3 --&gt; L1",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#find-loop-invariant-instructions",
     "href": "lectures/05b_licm.html#find-loop-invariant-instructions",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "find loop invariant instructions,",
     "text": "find loop invariant instructions,",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#naturally-iterative",
     "href": "lectures/05b_licm.html#naturally-iterative",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "naturally iterative",
     "text": "naturally iterative\niterate to convergence\n for each instr in  the loop\n   see if it is loop invar \n   if it is - move it",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
     ]
   },
   {
     "objectID": "lectures/05b_licm.html#nested-loops",
     "href": "lectures/05b_licm.html#nested-loops",
-    "title": "loop invariant code motion",
+    "title": "classic loop optimizations",
     "section": "nested loops",
     "text": "nested loops\nwe want to process inner loops first\n\nadd all the pre-headers\nwalk the dominator tree in reverse post order - saving all the loop headers",
     "crumbs": [
       "EECS 7398",
       "Lectures",
-      "loop invariant code motion"
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#def-of-loop-invariant-for-an-instruction-d-op-ab",
+    "href": "lectures/05b_licm.html#def-of-loop-invariant-for-an-instruction-d-op-ab",
+    "title": "classic loop optimizations",
+    "section": "def of loop invariant for an instruction d = op a,b",
+    "text": "def of loop invariant for an instruction d = op a,b\n\na,b are constants or,\na,b defined outside the loop\na,b are loop invariants\n\nin SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#test-at-the-bottom---loop-always-executes-at-least-once",
+    "href": "lectures/05b_licm.html#test-at-the-bottom---loop-always-executes-at-least-once",
+    "title": "classic loop optimizations",
+    "section": "test at the bottom - loop always executes at least once",
+    "text": "test at the bottom - loop always executes at least once\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nl0[\"l0:\"]\npre[\"preheader\"]\nl1[\"l1: i = i +1\"]\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl0--&gt;pre\npre --&gt; l1\nl1--&gt; d1\nd1--&gt; d2\nd3[\"(i &lt; N) goto L1\"]\nd2--&gt; d3\nd3--&gt; l1\nd3--&gt; Next\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\n\ngraph TD\nl0[\"l0:\"]\npre[\"preheader\"]\nl1[\"l1: i = i +1\"]\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl0--&gt;pre\npre --&gt; l1\nl1--&gt; d1\nd1--&gt; d2\nd3[\"(i &lt; N) goto L1\"]\nd2--&gt; d3\nd3--&gt; l1\nd3--&gt; Next\n\n\n\n\n\n\ncan move d",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#test-at-the-top",
+    "href": "lectures/05b_licm.html#test-at-the-top",
+    "title": "classic loop optimizations",
+    "section": "test at the top",
+    "text": "test at the top\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nl0[\"l0:d = 0\"]\npre[\"preheader\"]\nl1[\"if (i&gt;=N) goto L2 \\nl1: i = i +1\"]\nl0--&gt;pre\npre --&gt; l1\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl1--&gt; d1\nd1--&gt; d2\nd2--&gt; l1\nl1--&gt; l2\nl2--&gt; next\n\n\n\n\n%%{init: {\"flowchart\": {\"htmlLabels\": false}} }%%\ngraph TD\nl0[\"l0:d = 0\"]\npre[\"preheader\"]\nl1[\"if (i&gt;=N) goto L2 \\nl1: i = i +1\"]\nl0--&gt;pre\npre --&gt; l1\nd1[\"d1 = a ⊕ b\"]\nd2[\"   = d1\"]\nl1--&gt; d1\nd1--&gt; d2\nd2--&gt; l1\nl1--&gt; l2\nl2--&gt; next\n\n\n\n\n\n\n\nwe can always convert into\n\nloop test at top \n\n\nif (test) {\n  preheader\n  loop test at bottom\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#induction-variable-elimination",
+    "href": "lectures/05b_licm.html#induction-variable-elimination",
+    "title": "classic loop optimizations",
+    "section": "induction variable elimination",
+    "text": "induction variable elimination\nfor (int i = 0; i &lt; 100; ++1){\n    f(a[i])\n}\ncalculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4\nWe want to change the multiply and add to an add",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#transformation",
+    "href": "lectures/05b_licm.html#transformation",
+    "title": "classic loop optimizations",
+    "section": "Transformation",
+    "text": "Transformation\n\na_i = &a[0] before the loop\na_i = a_i + 4 (add the stride) in every iteration\nthe only remaining use of i is the test i &lt; 100, which could become a_i &lt; &a[0] + 4*100 (which is loop invariant)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#step-1",
+    "href": "lectures/05b_licm.html#step-1",
+    "title": "classic loop optimizations",
+    "section": "step 1",
+    "text": "step 1\n\nfind basic induction variables i = i + e, where e is loop invariant\n\nwhat does this look like in ssa\nfor each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#step-2-find-auxiliary-induction-variables",
+    "href": "lectures/05b_licm.html#step-2-find-auxiliary-induction-variables",
+    "title": "classic loop optimizations",
+    "section": "Step 2 find auxiliary induction variables",
+    "text": "Step 2 find auxiliary induction variables\nj = basic_ind * loop inv + loop invar\nfor (int i = 0; i &lt; n; i++) {\n     j = 2*i + 1;     // Y \n     k = -i;          // Y \n     l = 2*i*i + 1;   // N \n     c = c + 5;       // Y* \n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#step-3",
+    "href": "lectures/05b_licm.html#step-3",
+    "title": "classic loop optimizations",
+    "section": "step 3",
+    "text": "step 3\nreplace auxiliary induction variables (derived ) by new variables without the multiply",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#step4",
+    "href": "lectures/05b_licm.html#step4",
+    "title": "classic loop optimizations",
+    "section": "step4",
+    "text": "step4\nif the only remaining use of the induction variable is the termination test, change the test to use the new variable\nsum = 0\nfor (i = 1, i &lt; 100; i++) {\n  sum = sum + a[i -1]\n}\nin SSA form:\n   sum0 = 0\n   i0 = 1\nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t10 = i1 -1 \n   t20 = t10 * 4\n   t30 = t20 + &a\n   t40 = load t30\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   if (i2 &lt;= 100)go to l\n\ni is a basic induction variable\nt10 is a aux induction variable\nt20 is an aux induction variable\nt30 is an aux induction variable\n\nt3 has a use in the load\nt3 = t20 + &a ==&gt; t10 * 4 + &a ==&gt; (i1-1)* 4+ &a\nt3 = 4* i1 + &a - 4\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   t52 = t50 + 4\n   if (i2 &lt;= 100)go to l\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   // i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   //i2 = i1 + 1\n   t52 = t50 + 4\n   if (t52 &lt;= 396 + &a )go to l",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/05b_licm.html#loop-un-switching",
+    "href": "lectures/05b_licm.html#loop-un-switching",
+    "title": "classic loop optimizations",
+    "section": "loop un-switching",
+    "text": "loop un-switching\nfor (int i = 0 ; i &lt; 100; ++1){\n    if (c) {  // c is loop invariant \n        f(i)\n    } else {\n        g(i)\n    }\n}\nlook for special patterns and replace\nif (c) {  // c is loop invariant \n   for (int i = 0 ; i &lt; 100; ++1){\n        f(i)\n    } \n}else {\n    for (int i = 0 ; i &lt; 100; ++1){\n        g(i)\n    }\n}\nThis is often done before vectorization\nloop fusion\nfor (i = 0; i &lt; 100 ; ++){\n s0:   b[i] = f(a[i])\n}\nfor (i = 0; i &lt; 100 ; ++){\n s1:   c[i] = f(b[i])\n}\n\nwhen is it legal to do this?\nWhen can we get rid of the b array?\n\nThere is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
     ]
   },
   {

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>loop invariant code motion – EECE7398 Fall 2024</title>
+<title>classic loop optimizations – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -135,7 +135,7 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="loop invariant code motion – EECE7398 Fall 2024">
+<meta property="og:title" content="classic loop optimizations – EECE7398 Fall 2024">
 <meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
@@ -153,9 +153,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05b_licm.html">loop invariant code motion</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../lectures/010_compiler_overview.html">Lectures</a></li><li class="breadcrumb-item"><a href="../lectures/05b_licm.html">classic loop optimizations</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">loop invariant code motion</h1>
+<h1 class="title">classic loop optimizations</h1>
 </div>
 
 
@@ -172,47 +172,29 @@ window.Quarto = {
 </header>
 
 
-<section id="licm" class="level2">
-<h2 class="anchored" data-anchor-id="licm">licm</h2>
-<p>Loop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop.</p>
-</section>
-<section id="a-very-common-case-for-this-is-matrix-addressing" class="level2">
-<h2 class="anchored" data-anchor-id="a-very-common-case-for-this-is-matrix-addressing">A very common case for this is matrix addressing</h2>
-<p>a[i,j] might expand to to <span class="math inline">\(i*4*\operatorname{stride_{a}} + j *4\)</span></p>
-<pre><code>for j 
-  a[i,j] = f(a[i,j+1])</code></pre>
-<p>turns into</p>
-<pre><code>a = 
-b = 
-result = 0
-for (){
-    result += a*b
-}</code></pre>
-</section>
-<section id="when-is-a-computation-loop-invariant" class="level2">
-<h2 class="anchored" data-anchor-id="when-is-a-computation-loop-invariant">when is a computation loop invariant</h2>
-<p>f(a,b)</p>
+<p>Loop optimizations are important because</p>
 <ol type="1">
-<li>a,b are constants</li>
-<li>a,b are defined outside the loop,</li>
-<li>a,b are loop invariant</li>
+<li>typically there is a regular access pattern</li>
+<li>the body of a loop gets repeated</li>
+<li>compilers often assume <span class="math inline">\(10^{depth}\)</span> times</li>
 </ol>
-<p>if in ssa there is only one reaching def</p>
-<p>for non ssa, we need</p>
+<section id="what-are-classic-loop-optimizations" class="level2">
+<h2 class="anchored" data-anchor-id="what-are-classic-loop-optimizations">What are classic loop optimizations?</h2>
 <ol type="1">
-<li>all reaching defs of a,b defined outside of the loop</li>
-<li>only one def of a,b reaches the computation and that def is loop invariant</li>
+<li>Loop Invariant Code Motion</li>
+<li>Induction Variable Recognition</li>
+<li>Strength Reduction</li>
+<li>Linear Test Replacement</li>
+<li>Loop Unrolling</li>
 </ol>
 </section>
-<section id="when-is-a-computation-loop-invariant-1" class="level2">
-<h2 class="anchored" data-anchor-id="when-is-a-computation-loop-invariant-1">when is a computation loop invariant</h2>
-<pre><code>a defined outside of the loop (need one definition or ssa )
-
-b = a*2 
-
-d = 5 + b is loop invariant if b</code></pre>
-<p>In ssa a variable is loop invariant if it does not have a phi function at the header of the loop, or it is defined by a phi function and all the inputs are loop constants</p>
-<p>SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed</p>
+<section id="loop-invariant-code-motion" class="level2">
+<h2 class="anchored" data-anchor-id="loop-invariant-code-motion">Loop Invariant Code Motion</h2>
+<p>recall natural loops</p>
+<ol type="1">
+<li>strongly connected region in the cfg</li>
+<li>one entry point (dominates all the nodes in the loop)</li>
+</ol>
 </section>
 <section id="pre-steps---reshape-the-cfg" class="level2">
 <h2 class="anchored" data-anchor-id="pre-steps---reshape-the-cfg">pre steps - reshape the cfg</h2>
@@ -227,24 +209,24 @@ d = 5 + b is loop invariant if b</code></pre>
 <div class="columns">
 <div class="column">
 <div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>A["x1 = 3"]</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>B1["y1 = 4"]</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>B2["y2 = 5"]</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>C["x2=phi(x1,x3)\ny3=phi(y1,y2,y3)\nz1=x2*x3\nq1=y3*y3\nw1=y3+2"]</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>D["w2=w1+5"]</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>E["w3=phi(w1,w2)\np1=w3+y3\nx3=x2+1\nq2=q1+1"]</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>A--&gt; B1</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>A--&gt; B2</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>B1--&gt; C</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>B2--&gt; C</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>C--&gt;D</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>D--&gt; E</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>C--&gt; E</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>E--&gt; C</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>E--&gt; After</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>A["x1 = 3"]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>B1["y1 = 4"]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>B2["y2 = 5"]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>C["x2=phi(x1,x3)\ny3=phi(y1,y2,y3)\nz1=x2*x3\nq1=y3*y3\nw1=y3+2"]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>D["w2=w1+5"]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>E["w3=phi(w1,w2)\np1=w3+y3\nx3=x2+1\nq2=q1+1"]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>A--&gt; B1</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>A--&gt; B2</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>B1--&gt; C</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>B2--&gt; C</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>C--&gt;D</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>D--&gt; E</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>C--&gt; E</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>E--&gt; C</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>E--&gt; After</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
@@ -275,25 +257,25 @@ E--&gt; After
 </div>
 </div><div class="column">
 <div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>A["x1 = 3"]</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>B1["y1 = 4"]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>B2["y2 = 5"]</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>LP["y3=phi(y1,y2)"]</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>C["x2=phi(x1,x3)\nz1=x2*x3\nq1=y3*y3\nw1=y3+2"]</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>D["w2=w1+5"]</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>E["w3=phi(w1,w2)\np1=w3+y3\nx3=x2+1\nq2=q1+1"]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>A--&gt; B1</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>A--&gt; B2</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>B1--&gt;LP --&gt; C</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>B2--&gt;LP </span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>C--&gt;D</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>D--&gt; E</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>C--&gt; E</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>E--&gt; C</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>E--&gt; After</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>A["x1 = 3"]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>B1["y1 = 4"]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>B2["y2 = 5"]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>LP["y3=phi(y1,y2)"]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>C["x2=phi(x1,x3)\nz1=x2*x3\nq1=y3*y3\nw1=y3+2"]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>D["w2=w1+5"]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>E["w3=phi(w1,w2)\np1=w3+y3\nx3=x2+1\nq2=q1+1"]</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>A--&gt; B1</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>A--&gt; B2</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>B1--&gt;LP --&gt; C</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>B2--&gt;LP </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>C--&gt;D</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>D--&gt; E</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>C--&gt; E</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>E--&gt; C</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>E--&gt; After</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
@@ -348,18 +330,18 @@ E--&gt; After
 <div class="columns">
 <div class="column">
 <div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>graph TB</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>A;</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>B["if e"]</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>S</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>endloop</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>next</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>A--&gt; B</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>B--&gt; next</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>B--&gt; S</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>S--&gt; endloop</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>endloop --&gt; B</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>graph TB</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>A;</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>B["if e"]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>S</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>endloop</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>next</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>A--&gt; B</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>B--&gt; next</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>B--&gt; S</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>S--&gt; endloop</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>endloop --&gt; B</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
@@ -385,22 +367,22 @@ endloop --&gt; B
 </div>
 </div><div class="column">
 <div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>pretest["if e"]</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>pretest--&gt;next </span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>do</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>s</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>endloop</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>posttest["if e"]</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>next</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>pretest--&gt;do</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>do --&gt; s</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>s--&gt; endloop</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>endloop--&gt; posttest</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>posttest --&gt; do</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>posttest --&gt; next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>pretest["if e"]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>pretest--&gt;next </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>do</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>s</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>endloop</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>posttest["if e"]</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>next</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>pretest--&gt;do</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>do --&gt; s</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>s--&gt; endloop</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>endloop--&gt; posttest</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>posttest --&gt; do</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>posttest --&gt; next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
@@ -430,6 +412,25 @@ posttest --&gt; next
 </div>
 </div>
 </div>
+<p>In ssa a variable is loop invariant if it does not have a phi function at the header of the loop, or it is defined by a phi function and all the inputs are loop constants</p>
+<p>SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed</p>
+</section>
+<section id="licm" class="level2">
+<h2 class="anchored" data-anchor-id="licm">licm</h2>
+<p>Loop invariant code motion recognizes computations in loop that produce the same value on each iteration and moves them out of the loop.</p>
+</section>
+<section id="a-very-common-case-for-this-is-matrix-addressing" class="level2">
+<h2 class="anchored" data-anchor-id="a-very-common-case-for-this-is-matrix-addressing">A very common case for this is matrix addressing</h2>
+<p>a[i,j] might expand to to <span class="math inline">\(i*4*\operatorname{stride_{a}} + j *4\)</span></p>
+<pre><code>for j 
+  a[i,j] = f(a[i,j+1])</code></pre>
+<p>turns into</p>
+<pre><code>a = 
+b = 
+result = 0
+for (){
+    result += a*b
+}</code></pre>
 </section>
 <section id="when-is-ok-to-move-a-computation" class="level2">
 <h2 class="anchored" data-anchor-id="when-is-ok-to-move-a-computation">when is ok to move a computation</h2>
@@ -441,22 +442,22 @@ posttest --&gt; next
 <div class="columns">
 <div class="column">
 <div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>pre["d = 0"]</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>L1["if i &gt; n" ]</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>loop1["i = i +1"]</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>d["d = a op b"]</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>use["  =d "]</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>next[" = d"]</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>pre--&gt; L1</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>L1--&gt; loop1</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>loop1--&gt; d</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>d--&gt; use </span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>use --&gt; L1</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>L1 --&gt; next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>pre["d = 0"]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>L1["if i &gt; n" ]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>loop1["i = i +1"]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>d["d = a op b"]</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>use["  =d "]</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>next[" = d"]</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>pre--&gt; L1</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>L1--&gt; loop1</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>loop1--&gt; d</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>d--&gt; use </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>use --&gt; L1</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>L1 --&gt; next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
@@ -485,18 +486,18 @@ L1 --&gt; next
 </div>
 </div><div class="column">
 <div class="cell" data-layout-align="default">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>pre["d = 0"]</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>L1["i = i +1\n d= a op b\n use d"]</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>L2["d = 2\n use d"]</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>L3["if (i &lt; n)"]</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>pre--&gt; L1</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>L1--&gt; L2</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>L2--&gt; L3</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>L3--&gt; after</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>L3 --&gt; L1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>graph TB</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>pre["d = 0"]</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>L1["i = i +1\n d= a op b\n use d"]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>L2["d = 2\n use d"]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>L3["if (i &lt; n)"]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>pre--&gt; L1</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>L1--&gt; L2</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>L2--&gt; L3</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>L3--&gt; after</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>L3 --&gt; L1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
@@ -540,6 +541,242 @@ L3 --&gt; L1
 <li>add all the pre-headers</li>
 <li>walk the dominator tree in reverse post order - saving all the loop headers</li>
 </ol>
+</section>
+<section id="def-of-loop-invariant-for-an-instruction-d-op-ab" class="level2">
+<h2 class="anchored" data-anchor-id="def-of-loop-invariant-for-an-instruction-d-op-ab">def of loop invariant for an instruction d = op a,b</h2>
+<ol type="1">
+<li>a,b are constants or,</li>
+<li>a,b defined outside the loop</li>
+<li>a,b are loop invariants</li>
+</ol>
+<p>in SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop</p>
+</section>
+<section id="test-at-the-bottom---loop-always-executes-at-least-once" class="level2">
+<h2 class="anchored" data-anchor-id="test-at-the-bottom---loop-always-executes-at-least-once">test at the bottom - loop always executes at least once</h2>
+<div class="cell" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>l0["l0:"]</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>pre["preheader"]</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>l1["l1: i = i +1"]</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>d1["d1 = a ⊕ b"]</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>d2["   = d1"]</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>l0--&gt;pre</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>pre --&gt; l1</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>l1--&gt; d1</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>d1--&gt; d2</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>d3["(i &lt; N) goto L1"]</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>d2--&gt; d3</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>d3--&gt; l1</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>d3--&gt; Next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+l0["l0:"]
+pre["preheader"]
+l1["l1: i = i +1"]
+d1["d1 = a ⊕ b"]
+d2["   = d1"]
+l0--&gt;pre
+pre --&gt; l1
+l1--&gt; d1
+d1--&gt; d2
+d3["(i &lt; N) goto L1"]
+d2--&gt; d3
+d3--&gt; l1
+d3--&gt; Next
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>can move d</p>
+</section>
+<section id="test-at-the-top" class="level2">
+<h2 class="anchored" data-anchor-id="test-at-the-top">test at the top</h2>
+<div class="cell" data-layout-align="default">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>l0["l0:d = 0"]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>pre["preheader"]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>l1["if (i&gt;=N) goto L2 \nl1: i = i +1"]</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>l0--&gt;pre</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>pre --&gt; l1</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>d1["d1 = a ⊕ b"]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>d2["   = d1"]</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>l1--&gt; d1</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>d1--&gt; d2</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>d2--&gt; l1</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>l1--&gt; l2</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>l2--&gt; next</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+l0["l0:d = 0"]
+pre["preheader"]
+l1["if (i&gt;=N) goto L2 \nl1: i = i +1"]
+l0--&gt;pre
+pre --&gt; l1
+d1["d1 = a ⊕ b"]
+d2["   = d1"]
+l1--&gt; d1
+d1--&gt; d2
+d2--&gt; l1
+l1--&gt; l2
+l2--&gt; next
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>we can always convert into</p>
+<pre><code>
+loop test at top 
+
+
+if (test) {
+  preheader
+  loop test at bottom
+}</code></pre>
+</section>
+<section id="induction-variable-elimination" class="level2">
+<h2 class="anchored" data-anchor-id="induction-variable-elimination">induction variable elimination</h2>
+<pre><code>for (int i = 0; i &lt; 100; ++1){
+    f(a[i])
+}</code></pre>
+<p>calculate a[i] as: &amp;a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4</p>
+<p>We want to change the multiply and add to an add</p>
+</section>
+<section id="transformation" class="level2">
+<h2 class="anchored" data-anchor-id="transformation">Transformation</h2>
+<ol type="1">
+<li>a_i = &amp;a[0] before the loop</li>
+<li>a_i = a_i + 4 (add the stride) in every iteration</li>
+<li>the only remaining use of i is the test i &lt; 100, which could become a_i &lt; &amp;a[0] + 4*100 (which is loop invariant)</li>
+</ol>
+</section>
+<section id="step-1" class="level2">
+<h2 class="anchored" data-anchor-id="step-1">step 1</h2>
+<ol type="1">
+<li>find basic induction variables i = i + e, where e is loop invariant</li>
+</ol>
+<p>what does this look like in ssa</p>
+<p>for each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions</p>
+</section>
+<section id="step-2-find-auxiliary-induction-variables" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-find-auxiliary-induction-variables">Step 2 find auxiliary induction variables</h2>
+<p>j = basic_ind * loop inv + loop invar</p>
+<pre><code>for (int i = 0; i &lt; n; i++) {
+     j = 2*i + 1;     // Y 
+     k = -i;          // Y 
+     l = 2*i*i + 1;   // N 
+     c = c + 5;       // Y* 
+}</code></pre>
+</section>
+<section id="step-3" class="level2">
+<h2 class="anchored" data-anchor-id="step-3">step 3</h2>
+<p>replace auxiliary induction variables (derived ) by new variables without the multiply</p>
+</section>
+<section id="step4" class="level2">
+<h2 class="anchored" data-anchor-id="step4">step4</h2>
+<p>if the only remaining use of the induction variable is the termination test, change the test to use the new variable</p>
+<pre><code>sum = 0
+for (i = 1, i &lt; 100; i++) {
+  sum = sum + a[i -1]
+}</code></pre>
+<p>in SSA form:</p>
+<pre><code>   sum0 = 0
+   i0 = 1
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t10 = i1 -1 
+   t20 = t10 * 4
+   t30 = t20 + &amp;a
+   t40 = load t30
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   if (i2 &lt;= 100)go to l</code></pre>
+<ol type="1">
+<li>i is a basic induction variable</li>
+<li>t10 is a aux induction variable</li>
+<li>t20 is an aux induction variable</li>
+<li>t30 is an aux induction variable</li>
+</ol>
+<p>t3 has a use in the load</p>
+<p>t3 = t20 + &amp;a ==&gt; t10 * 4 + &amp;a ==&gt; (i1-1)* 4+ &amp;a</p>
+<p>t3 = 4* i1 + &amp;a - 4</p>
+<pre><code>   sum0 = 0
+   i0 = 1
+   t50 = &amp;a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &amp;a
+   t40 = load t50
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   t52 = t50 + 4
+   if (i2 &lt;= 100)go to l</code></pre>
+<pre><code>   sum0 = 0
+   i0 = 1
+   t50 = &amp;a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   // i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &amp;a
+   t40 = load t50
+   sum2 = sum1 + t40
+   //i2 = i1 + 1
+   t52 = t50 + 4
+   if (t52 &lt;= 396 + &amp;a )go to l</code></pre>
+</section>
+<section id="loop-un-switching" class="level2">
+<h2 class="anchored" data-anchor-id="loop-un-switching">loop un-switching</h2>
+<pre><code>for (int i = 0 ; i &lt; 100; ++1){
+    if (c) {  // c is loop invariant 
+        f(i)
+    } else {
+        g(i)
+    }
+}</code></pre>
+<p>look for special patterns and replace</p>
+<pre><code>if (c) {  // c is loop invariant 
+   for (int i = 0 ; i &lt; 100; ++1){
+        f(i)
+    } 
+}else {
+    for (int i = 0 ; i &lt; 100; ++1){
+        g(i)
+    }
+}</code></pre>
+<p>This is often done before vectorization</p>
+<p>loop fusion</p>
+<pre><code>for (i = 0; i &lt; 100 ; ++){
+ s0:   b[i] = f(a[i])
+}
+for (i = 0; i &lt; 100 ; ++){
+ s1:   c[i] = f(b[i])
+}</code></pre>
+<ol type="1">
+<li>when is it legal to do this?</li>
+<li>When can we get rid of the b array?</li>
+</ol>
+<p>There is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors</p>
 
 
 </section>
