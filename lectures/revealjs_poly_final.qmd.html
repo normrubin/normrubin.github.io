@@ -620,7 +620,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section id="forward-order" class="slide level2">
 <h2>forward order</h2>
-<div id="60e0952d" class="cell" data-execution_count="2">
+<div id="eafff693" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a></a>iteration_space <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
@@ -642,7 +642,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section id="backward-order" class="slide level2">
 <h2>backward order</h2>
-<div id="f6b9c90d" class="cell" data-execution_count="3">
+<div id="10e50497" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a></a>iteration_space <span class="op">=</span> [<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>]</span>
@@ -717,7 +717,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section id="visualization-1" class="slide level2">
 <h2>visualization</h2>
-<div id="64611de7" class="cell" data-execution_count="4">
+<div id="5e1676a2" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a></a>iteration_space <span class="op">=</span> [(<span class="dv">1</span>,<span class="dv">1</span>),(<span class="dv">1</span>,<span class="dv">2</span>),(<span class="dv">1</span>,<span class="dv">3</span>),(<span class="dv">1</span>,<span class="dv">4</span>),</span>
@@ -758,7 +758,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section id="example-diagonal-scheduling-code" class="slide level2">
 <h2>Example: Diagonal Scheduling Code</h2>
-<div id="8f15ce4e" class="cell" data-execution_count="5">
+<div id="0f23a7d1" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a></a><span class="co"># Organize the iteration space by diagonals</span></span>
@@ -784,7 +784,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 </section>
 <section id="visualizing-the-parallel-schedule" class="slide level2">
 <h2>Visualizing the parallel schedule:</h2>
-<div id="a397f693" class="cell" data-execution_count="6">
+<div id="effc5e23" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-stdout">
 <pre><code>Schedule:  [(1, 1), (1, 2), (2, 1), (1, 3), (2, 2), (3, 1), (1, 4), (2, 3), (3, 2), (4, 1), (2, 4), (3, 3), (4, 2), (3, 4), (4, 3), (4, 4)]</code></pre>
 </div>
@@ -995,7 +995,7 @@ N
 </section>
 <section id="domain" class="slide level2">
 <h2>domain</h2>
-<div id="2858a03a" class="cell" data-execution_count="7">
+<div id="7eff5d64" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -1131,7 +1131,7 @@ for (j = 0; j &lt;=6; j++)
 </section>
 <section id="graph-with-tiles" class="slide level2">
 <h2>graph with tiles</h2>
-<div id="d13674d3" class="cell" data-execution_count="8">
+<div id="70dc5acb" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-stdout">
 <pre><code>Data Dependence for A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5
 [((1, 1), (1, 2)), ((1, 2), (1, 3)), ((1, 3), (1, 4)), ((1, 4), (1, 5)), ((1, 5), (1, 6)), ((1, 6), (1, 7)), ((1, 7), (1, 8)), ((1, 2), (2, 2)), ((2, 1), (2, 2)), ((1, 3), (2, 3)), ((2, 2), (2, 3)), ((1, 4), (2, 4)), ((2, 3), (2, 4)), ((1, 5), (2, 5)), ((2, 4), (2, 5)), ((1, 6), (2, 6)), ((2, 5), (2, 6)), ((1, 7), (2, 7)), ((2, 6), (2, 7)), ((1, 8), (2, 8)), ((2, 7), (2, 8)), ((2, 3), (3, 3)), ((3, 2), (3, 3)), ((2, 4), (3, 4)), ((3, 3), (3, 4)), ((2, 5), (3, 5)), ((3, 4), (3, 5)), ((2, 6), (3, 6)), ((3, 5), (3, 6)), ((2, 7), (3, 7)), ((3, 6), (3, 7)), ((2, 8), (3, 8)), ((3, 7), (3, 8)), ((3, 4), (4, 4)), ((4, 3), (4, 4)), ((3, 5), (4, 5)), ((4, 4), (4, 5)), ((3, 6), (4, 6)), ((4, 5), (4, 6)), ((3, 7), (4, 7)), ((4, 6), (4, 7)), ((3, 8), (4, 8)), ((4, 7), (4, 8)), ((4, 5), (5, 5)), ((5, 4), (5, 5)), ((4, 6), (5, 6)), ((5, 5), (5, 6)), ((4, 7), (5, 7)), ((5, 6), (5, 7)), ((4, 8), (5, 8)), ((5, 7), (5, 8)), ((5, 6), (6, 6)), ((6, 5), (6, 6)), ((5, 7), (6, 7)), ((6, 6), (6, 7)), ((5, 8), (6, 8)), ((6, 7), (6, 8)), ((6, 7), (7, 7)), ((7, 6), (7, 7)), ((6, 8), (7, 8)), ((7, 7), (7, 8)), ((7, 8), (8, 8)), ((8, 7), (8, 8))]</code></pre>
