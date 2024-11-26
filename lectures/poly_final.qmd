@@ -957,6 +957,85 @@ which gave me a solution:
 
 s(4,2) reads  s(3,3) but s(4,2) executes first 
 
+
+## Classic transformations 
+
+## loop reversal 
+
+transformation:  [i] ==> [-i]
+
+```
+for (int c0 = 0; c0 < n; c0 += 1)
+  S(c0);
+
+for (int c0 = -n + 1; c0 <= 0; c0 += 1)
+  S(-c0);
+```
+
+## loop fusion 
+
+transformation: [0, i] -> [i,0]; [1, i] -> [i, 1]
+
+```
+{
+  for (int c1 = 0; c1 <= n; c1 += 1)
+    S(c1);
+  for (int c1 = 0; c1 <= n; c1 += 1)
+    T(c1);
+}
+for (int c0 = 0; c0 <= n; c0 += 1) {
+  S(c0);
+  T(c0);
+}
+```
+
+## loop fission 
+
+transformation: [i, 0] -> [0, i]; [i, 1] -> [1, i]
+
+```
+for (int c0 = 0; c0 <= n; c0 += 1) {
+  S(c0);
+  T(c0);
+}
+{
+  for (int c1 = 0; c1 <= n; c1 += 1)
+    S(c1);
+  for (int c1 = 0; c1 <= n; c1 += 1)
+    T(c1);
+}
+```
+
+## strip mining 
+
+transformation: [i] -> [floor(i/4), i % 4]
+
+```
+for (int c0 = 0; c0 <= 1023; c0 += 1)
+  S(c0);
+
+for (int c0 = 0; c0 <= 255; c0 += 1)
+  for (int c1 = 0; c1 <= 3; c1 += 1)
+    S(4 * c0 + c1);
+```
+
+## loop tiling 
+
+transformation: [i,j] -> [floor(i/4), i % 4, floor(j/4), j % 4]
+
+```
+for (int c0 = 0; c0 <= 1023; c0 += 1)
+  for (int c1 = 0; c1 <= 1023; c1 += 1)
+    S(c0, c1);
+
+for (int c0 = 0; c0 <= 255; c0 += 1)
+  for (int c1 = 0; c1 <= 3; c1 += 1)
+    for (int c2 = 0; c2 <= 255; c2 += 1)
+      for (int c3 = 0; c3 <= 3; c3 += 1)
+        S(4 * c0 + c1, 4 * c2 + c3);
+
+```
+
 ## finding transformations:
 
 ```
@@ -1013,7 +1092,32 @@ We apply a theorem called the affine form of the Farkas lemma which turns this i
 
 An affine form is non-negative over a polyhedron if and only if it can be be written as a non-negative combination of the constraints that form the polyhedron 
 
+forall $0 \le i \le 5$ and $0 \le j \le 5$ and $i = j$ 
+
+such that $-\alpha_1 * i + \alpha_2  * j + (\beta_1 - \beta_2) \ge 0$ affine form
+
+polyhedron 
+
+- $i \ge 0$
+- $-i \ge -5$
+- $j \ge 0$
+- $-j \ge -5$
+- $j - i \ge 0$
+- $i=j \ge 0$
+
+## optimization problem 
+
+find a function that gives the locality 
+
+minimize w: $w \ge \alpha_2 * i + \beta_2 - \alpha_1 * j - \beta_1$
+
+w is a bound in time between producer and consumer, how long the location needs to stay in the local memory 
+
 ## parallelism 
 
 we minimized the time between definition and use, for best locality, if we maximize that time we get the most parallel code 
 
+
+## objectives 
+
+Since everything is affine it is hard to formulate a complex cost function 
