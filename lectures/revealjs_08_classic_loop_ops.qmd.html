@@ -9,7 +9,7 @@
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.6.37">
 
-  <title>EECE7398 Fall 2024 – Representation of programs</title>
+  <title>EECE7398 Fall 2024 – classic loop optimizations</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -27,71 +27,6 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-    /* CSS for syntax highlighting */
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="../site_libs/revealjs/dist/theme/quarto-bbe7401fe57d4b791b917637bb662036.css">
   <link href="../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -188,10 +123,7 @@
       margin-right: 0; 
     }
   </style>
-  <script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-  <script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-  <link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
-<meta property="og:title" content="Representation of programs – EECE7398 Fall 2024">
+<meta property="og:title" content="classic loop optimizations – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 <body class="quarto-light">
@@ -199,378 +131,226 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Representation of programs</h1>
+  <h1 class="title">classic loop optimizations</h1>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="how-do-we-represent-programs" class="slide level2">
-<h2>How do we represent programs</h2>
-<p>The representation of a program</p>
-<p>What we read in and read out when transforming a program.</p>
-<p>What kind of properties make a good representation?</p>
-<p>This lecture explores different representations and their implications.</p>
-<div id="d5e2216f" class="cell" data-execution_count="1">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a></a><span class="im">from</span> graphviz <span class="im">import</span> Digraph</span>
-<span id="cb1-2"><a></a><span class="im">import</span> ast</span>
-<span id="cb1-3"><a></a><span class="im">import</span> os </span>
-<span id="cb1-4"><a></a></span>
-<span id="cb1-5"><a></a><span class="kw">def</span> cmd(x):</span>
-<span id="cb1-6"><a></a>  os.system(x)</span>
-<span id="cb1-7"><a></a>  </span>
-<span id="cb1-8"><a></a><span class="kw">def</span> ast_syntax(line):</span>
-<span id="cb1-9"><a></a>  <span class="cf">return</span> ast.dump(ast.parse(line).body[<span class="dv">0</span>], indent<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb1-10"><a></a></span>
-<span id="cb1-11"><a></a>  </span>
-<span id="cb1-12"><a></a><span class="co"># Define a function to recursively add nodes to the Digraph</span></span>
-<span id="cb1-13"><a></a><span class="kw">def</span> add_node(dot, node, parent<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb1-14"><a></a>  node_name <span class="op">=</span> <span class="bu">str</span>(node.__class__.<span class="va">__name__</span>)</span>
-<span id="cb1-15"><a></a>  dot.node(<span class="bu">str</span>(<span class="bu">id</span>(node)), node_name)</span>
-<span id="cb1-16"><a></a>  <span class="cf">if</span> parent:</span>
-<span id="cb1-17"><a></a>    dot.edge(<span class="bu">str</span>(<span class="bu">id</span>(parent)), <span class="bu">str</span>(<span class="bu">id</span>(node)))</span>
-<span id="cb1-18"><a></a>  <span class="cf">for</span> child <span class="kw">in</span> ast.iter_child_nodes(node):</span>
-<span id="cb1-19"><a></a>    add_node(dot, child, node)</span>
-<span id="cb1-20"><a></a></span>
-<span id="cb1-21"><a></a><span class="co"># Add nodes to the Digraph</span></span>
-<span id="cb1-22"><a></a></span>
-<span id="cb1-23"><a></a><span class="kw">def</span> graph(line):</span>
-<span id="cb1-24"><a></a>  dot <span class="op">=</span> Digraph()</span>
-<span id="cb1-25"><a></a>  add_node(dot, ast.parse(line).body[<span class="dv">0</span>])</span>
-<span id="cb1-26"><a></a>  <span class="cf">return</span> dot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</section>
-<section id="concrete-syntax" class="slide level2">
-<h2>Concrete Syntax</h2>
-<p><strong><em>Concrete syntax</em></strong>, or surface syntax, represents programs as they are written</p>
-<p>Programs are text or surface syntax- just what you would type into an editor.</p>
-<pre><code>value = 8
-result = 1
-for i in range(value):
-  result = result + i
-print(result)</code></pre>
-<p>What is good and what is bad about this representation?</p>
-<p>What is the level of abstraction?</p>
-<p>How do you understand the semantics.</p>
-</section>
-<section id="abstract-syntax" class="slide level2 scrollable">
-<h2>Abstract syntax</h2>
-<p>Abstract syntax represents programs as tree structures, focusing on the nodes and their connections.</p>
-<ol type="1">
-<li>Nodes are parts of the program,</li>
-<li>Edges show how they are connected.</li>
-</ol>
-<p>We can write this as a list or a graph</p>
-<div class="columns">
-<div class="column">
-<pre><code>def pgm():
-    value = 8
-    result = 1
-    for i in range(value):
-        result = result * i
-    print(result)</code></pre>
-</div><div class="column">
-<p><img data-src="images/abst.png"></p>
-</div></div>
-</section>
-<section id="ast-tree-representation" class="slide level2 scrollable">
-<h2>AST tree representation</h2>
-<p>An AST is a tree structure, nodes like ‘if’, ‘test’, ‘body’, assign’.</p>
-<p>Each node is one concept from the program</p>
-<p>Recursive function can walk over the tree, one chunk of code for each node.</p>
-<ol type="1">
-<li>Good - each type of node is different, making special cases are easy</li>
-<li>Bad - each type of node is different so analysis has to know about every type, making general cases hard</li>
-</ol>
-<p>This is the classic way to write an interpreter.</p>
-<p>Simple (non optimizing) compilers often use this format.</p>
-</section>
-<section id="a-more-regular-representation" class="slide level2">
-<h2>A more regular representation</h2>
-<p>Programs are lists of instructions. Like an assembly instructions. Same sort of representation as LLVM.</p>
-<p><strong><em>ts2bril images/toy.ts | bril2txt</em></strong></p>
-<div class="columns">
-<div class="column" style="width:45%;">
-<pre><code>    //typescript program 
-    let value = 8
-    let result = 1
-    for (let i = 0; i &lt; value;
-         i = i+1)
-    {
-        result = result * i
-    }
-    console.log(result)</code></pre>
-</div><div class="column" style="width:5%;">
-<!-- empty column to create gap -->
-</div><div class="column" style="width:40%;">
-<pre><code>@main {
-  v0: float = const 8;
-  value: float = id v0;
-  v1: float = const 1;
-  result: float = id v1;
-  v3: float = const 0;
-  i: float = id v3;
-.for.cond.2:
-  v4: float = id i;
-  v5: float = id value;
-  v6: bool = flt v4 v5;
-  br v6 .for.body.2 .for.end.2;
-.for.body.2:
-  v7: float = id result;
-  v8: float = id i;
-  v9: float = fmul v7 v8;
-  result: float = id v9;
-  v10: float = id i;
-  v11: float = const 1;
-  v12: float = fadd v10 v11;
-  i: float = id v12;
-  jmp .for.cond.2;
-.for.end.2:
-  v13: float = id result;
-  print v13;
-  v14: int = const 0;
-}
-</code></pre>
-</div></div>
-</section>
-<section id="bril" class="slide level2 scrollable">
-<h2>bril</h2>
-<ol type="1">
-<li><p>Looks like assembly</p></li>
-<li><p>no limit on registers,</p></li>
-<li><p>no condition codes.</p></li>
-<li><p>fully typed,</p></li>
-<li><p>no complex addressing modes.</p></li>
-<li><p>easy to extend</p></li>
-</ol>
-</section>
-<section id="bril-syntax" class="slide level2 scrollable">
-<h2>Bril syntax</h2>
-<p>Declare functions, labels, instructions</p>
-<p>instruction:</p>
-<ol type="1">
-<li>variable type = opcode arguments</li>
-<li>opcode list of arguments</li>
-</ol>
-<p>Form 1, variable is the destination, like a: int = add b, c</p>
-<p>Form 2, no destination, like print a</p>
-<p>what is good and what is about this representation?</p>
-</section>
-<section>
-<section id="using-bril---control-flow-graph" class="title-slide slide level1 center">
-<h1>Using Bril - Control Flow Graph</h1>
-<p>extract info from this representation.</p>
-</section>
-<section id="control-flow-graph-cfg-version-1" class="slide level2 scrollable">
-<h2>control flow graph (CFG) (version 1)</h2>
-<p>Representation is a directed graph.</p>
-<ol type="1">
-<li>Nodes are instructions,</li>
-<li>edges indicate <strong><em>possible</em></strong> flow of control,</li>
-<li>one entry and one exit node.</li>
-</ol>
-</section>
-<section id="example-one" class="slide level2">
-<h2>Example one</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource {bril} number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a></a>@main {</span>
-<span id="cb6-2"><a></a>    v: int = const 5;</span>
-<span id="cb6-3"><a></a>    print v;</span>
-<span id="cb6-4"><a></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb7-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb7-2"><a></a></span>
-<span id="cb7-3"><a></a>%%| fig-width: 10</span>
-<span id="cb7-4"><a></a>%%| fig-height: 9</span>
-<span id="cb7-5"><a></a></span>
-<span id="cb7-6"><a></a>flowchart LR</span>
-<span id="cb7-7"><a></a>A[const] --&gt; B[print]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-
-%%| fig-width: 10
-%%| fig-height: 9
-
-flowchart LR
-A[const] --&gt; B[print]
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="second-example" class="slide level2">
-<h2>second example</h2>
-<pre><code>    @main {
-        v: int = const 4;
-        jmp  .somewhere;
-        v: int = const 2;
-        .somewhere;
-        print v;
-    }</code></pre>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb9-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb9-2"><a></a></span>
-<span id="cb9-3"><a></a>%%| fig-width: 6.5</span>
-<span id="cb9-4"><a></a>flowchart LR</span>
-<span id="cb9-5"><a></a>  A[const 4] --&gt; B[jmp]</span>
-<span id="cb9-6"><a></a>  B --&gt; C[print]</span>
-<span id="cb9-7"><a></a>  D[const 2] --&gt; C</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-
-%%| fig-width: 6.5
-flowchart LR
-  A[const 4] --&gt; B[jmp]
-  B --&gt; C[print]
-  D[const 2] --&gt; C
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>notice label does not produce a node</p>
-<p>Easy to see a dead instruction.</p>
-</div>
-</section>
-<section id="third-example" class="slide level2">
-<h2>Third example:</h2>
-<pre><code>    @main {
-        v: int = const 4;
-        b: bool = const false;
-        br b .there .here;
-    .here:
-        v: int = const 2;
-    .there;
-        print v;
-    }</code></pre>
-<div class="fragment">
-<div class="cell" data-reveal="true" data-layout-align="default">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb11-1"><a></a>%%{init: {"flowchart": {"htmlLabels": false}} }%%</span>
-<span id="cb11-2"><a></a></span>
-<span id="cb11-3"><a></a>%%| fig-width: 6.5</span>
-<span id="cb11-4"><a></a>flowchart LR</span>
-<span id="cb11-5"><a></a>  A[v: int const 4] --&gt; B[b: bool const false]</span>
-<span id="cb11-6"><a></a>  B --&gt; C[br b .there, .false]</span>
-<span id="cb11-7"><a></a>  C --&gt; D[v: const 2]</span>
-<span id="cb11-8"><a></a>  C --&gt; E[print v]</span>
-<span id="cb11-9"><a></a>  D --&gt; E</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<p></p><figure class=""><p></p>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-
-%%| fig-width: 6.5
-flowchart LR
-  A[v: int const 4] --&gt; B[b: bool const false]
-  B --&gt; C[br b .there, .false]
-  C --&gt; D[v: const 2]
-  C --&gt; E[print v]
-  D --&gt; E
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-</div>
-<div class="fragment">
-<p>which is the true edge and which is the false edge , could mark the edges or use a convention</p>
-<p>Which is the entry, which is the exit?</p>
-<p>There is a long chain of instructions entered at the top, exit at the bottom, no branches inside.</p>
-</div>
-</section>
-<section id="cfg-cfg-form-2" class="slide level2 scrollable">
-<h2>CFG (cfg form 2)</h2>
-<ol type="1">
-<li>nodes ares sequences of instructions.</li>
-<li>jumps and branches can only be at the end of a sequence</li>
-<li>only label has to be at the start</li>
-<li>every instruction in the sequence executes the same number of times</li>
-</ol>
-</section>
-<section id="construct-cfg" class="slide level2">
-<h2>construct cfg</h2>
-<p>walk over the instructions:</p>
-<p>As we construct basic blocks, we can add instructions up till something that ends the block (<strong><em>terminator</em></strong>)</p>
-<p>Option: do all blocks end in a terminator or not?</p>
-<p>given a block b, the <strong><em>predecessors</em></strong> of <span class="math inline">\(b\)</span> are the blocks <span class="math inline">\(b_{in}\)</span> where there is an edge <span class="math inline">\(b_{in}-&gt;b\)</span>. And the <strong><em>successors</em></strong> of <span class="math inline">\(b\)</span> are the <span class="math inline">\(b_{out}\)</span> where <span class="math inline">\(b-&gt;b_{out}\)</span> is an edge.</p>
-</section>
-<section id="what-is-an-algorithm-that-forms-a-cfg" class="slide level2 scrollable">
-<h2>What is an algorithm that forms a cfg</h2>
-<div class="fragment">
-<ol type="1">
-<li>just find all the basic blocks</li>
-<li>add the control flow edges</li>
-</ol>
-</div>
-</section>
-<section id="pseudo-code-to-construct-cfg" class="slide level2 scrollable">
-<h2>pseudo code to construct cfg</h2>
-<ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
-</ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []</code></pre>
-</section>
 <section class="slide level2 scrollable">
 
-<p>step 2 we need a map from labels to basic blocks</p>
+<p>Loops optimizations are important because</p>
 <ol type="1">
-<li>in: instructions - list of instructions</li>
-<li>out blocks - list of lists of instructions</li>
+<li>typically there is a regular access pattern</li>
+<li>the body of a loop gets repeated</li>
+<li>compilers often assume <span class="math inline">\(10^{depth}\)</span> times</li>
 </ol>
-<pre><code>current_block = []
-for i in instructions:
-    if i is not a label:
-       block.append(i)
-    if i is a label or terminator:
-        blocks.append(current_block)
-        current_block = []
-    
+<p>What are classic loop optimizations?</p>
+<ol type="1">
+<li>Loop Invariant Code Motion</li>
+<li>Induction Variable Recognition</li>
+<li>Strength Reduction</li>
+<li>Linear Test Replacement</li>
+<li>Loop Unrolling</li>
+</ol>
+<p>Less classic loop optimizations</p>
+<ol type="1">
+<li>Scalar replacement</li>
+<li>Loop Interchange</li>
+<li>Loop Fusion</li>
+<li>Loop Distribution (also known as Fision</li>
+<li>Loop Skewing</li>
+<li>Loop Reversal</li>
+</ol>
+<p>First recall natural loops</p>
+<ol type="1">
+<li>strongly connected region in the cfg</li>
+<li>one entry point (dominates all the nodes in the loop)</li>
+</ol>
+<p>def of loop invariant for an instruction d = op a,b</p>
+<ol type="1">
+<li>a,b are constants or,</li>
+<li>a,b defined outside the loop</li>
+<li>a,b are loop invariants</li>
+</ol>
+<p>in SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop</p>
+<p>conditions when moving an instruction d = a op b is ok</p>
+<pre><code>L0: d = 0 
+preheader: 
+L1: i = i + 1 
+d = a ⊕ b 
+     = d 
+if (i&lt;N) goto L1 
+L2: x = d </code></pre>
+<p>can move d</p>
+<p>L0: d = 0 preheader L1: if (i&gt;=N) goto L2 i = i + 1 d = a ⊕ b = d goto L1 L2: x = d ```</p>
+<p>no good d used after the loop, would not be changed if the loop executes zero times</p>
+<pre><code>L0: d = 0 
+preheader 
+L1: i = i + 1 
+d = a ⊕ b 
+  = d 
+d = 0 
+  = d 
+if (i&lt;N) goto L1
+L2: L0: d = 0 </code></pre>
+<p>no good d reassigned in the loop, do invar would be changed</p>
+<pre><code>l0: d = 0 
+preheader 
+L1: = d 
+i = i + 1 
+d = a ⊕ b 
+   = d 
+if (i&lt;N) goto L1 
+L2: x = d
 
-for block in blocks:
-   last = block[-1]
-   if last is a jmp (one successor)
-      add edge from block to last.dest 
-   else if last is a br (two successors)
-      add two edges from block to last.true, last.false 
-   else  fall through 
-      add edge to next block (if it exists)</code></pre>
+
+conditions without SSA
+
+1) the instruction dominates all the loop exits, where d is still live 
+1) d is only defined once 
+1) d in not live before the instruction 
+
+in SSA
+
+1) is d is live in some block after the loop, then d has to dominate that block
+2) clear 
+3) clear 
 
 
-</section></section>
+Suppose the loop might run zero times 
+</code></pre>
+<p>while (e) { j = loopinv // may never execute S }</p>
+<p>j = loopinv // always executes while (e) { S }</p>
+<pre><code>
+can be converted into </code></pre>
+<p>if (e) { j = loopinv // may never execute while (e) { S }</p>
+<p>} ````</p>
+</section>
+<section id="induction-variable-elimination" class="slide level2 scrollable">
+<h2>induction variable elimination</h2>
+<pre><code>for (int i = 0; i &lt; 100; ++1){
+    f(a[i])
+}</code></pre>
+<p>calculate a[i] as: &amp;a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4</p>
+<ol type="1">
+<li>a_i = &amp;a[0] before the loop</li>
+<li>a_i = a_i + 4 (add the stride) in every iteration</li>
+<li>the only remaining use of i is the test i &lt; 100, which could become a_i &lt; &amp;a[0] + 4*100 (which is loop invariant)</li>
+</ol>
+<p>steps</p>
+<p>1find basic induction variables i = i + e, where e is loop invariant</p>
+<p>what does this look like in ssa</p>
+<pre><code>loop header:
+ i1 = phi(i0, i2)
+loop body:
+i2 = i1 + e</code></pre>
+<pre><code>loop header:
+ i1 = phi(i0, i2)
+loop body:
+a0 = i1 + e
+i2 = a0 + e1</code></pre>
+<p>for each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions</p>
+<p>Step 2 find auxiliary induction variables</p>
+<p>j = basic_ind * loop inv + loop invar</p>
+<pre><code>for (int i = 0; i &lt; n; i++) {
+     j = 2*i + 1;     // Y 
+     k = -i;          // Y 
+     l = 2*i*i + 1;   // N 
+     c = c + 5;       // Y* 
+}</code></pre>
+<p>step 3 replace auxiliary induction variables (derived ) by new variables without the multiply</p>
+<p>step4 if the only remaining use of the induction variable is the termination test, change the test to use the new variable</p>
+<pre><code>sum = 0
+for (i = 1, i &lt; 100; i++) {
+  sum = sum + a[i -1]
+}</code></pre>
+<p>in SSA form:</p>
+<pre><code>   sum0 = 0
+   i0 = 1
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t10 = i1 -1 
+   t20 = t10 * 4
+   t30 = t20 + &amp;a
+   t40 = load t30
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   if (i2 &lt;= 100)go to l</code></pre>
+<ol type="1">
+<li>i is a basic induction variable</li>
+<li>t10 is a aux induction variable</li>
+<li>t20 is an aux induction variable</li>
+<li>t30 is an aux induction variable</li>
+</ol>
+<p>t3 has a use in the load</p>
+<p>t3 = t20 + &amp;a ==&gt; t10 * 4 + &amp;a ==&gt; (i1-1)* 4+ &amp;a</p>
+<p>t3 = 4* i1 + &amp;a - 4</p>
+<pre><code>   sum0 = 0
+   i0 = 1
+   t50 = &amp;a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &amp;a
+   t40 = load t50
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   t52 = t50 + 4
+   if (i2 &lt;= 100)go to l</code></pre>
+<pre><code>   sum0 = 0
+   i0 = 1
+   t50 = &amp;a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   // i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &amp;a
+   t40 = load t50
+   sum2 = sum1 + t40
+   //i2 = i1 + 1
+   t52 = t50 + 4
+   if (t52 &lt;= 396 + &amp;a )go to l</code></pre>
+</section>
+<section id="loop-un-switching" class="slide level2 scrollable">
+<h2>loop un-switching</h2>
+<pre><code>for (int i = 0 ; i &lt; 100; ++1){
+    if (c) {  // c is loop invariant 
+        f(i)
+    } else {
+        g(i)
+    }
+}</code></pre>
+<p>look for special patterns and replace</p>
+<pre><code>if (c) {  // c is loop invariant 
+   for (int i = 0 ; i &lt; 100; ++1){
+        f(i)
+    } 
+}else {
+    for (int i = 0 ; i &lt; 100; ++1){
+        g(i)
+    }
+}</code></pre>
+<p>This is often done before vectorization</p>
+<p>loop fusion</p>
+<pre><code>for (i = 0; i &lt; 100 ; ++){
+ s0:   b[i] = f(a[i])
+}
+for (i = 0; i &lt; 100 ; ++){
+ s1:   c[i] = f(b[i])
+}</code></pre>
+<ol type="1">
+<li>when is it legal to do this?</li>
+<li>When can we get rid of the b array?</li>
+</ol>
+<p>There is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors</p>
+<p>These sort of loop optimizations would make good projects</p>
+
+
+</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

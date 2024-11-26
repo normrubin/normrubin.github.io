@@ -3971,7 +3971,7 @@
     "href": "lectures/09_poly.html#how-much-of-a-limitation-is-affine-only",
     "title": "Polyhedral Analysis",
     "section": "How much of a limitation is affine only",
-    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#4fd6bb61 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
+    "text": "How much of a limitation is affine only\n99% of hpc loops are affine C. Bastoul, A. Cohen, S. Girbal, S. Sharma, and O. Temam. Putting polyhedral loop transformations to work. In LCPC, 2003.\nover 95% of loops in deep learning are affine Norman P Jouppi, Cliff Young, Nishant Patil, David Patterson, Gaurav Agrawal, RaminderBajwa, Sarah Bates, Suresh Bhatia, Nan Boden, Al Borchers, et al. 2017. In-datacenter performance analysis of a tensor processing unit. In 2017 ACM/IEEE 44th Annual International Symposium on Computer Architecture (ISCA). IEEE, 1–12.\n\nOver the course of this, I’ll use 3 pieces of math\n\nILP integer linear programming find a set of integers that satisfies a set of inequalities and maximize something\nfourier-motzkin method\nThe affine form of Farkas Lemma (maybe)\n\n\nHere is a graph showing the data flow \n\n::: {#ddbb2fb3 .cell execution_count=4}\n``` {.python .cell-code}\nimport matplotlib.pyplot as plt\nimport matplotlib.ticker as ticker\n\n# Define the range of the loops\nn = 4  # Range for 'i' (1 to 4)\n\n# Create lists to hold the iteration points\ni_values = []\nj_values = []\n\n# Nested loops to generate iteration space\nfor i in range(1, n + 1):\n  i_values.append(i)\n  j_values.append(1)\n\n# Plotting the iteration space\nplt.figure(figsize=(6, 3))\nplt.scatter(i_values, j_values, c='blue', marker='o')\nplt.xlabel('i  loop index)')\nplt.title('Iteration Space with Data Flow')\nplt.grid(True)\nplt.gca().invert_yaxis()\n\nplt.gca().xaxis.set_major_locator(ticker.MaxNLocator(integer=True))\nplt.gca().yaxis.set_ticklabels([])\n\n# Annotate the iteration order and add arrows for data flow\nfor i in range(2, n + 1):\n    plt.annotate('',\n      xy=(i,1), xytext=(i-1,1),\n        arrowprops=dict(facecolor='black', shrink=0.05))\n\n# Show the plot\nplt.show()\n\n\n\n\n\n\n\n:::\n\nWe need to preserve order where an instance produces a value, some other instance consumes the value\nmore formally:\nThe order that statements execute is called a *schedule\neach s(i) is an instance of a single statement\ndata dependence is a mapping: \\(s(i) =&gt; s(i+1)\\)\na valid schedule does not violate data dependence\n\nobservation 1- same set of instances\nif we track each instance, we have more info but could run out of space\nwe need a more compressed ir format, polyhedral methods use sets and math",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -4955,7 +4955,7 @@
     "href": "lectures/02b_bril.html#running-commands-inside-python",
     "title": "Overview of Bril",
     "section": "running commands inside python",
-    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1588\n-rw-r--r-- 1 runner docker  40847 Nov 23 16:32 010_compiler_overview.html\n-rw-r--r-- 1 runner docker  11181 Nov 23 16:32 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker   3018 Nov 23 16:32 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 23 16:31 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker   3018 Nov 23 16:32 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  33799 Nov 23 16:32 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker   4152 Nov 23 16:32 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker   4096 Nov 23 16:32 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker   7431 Nov 23 16:32 02a_representation.qmd\n-rw-r--r-- 1 runner docker  13795 Nov 23 16:32 02b_bril.qmd\n-rw-r--r-- 1 runner docker  23632 Nov 23 16:32 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  75099 Nov 23 16:32 03_local.html\n-rw-r--r-- 1 runner docker  12760 Nov 23 16:32 03_local.qmd\n-rw-r--r-- 1 runner docker  13285 Nov 23 16:32 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  56836 Nov 23 16:32 04_data_flow.html\n-rw-r--r-- 1 runner docker   9456 Nov 23 16:32 04_data_flow.qmd\n-rw-r--r-- 1 runner docker   9992 Nov 23 16:32 05_global.qmd\n-rw-r--r-- 1 runner docker   8730 Nov 23 16:32 05b_licm.qmd\n-rw-r--r-- 1 runner docker   3166 Nov 23 16:32 05c_pre.qmd\n-rw-r--r-- 1 runner docker  20202 Nov 23 16:32 06_ssa.qmd\n-rwxr-xr-x 1 runner docker  25643 Nov 23 16:31 07_llvm.notebook\n-rwxr-xr-x 1 runner docker  32475 Nov 23 16:32 09_poly.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 23 16:31 09_poly_files\n-rw-r--r-- 1 runner docker    320 Nov 23 16:32 100_mlir.qmd\n-rw-r--r-- 1 runner docker  21170 Nov 23 16:32 110_whole_program.html\n-rw-r--r-- 1 runner docker    338 Nov 23 16:32 110_whole_program.qmd\n-rw-r--r-- 1 runner docker  21228 Nov 23 16:32 12_memory.html\n-rw-r--r-- 1 runner docker    334 Nov 23 16:32 12_memory.qmd\n-rw-r--r-- 1 runner docker 102312 Nov 23 16:32 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker  31886 Nov 23 16:32 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker  10135 Nov 23 16:32 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker   4682 Nov 23 16:31 a.json\n-rw-r--r-- 1 runner docker    248 Nov 23 16:31 a.ts\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 df\n-rw-r--r-- 1 runner docker  27522 Nov 23 16:32 diverg.qmd\n-rw-r--r-- 1 runner docker   5001 Nov 23 16:32 diverg1.qmd\n-rw-r--r-- 1 runner docker   4595 Nov 23 16:31 errors\n-rw-r--r-- 1 runner docker   3623 Nov 23 16:31 foo.ll\n-rw-r--r-- 1 runner docker   2296 Nov 23 16:31 identity.bc\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 images\n-rw-r--r-- 1 runner docker  30815 Nov 23 16:32 junk.html\n-rw-r--r-- 1 runner docker   2152 Nov 23 16:32 junk.qmd\n-rw-r--r-- 1 runner docker    905 Nov 23 16:31 junk.txt\n-rw-r--r-- 1 runner docker  51734 Nov 23 16:32 llvm.html\n-rw-r--r-- 1 runner docker  20731 Nov 23 16:32 llvm.qmd\n-rw-r--r-- 1 runner docker   7659 Nov 23 16:31 llvm.qmd.next\n-rw-r--r-- 1 runner docker  15878 Nov 23 16:32 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker   2278 Nov 23 16:32 mlir.qmd\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 papers\n-rwxr-xr-x 1 runner docker  28903 Nov 23 16:32 poly_final.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 23 16:31 poly_final_files\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 pytorch\ndrwxr-xr-x 2 runner docker   4096 Nov 23 16:31 ra\n-rw-r--r-- 1 runner docker  41902 Nov 23 16:32 ra-checking.html\n-rw-r--r-- 1 runner docker  15172 Nov 23 16:32 ra-checking.qmd\n-rw-r--r-- 1 runner docker   8032 Nov 23 16:32 register_allocation.qmd\n-rw-r--r-- 1 runner docker  52254 Nov 23 16:32 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker  46478 Nov 23 16:32 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker  85290 Nov 23 16:32 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker  62223 Nov 23 16:32 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker  33153 Nov 23 16:32 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker  33176 Nov 23 16:32 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker  99461 Nov 23 16:32 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker  41999 Nov 23 16:32 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker  63025 Nov 23 16:32 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker  51904 Nov 23 16:32 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker  22316 Nov 23 16:31 xx",
+    "text": "running commands inside python\nGitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.\n\n\nimport subprocess\n\n# Run a command and capture its output\noutput = subprocess.check_output(['ls', '-l'])\n\n# Convert the byte string to a regular string (assuming UTF-8 encoding)\noutput_str = output.decode('utf-8')\n\nprint(output_str)\n\ntotal 1528\n-rw-r--r-- 1 runner docker  40732 Nov 26 16:14 010_compiler_overview.html\n-rw-r--r-- 1 runner docker  11181 Nov 26 16:14 010_compiler_overview.qmd\n-rw-r--r-- 1 runner docker   3018 Nov 26 16:14 01a1_performance_measurement.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 26 16:13 01a1_performance_measurement_files\n-rw-r--r-- 1 runner docker   3018 Nov 26 16:14 01a2_performance_measurement.qmd\n-rw-r--r-- 1 runner docker  33835 Nov 26 16:14 01a_performance_measurement.html\n-rw-r--r-- 1 runner docker   4152 Nov 26 16:14 01a_performance_measurement.qmd\ndrwxr-xr-x 4 runner docker   4096 Nov 26 16:14 01a_performance_measurement_files\n-rw-r--r-- 1 runner docker   7431 Nov 26 16:14 02a_representation.qmd\n-rw-r--r-- 1 runner docker  13795 Nov 26 16:14 02b_bril.qmd\n-rw-r--r-- 1 runner docker  23632 Nov 26 16:14 02b_bril.quarto_ipynb\n-rw-r--r-- 1 runner docker  74899 Nov 26 16:14 03_local.html\n-rw-r--r-- 1 runner docker  12760 Nov 26 16:14 03_local.qmd\n-rw-r--r-- 1 runner docker  13285 Nov 26 16:14 03b_local_value_numbering.qmd\n-rw-r--r-- 1 runner docker  56721 Nov 26 16:14 04_data_flow.html\n-rw-r--r-- 1 runner docker   9456 Nov 26 16:14 04_data_flow.qmd\n-rw-r--r-- 1 runner docker   9992 Nov 26 16:14 05_global.qmd\n-rw-r--r-- 1 runner docker   8730 Nov 26 16:14 05b_licm.qmd\n-rw-r--r-- 1 runner docker   3166 Nov 26 16:14 05c_pre.qmd\n-rw-r--r-- 1 runner docker  20202 Nov 26 16:14 06_ssa.qmd\n-rwxr-xr-x 1 runner docker  25643 Nov 26 16:13 07_llvm.notebook\n-rw-r--r-- 1 runner docker  28112 Nov 26 16:14 08_classic_loop_ops.html\n-rw-r--r-- 1 runner docker   5707 Nov 26 16:14 08_classic_loop_ops.qmd\n-rwxr-xr-x 1 runner docker  32475 Nov 26 16:14 09_poly.qmd\ndrwxr-xr-x 3 runner docker   4096 Nov 26 16:13 09_poly_files\n-rw-r--r-- 1 runner docker    320 Nov 26 16:14 100_mlir.qmd\n-rw-r--r-- 1 runner docker  20970 Nov 26 16:14 110_whole_program.html\n-rw-r--r-- 1 runner docker    338 Nov 26 16:14 110_whole_program.qmd\n-rw-r--r-- 1 runner docker  21028 Nov 26 16:14 12_memory.html\n-rw-r--r-- 1 runner docker    334 Nov 26 16:14 12_memory.qmd\n-rw-r--r-- 1 runner docker 102297 Nov 26 16:14 13_dynamic_compilers.html\n-rw-r--r-- 1 runner docker  31886 Nov 26 16:14 13_dynamic_compilers.qmd\n-rw-r--r-- 1 runner docker  10135 Nov 26 16:14 14_gpu_compilers.qmd\n-rw-r--r-- 1 runner docker   4682 Nov 26 16:13 a.json\n-rw-r--r-- 1 runner docker    248 Nov 26 16:13 a.ts\ndrwxr-xr-x 2 runner docker   4096 Nov 26 16:13 df\n-rw-r--r-- 1 runner docker  27522 Nov 26 16:14 diverg.qmd\n-rw-r--r-- 1 runner docker   5001 Nov 26 16:14 diverg1.qmd\n-rw-r--r-- 1 runner docker   4595 Nov 26 16:13 errors\n-rw-r--r-- 1 runner docker   3623 Nov 26 16:13 foo.ll\n-rw-r--r-- 1 runner docker   2296 Nov 26 16:13 identity.bc\ndrwxr-xr-x 2 runner docker   4096 Nov 26 16:13 images\n-rw-r--r-- 1 runner docker  30615 Nov 26 16:14 junk.html\n-rw-r--r-- 1 runner docker   2152 Nov 26 16:14 junk.qmd\n-rw-r--r-- 1 runner docker    905 Nov 26 16:13 junk.txt\n-rw-r--r-- 1 runner docker  51534 Nov 26 16:14 llvm.html\n-rw-r--r-- 1 runner docker  20731 Nov 26 16:14 llvm.qmd\n-rw-r--r-- 1 runner docker   7659 Nov 26 16:13 llvm.qmd.next\n-rw-r--r-- 1 runner docker  15878 Nov 26 16:14 mem_consistancy.qmd\n-rw-r--r-- 1 runner docker   2278 Nov 26 16:14 mlir.qmd\ndrwxr-xr-x 2 runner docker   4096 Nov 26 16:13 papers\n-rwxr-xr-x 1 runner docker  30724 Nov 26 16:14 poly_final.qmd\ndrwxr-xr-x 2 runner docker   4096 Nov 26 16:13 pytorch\ndrwxr-xr-x 2 runner docker   4096 Nov 26 16:13 ra\n-rw-r--r-- 1 runner docker  41702 Nov 26 16:14 ra-checking.html\n-rw-r--r-- 1 runner docker  15172 Nov 26 16:14 ra-checking.qmd\n-rw-r--r-- 1 runner docker   8032 Nov 26 16:14 register_allocation.qmd\n-rw-r--r-- 1 runner docker  40546 Nov 26 16:14 revealjs_010_compiler_overview.qmd.html\n-rw-r--r-- 1 runner docker  34770 Nov 26 16:14 revealjs_01a_performance_measurement.qmd.html\n-rw-r--r-- 1 runner docker  73582 Nov 26 16:14 revealjs_03_local.qmd.html\n-rw-r--r-- 1 runner docker  50515 Nov 26 16:14 revealjs_04_data_flow.qmd.html\n-rw-r--r-- 1 runner docker  27520 Nov 26 16:14 revealjs_08_classic_loop_ops.qmd.html\n-rw-r--r-- 1 runner docker  21445 Nov 26 16:14 revealjs_110_whole_program.qmd.html\n-rw-r--r-- 1 runner docker  21468 Nov 26 16:14 revealjs_12_memory.qmd.html\n-rw-r--r-- 1 runner docker  87753 Nov 26 16:14 revealjs_13_dynamic_compilers.qmd.html\n-rw-r--r-- 1 runner docker  30291 Nov 26 16:14 revealjs_junk.qmd.html\n-rw-r--r-- 1 runner docker  51317 Nov 26 16:14 revealjs_llvm.qmd.html\n-rw-r--r-- 1 runner docker  40196 Nov 26 16:14 revealjs_ra-checking.qmd.html\n-rw-r--r-- 1 runner docker  22316 Nov 26 16:13 xx",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -6288,6 +6288,84 @@
     "text": "effects of optimization\nRemove performance penalty for:\n\nusing higher level constructs\nsafety checks (e.g., array bounds checks)\nwriting clean, simple code (no benefit to applying loop unrolling by hand)\nEncourage ADT’s that are as efficient as primitive types"
   },
   {
+    "objectID": "lectures/08_classic_loop_ops.html",
+    "href": "lectures/08_classic_loop_ops.html",
+    "title": "classic loop optimizations",
+    "section": "",
+    "text": "Loops optimizations are important because\nWhat are classic loop optimizations?\nLess classic loop optimizations\nFirst recall natural loops\ndef of loop invariant for an instruction d = op a,b\nin SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop\nconditions when moving an instruction d = a op b is ok\ncan move d\nL0: d = 0 preheader L1: if (i&gt;=N) goto L2 i = i + 1 d = a ⊕ b = d goto L1 L2: x = d ```\nno good d used after the loop, would not be changed if the loop executes zero times\nno good d reassigned in the loop, do invar would be changed\nwhile (e) { j = loopinv // may never execute S }\nj = loopinv // always executes while (e) { S }\nif (e) { j = loopinv // may never execute while (e) { S }\n} ````",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/08_classic_loop_ops.html#induction-variable-elimination",
+    "href": "lectures/08_classic_loop_ops.html#induction-variable-elimination",
+    "title": "classic loop optimizations",
+    "section": "induction variable elimination",
+    "text": "induction variable elimination\nfor (int i = 0; i &lt; 100; ++1){\n    f(a[i])\n}\ncalculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4\n\na_i = &a[0] before the loop\na_i = a_i + 4 (add the stride) in every iteration\nthe only remaining use of i is the test i &lt; 100, which could become a_i &lt; &a[0] + 4*100 (which is loop invariant)\n\nsteps\n1find basic induction variables i = i + e, where e is loop invariant\nwhat does this look like in ssa\nloop header:\n i1 = phi(i0, i2)\nloop body:\ni2 = i1 + e\nloop header:\n i1 = phi(i0, i2)\nloop body:\na0 = i1 + e\ni2 = a0 + e1\nfor each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions\nStep 2 find auxiliary induction variables\nj = basic_ind * loop inv + loop invar\nfor (int i = 0; i &lt; n; i++) {\n     j = 2*i + 1;     // Y \n     k = -i;          // Y \n     l = 2*i*i + 1;   // N \n     c = c + 5;       // Y* \n}\nstep 3 replace auxiliary induction variables (derived ) by new variables without the multiply\nstep4 if the only remaining use of the induction variable is the termination test, change the test to use the new variable\nsum = 0\nfor (i = 1, i &lt; 100; i++) {\n  sum = sum + a[i -1]\n}\nin SSA form:\n   sum0 = 0\n   i0 = 1\nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t10 = i1 -1 \n   t20 = t10 * 4\n   t30 = t20 + &a\n   t40 = load t30\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   if (i2 &lt;= 100)go to l\n\ni is a basic induction variable\nt10 is a aux induction variable\nt20 is an aux induction variable\nt30 is an aux induction variable\n\nt3 has a use in the load\nt3 = t20 + &a ==&gt; t10 * 4 + &a ==&gt; (i1-1)* 4+ &a\nt3 = 4* i1 + &a - 4\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   t52 = t50 + 4\n   if (i2 &lt;= 100)go to l\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   // i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   //i2 = i1 + 1\n   t52 = t50 + 4\n   if (t52 &lt;= 396 + &a )go to l",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/08_classic_loop_ops.html#loop-un-switching",
+    "href": "lectures/08_classic_loop_ops.html#loop-un-switching",
+    "title": "classic loop optimizations",
+    "section": "loop un-switching",
+    "text": "loop un-switching\nfor (int i = 0 ; i &lt; 100; ++1){\n    if (c) {  // c is loop invariant \n        f(i)\n    } else {\n        g(i)\n    }\n}\nlook for special patterns and replace\nif (c) {  // c is loop invariant \n   for (int i = 0 ; i &lt; 100; ++1){\n        f(i)\n    } \n}else {\n    for (int i = 0 ; i &lt; 100; ++1){\n        g(i)\n    }\n}\nThis is often done before vectorization\nloop fusion\nfor (i = 0; i &lt; 100 ; ++){\n s0:   b[i] = f(a[i])\n}\nfor (i = 0; i &lt; 100 ; ++){\n s1:   c[i] = f(b[i])\n}\n\nwhen is it legal to do this?\nWhen can we get rid of the b array?\n\nThere is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors\nThese sort of loop optimizations would make good projects",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "classic loop optimizations"
+    ]
+  },
+  {
+    "objectID": "lectures/revealjs_08_classic_loop_ops.qmd.html#induction-variable-elimination",
+    "href": "lectures/revealjs_08_classic_loop_ops.qmd.html#induction-variable-elimination",
+    "title": "classic loop optimizations",
+    "section": "induction variable elimination",
+    "text": "induction variable elimination\nfor (int i = 0; i &lt; 100; ++1){\n    f(a[i])\n}\ncalculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4\n\na_i = &a[0] before the loop\na_i = a_i + 4 (add the stride) in every iteration\nthe only remaining use of i is the test i &lt; 100, which could become a_i &lt; &a[0] + 4*100 (which is loop invariant)\n\nsteps\n1find basic induction variables i = i + e, where e is loop invariant\nwhat does this look like in ssa\nloop header:\n i1 = phi(i0, i2)\nloop body:\ni2 = i1 + e\nloop header:\n i1 = phi(i0, i2)\nloop body:\na0 = i1 + e\ni2 = a0 + e1\nfor each instruction d = c +- loop invariant see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions\nStep 2 find auxiliary induction variables\nj = basic_ind * loop inv + loop invar\nfor (int i = 0; i &lt; n; i++) {\n     j = 2*i + 1;     // Y \n     k = -i;          // Y \n     l = 2*i*i + 1;   // N \n     c = c + 5;       // Y* \n}\nstep 3 replace auxiliary induction variables (derived ) by new variables without the multiply\nstep4 if the only remaining use of the induction variable is the termination test, change the test to use the new variable\nsum = 0\nfor (i = 1, i &lt; 100; i++) {\n  sum = sum + a[i -1]\n}\nin SSA form:\n   sum0 = 0\n   i0 = 1\nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t10 = i1 -1 \n   t20 = t10 * 4\n   t30 = t20 + &a\n   t40 = load t30\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   if (i2 &lt;= 100)go to l\n\ni is a basic induction variable\nt10 is a aux induction variable\nt20 is an aux induction variable\nt30 is an aux induction variable\n\nt3 has a use in the load\nt3 = t20 + &a ==&gt; t10 * 4 + &a ==&gt; (i1-1)* 4+ &a\nt3 = 4* i1 + &a - 4\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   i2 = i1 + 1\n   t52 = t50 + 4\n   if (i2 &lt;= 100)go to l\n   sum0 = 0\n   i0 = 1\n   t50 = &a -4  // initial value \nL: sum1 = phi(sum0, sum2)\n   // i1 = phi(i0, i2)\n   t51 = phi(t50, t52)\n   //t10 = i1 -1 \n   //t20 = t10 * 4\n   //t30 = t20 + &a\n   t40 = load t50\n   sum2 = sum1 + t40\n   //i2 = i1 + 1\n   t52 = t50 + 4\n   if (t52 &lt;= 396 + &a )go to l"
+  },
+  {
+    "objectID": "lectures/revealjs_08_classic_loop_ops.qmd.html#loop-un-switching",
+    "href": "lectures/revealjs_08_classic_loop_ops.qmd.html#loop-un-switching",
+    "title": "classic loop optimizations",
+    "section": "loop un-switching",
+    "text": "loop un-switching\nfor (int i = 0 ; i &lt; 100; ++1){\n    if (c) {  // c is loop invariant \n        f(i)\n    } else {\n        g(i)\n    }\n}\nlook for special patterns and replace\nif (c) {  // c is loop invariant \n   for (int i = 0 ; i &lt; 100; ++1){\n        f(i)\n    } \n}else {\n    for (int i = 0 ; i &lt; 100; ++1){\n        g(i)\n    }\n}\nThis is often done before vectorization\nloop fusion\nfor (i = 0; i &lt; 100 ; ++){\n s0:   b[i] = f(a[i])\n}\nfor (i = 0; i &lt; 100 ; ++){\n s1:   c[i] = f(b[i])\n}\n\nwhen is it legal to do this?\nWhen can we get rid of the b array?\n\nThere is also an optimization that goes the other way split a loop so that each statement becomes a separate loop incase we could run as vectors\nThese sort of loop optimizations would make good projects"
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
+    "title": "Performance and Measurement",
+    "section": "example 1",
+    "text": "example 1\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\n445 references"
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
+    "title": "Performance and Measurement",
+    "section": "another example",
+    "text": "another example\nStrangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!\nSIGPLAN Empirical Evaluation Guidelines"
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
+    "title": "Performance and Measurement",
+    "section": "violin plots",
+    "text": "violin plots\ndata\nA dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle\n\n\nCode\n# library & dataset\nimport seaborn as sns\nimport pandas as pd\nimport numpy as np\n\n\ndf = pd.read_csv('images/chip_dataset.csv')\nprint(df.head())\n\nsns.set_palette(\"pastel\")\n\nsns.violinplot(x=df[\"Vendor\"], y=np.log(df[\"Freq (MHz)\"]), hue=df['Type'])\n\n\n   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \\\n0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   \n1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   \n2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   \n3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   \n4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   \n\n   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \\\n0     45.0             77.0                  122.0      2200.0  Unknown   \n1     35.0            192.0                 4800.0      3200.0  Unknown   \n2     28.0              NaN                    NaN      2600.0    Intel   \n3     80.0            160.0                 1400.0      1800.0    Intel   \n4    125.0            258.0                  758.0      3700.0  Unknown   \n\n  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  \n0    AMD          NaN          NaN          NaN  \n1    AMD          NaN          NaN          NaN  \n2  Intel          NaN          NaN          NaN  \n3  Intel          NaN          NaN          NaN  \n4    AMD          NaN          NaN          NaN  \n\n\n\n\n\n\n\n\n\napply np.log to the Freq (MHz) column. Because of wide range of values\nSet a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot\nHue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette\nData Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.\nI might want to take date into account in these plots"
+  },
+  {
+    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
+    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
+    "title": "Performance and Measurement",
+    "section": "error bars",
+    "text": "error bars\n\n\nCode\nprint(df.describe())\n\nimport pandas as pd\n\n# Assuming df is your DataFrame and 'Release Date' is the column\ndf['Release Date'] = pd.to_datetime(df['Release Date'], errors='coerce')\ndf['Release Year'] = ((df['Release Date'].dt.year) // 5) * 5\n\n# Now df['Release Year'] contains the year extracted from 'Release Date'\n\n\n# plot a bar chart\nax = sns.barplot(x=df['Release Year'], y=df[\"TDP (W)\"], hue =df['Type'], estimator=np.mean, errorbar=(\"sd\"))\n\n\n        Unnamed: 0  Process Size (nm)      TDP (W)  Die Size (mm^2)  \\\ncount  4854.000000        4845.000000  4228.000000      4139.000000   \nmean   2426.500000          55.109598    81.359981       188.440445   \nstd    1401.373433          44.998676    76.807808       126.189383   \nmin       0.000000           0.000000     1.000000         1.000000   \n25%    1213.250000          22.000000    33.000000       104.000000   \n50%    2426.500000          40.000000    65.000000       148.000000   \n75%    3639.750000          90.000000   100.000000       239.000000   \nmax    4853.000000         250.000000   900.000000       826.000000   \n\n       Transistors (million)   Freq (MHz)    FP16 GFLOPS   FP32 GFLOPS  \\\ncount            4143.000000  4854.000000     536.000000   1948.000000   \nmean             1929.922279  1484.406057    8397.459851   2134.756653   \nstd              4044.891098  1066.701523   13799.551131   3898.431487   \nmin                 8.000000   100.000000      10.020000     12.800000   \n25%               154.000000   590.000000     768.800000    257.300000   \n50%               624.000000  1073.500000    2965.500000    696.000000   \n75%              1550.000000  2400.000000   10600.000000   2116.750000   \nmax             54200.000000  4700.000000  184600.000000  40000.000000   \n\n        FP64 GFLOPS  \ncount   1306.000000  \nmean     363.670511  \nstd     1145.931856  \nmin        3.600000  \n25%       38.295000  \n50%       89.280000  \n75%      220.000000  \nmax    11540.000000"
+  },
+  {
     "objectID": "lectures/01a_performance_measurement.html",
     "href": "lectures/01a_performance_measurement.html",
     "title": "Performance and Measurement",
@@ -6346,34 +6424,6 @@
       "Lectures",
       "Performance and Measurement"
     ]
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#example-1",
-    "title": "Performance and Measurement",
-    "section": "example 1",
-    "text": "example 1\nProducing Wrong Data Without Doing Anything Obviously Wrong! Todd Mytkowicz, Amer Diwan, Matthias Hauswirth, and Peter F. Sweeney. ASPLOS 2009.\n445 references"
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#another-example",
-    "title": "Performance and Measurement",
-    "section": "another example",
-    "text": "another example\nStrangely, Matrix Multiplications on GPUs Run Faster When Given “Predictable” Data!\nSIGPLAN Empirical Evaluation Guidelines"
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#violin-plots",
-    "title": "Performance and Measurement",
-    "section": "violin plots",
-    "text": "violin plots\ndata\nA dataset with 2,185 CPUs and 2,668 GPUs to help researchers understand the development trend of CPUs and GPUs. Setup by Kaggle\n\n\nCode\n# library & dataset\nimport seaborn as sns\nimport pandas as pd\nimport numpy as np\n\n\ndf = pd.read_csv('images/chip_dataset.csv')\nprint(df.head())\n\nsns.set_palette(\"pastel\")\n\nsns.violinplot(x=df[\"Vendor\"], y=np.log(df[\"Freq (MHz)\"]), hue=df['Type'])\n\n\n   Unnamed: 0                  Product Type Release Date  Process Size (nm)  \\\n0           0      AMD Athlon 64 3500+  CPU   2007-02-20               65.0   \n1           1         AMD Athlon 200GE  CPU   2018-09-06               14.0   \n2           2     Intel Core i5-1145G7  CPU   2020-09-02               10.0   \n3           3    Intel Xeon E5-2603 v2  CPU   2013-09-01               22.0   \n4           4  AMD Phenom II X4 980 BE  CPU   2011-05-03               45.0   \n\n   TDP (W)  Die Size (mm^2)  Transistors (million)  Freq (MHz)  Foundry  \\\n0     45.0             77.0                  122.0      2200.0  Unknown   \n1     35.0            192.0                 4800.0      3200.0  Unknown   \n2     28.0              NaN                    NaN      2600.0    Intel   \n3     80.0            160.0                 1400.0      1800.0    Intel   \n4    125.0            258.0                  758.0      3700.0  Unknown   \n\n  Vendor  FP16 GFLOPS  FP32 GFLOPS  FP64 GFLOPS  \n0    AMD          NaN          NaN          NaN  \n1    AMD          NaN          NaN          NaN  \n2  Intel          NaN          NaN          NaN  \n3  Intel          NaN          NaN          NaN  \n4    AMD          NaN          NaN          NaN  \n\n\n\n\n\n\n\n\n\napply np.log to the Freq (MHz) column. Because of wide range of values\nSet a pastel palette with sns.set_palette(“pastel”). These colors make it easier to see the parts of the violin plot\nHue Parameter: I’m using the hue parameter to differentiate between types of chips. Hue sets a color within the palette\nData Source and Preparation: Include a brief note on where the data comes from (you’ve provided a link, but a sentence or two summarizing the dataset would be helpful) and any preprocessing steps taken before visualization.\nI might want to take date into account in these plots"
-  },
-  {
-    "objectID": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
-    "href": "lectures/revealjs_01a_performance_measurement.qmd.html#error-bars",
-    "title": "Performance and Measurement",
-    "section": "error bars",
-    "text": "error bars\n\n\nCode\nprint(df.describe())\n\nimport pandas as pd\n\n# Assuming df is your DataFrame and 'Release Date' is the column\ndf['Release Date'] = pd.to_datetime(df['Release Date'], errors='coerce')\ndf['Release Year'] = ((df['Release Date'].dt.year) // 5) * 5\n\n# Now df['Release Year'] contains the year extracted from 'Release Date'\n\n\n# plot a bar chart\nax = sns.barplot(x=df['Release Year'], y=df[\"TDP (W)\"], hue =df['Type'], estimator=np.mean, errorbar=(\"sd\"))\n\n\n        Unnamed: 0  Process Size (nm)      TDP (W)  Die Size (mm^2)  \\\ncount  4854.000000        4845.000000  4228.000000      4139.000000   \nmean   2426.500000          55.109598    81.359981       188.440445   \nstd    1401.373433          44.998676    76.807808       126.189383   \nmin       0.000000           0.000000     1.000000         1.000000   \n25%    1213.250000          22.000000    33.000000       104.000000   \n50%    2426.500000          40.000000    65.000000       148.000000   \n75%    3639.750000          90.000000   100.000000       239.000000   \nmax    4853.000000         250.000000   900.000000       826.000000   \n\n       Transistors (million)   Freq (MHz)    FP16 GFLOPS   FP32 GFLOPS  \\\ncount            4143.000000  4854.000000     536.000000   1948.000000   \nmean             1929.922279  1484.406057    8397.459851   2134.756653   \nstd              4044.891098  1066.701523   13799.551131   3898.431487   \nmin                 8.000000   100.000000      10.020000     12.800000   \n25%               154.000000   590.000000     768.800000    257.300000   \n50%               624.000000  1073.500000    2965.500000    696.000000   \n75%              1550.000000  2400.000000   10600.000000   2116.750000   \nmax             54200.000000  4700.000000  184600.000000  40000.000000   \n\n        FP64 GFLOPS  \ncount   1306.000000  \nmean     363.670511  \nstd     1145.931856  \nmin        3.600000  \n25%       38.295000  \n50%       89.280000  \n75%      220.000000  \nmax    11540.000000"
   },
   {
     "objectID": "lectures/revealjs_13_dynamic_compilers.qmd.html#jit-just-in-time-compilers-vs-aotahead-of-time-compilers",
@@ -10706,6 +10756,48 @@
     "text": "solution\nI ran it through:\nhttps://online-optimizer.appspot.com\nwhich gave me a solution:\ns(4,2) reads s(3,3) but s(4,2) executes first"
   },
   {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#classic-transformations",
+    "href": "lectures/revealjs_poly_final.qmd.html#classic-transformations",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "Classic transformations",
+    "text": "Classic transformations"
+  },
+  {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#loop-reversal",
+    "href": "lectures/revealjs_poly_final.qmd.html#loop-reversal",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop reversal",
+    "text": "loop reversal\ntransformation: [i] ==&gt; [-i]\nfor (int c0 = 0; c0 &lt; n; c0 += 1)\n  S(c0);\n\nfor (int c0 = -n + 1; c0 &lt;= 0; c0 += 1)\n  S(-c0);"
+  },
+  {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#loop-fusion",
+    "href": "lectures/revealjs_poly_final.qmd.html#loop-fusion",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop fusion",
+    "text": "loop fusion\ntransformation: [0, i] -&gt; [i,0]; [1, i] -&gt; [i, 1]\n{\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    S(c1);\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    T(c1);\n}\nfor (int c0 = 0; c0 &lt;= n; c0 += 1) {\n  S(c0);\n  T(c0);\n}"
+  },
+  {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#loop-fission",
+    "href": "lectures/revealjs_poly_final.qmd.html#loop-fission",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop fission",
+    "text": "loop fission\ntransformation: [i, 0] -&gt; [0, i]; [i, 1] -&gt; [1, i]\nfor (int c0 = 0; c0 &lt;= n; c0 += 1) {\n  S(c0);\n  T(c0);\n}\n{\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    S(c1);\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    T(c1);\n}"
+  },
+  {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#strip-mining",
+    "href": "lectures/revealjs_poly_final.qmd.html#strip-mining",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "strip mining",
+    "text": "strip mining\ntransformation: [i] -&gt; [floor(i/4), i % 4]\nfor (int c0 = 0; c0 &lt;= 1023; c0 += 1)\n  S(c0);\n\nfor (int c0 = 0; c0 &lt;= 255; c0 += 1)\n  for (int c1 = 0; c1 &lt;= 3; c1 += 1)\n    S(4 * c0 + c1);"
+  },
+  {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#loop-tiling",
+    "href": "lectures/revealjs_poly_final.qmd.html#loop-tiling",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop tiling",
+    "text": "loop tiling\ntransformation: [i,j] -&gt; [floor(i/4), i % 4, floor(j/4), j % 4]\nfor (int c0 = 0; c0 &lt;= 1023; c0 += 1)\n  for (int c1 = 0; c1 &lt;= 1023; c1 += 1)\n    S(c0, c1);\n\nfor (int c0 = 0; c0 &lt;= 255; c0 += 1)\n  for (int c1 = 0; c1 &lt;= 3; c1 += 1)\n    for (int c2 = 0; c2 &lt;= 255; c2 += 1)\n      for (int c3 = 0; c3 &lt;= 3; c3 += 1)\n        S(4 * c0 + c1, 4 * c2 + c3);"
+  },
+  {
     "objectID": "lectures/revealjs_poly_final.qmd.html#finding-transformations",
     "href": "lectures/revealjs_poly_final.qmd.html#finding-transformations",
     "title": "Introduction To Polyhedral Methods",
@@ -10738,7 +10830,14 @@
     "href": "lectures/revealjs_poly_final.qmd.html#magic",
     "title": "Introduction To Polyhedral Methods",
     "section": "magic",
-    "text": "magic\nWe apply a theorem called the affine form of the Farkas lemma which turns this into a tractable problem\nAn affine form is non-negative over a polyhedron if and only if it can be be written as a non-negative combination of the constraints that form the polyhedron"
+    "text": "magic\nWe apply a theorem called the affine form of the Farkas lemma which turns this into a tractable problem\nAn affine form is non-negative over a polyhedron if and only if it can be be written as a non-negative combination of the constraints that form the polyhedron\nforall \\(0 \\le i \\le 5\\) and \\(0 \\le j \\le 5\\) and \\(i = j\\)\nsuch that \\(-\\alpha_1 * i + \\alpha_2  * j + (\\beta_1 - \\beta_2) \\ge 0\\) affine form\npolyhedron\n\n\\(i \\ge 0\\)\n\\(-i \\ge -5\\)\n\\(j \\ge 0\\)\n\\(-j \\ge -5\\)\n\\(j - i \\ge 0\\)\n\\(i=j \\ge 0\\)"
+  },
+  {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#optimization-problem",
+    "href": "lectures/revealjs_poly_final.qmd.html#optimization-problem",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "optimization problem",
+    "text": "optimization problem\nfind a function that gives the locality\nminimize w: \\(w \\ge \\alpha_2 * i + \\beta_2 - \\alpha_1 * j - \\beta_1\\)\nw is a bound in time between producer and consumer, how long the location needs to stay in the local memory"
   },
   {
     "objectID": "lectures/revealjs_poly_final.qmd.html#parallelism",
@@ -10746,6 +10845,13 @@
     "title": "Introduction To Polyhedral Methods",
     "section": "parallelism",
     "text": "parallelism\nwe minimized the time between definition and use, for best locality, if we maximize that time we get the most parallel code"
+  },
+  {
+    "objectID": "lectures/revealjs_poly_final.qmd.html#objectives",
+    "href": "lectures/revealjs_poly_final.qmd.html#objectives",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "objectives",
+    "text": "objectives\nSince everything is affine it is hard to formulate a complex cost function"
   },
   {
     "objectID": "lectures/poly_final.html",
@@ -11528,6 +11634,78 @@
     ]
   },
   {
+    "objectID": "lectures/poly_final.html#classic-transformations",
+    "href": "lectures/poly_final.html#classic-transformations",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "Classic transformations",
+    "text": "Classic transformations",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
+    "objectID": "lectures/poly_final.html#loop-reversal",
+    "href": "lectures/poly_final.html#loop-reversal",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop reversal",
+    "text": "loop reversal\ntransformation: [i] ==&gt; [-i]\nfor (int c0 = 0; c0 &lt; n; c0 += 1)\n  S(c0);\n\nfor (int c0 = -n + 1; c0 &lt;= 0; c0 += 1)\n  S(-c0);",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
+    "objectID": "lectures/poly_final.html#loop-fusion",
+    "href": "lectures/poly_final.html#loop-fusion",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop fusion",
+    "text": "loop fusion\ntransformation: [0, i] -&gt; [i,0]; [1, i] -&gt; [i, 1]\n{\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    S(c1);\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    T(c1);\n}\nfor (int c0 = 0; c0 &lt;= n; c0 += 1) {\n  S(c0);\n  T(c0);\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
+    "objectID": "lectures/poly_final.html#loop-fission",
+    "href": "lectures/poly_final.html#loop-fission",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop fission",
+    "text": "loop fission\ntransformation: [i, 0] -&gt; [0, i]; [i, 1] -&gt; [1, i]\nfor (int c0 = 0; c0 &lt;= n; c0 += 1) {\n  S(c0);\n  T(c0);\n}\n{\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    S(c1);\n  for (int c1 = 0; c1 &lt;= n; c1 += 1)\n    T(c1);\n}",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
+    "objectID": "lectures/poly_final.html#strip-mining",
+    "href": "lectures/poly_final.html#strip-mining",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "strip mining",
+    "text": "strip mining\ntransformation: [i] -&gt; [floor(i/4), i % 4]\nfor (int c0 = 0; c0 &lt;= 1023; c0 += 1)\n  S(c0);\n\nfor (int c0 = 0; c0 &lt;= 255; c0 += 1)\n  for (int c1 = 0; c1 &lt;= 3; c1 += 1)\n    S(4 * c0 + c1);",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
+    "objectID": "lectures/poly_final.html#loop-tiling",
+    "href": "lectures/poly_final.html#loop-tiling",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "loop tiling",
+    "text": "loop tiling\ntransformation: [i,j] -&gt; [floor(i/4), i % 4, floor(j/4), j % 4]\nfor (int c0 = 0; c0 &lt;= 1023; c0 += 1)\n  for (int c1 = 0; c1 &lt;= 1023; c1 += 1)\n    S(c0, c1);\n\nfor (int c0 = 0; c0 &lt;= 255; c0 += 1)\n  for (int c1 = 0; c1 &lt;= 3; c1 += 1)\n    for (int c2 = 0; c2 &lt;= 255; c2 += 1)\n      for (int c3 = 0; c3 &lt;= 3; c3 += 1)\n        S(4 * c0 + c1, 4 * c2 + c3);",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
     "objectID": "lectures/poly_final.html#finding-transformations",
     "href": "lectures/poly_final.html#finding-transformations",
     "title": "Introduction To Polyhedral Methods",
@@ -11580,7 +11758,19 @@
     "href": "lectures/poly_final.html#magic",
     "title": "Introduction To Polyhedral Methods",
     "section": "magic",
-    "text": "magic\nWe apply a theorem called the affine form of the Farkas lemma which turns this into a tractable problem\nAn affine form is non-negative over a polyhedron if and only if it can be be written as a non-negative combination of the constraints that form the polyhedron",
+    "text": "magic\nWe apply a theorem called the affine form of the Farkas lemma which turns this into a tractable problem\nAn affine form is non-negative over a polyhedron if and only if it can be be written as a non-negative combination of the constraints that form the polyhedron\nforall \\(0 \\le i \\le 5\\) and \\(0 \\le j \\le 5\\) and \\(i = j\\)\nsuch that \\(-\\alpha_1 * i + \\alpha_2  * j + (\\beta_1 - \\beta_2) \\ge 0\\) affine form\npolyhedron\n\n\\(i \\ge 0\\)\n\\(-i \\ge -5\\)\n\\(j \\ge 0\\)\n\\(-j \\ge -5\\)\n\\(j - i \\ge 0\\)\n\\(i=j \\ge 0\\)",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
+    "objectID": "lectures/poly_final.html#optimization-problem",
+    "href": "lectures/poly_final.html#optimization-problem",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "optimization problem",
+    "text": "optimization problem\nfind a function that gives the locality\nminimize w: \\(w \\ge \\alpha_2 * i + \\beta_2 - \\alpha_1 * j - \\beta_1\\)\nw is a bound in time between producer and consumer, how long the location needs to stay in the local memory",
     "crumbs": [
       "EECS 7398",
       "Lectures",
@@ -11593,6 +11783,18 @@
     "title": "Introduction To Polyhedral Methods",
     "section": "parallelism",
     "text": "parallelism\nwe minimized the time between definition and use, for best locality, if we maximize that time we get the most parallel code",
+    "crumbs": [
+      "EECS 7398",
+      "Lectures",
+      "Introduction To Polyhedral Methods"
+    ]
+  },
+  {
+    "objectID": "lectures/poly_final.html#objectives",
+    "href": "lectures/poly_final.html#objectives",
+    "title": "Introduction To Polyhedral Methods",
+    "section": "objectives",
+    "text": "objectives\nSince everything is affine it is hard to formulate a complex cost function",
     "crumbs": [
       "EECS 7398",
       "Lectures",
