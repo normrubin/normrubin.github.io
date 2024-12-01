@@ -1,0 +1,159 @@
+---
+author: Sharmila Sivalingam
+execute:
+  enabled: false
+format:
+  html: default
+title: Compiler Homework 05 - LLVM Pass
+---
+
+In this blog, I’ll walk through the process of creating an LLVM pass to detect floating-point divisions within a C++ program. This project involves using the LLVM framework to analyze the Intermediate Representation (IR) code generated from a C++ program and detecting instances of floating-point division operations
+
+# Implementation:
+For each instruction in the basic block, we check if it’s a BinaryOperator with the opcode Instruction::FDiv, which represents a floating-point division in LLVM IR.
+
+# Testing :
+I tested my pass using the below example:
+
+```{c++}
+#include <iostream>
+#include <stdio.h>
+
+double divide(double a, double b) {
+    return a / b;
+}
+
+int main() {
+    double result1 = divide(10.0, 2.0);
+    double result2 = divide(19.0, 3.0);
+
+    if (result1 > result2) {
+        double result3 = divide(result1, result2);  // Division in if branch
+    } else {
+        double result4 = divide(result2, result1);  // Division in else branch
+    }
+
+    return 0;
+}
+```
+
+To look at LLVM IR of this example I used "clang -emit-llvm -S -o - test.cpp" 
+
+```{out}
+Analyzing Function: divided
+Floating point division detected in Basic Block: %0
+  Instruction:   %7 = fdiv double %5, %6
+Analyzing Function: main
+No floating point divisions found in function.
+Analyzing Function: _GLOBAL__sub_I_test.cpp
+No floating point divisions found in function.
+; ModuleID = '../test.cpp'
+source_filename = "../test.cpp"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+%"class.std::ios_base::Init" = type { i8 }
+
+@_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
+@__dso_handle = external hidden global i8
+@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_test.cpp, i8* null }]
+
+; Function Attrs: noinline uwtable
+define internal void @__cxx_global_var_init() #0 section ".text.startup" {
+  call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* @_ZStL8__ioinit)
+  %1 = call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i32 0, i32 0), i8* @__dso_handle) #3
+  ret void
+}
+
+declare dso_local void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"*) unnamed_addr #1
+
+; Function Attrs: nounwind
+declare dso_local void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"*) unnamed_addr #2
+
+; Function Attrs: nounwind
+declare dso_local i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local double @_Z6dividedd(double %0, double %1) #4 {
+  %3 = alloca double, align 8
+  %4 = alloca double, align 8
+  store double %0, double* %3, align 8
+  store double %1, double* %4, align 8
+  %5 = load double, double* %3, align 8
+  %6 = load double, double* %4, align 8
+  %7 = fdiv double %5, %6
+  ret double %7
+}
+
+; Function Attrs: noinline norecurse nounwind optnone uwtable
+define dso_local i32 @main() #5 {
+  %1 = alloca i32, align 4
+  %2 = alloca double, align 8
+  %3 = alloca double, align 8
+  %4 = alloca double, align 8
+  %5 = alloca double, align 8
+  store i32 0, i32* %1, align 4
+  %6 = call double @_Z6dividedd(double 1.000000e+01, double 2.000000e+00)
+  store double %6, double* %2, align 8
+  %7 = call double @_Z6dividedd(double 1.900000e+01, double 3.000000e+00)
+  store double %7, double* %3, align 8
+  %8 = load double, double* %2, align 8
+  %9 = load double, double* %3, align 8
+  %10 = fcmp ogt double %8, %9
+  br i1 %10, label %11, label %15
+
+11:                                               ; preds = %0
+  %12 = load double, double* %2, align 8
+  %13 = load double, double* %3, align 8
+  %14 = call double @_Z6dividedd(double %12, double %13)
+  store double %14, double* %4, align 8
+  br label %19
+
+15:                                               ; preds = %0
+  %16 = load double, double* %3, align 8
+  %17 = load double, double* %2, align 8
+  %18 = call double @_Z6dividedd(double %16, double %17)
+  store double %18, double* %5, align 8
+  br label %19
+
+19:                                               ; preds = %15, %11
+  ret i32 0
+}
+
+; Function Attrs: noinline uwtable
+define internal void @_GLOBAL__sub_I_test.cpp() #0 section ".text.startup" {
+  call void @__cxx_global_var_init()
+  ret void
+}
+
+attributes #0 = { noinline uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #2 = { nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { nounwind }
+attributes #4 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #5 = { noinline norecurse nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+
+!llvm.module.flags = !{!0}
+!llvm.ident = !{!1}
+
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{!"clang version 10.0.0-4ubuntu1 "}
+```
+
+To run this pass I used "clang -fpass-plugin=Homework5/build/FloatDivPass.so test.cpp"
+
+```{output}
+No floating point divisions found in function.
+Analyzing Function: divided
+Floating point division detected in Basic Block: %0
+  Instruction:   %7 = fdiv double %5, %6
+Analyzing Function: main
+No floating point divisions found in function.
+Analyzing Function: _GLOBAL__sub_I_test.cpp
+No floating point divisions found in function.
+```
+
+# Challenges Faced:
+Initially, I faced many challenges while setting up the llvm and during build and cmake stage. 
+Then, I fond it difficult in llvm pass code. Because even cout can't be mentioned as it is instead errs().
+Even while testing I was able to see the output of the test file but not the LLVM pass.
