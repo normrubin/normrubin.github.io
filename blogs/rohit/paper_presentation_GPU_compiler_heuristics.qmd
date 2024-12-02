@@ -1,0 +1,253 @@
+---
+title: "Paper Presentation"
+author:
+  - name: "Rohit Gurusamy Anandakumar"
+  - name: "Sharmila Sivalingam"
+
+format: html
+---
+
+# GENERATING GPU COMPILER HEURISTICS USING REINFORCEMENT LEARNING
+
+## Abstract: 
+- **Context**: GPU compilers optimize programs for GPU hardware. 
+- **Problem**: Manual creation of heuristic rules is labor-intensive and requires experts. 
+- **Solution Introduced**: A new framework uses off-policy deep reinforcement learning to automate heuristic rule generation. 
+- **Objective**: Enhance frame rates of graphics applications. 
+- **Resilience**: The new heuristics remain effective through compiler updates, reducing the need for frequent retraining. 
+- **Results**: The framework matches or exceeds traditional heuristics in 98% of benchmarks, improving frame rates by 1.6% to 15.8%.
+
+
+## Introduction:
+- Let’s break down the concepts of "black box" and "glass box" paradigms in compiler autotuning frameworks:
+  - **"Black Box" Paradigm**:
+    - **Definition**: In this approach, optimization is done from the outside. The framework uses pragmas (directives) and optimization flags to tweak the code for better performance.
+    - **Learning Agent**: The agent responsible for learning and improving the performance (like a human expert or a computational model) is separate from the compiler itself.
+    - **Limitations**: When new code is introduced, this external learning agent might not be available or integrated with the compiler, which can limit how well-tuned the optimizations are.
+  - **"Glass Box" Paradigm**:
+    - **Definition**: This approach integrates the learning agent directly into the compiler. The agent has visibility into the internal workings of the compiler and can interact with the code more deeply.
+    - **Advantages**: Because the learning agent is part of the compiler, it can continue to optimize new code introduced during production. This means a well-trained solution remains effective and adaptable without needing external adjustments.
+
+
+## Background:
+- **Optimal Heuristic Settings**: Finding the best optimization settings for compilers could theoretically be done by trial-and-error across all possibilities. However, this is impractical due to the extensive time and computational resources required, especially for complex graphics benchmarks.
+- **Challenges**: Graphics benchmarks have long runtimes. Production compilers are frequently updated, making manual tuning continuously laborious.
+- **Standard Approaches**:
+  + **Expert-Driven Autotuning**: Heuristics (optimization rules) are hand-tuned by experts over selected benchmarks. This requires significant expertise and might miss complex patterns.
+  + **Machine Learning-Based Autotuning**: Machine learning can automatically learn complex, non-linear optimization functions in high-dimensional spaces.
+- **Ideal for Compiler Autotuning**: It can handle the non-linear nature and local minima challenges of optimizing heuristics across different hardware.
+- **Benefits of ML-Based Autotuning**: ML models can generalize better to new programs and can be re-tuned more quickly for new hardware with a well-labeled dataset.
+- **"Glass Box" Framework**: In this approach, the ML models that are learned are integrated within the compiler itself, allowing them to control the optimizations directly.
+
+
+
+## Production GPU Compiler Autotuning
+- **Shaders and Their Role**:
+  - **Shaders**: Programs in graphics applications that render frames by projecting 3D shapes onto a 2D display and determining each pixel's color and opacity.
+  - **Languages and Resources**: Written in high-level languages, using resources like multi-dimensional arrays.
+- **Compilation Process**:
+  - **Front-End Compiler**: Converts shaders into device-independent byte code.
+  - **Driver Translation**: Translates byte code into machine-dependent byte code.
+  - **Back-End Compiler**: Converts byte code into the instruction set architecture (ISA) specific to the GPU.
+- **Execution**: ISA and dynamic resource information are combined and sent to the GPU for execution. Multiple shader pipelines can run asynchronously.
+- **Challenges and Heuristics**:
+  - **Dynamic Information**: Efforts to use dynamic information for optimization often fail as the back-end compiler lacks resource knowledge during compile time.
+  - **Simplified Heuristics**: Leads to assumptions that speeding up individual programs will improve the entire application.
+
+### Supervised Learning
+- **Focus on Supervised Learning**: Most machine learning (ML)-based autotuning frameworks use supervised learning to create predictive models based on labeled data.
+- **Performance and Training**: Supervised learning has achieved top performance in compiler autotuning by using inputs derived from the program code and hardware characteristics, and labels based on performance measurements like execution times or frame rates.
+- **Quality of Training Data**: The success of supervised learning depends heavily on the quality of the training dataset. Poor-quality or corrupted data can lead to models that don't perform well in real-world scenarios.
+- **Challenges in GPU Compiler Autotuning**: For real-world graphics applications, obtaining accurate performance labels is challenging due to the non-deterministic and multi-threaded nature of GPU executions, making performance measurement computationally intensive and often impractical.
+
+
+### Reinforcement Learning 
+- **Reinforcement Learning Basics**: Unlike supervised learning (SL), RL doesn't need pre-determined labels. Instead, it uses a reward signal from the environment.
+- **Policy**: The decision function that maps states to actions. In deep reinforcement learning (DRL), this is modeled using a deep neural network (DNN).
+  - **Objective**: To learn a policy (π) that maximizes cumulative expected rewards over a series of states, known as a trajectory (τ).
+- **Training Process**: RL involves trial-and-error, with reward signals guiding the updates to parameters. The "state, action, reward" tuples are generated through interactions between the policy and the environment, forming a feedback loop.
+- **Applications**: RL is typically used for sequential decision-making problems but can also achieve high performance in tasks like classification or detection. Unlike SL, which trains on large static datasets, RL collects data dynamically throughout the training process.
+- **Compiler Autotuning with DRL**:
+  + Previous works have applied DRL to compiler autotuning.
+  + **States**: Derived from characteristics of program code.
+  + **Actions**: Applied code optimizations or heuristic settings.
+  + **Rewards**: Based on performance measurements.
+
+#### Q-Learning
+- **What is Q-Learning?**: Q-Learning is a reinforcement learning (RL) strategy that helps an agent learn how to act optimally by evaluating the quality of different actions in different states, known as state-action pairs.
+- **Q-Table**: In discrete action spaces, the evaluations (or values) of state-action pairs are stored in a Q-table. Each entry represents the expected cumulative reward (discounted by a factor γ) for taking a certain action in a certain state and following a specific policy π.
+- **Optimal Policy**: The goal is to find the optimal policy (π*) that maximizes expected cumulative reward over time. This is achieved by updating the Q-table through trial-and-error interactions with the environment. When following the optimal policy, the agent chooses actions that maximize the expected reward from an initial state s0.
+- **Convergence**: Q-Learning is proven to converge to the optimal values of state-action pairs with probability 1, given that all state-action pairs are sampled repeatedly. Over time, the Q-table reflects the best possible actions for every state.
+- **Expected Cumulative Discounted Reward**: The values in the Q-table, denoted as Q*(s, a), represent the expected cumulative reward, discounted by time, when following the optimal policy through a trajectory τ of size T.
+
+
+
+
+
+## On-Policy vs. Off-Policy DRL for GPU Compiler Autotuning  
+
+**On-Policy DRL:**  
+- Standard DRL algorithms require frequent interaction with a stationary environment, using collected data only once to update internal parameters, making them sample inefficient.
+- Research shows that on-policy algorithms are more simulation-bound compared to off-policy counterparts.
+- Relying solely on on-policy DRL can bottleneck GPU compiler autotuning due to long graphic benchmark runtimes and frequent compiler updates.
+
+**Off-Policy DRL:**  
+- Off-policy DRL learns from previously collected data without needing frequent interaction with the environment, suitable for GPU compiler auto-tuning.
+- This approach allows decoupling data collection and model training, leveraging existing performance automation workflows to prepare offline datasets.
+- However, off-policy methods face instability without corrective feedback and require careful hyperparameter tuning.
+- To address these issues, a Q-learning-based strategy with a controlled feedback loop between data collection and model training is proposed.
+
+
+
+## Problem Formulation for RL-Based GPU Compiler Autotuning  
+
+The objective here will be to identify those heuristic settings that achieve the highest possible frame rate improvements for shaders, while deploying stable compiler heuristics in light of frequent code changes.
+
+- **Environment:** Non-stationary system: static hardware with evolving compiler revisions over time.
+- **States:** Extracted from the IR of the shader, which changes according to the compiler updates.
+- **Actions:** Heuristic settings used at compile time. Optimal actions result in maximum increases in frame rates.
+- **Rewards:** Observed frame rate improvements when performing an action on states.
+- **Policy:** A DNN-based decision function which is trained to maximize the expected frame rates in a non-stationary environment.
+
+## Solution Overview
+The author propose a Q-learning-based off-policy RL strategy to generate GPU compiler heuristics.
+
+- **Training Objective:** Optimize a Q-table to maximize expected frame rate improvements for heuristic actions applied to given states.
+
+• **Inference Objective:** Fit a DNN-based decision policy to approximate the optimal policy by minimizing divergence between them.
+- **Integration:** The trained inference model will serve as a heuristic decision function integrated into the compiler.
+- **Policy Differentiation:** During training, iterate on the decision policy while the behavior policy is frozen at inference time for stable deployment.
+
+## RL-Based GPU Compiler Auto-tuning
+
+The framework addresses the high cost of GPU graphics benchmarks with a robust and generalizable auto-tuning pipeline comprising three modules in a feedback loop: continuous integration, data collection, and model training.
+
+- **Continuous Integration (CI):** Deploys the behavior policy as a heuristic in the latest production compiler.
+
+- **Data Collection:** Gathers performance metrics and IRs from the graphics benchmarks.
+- **Model Training:** Updates Q-table and trains the decision policy to approximate the optimal policy for maximum expected frame rates across the application suite.
+Starting with a randomly initialized decision policy, the framework iteratively refines the model to generate stable and efficient GPU compiler heuristics.
+
+## Continuous Integration
+Continuous integration means developers' source code revisions are incorporated into a shared mainline many times a day. For the generated code, this tempo translates to significant changes in a production compiler. Unlike traditional ML-based autotuning based on frozen snapshots of compilers, our approach integrates the behavior policy into a continuously updated compiler.
+
+## Inference Engine
+
+The compiler inference engine applies the behavior policy as a heuristic to the IR before machine-dependent optimizations.
+
+- **State Analysis:** The state, derived from the incoming IR, is analyzed by the model to determine the optimal heuristic setting.
+- **Continuous Integration:** The policy of behavior is compiled into the most recent compiler for each run of performance.
+- **Data Collection:** Every trial collects the static features of the IR, applied heuristic settings, and observed frame rates from the benchmark suite.
+
+Static features extracted pre-inference are used to build the state to apply heuristics in a time and memory-efficient and reproducible manner.
+
+## Robust Reward Signals
+
+A stable policy generalizing well relies on a meaningful reward signal that encourages desired behavior. In a multi-threaded environment, the performance of one optimized shader sometimes degrades in others due to shared resource competition. The reward signal is defined by the normalized change in frame rate compared to the global default compiler actions. Given a baseline frame rate F0​ and observed frame rate F, the reward is the relative speed-up, F/F0​. But as compilers improve, the performance measurements from the past become outdated.
+
+## Data Collection
+
+Representation of source code for machine learning can be static or dynamic. Dynamic techniques depend on performance counters, which provide a compact summary at runtime, but are expensive to collect and unavailable at compile time. Static techniques, like those in natural language processing, directly extract features from the source code, which is resource-intensive. We extract the features at compile time from the compiler IR in the form of fast, machine-independent features, such as total instructions, basic blocks, and memory operations to meet the constraints of production compilers. This yields a fixed-length feature vector of 44 attributes, consuming merely 176 bytes at 32-bit floating point precision.
+
+## Model Training
+
+- **Off-Policy DRL Algorithms**: Reuse data collected asynchronously, allowing training without bottlenecks from data collection. This is crucial in production systems, where the compiler and data continuously evolve. We implement a Q-learning strategy for stable heuristics in GPU compiler autotuning.
+
+## Q-Learning for GPU Compiler Autotuning
+
+1. **Q-Table and Probabilistic Policy**:
+   - The Q-table represents the expected reward for each state-action pair over a set of applications. It simplifies to the expected performance of applying a heuristic action given a shader's state, modeled as a single time-step Markov Decision Process (MDP).
+   - The optimal policy selects the action that maximizes the probability of achieving the best performance for a given state. Alternatively, the policy can be derived using the Boltzmann softmax operator to balance exploration and exploitation, controlled by the temperature parameter.
+
+2. **Q-Table Updates and Staleness Discounting**:
+   - As the compiler evolves, older performance measurements may become stale. Q-table updates include a discount factor, diminishing the weight of older data based on elapsed time.
+   - For existing state-action pairs, the Q-value is updated as a weighted average of the prior value and the newly observed reward, modulated by a learning rate. For unseen states, the Q-value initializes to the observed reward.
+
+3. **Hyperparameter Tuning and Policy Behavior**:
+   - The temperature parameter in the softmax operator adjusts the trade-off between exploration and exploitation.
+   - The learning rate and discount factor are tunable hyperparameters, ensuring adaptability to changing compiler behavior and iterative data collection.
+
+
+## Approximate optimal policy
+1. Dynamic Q-Table and Generalization Issue:
+Compiler updates change the intermediate representation (IR), creating a non-stationary environment (EEE) and expanding the Q-table with new state-action pairs. This makes the Q-table too large and impractical while lacking the ability to generalize to unseen states.
+
+2. Model-Based Policy Approximation and Iterative Learning:
+To address these issues, train decision policy to approximates the optimal decision policy by minimizing the KL divergence between the empirical Q-table policy and the model's output. This model generalizes to new states and is periodically deployed to guide compiler decisions, with new performance data updating the Q-table in an iterative DRL feedback loop.
+
+```{Algorithm}
+
+    Algorithm 1: RL-based GPU Compiler Autotuning
+    Result: (N)
+    Randomly initialize ;
+    Initialize an empty Q-table;
+    while i < numIterations do
+        Copy learned parameters of decision policy to behaviour policy (i);
+        Integrate behaviour policy into the latest compiler;
+        Get states and performance measurements over A;
+        Update (or expand) the Q-table based on the observed performance measurements;
+        Convert the empirical Q-table to probabilities optimal decision policy(sa);
+        Train decision policy(a|s) to approximate optimal decision policy(sa);
+    end
+
+
+```
+
+
+## Model Training
+
+- **Off-Policy DRL Algorithms**: Reuse data collected asynchronously, allowing training without bottlenecks from data collection. This is crucial in production systems, where the compiler and data continuously evolve. We implement a Q-learning strategy for stable heuristics in GPU compiler autotuning.
+
+## Q-Learning for GPU Compiler Autotuning
+
+1. **Q-Table and Probabilistic Policy**:
+   - The Q-table represents the expected reward for each state-action pair over a set of applications. It simplifies to the expected performance of applying a heuristic action given a shader's state, modeled as a single time-step Markov Decision Process (MDP).
+   - The optimal policy selects the action that maximizes the probability of achieving the best performance for a given state. Alternatively, the policy can be derived using the Boltzmann softmax operator to balance exploration and exploitation, controlled by the temperature parameter.
+
+2. **Q-Table Updates and Staleness Discounting**:
+   - As the compiler evolves, older performance measurements may become stale. Q-table updates include a discount factor, diminishing the weight of older data based on elapsed time.
+   - For existing state-action pairs, the Q-value is updated as a weighted average of the prior value and the newly observed reward, modulated by a learning rate. For unseen states, the Q-value initializes to the observed reward.
+
+3. **Hyperparameter Tuning and Policy Behavior**:
+   - The temperature parameter in the softmax operator adjusts the trade-off between exploration and exploitation.
+   - The learning rate and discount factor are tunable hyperparameters, ensuring adaptability to changing compiler behavior and iterative data collection.
+### Adapting to Production Compiler Development
+- **Dynamic Environment**: Production-level compilers often change rapidly, resulting in a dynamic and non-stationary environment, with constantly evolving conditions and code.
+- **Non-Stationary Environment**: Defined by target hardware and continuously updated production compilers, leading to variability and complexity.
+- **Impact on IR Instructions**: Percentage change in intermediate representation (IR) instructions for a shader can vary by up to 50% over a year, indicating significant code structure changes.
+- **Growth of Q-Table**: The rapid pace of software development leads to an increase in the state space, causing the Q-table to grow. To manage growth and memory overhead, a DNN decision policy (πθ) is trained to approximate the optimal policy (π∗).
+- **Policy Deployment**: The trained DNN policy (πθ) is periodically deployed as a practical policy (πβ), maintaining an efficient and updated policy without excessive memory requirements of a growing Q-table.
+
+### Shader Wavefront Size Selection
+- **Wavefront Sizes**: AMD RDNA™ graphics architecture supports two wavefront sizes: wave32 (32 work-items) and wave64 (64 work-items). The optimal wavefront size depends on dynamic shader properties such as divergence and memory access patterns.
+- **Bandwidth Considerations**:
+  - **Wave64**: Can offer better performance if there is sufficient bandwidth, allowing for more simultaneous memory accesses without causing cache misses.
+  - **Wave32**: Reduces bandwidth strain by spreading out memory accesses over time, beneficial when multiple shaders are running concurrently.
+- **Dynamic Environment**: System bandwidth and other resources are dynamic and shared among concurrently running shaders. The best wavefront size depends on the real-time execution environment, which the compiler doesn't know at compile time.
+  + **RL-Based Autotuning Framework**: Improves frame rates by selecting the optimal wavefront size for each shader at compile time.
+  + **State Representation**: The state of each shader is represented as a fixed-length vector of static features from the compiler's intermediate representation (IR).
+  + **Action Space**: Limited to two options: wave32 and wave64.
+  + **Reward Signal**: Based on changes in frame rate compared to default behavior.
+- **Policy and Implementation**: The decision policy (πθ) is a lightweight, 3-layer feed-forward classifier with less than 20 KB of learnable parameters. The learned parameters are periodically integrated into the compiler as the behavior policy (πβ).
+- **Experimental Results**: The RL framework was tested on the AMD Radeon™ 6800 XT and achieved frame rates matching or surpassing 98% of graphics benchmarks. Performance improvements ranged from an average increase of 1.6% to a maximum of 15.8%. The model converged in only 45 iterations per benchmark application. Experiments were conducted using over 150 graphics benchmarks, each with an average of 230 unique shaders.
+
+### Stability in Production Compilers
+- **Generalization**: The model needs to generalize well to handle new code generated by the frequently updated compiler IR. A well-trained model should perform effectively without needing frequent updates to its learned parameters.
+- **Stability Metric**: Stability is measured using the inverse of the rate of statistically significant regressions. This metric shows how often the model's performance does not decline significantly. A 1-tailed t-test with a p-value of 5% is used to determine statistical significance.
+- **Shader Wavefront Size Selection**: The histogram in Figure 8 illustrates changes in frame rate when the RL-based compiler heuristic is used for selecting shader wavefront size on the AMD Radeon™ RX 5700 XT, demonstrating how the RL-based method impacts performance across various graphics applications.
+- **Stability Over Time**: Stability is tracked over a year of production compiler updates without retraining the deployed model. A value of 100% indicates no statistically significant performance regressions in benchmarks when using the DNN heuristic compared to the default compiler behavior.
+
+### Generalizing Across Target Hardware
+- **Transfer Learning**: Instead of starting from scratch, the researchers use transfer learning to optimize the wavefront execution mode for a different GPU (the AMD Radeon™ RX 5700 XT), utilizing the final Q-table and behavior policy (πβ) from previous experiments as the starting point.
+- **Efficiency and Performance**: With transfer learning, the model needed only 10 iterations over the set of graphics benchmarks to match or surpass previous frame rates in 94.4% of the benchmarks. Improvements included increases of up to 10.3% and an average improvement of 1.5%.
+- **Benchmarking**: Experiments were conducted using the AMD production graphics compiler on over 270 graphics benchmarks, each with an average of 230 unique shaders. Figure 8 in the document provides a histogram of these results, showing the distribution of observed changes in frame rates.
+
+## Conclusion
+- **Framework Development**: The authors developed a GPU compiler autotuning framework using off-policy deep reinforcement learning (DRL) to generate heuristics that improve frame rates in graphics applications.
+- **Continuous Integration and Q-Learning**: The framework combines continuous integration (CI) with Q-Learning to find optimal heuristic settings that maximize frame rate improvements across various graphics benchmarks.
+- **Deployment**: By considering the rapid changes in software development, the trained models can be deployed as stable heuristics in evolving production compilers.
+- **Generalized Gains**: The framework demonstrates generalized performance gains across a large suite of graphics benchmarks and different GPUs.
+
+## Future Work
+- **Explore Static Counters and Dynamic Properties**: Investigate the relationship between the set of static counters and the dynamic properties that the neural network has learned to account for.
+- **Extend to Continuous Action Spaces**: Aim to extend the framework to domains with continuous action spaces using techniques from deep Q-Learning.
