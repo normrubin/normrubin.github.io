@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.37">
+<meta name="generator" content="quarto-1.6.39">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -66,16 +66,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
 <link href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" rel="next">
-<link href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" rel="prev">
+<link href="../../blogs/rohit/paper_presentation_GPU_compiler_heuristics.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-7916ee7d1825171c577c080daf967e67.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-047fff0c935954e357db66cff73c7020.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -411,6 +411,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Homework 5</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/paper_presentation_GPU_compiler_heuristics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -491,6 +497,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Compiler Homework 05 - LLVM Pass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/paper_presentation_GPU_compiler_heuristics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation</span></a>
   </div>
 </li>
       </ul>
@@ -855,7 +867,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="explanation-of-the-code">Explanation of the Code</h2>
 <p>The code I wrote for this question implements a trivial dead code elimination (DCE) optimization for Bril programs. It works by iterating through the instructions in reverse order, maintaining a set of used variables. Instructions that define variables not in this set are eliminated. The algorithm adds variables used as arguments to the set and removes variables when their defining instruction is processed. This approach ensures that instructions defining unused variables are removed while preserving the program’s essential structure and functionality.</p>
 <p>Output of the code with Example 1 as the input:</p>
-<div id="ab416812" class="cell" data-execution_count="1">
+<div id="24cf2c15" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -989,7 +1001,7 @@ Optimized program:
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="er">print</span> <span class="er">a;</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="er">print</span> <span class="er">d;</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="a8affbc0" class="cell" data-execution_count="2">
+<div id="73cbd165" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1143,7 +1155,7 @@ Optimized program:
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="er">prod:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">mul</span> <span class="er">sum1</span> <span class="er">sum2;</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="er">print</span> <span class="er">prod;</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="e2a0cf2e" class="cell" data-execution_count="3">
+<div id="1b457627" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1743,8 +1755,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" class="pagination-link" aria-label="Homework 5">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 5</span>
+      <a href="../../blogs/rohit/paper_presentation_GPU_compiler_heuristics.html" class="pagination-link" aria-label="Paper Presentation">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Paper Presentation</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
