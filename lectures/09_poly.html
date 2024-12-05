@@ -244,7 +244,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
 <section id="a-graphical-view" class="level2">
 <h2 class="anchored" data-anchor-id="a-graphical-view">a graphical view</h2>
 <p>(not legal if there is a pair where the arrows go in opposite directions)</p>
-<div id="8e60c443" class="cell" data-execution_count="1">
+<div id="0631c26b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.ticker <span class="im">as</span> ticker</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -299,7 +299,7 @@ s:   a[i] = a[i-1]               s:   a[i] = a[i-1] </code></pre>
     a[i,j] = a[i,j-1]+ a[i-1,j]</code></pre>
 <p>can we execute this is parallel</p>
 <hr>
-<div id="6534338f" class="cell" data-execution_count="2">
+<div id="313b2e3b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.ticker <span class="im">as</span> ticker</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -472,7 +472,7 @@ j - k == 0</code></pre>
      a[i,j] = 
 </code></pre>
 <p>There is no dependence so we can reorder the loops but what are the new bounds</p>
-<div id="fc48c424" class="cell" data-execution_count="3">
+<div id="59bc495b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -556,7 +556,7 @@ j - k == 0</code></pre>
 <pre><code>
 Here is a graph showing the data flow 
 
-::: {#b4d6f6da .cell execution_count=4}
+::: {#ac11d9a0 .cell execution_count=4}
 ``` {.python .cell-code}
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -684,7 +684,7 @@ dependence = \left \{(s(i), s(i+1)) \mid 1&lt;= i &lt;= 3 \right \}
 <pre><code>for (i=1; i&lt;=n; i++)
 for (j=1; j&lt;=n; j++)
 S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
-<div id="93851842" class="cell" data-execution_count="5">
+<div id="94ac1562" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.ticker <span class="im">as</span> ticker</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -740,7 +740,7 @@ S: A[i][j] = (A[i-1][j] + A[i][j-1]) * 0.5;</code></pre>
 <hr>
 <p>The schedule actually goes up each column (the j values) going over the columns left to right (the i column)</p>
 <p>notice that this does not execute in parallel, but it could if pick a different schedule</p>
-<div id="9206d2a8" class="cell" data-execution_count="6">
+<div id="e8f66621" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.patches <span class="im">as</span> patches</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.ticker <span class="im">as</span> ticker</span>
@@ -1219,7 +1219,7 @@ What does this mean and how does it help?
 
 
 </code></pre>
-<div id="64351c97" class="cell" data-execution_count="7">
+<div id="5a0860c1" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Arc</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
