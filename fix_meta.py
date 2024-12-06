@@ -109,6 +109,7 @@ format:
         scrollable: true
         code-line-numbers: true
         slideNumber: "c/t"
+        mathjax: true
 sidebar: false 
 execute:
     echo: true

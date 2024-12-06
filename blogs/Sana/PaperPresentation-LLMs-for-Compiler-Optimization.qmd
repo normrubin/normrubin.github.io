@@ -1,0 +1,101 @@
+ ---
+author: Sana Taghipour Anvari
+format:
+  html: default
+title: LLMs for Code Optimization, A Promising Start or Overhyped Solution?
+
+--- 
+
+Link for the Paper: [LLMs](https://ar5iv.labs.arxiv.org/html/2309.07062)
+
+## Introduction
+
+The paper *"Large Language Models for Compiler Optimization"* by Cummins et al. introduces a novel application of Large Language Models (LLMs) for optimizing low-level compiler assembly code (LLVM IR). Compiler optimization has traditionally relied on complex rule-based systems developed over decades, but this work explores the potential for LLMs to perform these tasks using a purely data-driven approach. The authors trained a 7-billion parameter transformer model from scratch, specifically tailored to generate optimization strategies for LLVM IR, marking the first time LLMs have been applied directly to compiler optimization.
+
+## Background
+
+To fully appreciate the contributions of this paper, it's important to understand the context of compiler optimization and the role of LLVM:
+
+1. **Compiler Optimization**:
+   - Compilers like LLVM use a series of transformation passes to optimize code for performance and size.
+   - The pass ordering problem, where the goal is to select the sequence of optimization passes that yields the best result, is crucial because different orders can significantly impact performance.
+
+2. **LLVM IR**:
+   - LLVM IR (Intermediate Representation) is a low-level, platform-independent assembly-like code that allows for fine-grained control of compiler optimizations.
+   - Optimizing at the level of IR is challenging as it requires a deep understanding of control flow, data flow, and the underlying hardware.
+
+3. **Traditional Approaches**:
+   - Previous works on compiler optimization using machine learning relied on hand-crafted features, reinforcement learning, or graph neural networks, all of which require extensive manual engineering and multiple compilation attempts.
+
+The key question addressed by this paper is: *Can an LLM, trained directly on LLVM IR, learn to optimize code effectively without these manual features or iterative compilation?*
+
+## Main Contributions
+
+The authors' work offers several innovative contributions:
+
+1. **First Application of LLMs for Code Optimization**
+   - Unlike previous machine learning models, this LLM is trained on raw, unoptimized LLVM IR code, directly predicting the sequence of optimization passes.
+   - The model takes as input the unoptimized LLVM IR and outputs an ordered list of optimization passes, bypassing the need for multiple compilations.
+
+2. **Auxiliary Learning Tasks for Enhanced Understanding**
+   - The model is trained not only to generate pass lists but also to predict the instruction counts before and after optimization, and to generate the optimized code itself.
+   - These auxiliary tasks force the model to develop a deeper understanding of code semantics, and improve its ability to make effective optimization decisions.
+
+3. **Improved Performance Over Traditional Baselines**
+   - The LLM outperforms state-of-the-art machine learning approaches like AutoPhase and Coreset-NVP, achieving a 3.0% reduction in instruction count without invoking the compiler even once, also it's compared to the 5.0% reduction achieved by an autotuner that required millions of compilations. 
+
+4. **Evaluation on a Diverse Set of Benchmarks**
+   - The model's performance was evaluated on a variety of datasets including AI-SOCO, ExeBench, and YARPGen, demonstrating its robustness across different domains.
+
+## Merits and Shortcomings
+
+### Merits
+1. **Reduced Compilation Overhead**:
+   - The LLM generates effective pass lists without requiring iterative compilations and this makes this approach far more efficient than autotuning approaches that rely on exhaustive search.
+
+2. **Generalization Across Different Code Bases**:
+   - The model generalizes well to unseen programs, effectively optimizes code from diverse sources without relying on specific handcrafted features.
+
+3. **Demonstrated Code Understanding**:
+   - The auxiliary learning tasks show that the LLM can develop a sophisticated understanding of LLVM IR, even generating optimized code with almost high accuracy.
+
+### Shortcomings
+1. **Context Window Limitations**:
+   - The fixed sequence length (2k tokens) limits the size of LLVM IR that can be processed, restricting the model's ability to optimize larger functions or entire modules.
+
+2. **Arithmetic Reasoning Challenges**:
+   - The model struggles with complex arithmetic reasoning, such as constant folding and data flow analysis, which are crucial for certain compiler optimizations.
+
+3. **Inference Speed and Resource Requirements**:
+   - While faster than autotuning, the LLM inference is still significantly slower than traditional compiler heuristics, and the model requires substantial GPU resources.
+
+## Historical Context and Connections
+
+This paper represents a significant departure from traditional approaches in compiler optimization, which have relied heavily on handcrafted heuristics and rule-based systems for decades. By applying LLMs to this problem, the authors open up new avenues for leveraging data-driven methods in compiler design. This work is part of a broader trend towards integrating machine learning into software engineering tasks, building on successes in code generation and analysis by models like Codex and Code Llama.
+
+The use of LLMs for compiler optimization also connects to recent efforts in neural machine translation, where models are trained to translate code between different programming languages. However, this is the first instance of a model targeting LLVM IR, a more complex and lower-level code representation than typical source code.
+
+## Class Discussion and Consensus
+
+During the in-class and online discussions, several key insights emerged:
+
+1. **Potential for Hybrid Approaches**:
+   - Many participants suggested integrating the LLM with traditional compiler heuristics or using it as a guidance system for existing optimizers rather than a complete replacement.
+
+2. **Limitations of Current Model Size**:
+   - There was a consensus that scaling up the model and incorporating longer context windows could address some of the issues with handling larger code fragments.
+
+3. **High Error Rate and Need for Improved Accuracy**:
+   - We discussed that the current error rate is high, indicating the need for better accuracy. Training a larger model with a bigger input dataset could help improve the model's performance and reduce the error rate, especially in challenging optimization tasks.
+
+4. **Implications for Future Compiler Design**:
+   - The class generally agreed that this approach could influence the design of future compilers, possibly shifting towards data-driven optimization frameworks that can adapt based on new code patterns.
+
+Finally, a bigger model (bigger than Llama2) and bigger data size should be used for training LLMs to give us better accuracy, and a model that people can use and get benefit from.
+
+## Conclusion
+
+The paper *"Large Language Models for Compiler Optimization"* presents an innovative use of LLMs, demonstrating their potential to replace traditional compiler optimization strategies with a purely data-driven approach. Despite its impressive results, the work highlights several challenges, particularly in arithmetic reasoning and sequence length limitations. Future research could address these issues by leveraging longer context windows, more powerful and accurate models, and hybrid techniques that combine LLMs with traditional compiler heuristics.
+
+Overall, this paper is an exciting first step in applying LLMs to compiler optimization, providing a glimpse into the future of compiler design and the potential role of AI in software engineering.
+

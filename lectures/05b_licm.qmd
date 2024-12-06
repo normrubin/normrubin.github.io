@@ -8,69 +8,38 @@ format:
     code-fold: true
     code-line-numbers: true
     echo: true
+    mathjax: true
     output-file: revealjs_05b_licm.qmd
     scrollable: true
     slideNumber: c/t
 sidebar: false
-title: loop invariant code motion
+title: classic loop optimizations
 
 ---
 
-## licm 
-
-Loop invariant code motion recognizes computations in loop that produce the same value on each iteration  and moves them out of the loop.
-
-## A very common case for this is matrix addressing 
-
-a[i,j] might expand to  to $i*4*\operatorname{stride_{a}} + j *4$ 
-
-```
-for j 
-  a[i,j] = f(a[i,j+1])
-```
-
-turns into 
 
 
-```
-a = 
-b = 
-result = 0
-for (){
-    result += a*b
-}
-```
+Loop optimizations are important because 
 
-## when is a computation loop invariant 
-
-f(a,b)
-
-1. a,b are constants 
-1. a,b are defined outside the loop, 
-1. a,b are loop invariant 
-
-if in ssa there is only one reaching def
-
-for non ssa, we need 
-
-1. all reaching defs of a,b defined outside of the loop
-1. only one def of a,b reaches the computation and that def is loop invariant 
-
-##  when is a computation loop invariant 
-
-```
-a defined outside of the loop (need one definition or ssa )
-
-b = a*2 
-
-d = 5 + b is loop invariant if b
-```
-
-In ssa a variable is loop invariant if it does not have a phi function at the header  of the 
-loop, or it is defined by a phi function and all the inputs are loop constants 
+1. typically there is a regular access pattern
+1. the body of a loop gets repeated 
+1. compilers often assume $10^{depth}$ times 
 
 
-SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed 
+## What are classic loop optimizations?
+
+1. Loop Invariant Code Motion
+1. Induction Variable Recognition 
+1. Strength Reduction 
+1. Linear Test Replacement 
+1. Loop Unrolling
+
+##  Loop Invariant Code Motion
+
+recall natural loops
+
+1. strongly connected region in the cfg 
+1. one entry point (dominates all the nodes in the loop)
 
 
 
@@ -228,6 +197,45 @@ posttest --> next
 ::: 
 
 
+
+
+
+In ssa a variable is loop invariant if it does not have a phi function at the header  of the 
+loop, or it is defined by a phi function and all the inputs are loop constants 
+
+
+SSA If we find a loop-invariant computation in SSA form, then we just move it out of the loop to a block before the loop. When moving a (side effect-free) SSA loop-invariant computation to a previous position, nothing can go wrong, because the value it computes cannot be overwritten later and the values it depends on cannot have been changed 
+
+
+
+## licm 
+
+Loop invariant code motion recognizes computations in loop that produce the same value on each iteration  and moves them out of the loop.
+
+## A very common case for this is matrix addressing 
+
+a[i,j] might expand to  to $i*4*\operatorname{stride_{a}} + j *4$ 
+
+```
+for j 
+  a[i,j] = f(a[i,j+1])
+```
+
+turns into 
+
+
+```
+a = 
+b = 
+result = 0
+for (){
+    result += a*b
+}
+```
+
+
+
+
 ## when is ok to move a computation 
 
 1. no side effects - cannot move  alloc 10 outside of loop;
@@ -303,3 +311,243 @@ we want to process inner loops first
 
 1. add all the pre-headers 
 1. walk the dominator tree in reverse post order - saving all the  loop headers
+
+
+
+## def of loop invariant for an instruction d = op a,b 
+
+1. a,b are constants or,
+1. a,b defined outside the loop
+1. a,b are loop invariants 
+
+in SSA form if we find a loop invariant instruction we can always move it into the pre-header, because the value it writes is never rewritten, and the values that it depends on come from outside the loop
+
+
+
+## test at the bottom - loop always executes at least once 
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+graph TD
+l0["l0:"]
+pre["preheader"]
+l1["l1: i = i +1"]
+d1["d1 = a ⊕ b"]
+d2["   = d1"]
+l0-->pre
+pre --> l1
+l1--> d1
+d1--> d2
+d3["(i < N) goto L1"]
+d2--> d3
+d3--> l1
+d3--> Next
+```
+can move d
+
+## test at the top 
+
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph TD
+l0["l0:d = 0"]
+pre["preheader"]
+l1["if (i>=N) goto L2 \nl1: i = i +1"]
+l0-->pre
+pre --> l1
+d1["d1 = a ⊕ b"]
+d2["   = d1"]
+l1--> d1
+d1--> d2
+d2--> l1
+l1--> l2
+l2--> next
+
+```
+
+we can always convert into 
+
+```
+
+loop test at top 
+
+
+if (test) {
+  preheader
+  loop test at bottom
+}
+```
+
+
+
+## induction variable elimination
+
+```
+for (int i = 0; i < 100; ++1){
+    f(a[i])
+}
+```
+
+calculate a[i] as: &a[0] + 4 * i in every loop iteration, but the values at each step only differ by 4 
+
+We want to change the multiply and add to an add
+
+## Transformation
+
+1. a_i = &a[0] before the loop
+1. a_i = a_i + 4 (add the stride) in every iteration 
+1. the only remaining use of i is the test i < 100, which could become a_i < &a[0] + 4*100 (which is loop invariant)
+
+
+## step 1
+
+1. find basic induction variables 
+i = i + e, where e is loop invariant 
+
+what does this look like in ssa 
+
+
+for each instruction d = c +- loop invariant 
+see if there is a strongly connected graph in the ssa edges that only has adds and subtracts of loop invariant expressions 
+
+## Step 2 find auxiliary induction variables 
+
+j = basic_ind * loop inv + loop invar
+
+```
+for (int i = 0; i < n; i++) {
+     j = 2*i + 1;     // Y 
+     k = -i;          // Y 
+     l = 2*i*i + 1;   // N 
+     c = c + 5;       // Y* 
+}
+```
+
+## step 3 
+
+replace auxiliary induction variables (derived ) by new variables without the multiply
+
+## step4 
+
+if the only remaining use of the induction variable is the termination test, change the test to use the new variable 
+
+```
+sum = 0
+for (i = 1, i < 100; i++) {
+  sum = sum + a[i -1]
+}
+```
+
+in SSA form:
+
+``` 
+   sum0 = 0
+   i0 = 1
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t10 = i1 -1 
+   t20 = t10 * 4
+   t30 = t20 + &a
+   t40 = load t30
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   if (i2 <= 100)go to l
+```
+
+1) i is a basic induction variable 
+1) t10 is a aux  induction variable 
+1) t20 is an aux induction variable 
+1) t30 is an aux induction variable 
+
+t3 has a use in the load 
+
+t3 = t20 + &a ==> t10 * 4 + &a ==> (i1-1)* 4+ &a
+
+t3 = 4* i1 + &a - 4 
+
+
+``` 
+   sum0 = 0
+   i0 = 1
+   t50 = &a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &a
+   t40 = load t50
+   sum2 = sum1 + t40
+   i2 = i1 + 1
+   t52 = t50 + 4
+   if (i2 <= 100)go to l
+```
+
+
+
+``` 
+   sum0 = 0
+   i0 = 1
+   t50 = &a -4  // initial value 
+L: sum1 = phi(sum0, sum2)
+   // i1 = phi(i0, i2)
+   t51 = phi(t50, t52)
+   //t10 = i1 -1 
+   //t20 = t10 * 4
+   //t30 = t20 + &a
+   t40 = load t50
+   sum2 = sum1 + t40
+   //i2 = i1 + 1
+   t52 = t50 + 4
+   if (t52 <= 396 + &a )go to l
+```
+
+
+## loop un-switching 
+
+```
+for (int i = 0 ; i < 100; ++1){
+    if (c) {  // c is loop invariant 
+        f(i)
+    } else {
+        g(i)
+    }
+}
+```
+
+look for special patterns and replace 
+
+
+```
+if (c) {  // c is loop invariant 
+   for (int i = 0 ; i < 100; ++1){
+        f(i)
+    } 
+}else {
+    for (int i = 0 ; i < 100; ++1){
+        g(i)
+    }
+}
+```
+
+This is often done before vectorization 
+
+
+
+loop fusion
+```
+for (i = 0; i < 100 ; ++){
+ s0:   b[i] = f(a[i])
+}
+for (i = 0; i < 100 ; ++){
+ s1:   c[i] = f(b[i])
+}
+```
+
+1) when is it legal to do this?
+1) When can we get rid of the b array?
+
+There is also an optimization that goes the other way 
+split a loop so that each statement becomes a separate loop incase we could run as vectors 
+

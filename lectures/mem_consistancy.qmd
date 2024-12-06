@@ -8,6 +8,7 @@ format:
     code-fold: true
     code-line-numbers: true
     echo: true
+    mathjax: true
     output-file: revealjs_mem_consistancy.qmd
     scrollable: true
     slideNumber: c/t
@@ -255,6 +256,40 @@ y = 2;
 
 A thread expecting x and y to be updated separately might observe an inconsistent state if this transformation is applied.
 
+## volatile 
+
+volatile turns off some optimizations, so compiler writers don't like it. lots of bugs in compilers around volatile.
+
+spec is confusing, developers think it means something not in the spec.
+
+Best for memory mapped hardware, not good for inter thread communication. 
+
+Memory is allowed to tear. No synchronization.
+
+undefined:  bitfields, unions, pre/post increment(not atomic), big objects (more then 1 transfer operation)
+
+volatile is like const: does not apply in constructors/destructors and it does not effect call conventions or returns 
+
+```
+int i,j;
+volatile int vol;
+i = vol = j;
+```
+
+
+```
+volatile int buffer_ready; 
+char buffer[BUF_SIZE]; 
+void buffer_init() { 
+    int i;
+    for (i=0; i<BUF_SIZE; i++) 
+        buffer[i] = 0; 
+    buffer_ready = 1; 
+    }
+    // ok to move buffer assignments below buffer_ready 
+```
+
+In C++ using volatile for inter thread communication is a race, and is not a valid program, so the compiler is free to treat it as any way it wants.
 
 
 ## thread libraries 
@@ -282,6 +317,7 @@ Caching, prefetching, or other memory optimizations need to account for the fact
 The compiler effectively assumes that pthread mutex lock() may read or write any global variable. Thus a memory reference cannot simply be moved across the call. This approach also ensures that transitive calls, e.g. a call to a function f() which then calls pthread mutex lock(), are handled in the same way more or less appropriately, i.e. memory operations are not moved across the call to f() either, whether or not the entire user program is being analyzed at once.
 
 # example 2
+
 ```
 for (...) {
      ... 
@@ -290,7 +326,8 @@ for (...) {
      if (mt) pthread_mutex_unlock(...)
     }
 ```
-
+becomes 
+```
 r = x; 
 for (...) {
      ... 
@@ -303,7 +340,7 @@ for (...) {
      }
 } 
 x = r;
-
+```
 
 
 
@@ -354,7 +391,7 @@ void critical_section_task(int num_increments) {
 
 ## load acquire (needs special hardware )
 
-used by default with atomics not used for non-atomics 
+used by default with atomics but not used for non-atomics 
 
 all memory reads and writes after the load operation cannot be moved before the load. This ensures that after acquiring the value, any operations that depend on this value (like accessing shared data) will see consistent and up-to-date memory.
 
