@@ -440,39 +440,6 @@ EmbedInstrumentationModuleBitcodePass::run(llvm::Module &M,
     }
   }
 
-  auto &LLVMCtx = ClonedModule->getContext();
-
-  auto *Int32Type = llvm::Type::getInt32Ty(LLVMCtx);
-  auto *Int32Ptr =
-      llvm::PointerType::get(Int32Type, llvm::AMDGPUAS::CONSTANT_ADDRESS);
-  // Replace llvm.amdgcn.workgroup.id intrinsics with the luthier-equivalent
-  // Remove all kernels that are meant to serve as a host handle
-  for (auto &F : llvm::make_early_inc_range(ClonedModule->functions())) {
-    for (const auto &[LLVMName, LuthierName, ReturnType] :
-         std::initializer_list<
-             std::tuple<const char *, const char *, llvm::Type *>>{
-             {"llvm.amdgcn.workgroup.id.x", "luthier::workgroupIdX", Int32Type},
-             {"llvm.amdgcn.workgroup.idx.y", "luthier::workgroupIdY",
-              Int32Type},
-             {"llvm.amdgcn.workgroup.idx.z", "luthier::workgroupIdZ",
-              Int32Type},
-             {"llvm.amdgcn.implicitarg.ptr", "luthier::implicitArgPtr",
-              Int32Ptr}}) {
-      if (F.getName().starts_with(LLVMName)) {
-        for (auto *User : llvm::make_early_inc_range(F.users())) {
-          auto *CallInst = llvm::dyn_cast<llvm::CallInst>(User);
-          llvm::IRBuilder<> Builder(CallInst);
-          auto *LuthierIntrinsicCall = insertCallToIntrinsic(
-              *ClonedModule, Builder, LuthierName, *ReturnType);
-          CallInst->replaceAllUsesWith(LuthierIntrinsicCall);
-          CallInst->eraseFromParent();
-        }
-        F.dropAllReferences();
-        F.eraseFromParent();
-      }
-    }
-  }
-
   LLVM_DEBUG(llvm::dbgs() << "Embedded Module " << ClonedModule->getName()
                           << " dump: ");
   LLVM_DEBUG(ClonedModule->print(llvm::dbgs(), nullptr));
@@ -518,18 +485,135 @@ The compiler plugin peforms the following actions:
 6. Removes the body of all Luthier intrinsic functions, and re-format their CXX Itanium mangled names to look similar to LLVM intrinsics.
 7. Removes the "dummy" hook handles defined using the `LUTHIER_EXPORT_HOOK_HANDLE` macro.
 8. Makes all the global variables extern, as the non-cloned module will be the one defining them.
-9. Replaces a set of LLVM intrinsics with their Luthier equivalents, as they require special treatment during Luthier's instrumentation code generation process.
-10. Finally, the cloned module will be embedded inside a non-loadable section of the device code object called `.llvmbc`.
+9. Finally, the cloned module will be embedded inside a non-loadable section of the device code object called `.llvmbc`.
+
+## Generating Instrumented Code
+At runtime, calling the function `luthier::instrumentAndLoad` will generate a newly instrumented code object and loads it into the ROCm runtime for execution. It first clones the `LiftedRepresentation` to allow it to be writable (the original copy is cached by Luthier) and then runs the passed lambda (called the mutator) on the `LiftedRepresentation`. The mutator allows the `LiftedRepresentation` to be directly modified using LLVM CodeGen APIs, or one can also use the `InstrumentationTask` to insert calls to hooks before instructions.
+
+After the mutator is done executing, Luthier's instrumentation code generation executes, which is as follows:
+
+```c++
+  for (auto &[LCOHandle, LCOModule] : LR) {
+    hsa::LoadedCodeObject LCO(LCOHandle);
+    auto Agent = LCO.getAgent();
+    LUTHIER_RETURN_ON_ERROR(Agent.takeError());
+
+    auto &TM = *LR.getTM(LCOHandle);
+    // Load the bitcode of the instrumentation module into the
+    // Lifted Representation's context
+    std::unique_ptr<llvm::Module> IModule;
+    LUTHIER_RETURN_ON_ERROR(Task.getModule()
+                                .readBitcodeIntoContext(LR.getContext(), *Agent)
+                                .moveInto(IModule));
+    // Instantiate the Module PM and analysis in charge of running the
+    // IR pipeline for the instrumentation module
+    // We keep them here because we will need the analysis done at the IR
+    // stage at the code generation stage, which for now we have to use
+    // the legacy pass manager for
+    llvm::LoopAnalysisManager ILAM;
+    llvm::FunctionAnalysisManager IFAM;
+    llvm::CGSCCAnalysisManager ICGAM;
+    llvm::ModuleAnalysisManager IMAM;
+    llvm::ModulePassManager IPM;
+
+    // Instantiate the Legacy PM for running the modified codegen pipeline
+    // on the instrumentation module and MMI
+    // We allocate this on the heap to have the most control over its lifetime,
+    // as if it goes out of scope it will also delete the instrumentation
+    // MMI
+    auto LegacyIPM = new llvm::legacy::PassManager();
+    // Instrumentation module MMI wrapper pass, which will house the final
+    // generate instrumented code
+    auto *IMMIWP = new llvm::MachineModuleInfoWrapperPass(&TM);
+
+    // Create a module analysis manager for the target code
+    llvm::ModuleAnalysisManager TargetMAM;
+    // Create a new Module pass manager, in charge of running the entire
+    // pipeline
+    llvm::ModulePassManager TargetMPM;
+    // Add the pass instrumentation analysis as it is required by the new PM
+    TargetMAM.registerPass(
+        [&]() { return llvm::PassInstrumentationAnalysis(); });
+    // Add the MMI Analysis pass, pointing to the target app's lifted MMI
+    TargetMAM.registerPass(
+        [&]() { return llvm::MachineModuleAnalysis(LCOModule.second); });
+    // Add the instrumentation PM analysis
+    TargetMAM.registerPass([&]() {
+      return IModulePMAnalysis(*IModule, IPM, IMAM, ILAM, IFAM, ICGAM);
+    });
+    // Add the LR Analysis pass
+    TargetMAM.registerPass([&]() { return LiftedRepresentationAnalysis(LR); });
+    // Add the LCO Analysis pass
+    TargetMAM.registerPass([&]() { return LoadedCodeObjectAnalysis(LCO); });
+    // Add the LR Register Liveness pass
+    TargetMAM.registerPass([&]() { return LRRegLivenessAnalysis(); });
+    // Add the LR Callgraph analysis pass
+    TargetMAM.registerPass([&]() { return LRCallGraphAnalysis(); });
+    // Add the MMI-wide Slot indexes analysis pass
+    TargetMAM.registerPass([&]() { return MMISlotIndexesAnalysis(); });
+    // Add the State Value Array storage and load analysis pass
+    TargetMAM.registerPass(
+        [&]() { return LRStateValueStorageAndLoadLocationsAnalysis(); });
+    // Add the Function Preamble Descriptor Analysis pass
+    TargetMAM.registerPass(
+        [&]() { return FunctionPreambleDescriptorAnalysis(); });
+    // Add the IR pipeline for the instrumentation module
+    TargetMPM.addPass(
+        RunIRPassesOnIModulePass(Task, IntrinsicsProcessors, TM, *IModule));
+    // Add the MIR pipeline for the instrumentation module
+    TargetMPM.addPass(
+        RunMIRPassesOnIModulePass(TM, *IModule, *IMMIWP, *LegacyIPM));
+    // Add the kernel pre-amble emission pass
+    TargetMPM.addPass(PrePostAmbleEmitter());
+    // Add the lifted representation patching pass
+    TargetMPM.addPass(
+        PatchLiftedRepresentationPass(*IModule, IMMIWP->getMMI()));
+
+    TargetMPM.run(LCOModule.first, TargetMAM);
+    // TODO: remove this once the new MMI makes it to LLVM master
+    delete LegacyIPM;
+  };
+```
 
 
-
+1. Create an instrumentation `llvm::Module` (i.e. `IModule`) and read the bitcode we embedded in the previous step into it.
+2. Create two separate pass managers: One in charge of managing the target application's MIR and analysis passes on it, and one in charge of generating IR/MIR for the instrumentation logic and their analysis passes.
+3. Add the following analysis to the Target App PM:
+	1. `LRRegLivenessAnalysis`: Which analyzes the register liveness of the application using data flow analysis covered in class, though in some cases this is not enough to ensure liveness for VGPRs. I'm currently working on creating an alternate CFG to run liveness analysis on for VGPRs that also take into account changes in the `EXEC` mask value.
+	2. `LRCallGraphAnalysis`, which naively recovers the call graph of the target application. This is used in conjunction with the register liveness analysis, ensuring correct register reuse in callee instrumentation points.
+	3. `MMISlotIndexesAnalysis` assigns a slot index to each instruction and basic block inside the target application. It is used with the next analysis, `LRStateValueStorageAndLoadLocationsAnalysis`.
+	4. `LRStateValueStorageAndLoadLocationsAnalysis` attempts to find a place to store the SVA (defined previously) with unused/dead registers. Luthier has many ways to store the SVA, depending on the target of choice:
+		1. An Unused VGPR.
+		2. (If target supports using AGPRs as operands in vector instructions, post-gfx90A) an unused AGPR.
+		3. (pre-gfx908) two unused AGPR, with one serving as a spill spot for the app's live VGPR.
+		4. (pre-gfx908) one unused AGPR, with 3 unused SGPRs, with the AGPR holding the SVA, two SGPRs holding the correct flat scratch register value, and a third SGPR to point to the bottom of the instrumentation stack.
+		5. (post MI300, architected flat scratch) single SGPR that points to the bottom of the instrumentation stack.
+		6. (pre-MI300, absolute flat scratch) 3 unused SGPRs, with two SGPRs holding the correct flat scratch register value, and a third SGPR to point to the bottom of the instrumentation stack.
+	Each storage scheme has to have code for loading, and storing the SVA, as well as code to move itself to another storage scheme, and has enough registers/resources to do so without clobbering any of the application registers (especially the `SCC` bit). To minimize additional instructions injected inside the target application, this analysis first attempts to find a fixed storage for the SVA. In extreme cases where the attempt is not successful, it will then figure out where to store the SVA at each slot index of the application using the register liveness analysis. If, at any point in this analysis, no suitable SVA storage is found, instrumentation fails, as without an SVA there is no way to recover the instrumentation stack.
+	Besides storing the SVA, this pass also decides where the SVA will be loaded at each "injected payload" (defined later in `IModuleIRGeneratorPass`). The SVA will be then kept at a fixed location and will not be spilled.
+	5. `FunctionPreambleDescriptorAnalysis`, `LiftedRepresentationAnalysis`, and `LoadedCodeObjectAnalysis` are storage for the preamble descriptor, the `LiftedRepresentation` and the `LoadedCodeObject` being operated on. The `FunctionPreambleDescriptor` aggregates information for the required resources for instrumentation function; For example, if usage of stack is detected in the instrumentation code, the preamble descriptor will be signaled to emit code that sets up the SVA and access to instrumentation stack.
+4. Runs IR passes on the instrumentation Module, which runs the following passes on the `IModule`:
+	1. `IModuleIRGeneratorPass` takes the `InstrumentationTask` description and peforms the following tasks for each instrumentation point (target application's instruction):
+		1. Creates a new `llvm::Function` with the `C` calling convention with no input or output arguments and a `Naked` attribute to prevent a frame to emitted for them (we will emit a custom frame ourselves). We call these functions an "Injected Payload".
+		2. Inside each injected payload it inserts  `llvm::CallInst`s to the hooks with the specified arguments; Register values are done with calls to `luthier::ReadReg` intrinsics; For constant values, the `llvm::Constant`s passed to the instrumentation task will be directly used.
+	2. The normal LLVM IR optimization pipeline.
+	3. `ProcessIntrinsicsAtIRLevelPass` applies the IR lowering callback for each Luthier intrinsic. The callback:
+		1. Replaces each call to a Luthier intrinsic with a call to a "dummy inline assembly" inside the IR
+		2. Enforces the type of register (i.e. S/A/V) its inputs and outputs are required to be.
+		3. Can also analyse the arguments passed to it, and based on them request access to a physical register.
+	As inline assembly remains unchanged during both ISEL and CodeGen pipelines, we use the inline assembly string as a placeholder to identify it later done the code generation pipeline.
+5. Runs the Code Gen Passes on the instrumentation Module:
+	1. Run the LLVM ISEL passes on the `IModule` to generate the `IMMI`, the instrumentation module's `MachineModuleInfo` which will house the `MIR` of the `IModule.`
+	2. `PhysicalRegAccessVirtualizationPass` essentially generates valid MIR code to enforce register constraints:
+		1. Ensures the SVA is kept in a single place by declaring it as a live-in at the entry block, and adding the SVA VGPR as an implicit operand to all return instructions in all return blocks. They count as a valid def and use, respectively.
+		2. The set of registers live at the insertion point, as well as registers accessed by the injected payload will be divided into 32-bit registers; For example, if `s[0:1]` is live, then we divide it into `s0` and `s1`. If `s0_lo` is live, then we set `s0` to be live.
 
 
 
 The final result is a stand-alone ELF that can be loaded and run inside the ROCm runtime.
 
 ## New Feature: Lowering AMDGPU
-On NVIDIA GPUs, accessing this property is very easy; There are dedicated registers the hardware can query to obtain these values; On AMD GPUs, however, there are no dedicated registers for these; Instead, they are either passed as arguments to the SGPRs or
+On NVIDIA GPUs, accessing this property is very easy; There are dedicated registers the hardware can query to obtain these values; On AMD GPUs, however, there are no dedicated registers for these; Instead, they are either passed as arguments to the SGPRs or as "hidden arguments" in the kernel argument buffer.
 
 I implemented
 
