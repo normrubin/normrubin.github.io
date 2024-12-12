@@ -619,12 +619,491 @@ After the mutator is done executing, Luthier's instrumentation code generation e
 
 The final result is an instrumented `llvm::MachineModuleInfo` which can then be passed to LLVM's `AsmPrinter` pass to generate a relocatable file in memory. The relocatable is then linked to an executable using [AMD CoMGR](https://github.com/ROCm/llvm-project/tree/amd-staging/amd/comgr), which can then be loaded and run inside the ROCm runtime.
 
-## New Feature: Lowering AMDGPU
-On NVIDIA GPUs, accessing this property is very easy; There are dedicated registers the hardware can query to obtain these values; On AMD GPUs, however, there are no dedicated registers for these; Instead, they are either passed as arguments to the SGPRs or as "hidden arguments" in the kernel argument buffer.
+## New Feature: Lowering AMDGPU Intrinsics That Depends On Hidden Kernel Arguments
+Let's say I want to access the `blockDim` of a kernel inside a hook. On NVIDIA GPUs, accessing this property is very easy; There are dedicated registers the hardware can query to obtain these values; On AMD GPUs, however, there are no dedicated registers for `blockDim`; Instead, they are either passed as arguments to the SGPRs or as "hidden arguments" in the kernel argument buffer, as stated by the [AMDGPU backend docs](https://llvm.org/docs/AMDGPUUsage.html#code-object-v3-metadata).
 
-I implemented
+This can be easily observed using [Compiler Explorer](https://godbolt.org); The following (very incorrect) HIP code:
+```c++
+__global__ void square(int* array, int n) {
+    int tid = blockDim.x;
+    if (tid < n)
+        array[tid] = array[tid] * array[tid];
+}
+```
 
+will result in the following LLVM IR:
+
+```ll
+define protected amdgpu_kernel void @square(int*, int)(ptr addrspace(1) nocapture %array.coerce, i32 %n) local_unnamed_addr {
+entry:
+  %0 = tail call ptr addrspace(4) @llvm.amdgcn.implicitarg.ptr()
+  %1 = getelementptr inbounds i16, ptr addrspace(4) %0, i64 6
+  %2 = load i16, ptr addrspace(4) %1, align 4
+  %conv.i.i = zext i16 %2 to i32
+  %cmp = icmp slt i32 %conv.i.i, %n
+  br i1 %cmp, label %if.then, label %if.end
+
+if.then:
+  %idxprom = zext i16 %2 to i64
+  %arrayidx = getelementptr inbounds i32, ptr addrspace(1) %array.coerce, i64 %idxprom
+  %3 = load i32, ptr addrspace(1) %arrayidx, align 4
+  %mul = mul nsw i32 %3, %3
+  store i32 %mul, ptr addrspace(1) %arrayidx, align 4
+  br label %if.end
+
+if.end:
+  ret void
+}
+
+declare align 4 ptr addrspace(4) @llvm.amdgcn.implicitarg.ptr() #1
+```
+
+In the first 3 lines, we can see a call to `llvm.amdgcn.implicitarg.ptr`. This call will result in the pointer to the beginning of the hidden argument to be moved to value `%0`. Note that if we leave this LLVM intrinsic alone it will have undefined behavior according to the AMDGPU docs. If we need to find a way to replace it with a Luthier intrinsic so that we can lower it correctly ourselves, we should be in the clear.
+
+Another point of note is the constant `6` offset in the second instruction `%1 = getelementptr inbounds i16, ptr addrspace(4) %0, i64 6`; We can tell from this that hidden kernel arguments have "fixed" offset for each entry, and I confirmed this by looking at the [AMDGPUMetadataStreamer](https://github.com/llvm/llvm-project/blob/main/llvm/lib/Target/AMDGPU/AMDGPUHSAMetadataStreamer.cpp) code:
+```c++
+  auto *Int64Ty = Type::getInt64Ty(Func.getContext());
+  auto *Int32Ty = Type::getInt32Ty(Func.getContext());
+  auto *Int16Ty = Type::getInt16Ty(Func.getContext());
+
+  Offset = alignTo(Offset, ST.getAlignmentForImplicitArgPtr());
+  emitKernelArg(DL, Int32Ty, Align(4), "hidden_block_count_x", Offset, Args);
+  emitKernelArg(DL, Int32Ty, Align(4), "hidden_block_count_y", Offset, Args);
+  emitKernelArg(DL, Int32Ty, Align(4), "hidden_block_count_z", Offset, Args);
+
+  emitKernelArg(DL, Int16Ty, Align(2), "hidden_group_size_x", Offset, Args);
+  emitKernelArg(DL, Int16Ty, Align(2), "hidden_group_size_y", Offset, Args);
+  emitKernelArg(DL, Int16Ty, Align(2), "hidden_group_size_z", Offset, Args);
+
+  emitKernelArg(DL, Int16Ty, Align(2), "hidden_remainder_x", Offset, Args);
+  emitKernelArg(DL, Int16Ty, Align(2), "hidden_remainder_y", Offset, Args);
+  emitKernelArg(DL, Int16Ty, Align(2), "hidden_remainder_z", Offset, Args);
+```
+
+An offset of 6 `i16` is 3 `i32`s, which indeed means we're trying to access the `hidden_group_size_x` argument.
+
+### Implementation
+First I had to create a Luthier intrinsic, called `luthier::implicitArgPtr`. The frontend would look like the following:
+```c++
+/// \return the address of the implicit argument segment
+LUTHIER_INTRINSIC_ANNOTATE uint32_t* implicitArgPtr() {
+  uint32_t* Out;
+  doNotOptimize(Out);
+  return Out;
+}
+```
+This intrinsic, when called, will return a pointer to the beginning of the hidden argument segment.
+
+The next step was to modify the Luthier compiler plugin to replace all uses of `llvm.amdgcn.implicitarg.ptr` with `luthier::implicitArgPtr`, which was done by adding the following code snippet right before embedding the modified bitcode:
+
+```c++
+  auto *Int32Type = llvm::Type::getInt32Ty(LLVMCtx);
+  auto *Int32Ptr =
+      llvm::PointerType::get(Int32Type, llvm::AMDGPUAS::CONSTANT_ADDRESS);
+  // Replace llvm.amdgcn.workgroup.id intrinsics with the luthier-equivalent
+  // Remove all kernels that are meant to serve as a host handle
+  for (auto &F : llvm::make_early_inc_range(ClonedModule->functions())) {
+    for (const auto &[LLVMName, LuthierName, ReturnType] :
+         std::initializer_list<
+             std::tuple<const char *, const char *, llvm::Type *>>{
+             {"llvm.amdgcn.workgroup.id.x", "luthier::workgroupIdX", Int32Type},
+             {"llvm.amdgcn.workgroup.idx.y", "luthier::workgroupIdY",
+              Int32Type},
+             {"llvm.amdgcn.workgroup.idx.z", "luthier::workgroupIdZ",
+              Int32Type},
+             {"llvm.amdgcn.implicitarg.ptr", "luthier::implicitArgPtr",
+              Int32Ptr}}) {
+      if (F.getName().starts_with(LLVMName)) {
+        for (auto *User : llvm::make_early_inc_range(F.users())) {
+          auto *CallInst = llvm::dyn_cast<llvm::CallInst>(User);
+          llvm::IRBuilder<> Builder(CallInst);
+          auto *LuthierIntrinsicCall = insertCallToIntrinsic(
+              *ClonedModule, Builder, LuthierName, *ReturnType);
+          CallInst->replaceAllUsesWith(LuthierIntrinsicCall);
+          CallInst->eraseFromParent();
+        }
+        F.dropAllReferences();
+        F.eraseFromParent();
+      }
+    }
+  }
+```
+
+(Note that I plan to do a similar thing for other special intrinsics).
+
+Now that we've generated valid instrumentation IR, it was time to implement a way to lower this intrinsic. To do that, I need to add an additional feature to the Luthier intrinsic lowering mechanism: Accessing kernel arguments, which meant the MIR lowering callbacks had to be modified with an additional lambda:
+
+```c++
+namespace luthier {
+
+/// \brief a set of kernel arguments Luthier's intrinsic lowering mechanism
+/// can ensure access to
+/// \details these values are only available to the kernel as "arguments"
+/// as they come either preloaded in S/VGPRs or they are passed as "hidden"
+/// arguments in the kernel argument buffer. As these values (or the way to
+/// access them) are stored in GPRs they can be overwritten the moment they
+/// are unused by the instrumented app. To ensure access to these values
+/// in instrumentation routines, Luthier must emit a prologue on top of the
+/// kernel's original prologue to save these values in an unused register,
+/// or spill them to the top of the instrumentation stack's buffer to be
+/// loaded when necessary
+enum KernelArgumentType {
+  /// Wavefront's private segment buffer
+  WAVEFRONT_PRIVATE_SEGMENT_BUFFER = 0,
+  /// Enum marking the beginning of kernel arguments always passed on SGPRs
+  ALWAYS_IN_SGPR_BEGIN = WAVEFRONT_PRIVATE_SEGMENT_BUFFER,
+  /// 64-bit address of the kernel's argument buffer
+  KERNARG_SEGMENT_PTR = 1,
+  /// 32-bit offset from the beginning of the kernel's argument buffer where
+  /// the kernel's hidden arguments starts
+  HIDDEN_KERNARG_OFFSET = 2,
+  /// 32-bit offset from the beginning of the kernel's argument buffer where
+  /// the instrumentation-passed (i.e. user) argument buffer starts
+  USER_KERNARG_OFFSET = 3,
+  /// 64-bit Dispatch ID of the kernel
+  DISPATCH_ID = 4,
+  /// 64-bit flat scratch base address of the wavefront
+  FLAT_SCRATCH = 5,
+  /// 32-bit private segment wave offset
+  PRIVATE_SEGMENT_WAVE_BYTE_OFFSET = 6,
+  /// Enum marking the end of kernel arguments always passed on SGPRs
+  ALWAYS_IN_SGPR_END = PRIVATE_SEGMENT_WAVE_BYTE_OFFSET,
+  /// 64-bit address of the dispatch packet of the kernel being executed
+  DISPATCH_PTR = 7,
+  /// Enum marking the beginning of kernel arguments that can either be passed
+  /// on SGPRs or hidden kernel arguments
+  EITHER_IN_SGPR_OR_HIDDEN_BEGIN = DISPATCH_PTR,
+  /// 64-bit address of the HSA queue used to launch the kernel
+  QUEUE_PTR = 8,
+  /// Size of a work-item's private segment
+  WORK_ITEM_PRIVATE_SEGMENT_SIZE = 9,
+  /// Enum marking the end of kernel arguments that are either passed on the
+  /// SGPRs or hidden kernel arguments
+  EITHER_IN_SGPR_OR_HIDDEN_END = WORK_ITEM_PRIVATE_SEGMENT_SIZE,
+  /// Dispatch workgroup work-item count for the x dimension
+  BLOCK_COUNT_X = 10,
+  /// Enum marking the beginning of hidden-only kernel arguments
+  HIDDEN_BEGIN = BLOCK_COUNT_X,
+  /// Dispatch workgroup work-item count for the y dimension
+  BLOCK_COUNT_Y = 11,
+  /// Dispatch workgroup work-item count for the z dimension
+  BLOCK_COUNT_Z = 12,
+  GROUP_SIZE_X = 13,
+  GROUP_SIZE_Y = 14,
+  GROUP_SIZE_Z = 15,
+  REMAINDER_X = 16,
+  REMAINDER_Y = 17,
+  REMAINDER_Z = 18,
+  GLOBAL_OFFSET_X = 19,
+  GLOBAL_OFFSET_Y = 20,
+  GLOBAL_OFFSET_Z = 21,
+  PRINT_BUFFER = 22,
+  HOSTCALL_BUFFER = 23,
+  DEFAULT_QUEUE = 24,
+  COMPLETION_ACTION = 25,
+  MULTIGRID_SYNC = 26,
+  GRID_DIMS = 27,
+  HEAP_V1 = 28,
+  DYNAMIC_LDS_SIZE = 29,
+  PRIVATE_BASE = 30,
+  SHARED_BASE = 31,
+  HIDDEN_END = SHARED_BASE,
+  WORK_ITEM_X = 32,
+  WORK_ITEM_Y = 33,
+  WORK_ITEM_Z = 34
+};
+
+/// \brief describes a function type used for each intrinsic to generate
+/// <tt>llvm::MachineInstr</tt>s in place of its IR calls.
+/// The MIR processor takes in the
+/// \c IntrinsicIRLoweringInfo generated by its \c IntrinsicIRProcessorFunc as
+/// well as the lowered registers and their inline assembly flags for
+/// its used/defined values. A lambda which will create an
+/// \c llvm::MachineInstr at the place of emission given an instruction opcode
+/// is also passed to this function
+typedef std::function<llvm::Error(
+    const IntrinsicIRLoweringInfo &,
+    llvm::ArrayRef<std::pair<llvm::InlineAsm::Flag, llvm::Register>>,
+    const std::function<llvm::MachineInstrBuilder(int)> &,
+    const std::function<llvm::Register(const llvm::TargetRegisterClass *)> &,
+    const std::function<llvm::Register(KernelArgumentType)> &,
+    const llvm::MachineFunction &,
+    const std::function<llvm::Register(llvm::MCRegister)> &,
+    llvm::DenseMap<llvm::MCRegister, llvm::Register> &)>
+    IntrinsicMIRProcessorFunc;
+
+/// \brief Used internally by \c luthier::CodeGenerator to keep track of
+/// registered intrinsics and how to process them
+struct IntrinsicProcessor {
+  IntrinsicIRProcessorFunc IRProcessor{};
+  IntrinsicMIRProcessorFunc MIRProcessor{};
+};
+```
+
+The new argument to the `IntrinsicMIRProcessorFunc` is a function which will return a virtual register that contains the value of that "kernel argument". That function is implemented inside `IntrinsicMIRLoweringPass` as follows:
+
+```c++
+auto SVAAccessorBuilder = [&](KernelArgumentType KA) {
+          auto LaneId =
+              stateValueArray::getKernelArgumentLaneIdStoreSlotBeginForWave64(
+                  KA);
+          LUTHIER_REPORT_FATAL_ON_ERROR(LaneId.takeError());
+          auto ArgSize =
+              stateValueArray::getKernelArgumentStoreSlotSizeForWave64(KA);
+          LUTHIER_REPORT_FATAL_ON_ERROR(ArgSize.takeError());
+
+          llvm::SmallVector<llvm::Register, 2> Out;
+
+          for (unsigned short i = 0; i < *ArgSize; i++) {
+            Out.push_back(
+                MRI.createVirtualRegister(&llvm::AMDGPU::SGPR_32RegClass));
+            llvm::BuildMI(MBB, MI, llvm::MIMetadata(MI),
+                          TII->get(llvm::AMDGPU::V_READLANE_B32), Out.back())
+                .addReg(SVAVGPR, 0)
+                .addImm(*LaneId + i);
+          }
+          // Add the requested kernarg
+          auto TargetMF = TargetMI.getParent()->getParent();
+          if (TargetMF->getFunction().getCallingConv() ==
+              llvm::CallingConv::AMDGPU_KERNEL) {
+            PreambleDescriptor.Kernels[TargetMF]
+                .RequestedKernelArguments.insert(KA);
+          } else {
+            PreambleDescriptor.DeviceFunctions[TargetMF]
+                .RequestedKernelArguments.insert(KA);
+          }
+
+          // Emit a reg sequence if the arg size was greater than 1
+          if (*ArgSize > 1) {
+            // First create a reg sequence MI
+            auto Builder = MIBuilder(llvm::AMDGPU::REG_SEQUENCE);
+
+            auto MergedReg = MRI.createVirtualRegister(
+                llvm::SIRegisterInfo::getSGPRClassForBitWidth(*ArgSize * 32));
+            Builder.addReg(MergedReg, llvm::RegState::Define);
+
+            // Split the src reg into 32-bit regs, and merge them in the
+            for (const auto &[SubIdx, Reg] : llvm::enumerate(Out)) {
+              Builder.addReg(Reg).addImm(
+                  llvm::SIRegisterInfo::getSubRegFromChannel(SubIdx));
+            }
+            return MergedReg;
+          } else {
+            return Out[0];
+          }
+        };
+```
+Each kernel argument will be stored in fixed lane(s) of the SVA. Kernel argument address is saved in lanes 15 and 16, and the offset for the hidden kernel arg is located in lane 17.
+
+With the MIR lowering callback now modified, we can implement a lowering mechanism for the `luthier::implicitArgPtr`:
+
+```c++
+namespace luthier {
+
+llvm::Expected<IntrinsicIRLoweringInfo>
+implicitArgPtrIRProcessor(const llvm::Function &Intrinsic,
+                          const llvm::CallInst &User,
+                          const llvm::GCNTargetMachine &TM) {
+  // The user must not have any operands
+  LUTHIER_RETURN_ON_ERROR(
+      LUTHIER_ERROR_CHECK(User.arg_size() == 0,
+                          "Expected no operands to be passed to the "
+                          "luthier::implicitArgPtr intrinsic '{0}', got {1}.",
+                          User, User.arg_size()));
+
+  luthier::IntrinsicIRLoweringInfo Out;
+  // The kernarg hidden address will be returned in an SGPR
+  Out.setReturnValueInfo(&User, "s");
+
+  return Out;
+}
+
+llvm::Error implicitArgPtrMIRProcessor(
+    const IntrinsicIRLoweringInfo &IRLoweringInfo,
+    llvm::ArrayRef<std::pair<llvm::InlineAsm::Flag, llvm::Register>> Args,
+    const std::function<llvm::MachineInstrBuilder(int)> &MIBuilder,
+    const std::function<llvm::Register(const llvm::TargetRegisterClass *)>
+        &VirtRegBuilder,
+    const std::function<llvm::Register(KernelArgumentType)> &KernArgAccessor,
+    const llvm::MachineFunction &MF,
+    const std::function<llvm::Register(llvm::MCRegister)> &PhysRegAccessor,
+    llvm::DenseMap<llvm::MCRegister, llvm::Register> &PhysRegsToBeOverwritten) {
+  // There should be only a single virtual register involved in the operation
+  LUTHIER_RETURN_ON_ERROR(
+      LUTHIER_ERROR_CHECK(Args.size() == 1,
+                          "Number of virtual register arguments "
+                          "involved in the MIR lowering stage of "
+                          "luthier::implicitArgPtr is {0} instead of 1.",
+                          Args.size()));
+  LUTHIER_RETURN_ON_ERROR(LUTHIER_ERROR_CHECK(
+      Args[0].first.isRegDefKind(),
+      "The register argument of luthier::implicitArgPtr is not a definition."));
+  llvm::Register Output = Args[0].second;
+  // Get the kernel argument
+  llvm::Register KernArgSGPR = KernArgAccessor(KERNARG_SEGMENT_PTR);
+  // Get the offset of the hidden arg
+  llvm::Register HiddenOffsetSGPR = KernArgAccessor(HIDDEN_KERNARG_OFFSET);
+
+	// The lower part of the hidden argument address
+  llvm::Register FirstAddSGPR = VirtRegBuilder(&llvm::AMDGPU::SGPR_32RegClass);
+
+	// The upper part of the hidden argument address
+  llvm::Register SecondAddSGPR = VirtRegBuilder(&llvm::AMDGPU::SGPR_32RegClass);
+
+	// Add the hidden argument offset to the kernel argument address's
+	// lower register
+  MIBuilder(llvm::AMDGPU::S_ADD_U32)
+      .addReg(FirstAddSGPR, llvm::RegState::Define)
+      .addReg(KernArgSGPR, llvm::RegState::Kill,
+              llvm::SIRegisterInfo::getSubRegFromChannel(0))
+      .addReg(HiddenOffsetSGPR, llvm::RegState::Kill);
+
+	// Add the carry to the upper register fo the kernel argument address
+  MIBuilder(llvm::AMDGPU::S_ADDC_U32)
+      .addReg(SecondAddSGPR, llvm::RegState::Define)
+      .addReg(KernArgSGPR, llvm::RegState::Kill,
+              llvm::SIRegisterInfo::getSubRegFromChannel(1))
+      .addImm(0);
+
+  // Do a reg sequence copy to the output to return it
+  (void)MIBuilder(llvm::AMDGPU::REG_SEQUENCE)
+      .addReg(Output, llvm::RegState::Define)
+      .addReg(SecondAddSGPR)
+      .addImm(llvm::SIRegisterInfo::getSubRegFromChannel(1))
+      .addReg(FirstAddSGPR)
+      .addImm(llvm::SIRegisterInfo::getSubRegFromChannel(0));
+
+  return llvm::Error::success();
+}
+
+} // namespace luthier
+```
+
+
+Finally, we have to add support to the `PrePostAmbleEmitter.cpp`, so that whenever we need access to the hidden kernel argument offset, we extract it from the metadata and hardcode it into the kernel pre-amble. The kernel argument buffer address is different as it is an SGPR argument:
+```c++
+		// If access to kernarg buffer was requested, enable it
+        if (SVAInfo.RequestedKernelArguments.contains(KERNARG_SEGMENT_PTR)) {
+          enableKernArg(MFI, TRI);
+        }
+		// Omitted code for handling scratch
+        // Emit code to store the rest of the requested SGPR kernel arguments
+        for (const auto &[KernArg, PreloadValue] :
+             {std::pair{KERNARG_SEGMENT_PTR,
+                        llvm::AMDGPUFunctionArgInfo::KERNARG_SEGMENT_PTR},
+              {DISPATCH_ID, llvm::AMDGPUFunctionArgInfo::DISPATCH_ID},
+              {DISPATCH_PTR, llvm::AMDGPUFunctionArgInfo::DISPATCH_PTR},
+              {QUEUE_PTR, llvm::AMDGPUFunctionArgInfo::QUEUE_PTR}}) {
+          if (SVAInfo.RequestedKernelArguments.contains(KernArg)) {
+            auto StoreSlotBegin =
+                stateValueArray::getKernelArgumentLaneIdStoreSlotBeginForWave64(
+                    KernArg);
+            if (auto Err = StoreSlotBegin.takeError()) {
+              TargetModule.getContext().emitError(toString(std::move(Err)));
+              return llvm::PreservedAnalyses::all();
+            }
+            auto StoreSlotSize =
+                stateValueArray::getKernelArgumentStoreSlotSizeForWave64(
+                    KernArg);
+            if (auto Err = StoreSlotSize.takeError()) {
+              TargetModule.getContext().emitError(toString(std::move(Err)));
+              return llvm::PreservedAnalyses::all();
+            }
+            if (auto Err = emitCodeToStoreSGPRKernelArg(
+                    *EntryInstr, getArgReg(*MF, PreloadValue), SVSStorageReg,
+                    *StoreSlotBegin, *StoreSlotSize,
+                    OriginalSGPRArgLocs.contains(PreloadValue))) {
+              TargetModule.getContext().emitError(toString(std::move(Err)));
+              return llvm::PreservedAnalyses::all();
+            }
+          }
+        }
+// Add code for storring the hidden kernarg offset
+        if (SVAInfo.RequestedKernelArguments.contains(HIDDEN_KERNARG_OFFSET)) {
+          llvm::outs() << "emitting code to store the hidden arg offset.\n";
+          auto &KernArgs =
+              llvm::dyn_cast<hsa::LoadedCodeObjectKernel>(FuncSymbol)
+                  ->getKernelMetadata()
+                  .Args;
+
+          LUTHIER_REPORT_FATAL_ON_ERROR(LUTHIER_ERROR_CHECK(
+              KernArgs.has_value(), "Attempted to access the hidden arguments "
+                                    "of a kernel without any arguments."));
+          uint32_t HiddenOffset = [&]() {
+            for (const auto &Arg : *KernArgs) {
+              if (Arg.ValueKind >= hsa::md::ValueKind::HiddenArgKindBegin &&
+                  Arg.ValueKind <= hsa::md::ValueKind::HiddenArgKindEnd) {
+                return Arg.Offset;
+              }
+            }
+            return uint32_t{0};
+          }();
+          auto StoreLane =
+              stateValueArray::getKernelArgumentLaneIdStoreSlotBeginForWave64(
+                  HIDDEN_KERNARG_OFFSET);
+          LUTHIER_REPORT_FATAL_ON_ERROR(StoreLane.takeError());
+
+          llvm::BuildMI(*EntryInstr->getParent(), EntryInstr, llvm::DebugLoc(),
+                        TII->get(llvm::AMDGPU::V_WRITELANE_B32), SVSStorageReg)
+              .addImm(HiddenOffset)
+              .addImm(*StoreLane)
+              .addReg(SVSStorageReg);
+
+          EntryInstr->getMF()->print(llvm::outs());
+        }
+
+```
+
+That's it!
+
+## Results
+For validating the implementation, I wrote a tool which instrumented the last instruction of the first basic block to copy over the `gridDim` and `blockDim` into two managed variables as follows
+
+```c++
+MARK_LUTHIER_DEVICE_MODULE
+
+/// Where we will write the grid dim
+__attribute__((managed)) dim3 GridDim{0, 0, 0};
+/// Where we will write the block dim
+__attribute__((managed)) dim3 BlockDim{0, 0, 0};
+
+/// Copy over the grid dim and block dim
+LUTHIER_HOOK_ANNOTATE accessKernelArg() { GridDim = gridDim;
+										 BlockDim = blockDim;}
+
+LUTHIER_EXPORT_HOOK_HANDLE(accessKernelArg);
+
+/// Instruments the last instruction of the first basic block
+static llvm::Error instrumentationLoop(InstrumentationTask &IT,
+                                       LiftedRepresentation &LR) {
+  for (auto &[_, MF] : LR.functions()) {
+    LUTHIER_RETURN_ON_ERROR(IT.insertHookBefore(
+        MF->begin()->back(), LUTHIER_GET_HOOK_HANDLE(accessKernelArg)));
+  }
+  return llvm::Error::success();
+}
+
+static void
+instrumentAllFunctionsOfLR(const hsa::LoadedCodeObjectKernel &Kernel) {
+  auto LR = lift(Kernel);
+  LUTHIER_REPORT_FATAL_ON_ERROR(LR.takeError());
+
+  LUTHIER_REPORT_FATAL_ON_ERROR(
+      instrumentAndLoad(Kernel, *LR, instrumentationLoop, "kernarg_access"));
+}
+
+```
+
+
+On three separate benchmarks in the [HecBench](https://github.com/zjin-lcf/HeCBench) this tool will return the correct `gridDim` and `blockDim`s:
+
+
+
+
+
+Seems like it works!
 
 ## Conclusion and Future Work
-
-Right now I rely solely . However, I need to implement an additional mechanism that compares the kernel arguments in the original kernel and the instrumented one. Even though the
+Though the code is successfully lowered to correct code, there is still work that needs to be done:
+1. If a kernel doesn't require access to hidden arguments, it might not be setup by the ROCCLR low-level runtime; If this is indeed the case, Luthier instead needs to setup the kernel arguments.
+2. Since hooks potentially can be called many many times inside a kernel, reading from the kernel argument memory many times is not efficient. Instead of replacing the `implicitarg` LLVM intrinsic, we need to look at the offsets that they are loading from, and use that to detect the exact kernel arguments they are accessing. This way, we can only do this once in the pre-amble and store it in the SVA, so that we can access it later.
