@@ -31,7 +31,7 @@ Luthier addresses each of the afformentioned challenge as follows:
 
 Luthier implements these designs by heavily leveraging the LLVM project and its AMDGPU backend, which we explain in more detail below:
 
-### Inspecting Code Objects
+### Disassembling, Lifting, and Inspecting Code Objects
 As we mentioned earlier, Luthier instruments code by duplicating the target application's code so that it can freely inject instrumentation logic inside it. To do this, Luthier takes in a single ELF/executable, and inspects its symbols using LLVM's object utilities. It then identifies the kernels and device functions inside the ELF and disassembles them into LLVM MC instructions. [MC](https://blog.llvm.org/2010/04/intro-to-llvm-mc-project.html) is the machine code/assembler layer of LLVM. It is meant to represent "physical" instructions and registers. While disassembling code, Luthier identifies the branch instructions and identifies their targets if possible for later use.
 
 After disassembly is complete Luthier uses the obtained information from the ELF to "lift" it to LLVM Machine IR (MIR). [MIR](https://llvm.org/docs/CodeGenerator.html) is LLVM's representation used in its target-independent code generator (i.e. backends). It is a superset of LLVM MC, meaning an LLVM MC instruction can also be easily converted to
@@ -49,16 +49,491 @@ s_add_u32 s4, s4, func1@rel32@lo+4
 s_addc_u32 s5, s5, func1@rel32@lo+4
 ```
 
-The result of the lifting process it a `LiftedRepresentation`, which is a mapping between the HSA/ROCr symbols of the ELF and their LLVM equivalent.
+In the future, we will have to add analysis logic to at least reduce this restriction; For now, however, it is more than enough for a proof-of-concept. The result of the lifting process it a `LiftedRepresentation`, which is a mapping between the HSA/ROCr symbols of the ELF and their LLVM equivalent.
 
-### Generating Instrumentation Code
-As mentioned earlier,
 
-### Step 1. Intercepting AMD GPU Code Objects
+### Writing Luthier Tools
+A sample Luthier tool can look like the following:
 
-### Step 2. Analyzing the
+```c++
+
+using namespace luthier;
+
+/// Kernel instruction counter
+__attribute__((managed)) uint64_t Counter = 0;
+
+/// Macro marking the device module (code object) of this tool to
+/// be a Luthier tool
+MARK_LUTHIER_DEVICE_MODULE
+
+LUTHIER_HOOK_ANNOTATE countInstructionsVector(bool CountWaveFrontLevel) {
+  // Get the exec mask of the wavefront
+  unsigned long long int ExecMask = __builtin_amdgcn_read_exec();
+  // Get the position of the thread in the current wavefront (1-index)
+  const uint32_t LaneId = __lane_id() + 1;
+  // Get the first active thread id inside this wavefront
+  uint32_t FirstActiveThreadId = __ffsll(ExecMask);
+  // Get the number of active threads in this wavefront
+  uint32_t NumActiveThreads = __popcll(ExecMask);
+
+  // Have only the first active thread perform the atomic add
+  if (FirstActiveThreadId == LaneId) {
+    if (CountWaveFrontLevel) {
+      // Num threads can be zero when accounting for predicates off
+      if (NumActiveThreads > 0) {
+        atomicAdd(&Counter, 1);
+      }
+    } else {
+      atomicAdd(&Counter, NumActiveThreads);
+    }
+  }
+}
+
+LUTHIER_EXPORT_HOOK_HANDLE(countInstructionsVector);
+
+LUTHIER_HOOK_ANNOTATE countInstructionsScalar() {
+  // Get the exec mask of the wavefront
+  unsigned long long int ExecMask = __builtin_amdgcn_read_exec();
+  // Overwrite the exec mask with one so that only a single thread is active
+  luthier::writeExec(1);
+  // Increment the counter by 1
+  atomicAdd(&Counter, 1);
+  // Restore the exec mask
+  luthier::writeExec(ExecMask);
+}
+
+LUTHIER_EXPORT_HOOK_HANDLE(countInstructionsScalar);
+
+static llvm::Error instrumentationLoop(InstrumentationTask &IT,
+                                       LiftedRepresentation &LR) {
+  // Create a constant bool indicating the CountWavefrontLevel value
+  auto *CountWavefrontLevelConstVal =
+      llvm::ConstantInt::getBool(LR.getContext(), CountWavefrontLevel);
+  unsigned int I = 0;
+  for (auto &[_, MF] : LR.functions()) {
+    for (auto &MBB : *MF) {
+      for (auto &MI : MBB) {
+        if (I >= InstrBeginInterval && I < InstrEndInterval) {
+          bool IsScalar =
+              llvm::SIInstrInfo::isSOP1(MI) || llvm::SIInstrInfo::isSOP2(MI) ||
+              llvm::SIInstrInfo::isSOPK(MI) || llvm::SIInstrInfo::isSOPC(MI) ||
+              llvm::SIInstrInfo::isSOPP(MI) || llvm::SIInstrInfo::isSMRD(MI);
+          bool IsLaneAccess =
+              MI.getOpcode() == llvm::AMDGPU::V_READFIRSTLANE_B32 ||
+              MI.getOpcode() == llvm::AMDGPU::V_READLANE_B32 ||
+              MI.getOpcode() == llvm::AMDGPU::V_WRITELANE_B32;
+          if (IsScalar || IsLaneAccess)
+            LUTHIER_RETURN_ON_ERROR(IT.insertHookBefore(
+                MI, LUTHIER_GET_HOOK_HANDLE(countInstructionsScalar)));
+          else
+            LUTHIER_RETURN_ON_ERROR(IT.insertHookBefore(
+                MI, LUTHIER_GET_HOOK_HANDLE(countInstructionsVector),
+                {CountWavefrontLevelConstVal}));
+        }
+        I++;
+      }
+    }
+  }
+  return llvm::Error::success();
+}
+
+static void
+instrumentAllFunctionsOfLR(const hsa::LoadedCodeObjectKernel &Kernel) {
+  auto LR = lift(Kernel);
+  LUTHIER_REPORT_FATAL_ON_ERROR(LR.takeError());
+  LUTHIER_REPORT_FATAL_ON_ERROR(
+      instrumentAndLoad(Kernel, *LR, instrumentationLoop, "instr_count"));
+}
+
+/// ... Definition of Luthier HSA/ROCr callbacks goes here
+
+```
+
+Luthier tools are written in HIP/C++. This example tool first calls the `lift` function on the kernel of interest to obtain an instance of `LiftedRepresentation`. It then uses the `instrumentAndLoad` function to instrument the kernel and load it into ROCr. The `instrumentationLoop` is a lambda function that allows direct modification of the `LR` (the one inside the `instrumentAllFunctionsOfLR` is immutable) and population of an `InstrumentationTask` by calling the `insertHookBefore` function, letting the tool know that we want to insert a call to an instrumentation function (also called hooks).
+
+Some special macros used in Luthier tools are as follows:
+1. `MARK_LUTHIER_DEVICE_MODULE` has the following definition:
+	```c++
+	#define MARK_LUTHIER_DEVICE_MODULE \
+	__attribute__((managed, used)) char __luthier_reserved = 0;
+	```
+	This macro ensures the device module of the Luthier tool is easily identifiable by the Luthier runtime. Also the managed variable ensures that our device module will be loaded right before the first HIP kernel launch. In some instances  where the target application directly uses the ROCr runtime, we enable eager loading in HIP using a special environment variable to ensure our tool device module is loaded right away.
+2. The following macros are related to Luthier "hooks":
+	```c++
+	#define LUTHIER_HOOK_ANNOTATE \
+  	__attribute__((device, used, annotate("luthier_hook"))) extern "C" void
+	#define LUTHIER_EXPORT_HOOK_HANDLE(HookName) \
+  	__attribute__((global, used)) extern "C" void __luthier_hook_handle_##HookName(){};
+		#define LUTHIER_GET_HOOK_HANDLE(HookName)     \
+  	reinterpret_cast<const void *>(__luthier_hook_handle_##HookName)
+	```
+	Hook is an special instrumentation function that can be called right before an instruction of a application. It will be inlined inside the call site while ensuring correct register and stack usage. A hook can also call other device functions and they don't have to be inlined themselves. Hooks can take arguments to Register values and LLVM `Constant`s (e.g. `countInstructionsVector` takes a bool argument which is setup inside `instrumentationLoop`).
+
+	As device functions in HIP don't get a handle accessible from the host code, the `LUTHIER_EXPORT_HOOK_HANDLE` macro creates a host-accessible dummy handle that can be used by the host logic using  `LUTHIER_GET_HOOK_HANDLE`. The `__attribute__(used)` ensures the compiler doesn't optimize these symbols away, as they are needed for Luthier's correct functionality.
+
+3. Luthier doesn't allow usage of inline assembly inside its hooks or any of its called device functions as their register usage cannot be analyzed until the very last step of code generation; Instead, it introduces a new concept called a "Luthier Intrinsic". Luthier intrinsics are meant to behave like LLVM intrinsics, as they end up translating to a sequence of low-level code. Luthier itself has a set of pre-implemented intrinsics, including `luthier::readReg` and `luthier::writeReg`, which read and write values to the registers. In this example, we use the `luthier::writeExec` intrinsic:
+	```c++
+	#define LUTHIER_INTRINSIC_ANNOTATE \
+	__attribute__((device, noinline, annotate("luthier_intrinsic")))
+
+	template <typename T>
+	__attribute__((device, always_inline)) void doNotOptimize(T const &Value) {
+		__asm__ __volatile__("" : : "X"(Value) : "memory");
+	}
+
+	LUTHIER_INTRINSIC_ANNOTATE void writeExec(uint64_t Val) {
+	  doNotOptimize(Val);
+	}
+	```
+	The `LUTHIER_INTRINSIC_ANNOTATE` macro annotates any Luthier intrinsic device functions used in hooks. Since HIP doesn't allow calls to `extern` device functions (due to lack of support for device functions in the ROCr loader), we need to emit a body for it and ensure the compiler doesn't optimize any of the arguments away and the intrinsic calls away. The `doNotOptimize` template device function is used for exactly this purpose, which is borrowed from [Google Benchmark Framework](https://stackoverflow.com/questions/66795357/google-benchmark-frameworks-donotoptimize).
+
+As mentioned earlier, Luthier does not rely on inserting calls to a pre-compiled instrumentation device function. Luthier instead, embeds a pre-processed LLVM IR bitcode that it embeds inside the device code object. At tool compile time, Luthier utilizes a custom compiler plugin, implemented as follows:
+```c++
+//===-- EmbedInstrumentationModuleBitcodePass.cpp -------------------------===//
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file implements the \c luthier::EmbedInstrumentationModuleBitcode pass,
+/// used by Luthier tools to preprocess instrumentation modules and embedding
+/// them inside device code objects.
+//===----------------------------------------------------------------------===//
+
+#include "EmbedInstrumentationModuleBitcodePass.hpp"
+
+#include "llvm/Passes/PassPlugin.h"
+#include <llvm/ADT/StringExtras.h>
+#include <llvm/Analysis/ValueTracking.h>
+#include <llvm/Bitcode/BitcodeWriterPass.h>
+#include <llvm/Demangle/Demangle.h>
+#include <llvm/IR/Module.h>
+#include <llvm/Passes/PassBuilder.h>
+#include <llvm/Support/AMDGPUAddrSpace.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Transforms/Utils/Cloning.h>
+#include <llvm/Transforms/Utils/ModuleUtils.h>
+
+#undef DEBUG_TYPE
+#define DEBUG_TYPE "luthier-embed-optimized-bitcode-pass"
+
+namespace luthier {
+
+// TODO: Import these variables as well as the static functions from
+//  Luthier proper once the separate compilation issue is resolved
+
+static constexpr const char *ReservedManagedVar = "__luthier_reserved";
+
+static constexpr const char *HookAttribute = "luthier_hook";
+
+static constexpr const char *IntrinsicAttribute = "luthier_intrinsic";
+
+static constexpr const char *HipCUIDPrefix = "__hip_cuid_";
+
+/// Builds a \c llvm::CallInst invoking the intrinsic indicated by
+/// \p IntrinsicName at the instruction position indicated by the \p Builder
+/// with the given \p ReturnType and \p Args
+/// \tparam IArgs Arguments passed to the intrinsic; Can be either a scalar
+/// or a reference to a \c llvm::Value
+/// \param M the instrumentation module where the intrinsic will be inserted to
+/// \param Builder the instruction builder used to build the call instruction
+/// \param IntrinsicName the name of the intrinsic
+/// \param ReturnType the return type of the intrinsic call instruction
+/// \param Args the arguments to the intrinsic function
+/// \return a \c llvm::CallInst to the intrinsic function
+llvm::CallInst *insertCallToIntrinsic(llvm::Module &M,
+                                      llvm::IRBuilderBase &Builder,
+                                      llvm::StringRef IntrinsicName,
+                                      llvm::Type &ReturnType) {
+  auto &LLVMContext = Builder.getContext();
+  /// Construct the intrinsic's LLVM function type and its argument value
+  /// list
+  auto *IntrinsicFuncType = llvm::FunctionType::get(&ReturnType, false);
+  // Format the readReg intrinsic function name
+  std::string FormattedIntrinsicName{IntrinsicName};
+  llvm::raw_string_ostream IntrinsicNameOS(FormattedIntrinsicName);
+  // Format the intrinsic function name
+  IntrinsicNameOS << ".";
+  IntrinsicFuncType->getReturnType()->print(IntrinsicNameOS);
+  // Create the intrinsic function in the module, or get it if it already
+  // exists
+  auto ReadRegFunc = M.getOrInsertFunction(
+      FormattedIntrinsicName, IntrinsicFuncType,
+      llvm::AttributeList().addFnAttribute(LLVMContext, IntrinsicAttribute,
+                                           IntrinsicName));
+
+  return Builder.CreateCall(ReadRegFunc);
+}
+
+/// Given a function's mangled name \p MangledFuncName,
+/// partially demangles it and returns the base function name with its
+/// namespace prefix \n
+/// For example given a demangled function name int a::b::c<int>(), this
+/// method returns a::b::c
+/// \param MangledFuncName the mangled function name
+/// \return the name of the function with its namespace prefix
+static std::string
+getDemangledFunctionNameWithNamespace(llvm::StringRef MangledFuncName) {
+  // Get the name of the function, without its template arguments
+  llvm::ItaniumPartialDemangler Demangler;
+  // Ensure successful partial demangle operation
+  if (Demangler.partialDemangle(MangledFuncName.data()))
+    llvm::report_fatal_error("Failed to demangle the intrinsic name " +
+                             MangledFuncName + ".");
+  // Output string
+  std::string Out;
+  // Output string's ostream
+  llvm::raw_string_ostream OS(Out);
+
+  size_t BufferSize;
+  char *FuncNamespaceBegin =
+      Demangler.getFunctionDeclContextName(nullptr, &BufferSize);
+  if (strlen(FuncNamespaceBegin) != 0) {
+    OS << FuncNamespaceBegin;
+    OS << "::";
+  }
+  char *FuncNameBase = Demangler.getFunctionBaseName(nullptr, &BufferSize);
+  OS << FuncNameBase;
+  return Out;
+}
+
+/// Groups the set of annotated values in \p M into instrumentation
+/// hooks and intrinsics of instrumentation hooks \n
+/// \note This function should get updated as Luthier's programming model
+/// gets updated
+/// \param [in] M Module to inspect
+/// \param [out] Hooks a list of hook functions found in \p M
+/// \param [out] Intrinsics a list of intrinsics found in \p M
+/// \return any \c llvm::Error encountered during the process
+static llvm::Error
+getAnnotatedValues(const llvm::Module &M,
+                   llvm::SmallVectorImpl<llvm::Function *> &Hooks,
+                   llvm::SmallVectorImpl<llvm::Function *> &Intrinsics) {
+  const llvm::GlobalVariable *V =
+      M.getGlobalVariable("llvm.global.annotations");
+  if (V == nullptr)
+    return llvm::Error::success();
+  const llvm::ConstantArray *CA = cast<llvm::ConstantArray>(V->getOperand(0));
+  for (llvm::Value *Op : CA->operands()) {
+    auto *CS = cast<llvm::ConstantStruct>(Op);
+    // The first field of the struct contains a pointer to the annotated
+    // variable.
+    llvm::Value *AnnotatedVal = CS->getOperand(0)->stripPointerCasts();
+    if (auto *Func = llvm::dyn_cast<llvm::Function>(AnnotatedVal)) {
+      // The second field contains a pointer to a global annotation string.
+      auto *GV =
+          cast<llvm::GlobalVariable>(CS->getOperand(1)->stripPointerCasts());
+      llvm::StringRef Content;
+      llvm::getConstantStringInfo(GV, Content);
+      if (Content == HookAttribute) {
+        Hooks.push_back(Func);
+        LLVM_DEBUG(llvm::dbgs() << "Found hook " << Func->getName() << ".\n");
+      } else if (Content == IntrinsicAttribute) {
+        Intrinsics.push_back(Func);
+        LLVM_DEBUG(llvm::dbgs()
+                   << "Found intrinsic " << Func->getName() << ".\n");
+      }
+    }
+  }
+  return llvm::Error::success();
+}
+
+llvm::PreservedAnalyses
+EmbedInstrumentationModuleBitcodePass::run(llvm::Module &M,
+                                           llvm::ModuleAnalysisManager &AM) {
+  if (M.getGlobalVariable("llvm.embedded.module", /*AllowInternal=*/true))
+    llvm::report_fatal_error(
+        "Attempted to embed bitcode twice. Are you passing -fembed-bitcode?",
+        /*gen_crash_diag=*/false);
+
+  llvm::Triple T(M.getTargetTriple());
+  // Only operate on the AMD GCN code objects
+  if (T.getArch() != llvm::Triple::ArchType::amdgcn)
+    return llvm::PreservedAnalyses::all();
+
+  // Clone the module in order to preprocess it + not interfere with normal
+  // HIP compilation
+  auto ClonedModule = llvm::CloneModule(M);
+
+  // Extract all the hooks and intrinsics
+  llvm::SmallVector<llvm::Function *, 4> Hooks;
+  llvm::SmallVector<llvm::Function *, 4> Intrinsics;
+  if (auto Err = getAnnotatedValues(*ClonedModule, Hooks, Intrinsics))
+    llvm::report_fatal_error(std::move(Err), true);
+
+  // Remove the annotations variable from the Module now that it is processed
+  auto AnnotationGV =
+      ClonedModule->getGlobalVariable("llvm.global.annotations");
+  if (AnnotationGV) {
+    AnnotationGV->dropAllReferences();
+    AnnotationGV->eraseFromParent();
+  }
+
+  // Remove the llvm.used and llvm.compiler.use variable list
+  for (const auto &VarName : {"llvm.compiler.used", "llvm.used"}) {
+    auto LLVMUsedVar = ClonedModule->getGlobalVariable(VarName);
+    if (LLVMUsedVar != nullptr) {
+      LLVMUsedVar->dropAllReferences();
+      LLVMUsedVar->eraseFromParent();
+    }
+  }
+
+  // Give each Hook function a "hook" attribute
+  for (auto Hook : Hooks) {
+    // TODO: remove the always inline attribute once Hooks support the anyreg
+    // calling convention
+    Hook->addFnAttr(HookAttribute);
+    Hook->removeFnAttr(llvm::Attribute::OptimizeNone);
+    Hook->removeFnAttr(llvm::Attribute::NoInline);
+    Hook->addFnAttr(llvm::Attribute::AlwaysInline);
+  }
+  // Remove the body of each intrinsic function and make them extern
+  // Also demangle the name and format it similar to LLVM intrinsics
+  for (auto Intrinsic : Intrinsics) {
+    Intrinsic->deleteBody();
+    Intrinsic->setComdat(nullptr);
+    llvm::StringRef MangledIntrinsicName = Intrinsic->getName();
+    // Format the intrinsic name
+    std::string FormattedIntrinsicName;
+    llvm::raw_string_ostream FINOS(FormattedIntrinsicName);
+    std::string DemangledIntrinsicName =
+        getDemangledFunctionNameWithNamespace(MangledIntrinsicName);
+    FINOS << DemangledIntrinsicName;
+    // Add the output type if it's not void
+    auto *ReturnType = Intrinsic->getReturnType();
+    if (!ReturnType->isVoidTy()) {
+      FINOS << ".";
+      ReturnType->print(FINOS);
+    }
+    // Add the argument types
+    for (const auto &Arg : Intrinsic->args()) {
+      FINOS << ".";
+      Arg.getType()->print(FINOS);
+    }
+    Intrinsic->addFnAttr(IntrinsicAttribute, DemangledIntrinsicName);
+    Intrinsic->setName(FormattedIntrinsicName);
+  }
+
+  // Remove all kernels that are meant to serve as a host handle
+  for (auto &F : llvm::make_early_inc_range(ClonedModule->functions())) {
+
+    if (F.getCallingConv() == llvm::CallingConv::AMDGPU_KERNEL) {
+      F.dropAllReferences();
+      F.eraseFromParent();
+    }
+  }
+
+  // Convert all global variables to extern, remove any managed variable
+  // initializers
+  // Remove any unnecessary variables (e.g. "llvm.metadata")
+  // Extract the CUID for identification
+  for (auto &GV : llvm::make_early_inc_range(ClonedModule->globals())) {
+    auto GVName = GV.getName();
+    if (GVName.ends_with(".managed") || GVName == ReservedManagedVar ||
+        GV.getSection() == "llvm.metadata") {
+      GV.dropAllReferences();
+      GV.eraseFromParent();
+    } else if (!GVName.starts_with(HipCUIDPrefix)) {
+      GV.setInitializer(nullptr);
+      GV.setLinkage(llvm::GlobalValue::ExternalLinkage);
+      GV.setVisibility(llvm::GlobalValue::DefaultVisibility);
+      GV.setDSOLocal(false);
+    }
+  }
+
+  auto &LLVMCtx = ClonedModule->getContext();
+
+  auto *Int32Type = llvm::Type::getInt32Ty(LLVMCtx);
+  auto *Int32Ptr =
+      llvm::PointerType::get(Int32Type, llvm::AMDGPUAS::CONSTANT_ADDRESS);
+  // Replace llvm.amdgcn.workgroup.id intrinsics with the luthier-equivalent
+  // Remove all kernels that are meant to serve as a host handle
+  for (auto &F : llvm::make_early_inc_range(ClonedModule->functions())) {
+    for (const auto &[LLVMName, LuthierName, ReturnType] :
+         std::initializer_list<
+             std::tuple<const char *, const char *, llvm::Type *>>{
+             {"llvm.amdgcn.workgroup.id.x", "luthier::workgroupIdX", Int32Type},
+             {"llvm.amdgcn.workgroup.idx.y", "luthier::workgroupIdY",
+              Int32Type},
+             {"llvm.amdgcn.workgroup.idx.z", "luthier::workgroupIdZ",
+              Int32Type},
+             {"llvm.amdgcn.implicitarg.ptr", "luthier::implicitArgPtr",
+              Int32Ptr}}) {
+      if (F.getName().starts_with(LLVMName)) {
+        for (auto *User : llvm::make_early_inc_range(F.users())) {
+          auto *CallInst = llvm::dyn_cast<llvm::CallInst>(User);
+          llvm::IRBuilder<> Builder(CallInst);
+          auto *LuthierIntrinsicCall = insertCallToIntrinsic(
+              *ClonedModule, Builder, LuthierName, *ReturnType);
+          CallInst->replaceAllUsesWith(LuthierIntrinsicCall);
+          CallInst->eraseFromParent();
+        }
+        F.dropAllReferences();
+        F.eraseFromParent();
+      }
+    }
+  }
+
+  LLVM_DEBUG(llvm::dbgs() << "Embedded Module " << ClonedModule->getName()
+                          << " dump: ");
+  LLVM_DEBUG(ClonedModule->print(llvm::dbgs(), nullptr));
+
+  llvm::SmallVector<char> Data;
+  llvm::raw_svector_ostream OS(Data);
+  auto PA = llvm::BitcodeWriterPass(OS).run(*ClonedModule, AM);
+
+  llvm::embedBufferInModule(
+      M, llvm::MemoryBufferRef(llvm::toStringRef(Data), "ModuleData"),
+      ".llvmbc");
+
+  return PA;
+}
+} // namespace luthier
+
+llvm::PassPluginLibraryInfo getEmbedLuthierBitcodePassPluginInfo() {
+  const auto Callback = [](llvm::PassBuilder &PB) {
+    PB.registerOptimizerLastEPCallback(
+        [](llvm::ModulePassManager &MPM, llvm::OptimizationLevel Opt) {
+          MPM.addPass(luthier::EmbedInstrumentationModuleBitcodePass());
+        });
+  };
+
+  return {LLVM_PLUGIN_API_VERSION, "pre-process-and-embed-luthier-bitcode",
+          LLVM_VERSION_STRING, Callback};
+}
+
+#ifndef LLVM_LUTHIER_TOOL_COMPILE_PLUGIN_LINK_INTO_TOOLS
+extern "C" LLVM_ATTRIBUTE_WEAK ::llvm::PassPluginLibraryInfo
+llvmGetPassPluginInfo() {
+  return getEmbedLuthierBitcodePassPluginInfo();
+}
+#endif
+```
+
+The compiler plugin peforms the following actions:
+1. It only operates on AMDGPU code objects and not the host executable.
+2. It clones the device code's `llvm::Module`. It doesn't interfer with the original compilation  as the next steps will cause Clang/LLVM to be unhappy.
+3. Using annotations done in the tool's source code, we identify the hooks and intrinsics inside the device module, and then remove the `llvm::GlobalVariable` that holds the annotated values.
+4. Removes the `llvm.compiler.use` and `llvm.used` global variables, as they don't matter in the instrumentation process.
+5. Gives each hook device function a "luthier_hook" attribute so that they are easily identified later on. They are also given forced inlined attributes, as hooks are always meant to be inlined at the instrumentation point.
+6. Removes the body of all Luthier intrinsic functions, and re-format their CXX Itanium mangled names to look similar to LLVM intrinsics.
+7. Removes the "dummy" hook handles defined using the `LUTHIER_EXPORT_HOOK_HANDLE` macro.
+8. Makes all the global variables extern, as the non-cloned module will be the one defining them.
+9. Replaces a set of LLVM intrinsics with their Luthier equivalents, as they require special treatment during Luthier's instrumentation code generation process.
+10. Finally, the cloned module will be embedded inside a non-loadable section of the device code object called `.llvmbc`.
+
+
+
+
+
+
+The final result is a stand-alone ELF that can be loaded and run inside the ROCm runtime.
 
 ## New Feature: Lowering AMDGPU
 On NVIDIA GPUs, accessing this property is very easy; There are dedicated registers the hardware can query to obtain these values; On AMD GPUs, however, there are no dedicated registers for these; Instead, they are either passed as arguments to the SGPRs or
 
 I implemented
+
+
+## Conclusion and Future Work
+
+Right now I rely solely . However, I need to implement an additional mechanism that compares the kernel arguments in the original kernel and the instrumented one. Even though the
