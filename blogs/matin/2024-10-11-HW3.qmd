@@ -1,0 +1,280 @@
+---
+author: matinraayai
+format:
+ html: default
+title: "Homework 3: Dataflow Analysis"
+---
+For this homework I implemented a liveness analysis in BRIL. I implemented it using the pseudo code that was covered
+in class. My implementation can be found [here](https://github.com/matinraayai/bril/blob/main/examples/df_matin.py).
+
+I tested my implementation on the tests already under the
+[df](https://github.com/matinraayai/bril/tree/main/examples/test/df) folder, as well as other tests for other programs.
+I added a small portion at the end which checks if the live-ins of the successors of each block is included in the
+live-outs of each block.
+
+Sample Outputs:
+
+```bash
+bril2json < ../../../benchmarks/mem/adj2csr.bril | python3 ../../df_matin.py
+
+b1:
+  in:  max, seq
+  out: ∅
+b1:
+  in:  rng, size
+  out: arr, i, max, one, rng, size, zero
+loop:
+  in:  arr, i, max, one, rng, size, zero
+  out: arr, i, max, one, rng, size, zero
+body:
+  in:  arr, i, max, one, rng, size, zero
+  out: arr, i, max, one, rng, size, val, zero
+if_body:
+  in:  arr, i, max, one, rng, size, zero
+  out: arr, i, max, one, rng, size, val, zero
+if_done:
+  in:  arr, i, max, one, rng, size, val, zero
+  out: arr, i, max, one, rng, size, zero
+loop_end:
+  in:  arr, i, max, one, rng, size, zero
+  out: arr, i, max, one, rng, size, zero
+done:
+  in:  arr
+  out: ∅
+b1:
+  in:  arr, size
+  out: arr, i, one, size
+loop:
+  in:  arr, i, one, size
+  out: arr, i, one, size
+body:
+  in:  arr, i, one, size
+  out: arr, i, one, size
+loop_end:
+  in:  arr, i, one, size
+  out: arr, i, one, size
+done:
+  in:  ∅
+  out: ∅
+b1:
+  in:  size
+  out: arr, i, one, size, zero
+loop:
+  in:  arr, i, one, size, zero
+  out: arr, i, one, size, zero
+body:
+  in:  arr, i, one, size, zero
+  out: arr, i, one, size, zero
+loop_end:
+  in:  arr, i, one, size, zero
+  out: arr, i, one, size, zero
+done:
+  in:  arr
+  out: ∅
+b1:
+  in:  adjmat, csr_edges, csr_offset, num_nodes
+  out: adjmat, csr_edges, csr_offset, num_edges, num_nodes, one, row
+iter_row:
+  in:  adjmat, csr_edges, csr_offset, num_edges, num_nodes, one, row
+  out: adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+iter_col:
+  in:  adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+  out: adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+col_body:
+  in:  adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+  out: adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+if_body:
+  in:  adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+  out: adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+col_end:
+  in:  adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+  out: adjmat, col, csr_edges, csr_offset, num_edges, num_nodes, one, row
+col_done:
+  in:  adjmat, csr_edges, csr_offset, num_edges, num_nodes, one, row
+  out: adjmat, csr_edges, csr_offset, num_edges, num_nodes, one, row
+row_end:
+  in:  adjmat, csr_edges, csr_offset, num_edges, num_nodes, one, row
+  out: adjmat, csr_edges, csr_offset, num_edges, num_nodes, one, row
+row_done:
+  in:  num_edges
+  out: ∅
+b1:
+  in:  num_nodes, seed
+  out: ∅
+```
+
+```bash
+bril2json < ../../../benchmarks/mixed/cholesky.bril | python3 ../../df_matin.py
+
+b1:
+  in:  ∅
+  out: ∅
+b1:
+  in:  sqsize
+  out: arr, i, one, sqsize, zero
+loop:
+  in:  arr, i, one, sqsize, zero
+  out: arr, i, one, sqsize, zero
+body:
+  in:  arr, i, one, sqsize, zero
+  out: arr, i, one, sqsize, zero
+loop_end:
+  in:  arr, i, one, sqsize, zero
+  out: arr, i, one, sqsize, zero
+done:
+  in:  arr
+  out: ∅
+b1:
+  in:  arr, size
+  out: arr, i, one, size
+loop:
+  in:  arr, i, one, size
+  out: arr, i, one, size
+body:
+  in:  arr, i, one, size
+  out: arr, i, one, size
+loop_end:
+  in:  arr, i, one, size
+  out: arr, i, one, size
+done:
+  in:  ∅
+  out: ∅
+b1:
+  in:  arr1, arr2, dest, size
+  out: arr1, arr2, dest, one, row, size
+row.loop:
+  in:  arr1, arr2, dest, one, row, size
+  out: arr1, arr2, dest, one, row, size
+row.body:
+  in:  arr1, arr2, dest, one, row, size
+  out: arr1, arr2, col, dest, one, row, size
+col.loop:
+  in:  arr1, arr2, col, dest, one, row, size
+  out: arr1, arr2, col, dest, one, row, size
+col.body:
+  in:  arr1, arr2, col, dest, one, row, size
+  out: arr1, arr2, col, dest, i, one, row, size, sum
+sum.loop:
+  in:  arr1, arr2, col, dest, i, one, row, size, sum
+  out: arr1, arr2, col, dest, i, one, row, size, sum
+sum.body:
+  in:  arr1, arr2, col, dest, i, one, row, size, sum
+  out: arr1, arr2, col, dest, i, one, row, size, sum
+sum.loop_end:
+  in:  arr1, arr2, col, dest, i, one, row, size, sum
+  out: arr1, arr2, col, dest, i, one, row, size, sum
+sum.done:
+  in:  arr1, arr2, col, dest, one, row, size, sum
+  out: arr1, arr2, col, dest, one, row, size
+col.loop_end:
+  in:  arr1, arr2, col, dest, one, row, size
+  out: arr1, arr2, col, dest, one, row, size
+col.done:
+  in:  arr1, arr2, dest, one, row, size
+  out: arr1, arr2, dest, one, row, size
+row.loop_end:
+  in:  arr1, arr2, dest, one, row, size
+  out: arr1, arr2, dest, one, row, size
+row.done:
+  in:  ∅
+  out: ∅
+b1:
+  in:  input, output, size
+  out: input, one, output, row, size
+row.loop:
+  in:  input, one, output, row, size
+  out: input, one, output, row, size
+row.body:
+  in:  input, one, output, row, size
+  out: col, input, one, output, row, size
+col.loop:
+  in:  col, input, one, output, row, size
+  out: col, input, one, output, row, size
+col.body:
+  in:  col, input, one, output, row, size
+  out: col, input, one, output, row, size
+col.loop_end:
+  in:  col, input, one, output, row, size
+  out: col, input, one, output, row, size
+col.done:
+  in:  input, one, output, row, size
+  out: input, one, output, row, size
+row.loop_end:
+  in:  input, one, output, row, size
+  out: input, one, output, row, size
+row.done:
+  in:  ∅
+  out: ∅
+b1:
+  in:  input
+  out: n, notdone, precision, x
+for.cond.4:
+  in:  n, notdone, precision, x
+  out: n, notdone, precision, x
+for.body.4:
+  in:  n, notdone, precision, x
+  out: diff, n, notdone, precision, root
+then.18:
+  in:  diff, n, notdone, precision, root
+  out: diff, n, notdone, precision, root
+else.18:
+  in:  diff, n, notdone, precision, root
+  out: diff, n, notdone, precision, root
+endif.18:
+  in:  diff, n, notdone, precision, root
+  out: n, notdone, precision, root
+then.25:
+  in:  n, precision, root
+  out: n, notdone, precision, root
+else.25:
+  in:  n, notdone, precision, root
+  out: n, notdone, precision, root
+endif.25:
+  in:  n, notdone, precision, root
+  out: n, notdone, precision, x
+for.end.4:
+  in:  x
+  out: ∅
+b1:
+  in:  arr1, arr2, size
+  out: arr1, arr2, i, one, size
+i.loop:
+  in:  arr1, arr2, i, one, size
+  out: arr1, arr2, i, one, size
+i.body:
+  in:  arr1, arr2, i, one, size
+  out: arr1, arr2, i, j, one, size
+j.loop:
+  in:  arr1, arr2, i, j, one, size
+  out: arr1, arr2, i, j, one, size
+j.body:
+  in:  arr1, arr2, i, j, one, size
+  out: arr1, arr2, i, j, k, one, size
+k.loop:
+  in:  arr1, arr2, i, j, k, one, size
+  out: arr1, arr2, i, j, k, one, size
+k.body:
+  in:  arr1, arr2, i, j, k, one, size
+  out: arr1, arr2, i, j, k, one, size
+k.loop_end:
+  in:  arr1, arr2, i, j, k, one, size
+  out: arr1, arr2, i, j, k, one, size
+k.done:
+  in:  arr1, arr2, i, j, one, size
+  out: arr1, arr2, i, j, one, size
+j.loop_end:
+  in:  arr1, arr2, i, j, one, size
+  out: arr1, arr2, i, j, one, size
+j.done:
+  in:  arr1, arr2, i, one, size
+  out: arr1, arr2, i, one, size
+i.loop_end:
+  in:  arr1, arr2, i, one, size
+  out: arr1, arr2, i, one, size
+i.done:
+  in:  ∅
+  out: ∅
+b1:
+  in:  ∅
+  out: ∅
+```
