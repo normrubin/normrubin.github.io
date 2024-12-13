@@ -1096,9 +1096,27 @@ instrumentAllFunctionsOfLR(const hsa::LoadedCodeObjectKernel &Kernel) {
 
 
 On three separate benchmarks in the [HecBench](https://github.com/zjin-lcf/HeCBench) this tool will return the correct `gridDim` and `blockDim`s:
+```bash
 
+LD_PRELOAD=./examples/KernelArgumentIntrinsic/libKernelArgumentIntrinsic.so ./main data/CT-MONO2-16-brain.raw result.raw 1000000
 
+Kernel 0 - affine(unsigned short const*, unsigned short*): Total Grid Size Dims: (512, 512, 1) Workgroup Dims: (16, 16, 1) Kernel block count: (32, 32, 1).
 
+# asta-hip
+
+LD_PRELOAD=./examples/KernelArgumentIntrinsic/libKernelArgumentIntrinsic.so ./main
+
+Kernel 0 - PTTWAC_soa_asta(int, int, int, float*, int*, int*): Total Grid Size Dims: (1024, 1, 1) Workgroup Dims: (64, 1, 1) Kernel block count: (16, 1, 1).
+
+# complex-hip
+LD_PRELOAD=./examples/KernelArgumentIntrinsic/libKernelArgumentIntrinsic.so ./main 10000000 1000
+
+Kernel 0 - complex_float(char*, int): Total Grid Size Dims: (10000128, 1, 1) Workgroup Dims: (256, 1, 1) Kernel block count: (39063, 1, 1).
+...
+
+Kernel 338 - complex_float(char*, int): Total Grid Size Dims: (10000128, 1, 1) Workgroup Dims: (256, 1, 1) Kernel block count: (39063, 1, 1).
+
+```
 
 
 Seems like it works!
@@ -1106,4 +1124,5 @@ Seems like it works!
 ## Conclusion and Future Work
 Though the code is successfully lowered to correct code, there is still work that needs to be done:
 1. If a kernel doesn't require access to hidden arguments, it might not be setup by the ROCCLR low-level runtime; If this is indeed the case, Luthier instead needs to setup the kernel arguments.
-2. Since hooks potentially can be called many many times inside a kernel, reading from the kernel argument memory many times is not efficient. Instead of replacing the `implicitarg` LLVM intrinsic, we need to look at the offsets that they are loading from, and use that to detect the exact kernel arguments they are accessing. This way, we can only do this once in the pre-amble and store it in the SVA, so that we can access it later.
+2. I setup the hidden kernel argument offset by writing an immediate value to the SVA lane; For kernels with a lot of explicit arguments this offset must be written to an SGPR first before the `WRITELANE` instruction.
+3. Since hooks potentially can be called many many times inside a kernel, reading from the kernel argument memory many times is not efficient. Instead of replacing the `implicitarg` LLVM intrinsic, we need to look at the offsets that they are loading from, and use that to detect the exact kernel arguments they are accessing. This way, we can only do this once in the pre-amble and store it in the SVA, so that we can access it later.
