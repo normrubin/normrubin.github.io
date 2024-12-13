@@ -733,7 +733,7 @@ From a matrix multiplication input with three deeply nested loops doing matrix m
 ## Limitations
 Our implementation faces several key challenges in handling complex code patterns and optimizations. The parser struggles with complex index expressions (particularly nested arithmetic and composite indices like i*511 + k), while the static analysis approach has difficulty with dynamic array sizes and indirect memory accesses.
 
-- Loop transformations, though effective for simple cases, have important constraints: tiling can increase code size significantly, fusion only works with adjacent compatible loops, and interchange requires perfectly nested loops. The system particularly struggles with non-power-of-2 strides and complex alignment patterns that arise in matrix operations.
+- Loop transformations, though effective for simple cases, have important constraints: tiling can increase code size significantly (which happened for above inputs), fusion only works with adjacent compatible loops, and interchange requires perfectly nested loops. The system particularly struggles with non-power-of-2 strides and complex alignment patterns that arise in matrix operations.
 
 - Memory layout optimizations face similar challenges, balancing increased memory footprint from padding against performance gains. The implementation must work with fixed tile sizes and single-dimension padding, which may not be optimal across different architectures. When handling multiple loop variables or irregular strides, the system often fails to determine safe optimization strategies, particularly for loop tiling and interchange operations.
 
@@ -743,7 +743,8 @@ Our implementation faces several key challenges in handling complex code pattern
 ---
 
 ## Conclusion:
-The implemented data layout optimizer successfully handles certain optimization patterns but shows key limitations in complex matrix operations. The system demonstrates effectiveness with simple vector operations and basic matrix operations involving constant strides, successfully applying transformations like loop unrolling, tiling, and array padding. However, a significant limitation emerges in handling non-power-of-2 matrix dimensions and complex index expressions combining multiple loop variables (e.g., i*511 + k). This limitation primarily stems from the IndexExpressionParser's restricted capability in analyzing complex composite expressions, resulting in missed optimization opportunities particularly in matrix multiplication scenarios.
+The implemented data layout optimizer successfully handles certain optimization patterns but shows key limitations in complex matrix operations. The system demonstrates effectiveness with simple vector operations and basic matrix operations involving constant strides, successfully applying transformations like loop unrolling, tiling, and array padding. However, a significant limitation emerges in handling non-power-of-2 matrix dimensions and complex index expressions combining multiple loop variables (e.g., i*511 + k). This limitation primarily stems from the IndexExpressionParser's restricted capability in analyzing complex composite expressions, resulting in missed optimization opportunities particularly in matrix multiplication scenarios.:w
+
 ---
 
 ## Future Work:
@@ -770,3 +771,6 @@ The implemented data layout optimizer successfully handles certain optimization 
 - Support dynamic array sizes and bounds
 
 These improvements would make the optimizer more robust for real-world applications, particularly in scientific computing and machine learning domains where complex matrix operations are common.
+
+
+Although this project demonstrates effective implementation of core optimization techniques (loop tiling, fusion, interchange, and array padding) and shows promising results for basic matrix operations and vector computations, it needs significant improvements in handling complex index expressions, non-power-of-2 matrix dimensions, multi-level cache optimization strategies, and dynamic array size support to be truly competitive with state-of-the-art layout optimizers in the field of high-performance computing and compiler optimization.
