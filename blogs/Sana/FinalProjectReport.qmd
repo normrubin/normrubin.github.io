@@ -1,0 +1,772 @@
+ ---
+author: Sana Taghipour Anvari
+format:
+  html: default
+title: Data Layout Optimization and Loop Transformations
+
+---
+
+Link for the project: [BrilLayoutOptimizer](https://github.com/sanatgp/BrilLayoutOptimizer)
+
+### Goal
+
+This project focuses on optimizing data layout and memory access patterns to enhance the performance of programs that heavily utilize matrix operations and nested loops. Our primary objective is to improve cache utilization and memory access efficiency through systematic analysis and transformation of code patterns. We achieve this by developing a comprehensive system that can detect various array access patterns, including row-major, column-major, and strided access patterns, and apply appropriate optimizations based on these patterns.
+
+---
+
+## Design and Implementation
+
+### Analysis Pass
+The project employs a modular architecture with several key components:
+
+1. **DataLayoutAnalyzer**:
+The DataLayoutAnalyzer serves as our primary analysis engine, examining code to detect array access patterns and identify potential optimization opportunities. It works in conjunction with our dependency tracking system to ensure that all transformations preserve program semantics. This component provides the foundation for making informed optimization decisions.
+
+2. **CFGBuilder**:
+To support our analysis, we implemented a CFGBuilder that constructs detailed control flow graphs of the program. This component breaks down the code into basic blocks, establishes relationships between these blocks, and computes dominator information essential for optimization decisions. The control flow information proves crucial for understanding program structure and ensuring safe transformations.
+
+3. **SSAConverter**:
+Our SSA (Static Single Assignment) Converter transforms the code into SSA form, this simplifies analysis and optimization by ensuring each variable is assigned exactly once. This component manages variable versioning, handles the insertion of phi nodes at control flow convergence points, and maintains accurate definition-use chains throughout the program.
+
+4. **LayoutOptimizer**:
+The LayoutOptimizer acts as the central coordinator, applying various transformation passes based on the analysis results. It manages the sequence of optimizations and ensures that transformations take into account system-specific parameters such as cache sizes and memory hierarchy.
+
+
+---
+
+### Optimization Techniques
+
+We implemented several key optimization techniques to improve program performance:
+
+
+1. **Loop Tiling**: Loop tiling stands as one of our primary transformations, breaking large loops into cache-friendly blocks. The tile sizes are carefully calculated based on the target system's cache parameters to maximize cache utilization while minimizing overhead.
+
+2. **Loop Interchange**: Loop interchange focuses on reordering nested loops to improve memory access patterns. By analyzing array access patterns, we determine the optimal loop ordering that minimizes cache misses and maximizes spatial locality.
+
+3. **Loop Fusion**: Loop fusion combines adjacent compatible loops when possible, reducing loop overhead and improving cache utilization by processing related operations together. This transformation requires careful analysis of dependencies to ensure correctness.
+
+4. **Array Padding**: Our array padding implementation adjusts array dimensions to better align with cache line sizes, helping to avoid cache conflicts that can degrade performance. This transformation considers both the cache architecture and access patterns to determine optimal padding.
+
+5. **Loop Unrolling**: Loop unrolling reduces loop overhead and enables better instruction-level parallelism by replicating the loop body multiple times with adjusted indices, using a configurable unroll factor to balance between performance gains and code size increase.
+---
+
+### Technical Challenges
+
+#### SSA Implementation Complexities
+During implementation, we encountered several significant technical challenges. The SSA implementation proved particularly complex, especially in handling phi node placement and maintaining correct variable versioning across different scopes. We needed to carefully manage convergence points and ensure proper tracking of variable definitions throughout the program.
+
+#### Loop Tiling Difficulties
+Loop tiling presented its own set of challenges, particularly in determining optimal tile sizes and handling boundary conditions. We had to carefully balance cache utilization against the overhead of additional loop control structures and develop robust methods for transforming complex index expressions.
+
+
+#### Access Pattern Analysis
+Access pattern analysis required developing sophisticated detection methods that could reliably identify different access patterns while handling complex indexing expressions. We needed to strike a balance between analysis precision and computational complexity while ensuring our heuristics remained effective across a wide range of code patterns.
+
+### How the implementation is tested
+We wrote an optimization checker code, which performs four main checks by comparing the input JSON against the optimized output JSON:
+
+ - Loop Unrolling Detection: For loop unrolling detection, the checker examines loop body instructions to identify the telltale signs of unrolling. It specifically looks for patterns where loop variables appear multiple times with different offsets, such as expressions like (i + 0) and (i + 1) in consecutive instructions. This is implemented through the `detect_loop_unrolling` function, which recursively traverses the program's JSON structure and analyzes each loop's body to detect these characteristic patterns.
+
+ - Loop Tiling Detection: When checking for loop tiling transformations, the system searches for newly introduced loops with variables containing the _tile suffix in their names. The checker performs a string comparison between input and output program representations to identify these tiling-specific patterns. It verifies both the presence of tile loops and ensures they maintain the correct hierarchical structure with appropriate bounds modifications.
+
+ - Array Padding Detection: Array padding detection involves a more nuanced comparison of array allocations between input and output programs. The checker maintains lists of allocation patterns from both versions and compares their dimensions and sizes. It specifically looks for changes in array dimensions that would indicate padding has been applied to improve cache alignment.
+
+ - Loop Interchange Detection: For loop interchange verification, the checker performs a structural comparison of loop orderings in the AST. It extracts and stores the sequence of loop constructs from both input and output programs, then compares them to detect if their relative positions have changed. This includes analyzing both the loop structure itself and any modifications to array access patterns that would result from loop reordering.
+
+All of these checks are coordinated through the `compare_files` function, which orchestrates the entire verification process and provides clear, formatted output indicating which optimizations were successfully applied to the code. The checker maintains a careful balance between detailed analysis and performance, ensuring accurate detection without becoming overly computationally expensive.
+---
+
+### Detailed Cache Model Implementation
+Our cache optimization system implements a sophisticated approach to memory hierarchy awareness, with the core implementation in the `CacheInfo` and `LayoutOptimizer` classes:
+```python
+class CacheInfo:
+    def __init__(self):
+        self.l1_size = 0  
+        self.l2_size = 0
+        self.l3_size = 0
+        self.line_size = 0
+        self._detect_cache_sizes()
+    
+    def _detect_cache_sizes(self):
+        system = platform.system()
+        if system == "Linux":
+            self._detect_linux_cache()
+        elif system == "Darwin":
+            self._detect_darwin_cache()
+        else:
+            self._set_default_sizes()
+```
+The system automatically detects cache parameters or falls back to conservative defaults (32KB L1, 256KB L2, 8MB L3). These values inform our tile size calculations:
+```python
+def _calculate_optimal_tile_size(self):
+    try:
+        cache_size = self.cache_info.l1_size
+        element_size = 4  # assuming 4-byte elements
+        target_size = cache_size // 3  # Use 1/3 of L1 cache
+        elements = target_size // element_size
+        elements_per_line = self.cache_info.line_size // element_size
+        
+        # Calculate base tile size as square root of elements
+        base_tile_size = int(elements ** 0.5)
+        tile_size = (base_tile_size // elements_per_line) * elements_per_line
+        
+        return max(elements_per_line, min(tile_size, 256))
+    except Exception as e:
+        return 32  # Conservative fallback
+```
+Padding implementation aligns arrays with cache lines:
+```python
+def _pad_allocation(self, alloc_instr: Dict) -> Dict:
+    element_size = 4
+    elements_per_line = self.cache_line_size // element_size
+    padded_dim = ((last_dim + elements_per_line - 1) // 
+                  elements_per_line) * elements_per_line
+```
+This cache-aware design significantly improves memory access patterns by:
+
+- Aligning data structures with cache line boundaries
+- Calculating tile sizes based on actual cache parameters
+- Optimizing spatial and temporal locality through padding
+- Adapting transformations to the target architecture's memory hierarchy
+
+The system primarily optimizes for L1 cache but maintains awareness of the complete cache hierarchy for future extensions to multi-level optimization strategies.
+---
+
+## Results
+#### input 1:
+```json
+{
+  "functions": [
+    {
+      "name": "matrix_operations",
+      "args": [
+        {
+          "name": "A",
+          "type": {
+            "ptr": "int"
+          }
+        },
+        {
+          "name": "B",
+          "type": {
+            "ptr": "int"
+          }
+        },
+        {
+          "name": "C",
+          "type": {
+            "ptr": "int"
+          }
+        }
+      ],
+      "instrs": [
+        {
+          "op": "const",
+          "dest": "size",
+          "type": "int",
+          "value": 1024
+        },
+        {
+          "op": "const",
+          "dest": "zero",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "op": "loop",
+          "args": ["i", "0", "16", "1"],
+          "body": {
+            "instrs": [
+              {
+                "op": "load",
+                "dest": "val",
+                "args": ["A", "i"],
+                "type": "int"
+              },
+              {
+                "op": "store",
+                "args": ["B", "i", "val"]
+              }
+            ]
+          }
+        },
+        {
+          "op": "loop",
+          "args": ["j", "0", "32", "1"],
+          "body": {
+            "instrs": [
+              {
+                "op": "mul",
+                "dest": "idx",
+                "args": ["j", "4"],
+                "type": "int"
+              },
+              {
+                "op": "load",
+                "dest": "val",
+                "args": ["B", "idx"],
+                "type": "int"
+              },
+              {
+                "op": "add",
+                "dest": "new_val",
+                "args": ["val", "1"],
+                "type": "int"
+              },
+              {
+                "op": "store",
+                "args": ["C", "idx", "new_val"]
+              }
+            ]
+          }
+        },
+        {
+          "op": "loop",
+          "args": ["k", "0", "64", "1"],
+          "body": {
+            "instrs": [
+              {
+                "op": "mul",
+                "dest": "offset",
+                "args": ["k", "2"],
+                "type": "int"
+              },
+              {
+                "op": "load",
+                "dest": "val1",
+                "args": ["A", "offset"],
+                "type": "int"
+              },
+              {
+                "op": "load",
+                "dest": "val2",
+                "args": ["B", "offset"],
+                "type": "int"
+              },
+              {
+                "op": "add",
+                "dest": "sum",
+                "args": ["val1", "val2"],
+                "type": "int"
+              },
+              {
+                "op": "store",
+                "args": ["C", "offset", "sum"]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+From an input with three independent loops performing strided array accesses (strides 1, 4, and 2) and array operations (copy, increment, sum), we see loop unrolling, tiling, and interchange being successfully applied, demonstrating the optimizer handles simple strided access patterns effectively.
+```{textile}
+✓ Loop unrolling detected
+✓ Loop tiling detected 
+✓ Loop interchange detected
+```
+
+#### input2:
+```json
+{
+  "functions": [
+    {
+      "name": "vector_operations",
+      "args": [
+        {
+          "name": "input_array",
+          "type": {
+            "ptr": "int"
+          }
+        }
+      ],
+      "instrs": [
+        {
+          "op": "const",
+          "dest": "size",
+          "type": "int",
+          "value": 1024
+        },
+        {
+          "op": "alloc",
+          "dest": "output_array",
+          "type": {
+            "ptr": "int",
+            "size": [1024]
+          }
+        },
+        {
+          "op": "alloc",
+          "dest": "temp_array",
+          "type": {
+            "ptr": "int",
+            "size": [1024]
+          }
+        },
+        {
+          "op": "const",
+          "dest": "zero",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "op": "const",
+          "dest": "one",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "op": "const",
+          "dest": "threshold",
+          "type": "int",
+          "value": 100
+        },
+        {
+          "op": "const",
+          "dest": "scale",
+          "type": "int",
+          "value": 2
+        },
+        {
+          "op": "loop",
+          "args": ["i", "zero", "size"],
+          "body": {
+            "instrs": [
+              {
+                "op": "load",
+                "dest": "val",
+                "type": "int",
+                "args": ["input_array", "i"]
+              },
+              {
+                "op": "mul",
+                "dest": "val",
+                "type": "int",
+                "args": ["val", "scale"]
+              },
+              {
+                "op": "store",
+                "args": ["temp_array", "i", "val"]
+              }
+            ]
+          }
+        },
+        {
+          "op": "loop",
+          "args": ["i", "zero", "size"],
+          "body": {
+            "instrs": [
+              {
+                "op": "load",
+                "dest": "val",
+                "type": "int",
+                "args": ["temp_array", "i"]
+              },
+              {
+                "op": "lt",
+                "dest": "cond",
+                "type": "bool",
+                "args": ["val", "threshold"]
+              },
+              {
+                "op": "mul",
+                "dest": "val",
+                "type": "int",
+                "args": ["val", "scale"]
+              },
+              {
+                "op": "store",
+                "args": ["output_array", "i", "val"]
+              }
+            ]
+          }
+        },
+        {
+          "op": "loop",
+          "args": ["i", "zero", "size", "one"],
+          "body": {
+            "instrs": [
+              {
+                "op": "load",
+                "dest": "val",
+                "type": "int",
+                "args": ["output_array", "i"]
+              },
+              {
+                "op": "add",
+                "dest": "val",
+                "type": "int",
+                "args": ["val", "one"]
+              },
+              {
+                "op": "store",
+                "args": ["output_array", "i", "val"]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+From a vector operations input with three sequential loops performing vector scaling, thresholding and increment operations using direct indexing, we see all major optimizations being applied including array padding for better cache alignment.
+```{textile}
+✓ Loop unrolling detected
+✓ Loop tiling detected
+✓ Array padding detected 
+✓ Loop interchange detected
+```
+
+
+#### input3:
+```json
+{
+  "functions": [{
+    "name": "complex_matrix_ops",
+    "args": [
+      {"name": "matrix_a", "type": {"ptr": "int"}},
+      {"name": "matrix_b", "type": {"ptr": "int"}},
+      {"name": "vector_x", "type": {"ptr": "int"}},
+      {"name": "n", "type": "int"}
+    ],
+    "instrs": [
+      {
+        "op": "alloc",
+        "dest": "result_matrix",
+        "type": {
+          "ptr": "int",
+          "size": [512, 512]
+        }
+      },
+      {
+        "op": "alloc",
+        "dest": "temp_vector",
+        "type": {
+          "ptr": "int",
+          "size": [512]
+        }
+      },
+      {
+        "op": "const",
+        "dest": "alpha",
+        "type": "int",
+        "value": 2
+      },
+      {
+        "op": "const",
+        "dest": "beta",
+        "type": "int",
+        "value": 3
+      },
+      {
+        "op": "loop",
+        "args": ["i", "0", "512"],
+        "body": {
+          "instrs": [
+            {
+              "op": "mul",
+              "dest": "row_offset",
+              "type": "int",
+              "args": ["i", "512"]
+            },
+            {
+              "op": "loop",
+              "args": ["j", "0", "512"],
+              "body": {
+                "instrs": [
+                  {
+                    "op": "add",
+                    "dest": "idx",
+                    "type": "int",
+                    "args": ["row_offset", "j"]
+                  },
+                  {
+                    "op": "load",
+                    "dest": "a_val",
+                    "type": "int",
+                    "args": ["matrix_a", "idx"]
+                  },
+                  {
+                    "op": "load",
+                    "dest": "b_val",
+                    "type": "int",
+                    "args": ["matrix_b", "idx"]
+                  },
+                  {
+                    "op": "mul",
+                    "dest": "prod",
+                    "type": "int",
+                    "args": ["a_val", "b_val"]
+                  },
+                  {
+                    "op": "store",
+                    "args": ["result_matrix", "idx", "prod"]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "op": "loop",
+        "args": ["i", "0", "512"],
+        "body": {
+          "instrs": [
+            {
+              "op": "const",
+              "dest": "sum",
+              "type": "int",
+              "value": 0
+            },
+            {
+              "op": "loop",
+              "args": ["k", "0", "512"],
+              "body": {
+                "instrs": [
+                  {
+                    "op": "mul",
+                    "dest": "idx1",
+                    "type": "int",
+                    "args": ["i", "512"]
+                  },
+                  {
+                    "op": "add",
+                    "dest": "idx1",
+                    "type": "int",
+                    "args": ["idx1", "k"]
+                  },
+                  {
+                    "op": "load",
+                    "dest": "matrix_val",
+                    "type": "int",
+                    "args": ["result_matrix", "idx1"]
+                  },
+                  {
+                    "op": "load",
+                    "dest": "vec_val",
+                    "type": "int",
+                    "args": ["vector_x", "k"]
+                  },
+                  {
+                    "op": "mul",
+                    "dest": "prod",
+                    "type": "int",
+                    "args": ["matrix_val", "vec_val"]
+                  },
+                  {
+                    "op": "add",
+                    "dest": "sum",
+                    "type": "int",
+                    "args": ["sum", "prod"]
+                  }
+                ]
+              }
+            },
+            {
+              "op": "store",
+              "args": ["temp_vector", "i", "sum"]
+            }
+          ]
+        }
+      },
+      {
+        "op": "loop",
+        "args": ["i", "0", "512"],
+        "body": {
+          "instrs": [
+            {
+              "op": "load",
+              "dest": "val",
+              "type": "int",
+              "args": ["temp_vector", "i"]
+            },
+            {
+              "op": "mul",
+              "dest": "scaled",
+              "type": "int",
+              "args": ["val", "alpha"]
+            },
+            {
+              "op": "load",
+              "dest": "x_val",
+              "type": "int",
+              "args": ["vector_x", "i"]
+            },
+            {
+              "op": "mul",
+              "dest": "beta_x",
+              "type": "int",
+              "args": ["x_val", "beta"]
+            },
+            {
+              "op": "add",
+              "dest": "result",
+              "type": "int",
+              "args": ["scaled", "beta_x"]
+            },
+            {
+              "op": "store",
+              "args": ["temp_vector", "i", "result"]
+            }
+          ]
+        }
+      }
+    ]
+  }]
+}
+```
+
+From a complex matrix operations input combining matrix multiplication, matrix-vector multiplication and vector scaling with true 2D indexing (i*512 + j), we see the success of loop unrolling with tiling for cache locality and array padding for alignment, showing the optimizer handles 2D access patterns well.
+
+```{textile}
+✓ Loop unrolling detected
+✓ Loop tiling detected
+✓ Array padding detected
+✓ Loop interchange detected
+```
+
+
+#### input 4:
+```json
+{
+  "functions": [{
+    "name": "matrix_operations",
+    "args": [
+      {"name": "n", "type": "int"}
+    ],
+    "instrs": [
+      {
+        "op": "alloc",
+        "dest": "matrix1",
+        "type": {
+          "ptr": "int",
+          "size": [1023, 511]
+        }
+      },
+      {
+        "op": "alloc",
+        "dest": "matrix2",
+        "type": {
+          "ptr": "int", 
+          "size": [511, 1023]
+        }
+      },
+      {
+        "op": "alloc",
+        "dest": "result",
+        "type": {
+          "ptr": "int",
+          "size": [1023, 1023]
+        }
+      },
+      {
+        "op": "loop",
+        "args": ["i", "n"],
+        "body": {
+          "instrs": [
+            {
+              "op": "loop",
+              "args": ["j", "n"],
+              "body": {
+                "instrs": [
+                  {
+                    "op": "loop",
+                    "args": ["k", "n"],
+                    "body": {
+                      "instrs": [
+                        {
+                          "op": "load",
+                          "dest": "m1val",
+                          "args": ["matrix1", "i * 511 + k"]
+                        },
+                        {
+                          "op": "load",
+                          "dest": "m2val",
+                          "args": ["matrix2", "k * 1023 + j"]
+                        },
+                        {
+                          "op": "mul",
+                          "dest": "prod",
+                          "args": ["m1val", "m2val"]
+                        },
+                        {
+                          "op": "load",
+                          "dest": "current",
+                          "args": ["result", "i * 1023 + j"]
+                        },
+                        {
+                          "op": "add",
+                          "dest": "newval",
+                          "args": ["current", "prod"]
+                        },
+                        {
+                          "op": "store",
+                          "args": ["result", "i * 1023 + j", "newval"]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }]
+}
+```
+From a matrix multiplication input with three deeply nested loops doing matrix multiplication with non-power-of-2 dimensions (1023x511 * 511x1023 = 1023x1023) and complex index expressions combining loop variables (i511 + k, k1023 + j), we only see array padding being applied but no loop transformations, revealing that probably our optimizer's IndexExpressionParser fails to properly analyze composite index expressions that combine multiple loop variables with non-power-of-2 strides, limiting its ability to apply important optimizations like tiling and interchange that would be beneficial for matrix multiplication.
+```{textile}
+✗ No loop unrolling applied
+✗ No loop tiling applied
+✓ Array padding detected
+✗ No loop interchange applied
+```
+
+---
+
+## Limitations
+Our implementation faces several key challenges in handling complex code patterns and optimizations. The parser struggles with complex index expressions (particularly nested arithmetic and composite indices like i*511 + k), while the static analysis approach has difficulty with dynamic array sizes and indirect memory accesses.
+
+- Loop transformations, though effective for simple cases, have important constraints: tiling can increase code size significantly, fusion only works with adjacent compatible loops, and interchange requires perfectly nested loops. The system particularly struggles with non-power-of-2 strides and complex alignment patterns that arise in matrix operations.
+
+- Memory layout optimizations face similar challenges, balancing increased memory footprint from padding against performance gains. The implementation must work with fixed tile sizes and single-dimension padding, which may not be optimal across different architectures. When handling multiple loop variables or irregular strides, the system often fails to determine safe optimization strategies, particularly for loop tiling and interchange operations.
+
+- These limitations primarily impact complex numerical computations where precise optimization and accurate dependency analysis are crucial, indicating key areas for future improvement in both analysis and transformation capabilities.
+
+
+---
+
+## Conclusion:
+The implemented data layout optimizer successfully handles certain optimization patterns but shows key limitations in complex matrix operations. The system demonstrates effectiveness with simple vector operations and basic matrix operations involving constant strides, successfully applying transformations like loop unrolling, tiling, and array padding. However, a significant limitation emerges in handling non-power-of-2 matrix dimensions and complex index expressions combining multiple loop variables (e.g., i*511 + k). This limitation primarily stems from the IndexExpressionParser's restricted capability in analyzing complex composite expressions, resulting in missed optimization opportunities particularly in matrix multiplication scenarios.
+---
+
+## Future Work:
+
+#### Enhanced Index Expression Analysis:
+- Implement a more sophisticated index expression parser that can handle composite expressions
+- Add support for analyzing non-power-of-2 stride patterns
+- Improve detection of matrix multiplication patterns
+
+#### Optimization Coordination:
+- Develop a cost model to better decide when to apply each optimization
+- Implement optimization ordering to handle cases where transformations interact
+- Add support for partial loop fusion in compatible cases
+
+#### Cache Optimization:
+- Improve tile size calculation based on actual matrix dimensions
+- Add multi-level cache analysis
+- Implement more sophisticated padding strategies for irregular matrix sizes
+
+#### Additional Features:
+- Add support for data layout transformations (row-major to column-major)
+- Implement automatic vectorization hints
+- Add analysis and optimization for diagonal and block-diagonal matrix patterns
+- Support dynamic array sizes and bounds
+
+These improvements would make the optimizer more robust for real-world applications, particularly in scientific computing and machine learning domains where complex matrix operations are common.
