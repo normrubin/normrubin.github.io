@@ -1,0 +1,848 @@
+---
+author: matinraayai
+format:
+ html: default
+title: "Homework 4: Dominance Analysis"
+---
+For this homework I implemented an algorithm that given a BRIL function, it can find:
+1. For each basic block in the function, it found the blocks that dominated it (and vice-versa)
+2. The dominator frontier for each basic block.
+3. The dominator tree by calculating the immediate dominator relation.
+
+The implementation can be found [here](https://github.com/matinraayai/bril/blob/main/examples/dom_matin.py).
+
+To ensure the code is implemented correctly, I initially relied on the turnt tests already included under the
+[test/](https://github.com/matinraayai/bril/tree/main/examples/test) folder. On top of that, to ensure my dominator
+calculations were correct, I implemented a breadth-first search path finding algorithm on the predecessor graph;
+More specifically, for each block (except entry), I calculated all the paths from said block to the entry block. Then
+I would iterate over the calculated dominator and verify if all paths of execution indeed contain the dominated block,
+which is the exact definition for the dominance relation.
+
+The test would only print out in case of failure so that it wouldn't interfere with Turnt's testing.
+
+For frontier and tree calculations since all I needed to do was to follow a definition, I only relied on the unit tests.
+
+## Sample output
+
+```bash
+bril2json < ../../../benchmarks/float/cordic.bril | python3 ../../dom_matin.py dom
+{
+  "b1": [
+    "b1"
+  ]
+}
+{
+  "b1": [
+    "b1"
+  ],
+  "else.104": [
+    "b1",
+    "else.104",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "else.111": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "else.118": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "else.125": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.125",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "else.132": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.125",
+    "else.132",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "else.139": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.125",
+    "else.132",
+    "else.139",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "else.31": [
+    "b1",
+    "else.31",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "else.39": [
+    "b1",
+    "else.39",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "else.46": [
+    "b1",
+    "else.39",
+    "else.46",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "else.53": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "else.60": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "else.67": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "else.67",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "else.74": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "else.67",
+    "else.74",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "else.81": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "else.67",
+    "else.74",
+    "else.81",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "else.97": [
+    "b1",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.104": [
+    "b1",
+    "else.31",
+    "else.97",
+    "endif.104",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.111": [
+    "b1",
+    "else.104",
+    "else.31",
+    "else.97",
+    "endif.111",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.118": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.31",
+    "else.97",
+    "endif.118",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.125": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.31",
+    "else.97",
+    "endif.125",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.132": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.125",
+    "else.31",
+    "else.97",
+    "endif.132",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.139": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.125",
+    "else.132",
+    "else.31",
+    "else.97",
+    "endif.139",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.31": [
+    "b1",
+    "endif.31",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "endif.39": [
+    "b1",
+    "endif.39",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "endif.46": [
+    "b1",
+    "else.39",
+    "endif.46",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "endif.53": [
+    "b1",
+    "else.39",
+    "else.46",
+    "endif.53",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "endif.60": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "endif.60",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "endif.67": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "endif.67",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "endif.74": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "else.67",
+    "endif.74",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "endif.81": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "else.67",
+    "else.74",
+    "endif.81",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "endif.97": [
+    "b1",
+    "else.31",
+    "endif.97",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "for.body.12": [
+    "b1",
+    "for.body.12",
+    "for.cond.12"
+  ],
+  "for.cond.12": [
+    "b1",
+    "for.cond.12"
+  ],
+  "for.end.12": [
+    "b1",
+    "for.cond.12",
+    "for.end.12"
+  ],
+  "then.104": [
+    "b1",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12",
+    "then.104"
+  ],
+  "then.111": [
+    "b1",
+    "else.104",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12",
+    "then.111"
+  ],
+  "then.118": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12",
+    "then.118"
+  ],
+  "then.125": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12",
+    "then.125"
+  ],
+  "then.132": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.125",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12",
+    "then.132"
+  ],
+  "then.139": [
+    "b1",
+    "else.104",
+    "else.111",
+    "else.118",
+    "else.125",
+    "else.132",
+    "else.31",
+    "else.97",
+    "for.body.12",
+    "for.cond.12",
+    "then.139"
+  ],
+  "then.31": [
+    "b1",
+    "for.body.12",
+    "for.cond.12",
+    "then.31"
+  ],
+  "then.39": [
+    "b1",
+    "for.body.12",
+    "for.cond.12",
+    "then.31",
+    "then.39"
+  ],
+  "then.46": [
+    "b1",
+    "else.39",
+    "for.body.12",
+    "for.cond.12",
+    "then.31",
+    "then.46"
+  ],
+  "then.53": [
+    "b1",
+    "else.39",
+    "else.46",
+    "for.body.12",
+    "for.cond.12",
+    "then.31",
+    "then.53"
+  ],
+  "then.60": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "for.body.12",
+    "for.cond.12",
+    "then.31",
+    "then.60"
+  ],
+  "then.67": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "for.body.12",
+    "for.cond.12",
+    "then.31",
+    "then.67"
+  ],
+  "then.74": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "else.67",
+    "for.body.12",
+    "for.cond.12",
+    "then.31",
+    "then.74"
+  ],
+  "then.81": [
+    "b1",
+    "else.39",
+    "else.46",
+    "else.53",
+    "else.60",
+    "else.67",
+    "else.74",
+    "for.body.12",
+    "for.cond.12",
+    "then.31",
+    "then.81"
+  ],
+  "then.97": [
+    "b1",
+    "else.31",
+    "for.body.12",
+    "for.cond.12",
+    "then.97"
+  ]
+}
+```
+
+```bash
+bril2json < ../../../benchmarks/float/cordic.bril | python3 ../../dom_matin.py front
+{
+  "b1": []
+}
+{
+  "b1": [],
+  "else.104": [
+    "endif.104"
+  ],
+  "else.111": [
+    "endif.111"
+  ],
+  "else.118": [
+    "endif.118"
+  ],
+  "else.125": [
+    "endif.125"
+  ],
+  "else.132": [
+    "endif.132"
+  ],
+  "else.139": [
+    "endif.139"
+  ],
+  "else.31": [
+    "endif.31"
+  ],
+  "else.39": [
+    "endif.39"
+  ],
+  "else.46": [
+    "endif.46"
+  ],
+  "else.53": [
+    "endif.53"
+  ],
+  "else.60": [
+    "endif.60"
+  ],
+  "else.67": [
+    "endif.67"
+  ],
+  "else.74": [
+    "endif.74"
+  ],
+  "else.81": [
+    "endif.81"
+  ],
+  "else.97": [
+    "endif.97"
+  ],
+  "endif.104": [
+    "endif.97"
+  ],
+  "endif.111": [
+    "endif.104"
+  ],
+  "endif.118": [
+    "endif.111"
+  ],
+  "endif.125": [
+    "endif.118"
+  ],
+  "endif.132": [
+    "endif.125"
+  ],
+  "endif.139": [
+    "endif.132"
+  ],
+  "endif.31": [
+    "for.cond.12"
+  ],
+  "endif.39": [
+    "endif.31"
+  ],
+  "endif.46": [
+    "endif.39"
+  ],
+  "endif.53": [
+    "endif.46"
+  ],
+  "endif.60": [
+    "endif.53"
+  ],
+  "endif.67": [
+    "endif.60"
+  ],
+  "endif.74": [
+    "endif.67"
+  ],
+  "endif.81": [
+    "endif.74"
+  ],
+  "endif.97": [
+    "endif.31"
+  ],
+  "for.body.12": [
+    "for.cond.12"
+  ],
+  "for.cond.12": [
+    "for.cond.12"
+  ],
+  "for.end.12": [],
+  "then.104": [
+    "endif.104"
+  ],
+  "then.111": [
+    "endif.111"
+  ],
+  "then.118": [
+    "endif.118"
+  ],
+  "then.125": [
+    "endif.125"
+  ],
+  "then.132": [
+    "endif.132"
+  ],
+  "then.139": [
+    "endif.139"
+  ],
+  "then.31": [
+    "endif.31"
+  ],
+  "then.39": [
+    "endif.39"
+  ],
+  "then.46": [
+    "endif.46"
+  ],
+  "then.53": [
+    "endif.53"
+  ],
+  "then.60": [
+    "endif.60"
+  ],
+  "then.67": [
+    "endif.67"
+  ],
+  "then.74": [
+    "endif.74"
+  ],
+  "then.81": [
+    "endif.81"
+  ],
+  "then.97": [
+    "endif.97"
+  ]
+}
+```
+
+```bash
+bril2json < ../../../benchmarks/float/cordic.bril | python3 ../../dom_matin.py tree
+{
+  "b1": []
+}
+{
+  "b1": [
+    "for.cond.12"
+  ],
+  "else.104": [
+    "else.111",
+    "endif.111",
+    "then.111"
+  ],
+  "else.111": [
+    "else.118",
+    "endif.118",
+    "then.118"
+  ],
+  "else.118": [
+    "else.125",
+    "endif.125",
+    "then.125"
+  ],
+  "else.125": [
+    "else.132",
+    "endif.132",
+    "then.132"
+  ],
+  "else.132": [
+    "else.139",
+    "endif.139",
+    "then.139"
+  ],
+  "else.139": [],
+  "else.31": [
+    "else.97",
+    "endif.97",
+    "then.97"
+  ],
+  "else.39": [
+    "else.46",
+    "endif.46",
+    "then.46"
+  ],
+  "else.46": [
+    "else.53",
+    "endif.53",
+    "then.53"
+  ],
+  "else.53": [
+    "else.60",
+    "endif.60",
+    "then.60"
+  ],
+  "else.60": [
+    "else.67",
+    "endif.67",
+    "then.67"
+  ],
+  "else.67": [
+    "else.74",
+    "endif.74",
+    "then.74"
+  ],
+  "else.74": [
+    "else.81",
+    "endif.81",
+    "then.81"
+  ],
+  "else.81": [],
+  "else.97": [
+    "else.104",
+    "endif.104",
+    "then.104"
+  ],
+  "endif.104": [],
+  "endif.111": [],
+  "endif.118": [],
+  "endif.125": [],
+  "endif.132": [],
+  "endif.139": [],
+  "endif.31": [],
+  "endif.39": [],
+  "endif.46": [],
+  "endif.53": [],
+  "endif.60": [],
+  "endif.67": [],
+  "endif.74": [],
+  "endif.81": [],
+  "endif.97": [],
+  "for.body.12": [
+    "else.31",
+    "endif.31",
+    "then.31"
+  ],
+  "for.cond.12": [
+    "for.body.12",
+    "for.end.12"
+  ],
+  "for.end.12": [],
+  "then.104": [],
+  "then.111": [],
+  "then.118": [],
+  "then.125": [],
+  "then.132": [],
+  "then.139": [],
+  "then.31": [
+    "else.39",
+    "endif.39",
+    "then.39"
+  ],
+  "then.39": [],
+  "then.46": [],
+  "then.53": [],
+  "then.60": [],
+  "then.67": [],
+  "then.74": [],
+  "then.81": [],
+  "then.97": []
+}
+```
+
+```bash
+ bril2json < ../dom/loopcond.bril | python3 ../../dom_matin.py dom
+{
+  "body": [
+    "body",
+    "entry",
+    "loop"
+  ],
+  "endif": [
+    "body",
+    "endif",
+    "entry",
+    "loop"
+  ],
+  "entry": [
+    "entry"
+  ],
+  "exit": [
+    "entry",
+    "exit",
+    "loop"
+  ],
+  "loop": [
+    "entry",
+    "loop"
+  ],
+  "then": [
+    "body",
+    "entry",
+    "loop",
+    "then"
+  ]
+}
+```
+
+```bash
+bril2json < ../dom/loopcond.bril | python3 ../../dom_matin.py front
+{
+  "body": [
+    "loop"
+  ],
+  "endif": [
+    "loop"
+  ],
+  "entry": [],
+  "exit": [],
+  "loop": [
+    "loop"
+  ],
+  "then": [
+    "endif"
+  ]
+}
+```
+
+```bash
+bril2json < ../dom/loopcond.bril | python3 ../../dom_matin.py tree
+{
+  "body": [
+    "endif",
+    "then"
+  ],
+  "endif": [],
+  "entry": [
+    "loop"
+  ],
+  "exit": [],
+  "loop": [
+    "body",
+    "exit"
+  ],
+  "then": []
+}
+```
+
+
+## Challenges
+The main challenge in this homework was making sure I got the dominated/dominator relations right and correctly keep
+track of them. One example of this issue was when calculating the dominator tree, where my initial implementation only
+relied on the dominator relation. After debugging I realized I wasn't following the definition correctly, and I needed
+to use the dominated map for the second part of the definition, `c dom b` to make my life easier.
