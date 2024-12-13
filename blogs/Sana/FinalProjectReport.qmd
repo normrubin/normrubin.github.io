@@ -19,14 +19,14 @@ This project focuses on optimizing data layout and memory access patterns to enh
 ### Analysis Pass
 The project employs a modular architecture with several key components:
 
-1. **DataLayoutAnalyzer**:
-The DataLayoutAnalyzer serves as our primary analysis engine, examining code to detect array access patterns and identify potential optimization opportunities. It works in conjunction with our dependency tracking system to ensure that all transformations preserve program semantics. This component provides the foundation for making informed optimization decisions.
+1. **CFGBuilder**:
+We implemented a CFGBuilder that constructs detailed control flow graphs of the program. This component breaks down the code into basic blocks, establishes relationships between these blocks, and computes dominator information essential for optimization decisions. The control flow information proves crucial for understanding program structure and ensuring safe transformations.
 
-2. **CFGBuilder**:
-To support our analysis, we implemented a CFGBuilder that constructs detailed control flow graphs of the program. This component breaks down the code into basic blocks, establishes relationships between these blocks, and computes dominator information essential for optimization decisions. The control flow information proves crucial for understanding program structure and ensuring safe transformations.
-
-3. **SSAConverter**:
+2. **SSAConverter**:
 Our SSA (Static Single Assignment) Converter transforms the code into SSA form, this simplifies analysis and optimization by ensuring each variable is assigned exactly once. This component manages variable versioning, handles the insertion of phi nodes at control flow convergence points, and maintains accurate definition-use chains throughout the program.
+
+3. **DataLayoutAnalyzer**:
+The DataLayoutAnalyzer serves as our primary analysis engine, examining code to detect array access patterns and identify potential optimization opportunities. It works in conjunction with our dependency tracking system to ensure that all transformations preserve program semantics. This component provides the foundation for making informed optimization decisions.
 
 4. **LayoutOptimizer**:
 The LayoutOptimizer acts as the central coordinator, applying various transformation passes based on the analysis results. It manages the sequence of optimizations and ensures that transformations take into account system-specific parameters such as cache sizes and memory hierarchy.
@@ -41,13 +41,13 @@ We implemented several key optimization techniques to improve program performanc
 
 1. **Loop Tiling**: Loop tiling stands as one of our primary transformations, breaking large loops into cache-friendly blocks. The tile sizes are carefully calculated based on the target system's cache parameters to maximize cache utilization while minimizing overhead.
 
-2. **Loop Interchange**: Loop interchange focuses on reordering nested loops to improve memory access patterns. By analyzing array access patterns, we determine the optimal loop ordering that minimizes cache misses and maximizes spatial locality.
+2. **Loop Interchange**: Loop interchange focuses on reordering nested loops to improve memory access patterns. We determine the optimal loop ordering that minimizes cache misses and maximizes spatial locality by analyzing array access patterns.
 
 3. **Loop Fusion**: Loop fusion combines adjacent compatible loops when possible, reducing loop overhead and improving cache utilization by processing related operations together. This transformation requires careful analysis of dependencies to ensure correctness.
 
 4. **Array Padding**: Our array padding implementation adjusts array dimensions to better align with cache line sizes, helping to avoid cache conflicts that can degrade performance. This transformation considers both the cache architecture and access patterns to determine optimal padding.
 
-5. **Loop Unrolling**: Loop unrolling reduces loop overhead and enables better instruction-level parallelism by replicating the loop body multiple times with adjusted indices, using a configurable unroll factor to balance between performance gains and code size increase.
+5. **Loop Unrolling**: Loop unrolling reduces loop overhead and enables better instruction-level parallelism by replicating the loop body multiple times with adjusted indices, uses a configurable unroll factor to balance between performance gains and code size increase.
 ---
 
 ### Technical Challenges
@@ -56,16 +56,15 @@ We implemented several key optimization techniques to improve program performanc
 During implementation, we encountered several significant technical challenges. The SSA implementation proved particularly complex, especially in handling phi node placement and maintaining correct variable versioning across different scopes. We needed to carefully manage convergence points and ensure proper tracking of variable definitions throughout the program.
 
 #### Loop Tiling Difficulties
-Loop tiling presented its own set of challenges, particularly in determining optimal tile sizes and handling boundary conditions. We had to carefully balance cache utilization against the overhead of additional loop control structures and develop robust methods for transforming complex index expressions.
-
+Loop tiling presented its own set of challenges, particularly in determining optimal tile sizes and handling boundary conditions. We had to carefully balance cache utilization against the overhead of additional loop control structures and develop methods for transforming complex index expressions.
 
 #### Access Pattern Analysis
 Access pattern analysis required developing sophisticated detection methods that could reliably identify different access patterns while handling complex indexing expressions. We needed to strike a balance between analysis precision and computational complexity while ensuring our heuristics remained effective across a wide range of code patterns.
 
 ### How the implementation is tested
-We wrote an optimization checker code, which performs four main checks by comparing the input JSON against the optimized output JSON:
+We wrote an [optimization checker](https://github.com/sanatgp/BrilLayoutOptimizer/blob/main/optimization_checker.py) code, which performs four main checks by comparing the input JSON against the optimized output JSON:
 
- - Loop Unrolling Detection: For loop unrolling detection, the checker examines loop body instructions to identify the telltale signs of unrolling. It specifically looks for patterns where loop variables appear multiple times with different offsets, such as expressions like (i + 0) and (i + 1) in consecutive instructions. This is implemented through the `detect_loop_unrolling` function, which recursively traverses the program's JSON structure and analyzes each loop's body to detect these characteristic patterns.
+ - Loop Unrolling Detection: For loop unrolling detection, the checker examines loop body instructions to identify the signs of unrolling. It specifically looks for patterns where loop variables appear multiple times with different offsets, such as expressions like (i + 0) and (i + 1) in consecutive instructions. This is implemented through the `detect_loop_unrolling` function, which recursively traverses the program's JSON structure and analyzes each loop's body to detect these characteristic patterns.
 
  - Loop Tiling Detection: When checking for loop tiling transformations, the system searches for newly introduced loops with variables containing the _tile suffix in their names. The checker performs a string comparison between input and output program representations to identify these tiling-specific patterns. It verifies both the presence of tile loops and ensures they maintain the correct hierarchical structure with appropriate bounds modifications.
 
@@ -130,6 +129,26 @@ This cache-aware design significantly improves memory access patterns by:
 - Adapting transformations to the target architecture's memory hierarchy
 
 The system primarily optimizes for L1 cache but maintains awareness of the complete cache hierarchy for future extensions to multi-level optimization strategies.
+
+
+When the provided code runs with a specific cache size supplied by the user (for example: --cache-size 32768), it performs the following steps:
+
+- The `CacheInfo` class is initialized, and the user-supplied cache size (32768 bytes) is set as the L1 cache size:
+```python
+if args.cache_size:
+    cache_info.l1_size = args.cache_size
+```
+
+- The input JSON (input.json) is parsed into a data structure representing the program (a list of functions with instructions).
+
+ - The `DataLayoutAnalyzer` constructs the Control Flow Graph (CFG) with `CFGBuilder`, converts the CFG into Static Single Assignment (SSA) by using `SSAConverter`, analyzes array access patterns to classify them as row-major, column-major, strided, or random, and collects array and loop information.
+
+ - The `LayoutOptimizer` uses the cache size to compute tile sizes for loop tiling:
+ ```python
+ tile_size = (base_tile_size // elements_per_line) * elements_per_line
+ ```
+Here, the tile size is computed based on L1 cache size divided by element size (assuming 4 bytes per element), leaving room for other data in the cache. Then applies optimization passes in this order: Fusion, Padding, Unrolling, Interchange, Tiling.
+Then teh code writes teh optimized output json file.
 ---
 
 ## Results
@@ -770,7 +789,7 @@ The implemented data layout optimizer successfully handles certain optimization 
 - Add analysis and optimization for diagonal and block-diagonal matrix patterns
 - Support dynamic array sizes and bounds
 
-These improvements would make the optimizer more robust for real-world applications, particularly in scientific computing and machine learning domains where complex matrix operations are common.
-
 
 Although this project demonstrates effective implementation of core optimization techniques (loop tiling, fusion, interchange, and array padding) and shows promising results for basic matrix operations and vector computations, it needs significant improvements in handling complex index expressions, non-power-of-2 matrix dimensions, multi-level cache optimization strategies, and dynamic array size support to be truly competitive with state-of-the-art layout optimizers in the field of high-performance computing and compiler optimization.
+
+It's important to note that while our optimization passes are being applied successfully, we cannot guarantee they always improve code performance. Some optimizations like loop unrolling and tiling can sometimes degrade performance by increasing code size or adding overhead that outweighs the cache benefits. Future work should include comprehensive benchmarking with hardware performance counters and systematic testing across different matrix sizes to verify when these optimizations truly help versus when they might hurt performance, as our current implementation focuses on detecting and applying transformations but lacks concrete measurements to validate their effectiveness in improving cache behavior and overall program efficiency. 
