@@ -130,7 +130,7 @@ This cache-aware design significantly improves memory access patterns by:
 
 The system primarily optimizes for L1 cache but maintains awareness of the complete cache hierarchy for future extensions to multi-level optimization strategies.
 
-
+#### Overally what is happening?
 When the provided code runs with a specific cache size supplied by the user (for example: --cache-size 32768), it performs the following steps:
 
 - The `CacheInfo` class is initialized, and the user-supplied cache size (32768 bytes) is set as the L1 cache size:
@@ -747,6 +747,7 @@ From a matrix multiplication input with three deeply nested loops doing matrix m
 ✗ No loop interchange applied
 ```
 
+More inputs and results are in the code repo.
 ---
 
 ## Limitations
@@ -792,4 +793,4 @@ The implemented data layout optimizer successfully handles certain optimization 
 
 Although this project demonstrates effective implementation of core optimization techniques (loop tiling, fusion, interchange, and array padding) and shows promising results for basic matrix operations and vector computations, it needs significant improvements in handling complex index expressions, non-power-of-2 matrix dimensions, multi-level cache optimization strategies, and dynamic array size support to be truly competitive with state-of-the-art layout optimizers in the field of high-performance computing and compiler optimization.
 
-It's important to note that while our optimization passes are being applied successfully, we cannot guarantee they always improve code performance. Some optimizations like loop unrolling and tiling can sometimes degrade performance by increasing code size or adding overhead that outweighs the cache benefits. Future work should include comprehensive benchmarking with hardware performance counters and systematic testing across different matrix sizes to verify when these optimizations truly help versus when they might hurt performance, as our current implementation focuses on detecting and applying transformations but lacks concrete measurements to validate their effectiveness in improving cache behavior and overall program efficiency. 
+It's important to note that while our optimization passes are being applied successfully, we CANNOT guarantee they always improve code performance. Some optimizations like loop unrolling and tiling can sometimes degrade performance by increasing code size or adding overhead that outweighs the cache benefits. Future work should include comprehensive benchmarking with hardware performance counters and systematic testing across different matrix sizes to verify when these optimizations truly help versus when they might hurt performance, as our current implementation focuses on detecting and applying transformations but lacks concrete measurements to validate their effectiveness in improving cache behavior and overall program efficiency. 
