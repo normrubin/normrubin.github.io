@@ -1,0 +1,120 @@
+---
+author: Qucheng Jiang
+execute:
+  enabled: false
+format:
+  html: default
+title: 'Paper Discussion: SODA-OPT'
+---
+
+## Slides
+
+<iframe src="https://docs.google.com/gview?url=https://normrubin.github.io/blogs/Qucheng/file/Tutorial_SODA-OPT.pdf" style="width: 100%;height: 500px;border: none;" frameborder="0"></iframe>
+
+
+
+
+## Motivation
+
+- Mapping applications into Custom Hardware. 
+- Extract Performance.
+- Heavy manual intervention.
+
+![](img/soda-opt/Pasted%20image%2020241105114921.png)
+![](img/soda-opt/Pasted%20image%2020241105114850.png)
+
+
+## SODA-OPT
+
+- MLIR-based inputs
+	- Supports any high-level application that can be converted into `linalg`, `affine` dialects
+- System-Level Design
+- high-level optimizations for the HLS backends
+- DSE of compiler options
+
+![](img/soda-opt/Pasted%20image%2020241105115307.png)
+
+### Workflow (in paper)
+
+1. ML model in python (Tensorflow)
+2. Convert model to MLIR (tf dialect) & Lower to `TOSA`
+3. Lower to `linalg` MLIR dialect
+4. This work
+	- Select MLIR code for custom accelerator generation
+	- Optimize kernel code and generate IR for HLS (Bambu)
+5. Synthesize baseline and optimized code into Verilog
+6. Place and route synthesized code, generate final GDSII
+
+![](img/soda-opt/Pasted%20image%2020241105122150.png)
+
+
+
+## Background
+
+### Multi-Level Intermediate Representation Compiler Infrastructure
+
+- **Open-source**
+- **Progressive lowering** between existing and new operations
+- **Reuse** of abstractions and compiler transformations
+- Enables **co-existence** of different abstractions
+
+![](img/soda-opt/Pasted%20image%2020241105115019.png)
+
+#### MLIR - Example
+```c++
+// Linalg abstraction
+func.func dot(%A: memref<100xf32>, %B: memref<100xf32>, %out: memref<f32>){
+	linalg.dot ins(A, B: memref<100xf32>, memref<100xf32>) outs(%out: memref<f32>)
+	return
+}
+```
+
+```c++
+// SCF abstraction
+func.func @dot(%A: memref<100xf32>, %B: memref<100xf32>, %out: memref<f32>){
+	%c0 = arith.constant 0 : index
+	%c100 = arith.constant 100 : index
+	%cl = arith.constant 1 : index
+	scf.for %arg3 = %c0 to %c100 step %c1 {
+		%0 = memref.load %A[%arg3] : memref<100xf32>
+		%1 = memref.load %B[%arg3] : memref<100xf32>
+		%2 = memref.load %out[] : memref<f32>
+		%3 = arith.mulf %0, %1 : f32
+		%4 = arith.addf %2, %3 : f32
+		memref.store %4 , %out[] : memref<f32>
+	}
+	return
+}
+```
+
+```c++
+// CF abstraction
+func.func @dot(%A: memref<100xf32>, %B: memref<100xf32>, %out: memref<f32>){
+	%c0 = arith.constant 0 : index
+	%c100 = arith.constant 100 : index
+	%c1 = arith.constant 1 : index
+	cf.br ^bb1(&c0 : index)
+^bb1(%0: index):  // 2 preds: ^bb0, ^bb2
+	%1 = arith.cmpi slt, %0, %c100 : index
+	cf.cond_br %1, ^bb2, ^bb3
+^bb2:  // pred: ^bb1
+		%2 = memref.load %A[%arg3] : memref<100xf32>
+		%3 = memref.load %B[%arg3] : memref<100xf32>
+		%4 = memref.load %out[] : memref<f32>
+		%5 = arith.mulf %2, %3 : f32
+		%6 = arith.addf %4, %5 : f32
+		memref.store %6 , %out[] : memref<f32>
+		%7 = arith.addi %0, %c1 : index
+		cf.br ^bb1(%7 : index)
+^bb3:  // pred: ^bb1
+	return
+}
+```
+
+
+
+
+### Optimization
+
+![](img/soda-opt/Pasted%20image%2020241105125028.png)
+![](img/soda-opt/legend.png)
