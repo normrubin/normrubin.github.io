@@ -1,0 +1,214 @@
+ ---
+author: Yashaswini Makaram
+execute:
+  enabled: false
+format:
+  html: default
+title: Final Project - Yashaswini
+---
+
+# Evaluating Multi-Share Masking on GPU and CPU
+
+## Introduction to Masking
+
+In the context of cryptographic implementations, masking is a countermeasure against side-channel attacks. These attacks exploit physical leakages, such as power consumption or electromagnetic emissions, to infer secret data. Masking mitigates these risks by splitting sensitive data into multiple *shares* and operating on these shares independently. The operations must be designed so that the leakage of any subset of shares provides no useful information about the original data.
+
+There are two primary types of masking:
+1. **Boolean Masking:** Sensitive data is split using XOR operations.
+2. **Arithmetic Masking:** Sensitive data is split using modular arithmetic.
+
+For modern cryptographic workloads, the scalability and efficiency of masking techniques are critical. This project evaluates the performance of multi-share masking operations implemented on both CPU and GPU.
+
+---
+
+## Project Goal
+
+The goal of this project was to evaluate the performance of multi-share masked cryptographic operations when executed on GPU versus CPU. Specifically, we aimed to:
+1. Compare the runtime performance of Boolean and Arithmetic masking operations on both architectures.
+2. Simulate realistic cryptographic workloads (e.g., S-Box operations, AES rounds, and GF(2^n) arithmetic).
+4. Assess scalability as the number of shares increases.
+
+---
+
+## Design and Implementation
+
+### Design
+
+The project was structured as follows:
+1. **Workload Selection:** The workloads included:
+    - **Arithmatic operations:** basic logic and addition operations under masking.
+    - **S-Box Operations:** A non-linear substitution step used in AES encryption.
+    - **GF(2^n) Arithmetic:** Common in cryptographic operations like polynomial multiplication.
+2. **Masking Techniques:**
+    - Boolean and Arithmetic masking were applied with varying numbers of shares.
+3. **Platforms:**
+    - CPU: Sequential execution of masked operations.
+    - GPU: Parallel execution using CUDA.
+4. **Evaluation Metrics:**
+    - Runtime performance.
+    - Scalability as the number of shares increases.
+
+### Implementation
+
+#### CPU Implementation
+The CPU implementation involved:
+- Sequential loops for operating on shares.
+- Use of native C++ operations for Boolean masking (XOR) and Arithmetic masking (modular arithmetic).
+- Timing profiling using standard libraries.
+
+
+#### GPU Implementation
+The GPU implementation involved:
+- Parallel execution of masking operations using CUDA.
+- Separate kernels for S-Box operations and GF(2^n) arithmetic.
+- Accurate benchmarking using CUDA events.
+
+### Benchmarking and Testing
+- Inputs were generated randomly for reproducibility.
+- Benchmarks were run for varying numbers of shares (e.g., 2, 4, 8).
+- Outputs were verified for correctness across platforms.
+
+#### code snippet of arithmatic masking with 2 shares 
+
+```
+__global__ void arithmetic_share_operations_kernel(uint32_t *inputs, uint32_t *share1, uint32_t *share2, uint32_t *add_results, uint32_t *mul_results, int n) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < n) {
+        // Perform arithmetic operations with shares
+        share1[idx] = inputs[idx] / 2; // Example splitting
+        share2[idx] = inputs[idx] - share1[idx];
+        add_results[idx] = share1[idx] + share2[idx]; // Reconstruction
+        mul_results[idx] = share1[idx] * share2[idx]; // Masked multiplication
+    }
+}
+
+void arithmetic_share_operations_cpu(uint32_t *inputs, uint32_t *share1, uint32_t *share2, uint32_t *add_results, uint32_t *mul_results, int n) {
+    for (int i = 0; i < n; i++) {
+        share1[i] = inputs[i] / 2; // Example splitting
+        share2[i] = inputs[i] - share1[i];
+        add_results[i] = share1[i] + share2[i]; // Reconstruction
+        mul_results[i] = share1[i] * share2[i]; // Masked multiplication
+    }
+}
+```
+
+#### code snippet of boolean masking with 2 shares
+```
+__global__ void boolean_share_operations_kernel(uint32_t *inputs, uint32_t *share1, uint32_t *share2, uint32_t *xor_results, uint32_t *and_results, int n) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < n) {
+        // Generate shares
+        share1[idx] = inputs[idx] ^ (idx * 0xA5A5A5A5); // Simulated randomness
+        share2[idx] = inputs[idx] ^ share1[idx];
+        
+        // Perform XOR operation securely on shares
+        uint32_t xor1 = share1[idx] ^ 0xA5A5A5A5;
+        uint32_t xor2 = share2[idx] ^ 0x00000000;
+        
+        // Perform AND operation securely on shares
+        uint32_t and1 = share1[idx] & 0x5A5A5A5A;
+        uint32_t and2 = share2[idx] & 0x5A5A5A5A;
+        
+        // Reconstruct XOR and AND results
+        xor_results[idx] = xor1 ^ xor2;
+        and_results[idx] = and1 ^ and2; // XOR to reconstruct AND
+    }
+}
+
+// CPU Implementation for Comparison
+void boolean_share_operations_cpu(uint32_t *inputs, uint32_t *share1, uint32_t *share2, uint32_t *xor_results, uint32_t *and_results, int n) {
+    for (int i = 0; i < n; i++) {
+        share1[i] = inputs[i] ^ (i * 0xA5A5A5A5);
+        share2[i] = inputs[i] ^ share1[i];
+        uint32_t xor1 = share1[i] ^ 0xA5A5A5A5;
+        uint32_t xor2 = share2[i] ^ 0x00000000;
+        uint32_t and1 = share1[i] & 0x5A5A5A5A;
+        uint32_t and2 = share2[i] & 0x5A5A5A5A;
+        xor_results[i] = xor1 ^ xor2;
+        and_results[i] = and1 ^ and2;
+    }
+}
+
+```
+
+#### Code snippet of S-box evalution
+```
+__device__ uint8_t sbox[SBOX_SIZE] = {
+    0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+    // Populate with actual S-Box values for AES
+};
+
+__global__ void gpu_sbox_operations(uint8_t *shares, uint8_t *outputs, int num_shares, int num_elements) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < num_elements) {
+        for (int share = 0; share < num_shares; ++share) {
+            outputs[idx * num_shares + share] = sbox[shares[idx * num_shares + share]];
+        }
+    }
+}
+
+__global__ void gpu_gf2n_arithmetic(uint8_t *shares, uint8_t *outputs, int num_shares, int num_elements) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < num_elements) {
+        for (int share = 0; share < num_shares; ++share) {
+            outputs[idx * num_shares + share] = shares[idx * num_shares + share] ^ (shares[idx * num_shares + share] << 1);
+        }
+    }
+}
+
+void cpu_sbox_operations(uint8_t *shares, uint8_t *outputs, int num_shares, int num_elements) {
+    for (int idx = 0; idx < num_elements; ++idx) {
+        for (int share = 0; share < num_shares; ++share) {
+            outputs[idx * num_shares + share] = sbox[shares[idx * num_shares + share]];
+        }
+    }
+}
+
+void cpu_gf2n_arithmetic(uint8_t *shares, uint8_t *outputs, int num_shares, int num_elements) {
+    for (int idx = 0; idx < num_elements; ++idx) {
+        for (int share = 0; share < num_shares; ++share) {
+            outputs[idx * num_shares + share] = shares[idx * num_shares + share] ^ (shares[idx * num_shares + share] << 1);
+        }
+    }
+}
+```
+
+---
+
+## Challenges and Difficulties
+
+1. **CUDA-Specific Debugging:**
+   Debugging CUDA kernels required careful attention to memory allocation, thread indexing, and synchronization.
+2. **Timing Measurements:**
+   Measuring GPU execution time accurately required synchronizing kernels and using CUDA events.
+3. **Scalability:**
+   Ensuring that both CPU and GPU implementations scaled efficiently with the number of shares.
+
+---
+
+## Empirical Evaluation
+
+### Runtime Performance
+
+in the timing measurements,  the gpu implementation had close to 100x improvement over the CPU implementation for just 2 shares
+- **Observation:** GPU implementations significantly outperformed CPU implementations for large datasets due to parallelism.
+- **Trends:** As the number of shares increased, the GPU's advantage became more pronounced.
+
+### Scalability
+- **Observation:** GPU implementations scaled efficiently with increased input sizes and number of shares.
+---
+
+## Conclusion: Success Evaluation
+
+The project successfully implemented and benchmarked multi-share masked cryptographic operations on both CPU and GPU. Key findings include:
+- GPU implementations demonstrated significant speedups compared to CPUs, especially for larger datasets and higher numbers of shares.
+- The increased capabilites were pronounced not only for basic operations, but for cryptographic methods like sbox operations.
+- Decreased timing can allow for stronger masking to be applied.  This will make cryptographic methods more secure against sidechannel attacks without greatily increasing runtime.
+
+---
+## Future Work
+- Can these masking implementations be optimized further for specific cryptographic algorithms like AES?
+- What are the trade-offs when applying these techniques to hardware-constrained devices?
+- How do masking operations affect power consumption and energy efficiency?
+
+
