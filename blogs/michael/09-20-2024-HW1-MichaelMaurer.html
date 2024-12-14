@@ -329,6 +329,18 @@ window.Quarto = {
  <span class="menu-text">EECE7309 Homework 5 – LLVM</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/11-26-2024-EATSS-Review.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation – EATSS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/12-13-2024-Project-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Final Project Report – Register Allocator and minimal RISC-V Backend</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -483,6 +495,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/FinalProjectReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Layout Optimization and Loop Transformations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../blogs/Sana/PaperPresentation-LLMs-for-Compiler-Optimization.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">LLMs for Code Optimization, A Promising Start or Overhyped Solution?</span></a>
   </div>
@@ -573,6 +591,18 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework5 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/FinalReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Final Project - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/PaperPresentation-ProgaML.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation - Yashaswini</span></a>
   </div>
 </li>
       </ul>
@@ -937,7 +967,7 @@ sys 0m0.031s</code></pre>
 <p>To do this, I wrote a Python script which consumed the input JSON, parsed it to get the available instructions, and iterated through the map. Each instruction type has a unique construction, which I used to determine how many of each type of isntruction was contained. This tool only requires one pass through the program JSON to determine the count of each instruction type.</p>
 <p>This tool could readily be extended to gather information about the types of instructions in a program.</p>
 <p>The code for this tool is shared below:</p>
-<div id="b39210a1" class="cell">
+<div id="33733d84" class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env python3</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>

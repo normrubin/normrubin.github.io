@@ -300,6 +300,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">EECE7309 Homework 5 – LLVM</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/11-26-2024-EATSS-Review.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation – EATSS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/12-13-2024-Project-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Final Project Report – Register Allocator and minimal RISC-V Backend</span></a>
+  </div>
+</li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
@@ -454,6 +466,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/FinalProjectReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Layout Optimization and Loop Transformations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../blogs/Sana/PaperPresentation-LLMs-for-Compiler-Optimization.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">LLMs for Code Optimization, A Promising Start or Overhyped Solution?</span></a>
   </div>
@@ -544,6 +562,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework5 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/FinalReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Final Project - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/PaperPresentation-ProgaML.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation - Yashaswini</span></a>
   </div>
 </li>
       </ul>
@@ -865,7 +895,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="explanation-of-the-code">Explanation of the code</h2>
 <p>I implemented a generic data flow analysis framework that supports multiple analyses by designing a reusable structure for different types of data flow problems. The code includes:</p>
 <p>This code implements a liveness analysis tool for Bril programs. It builds a control flow graph (CFG) from the program’s instructions, computes the <code>in</code> and <code>out</code> sets for each basic block based on variable usage (using the <code>gen</code> and <code>kill</code> sets), and then prints the liveness information for each block. The analysis helps track which variables are live at various points in the program.</p>
-<div id="f8f416a5" class="cell" data-execution_count="1">
+<div id="e87451cb" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>

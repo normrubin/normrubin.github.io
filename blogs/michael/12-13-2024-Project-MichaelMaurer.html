@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Sana Taghipour Anvari">
+<meta name="author" content="Michael Maurer">
 
-<title>hw2-sanataghipouranvari – EECE7398 Fall 2024</title>
+<title>Final Project Report – Register Allocator and minimal RISC-V Backend – EECE7398 Fall 2024</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,8 +65,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" rel="next">
-<link href="../../blogs/rohit/paper_presentation_GPU_compiler_heuristics.html" rel="prev">
+<link href="../../blogs/oscar/2024-09-20-HW1.html" rel="next">
+<link href="../../blogs/michael/11-26-2024-EATSS-Review.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -102,10 +102,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<meta property="og:title" content="EECE7398 Fall 2024">
-<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
+<meta property="og:title" content="Final Project Report – Register Allocator and minimal RISC-V Backend – EECE7398 Fall 2024">
 <meta property="og:site_name" content="EECE7398 Fall 2024">
 </head>
 
@@ -118,7 +120,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html">Sana</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html">Homework2 - local optimizations</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/12-13-2024-Project-MichaelMaurer.html">Final Project Report – Register Allocator and minimal RISC-V Backend</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -263,13 +265,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Michael</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
@@ -308,7 +310,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/michael/12-13-2024-Project-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+  <a href="../../blogs/michael/12-13-2024-Project-MichaelMaurer.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Final Project Report – Register Allocator and minimal RISC-V Backend</span></a>
   </div>
 </li>
@@ -433,16 +435,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
  <span class="menu-text">Sana</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 show">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Homework2 - local optimizations</span></a>
   </div>
 </li>
@@ -865,9 +867,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html">Sana</a></li><li class="breadcrumb-item"><a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html">Homework2 - local optimizations</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item"><a href="../../blogs/09-20-2024-HW1-SanaTaghipourAnvari.html">Blogs</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html">Michael</a></li><li class="breadcrumb-item"><a href="../../blogs/michael/12-13-2024-Project-MichaelMaurer.html">Final Project Report – Register Allocator and minimal RISC-V Backend</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Homework2 - local optimizations</h1>
+<h1 class="title">Final Project Report – Register Allocator and minimal RISC-V Backend</h1>
 </div>
 
 
@@ -877,7 +879,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Sana Taghipour Anvari </p>
+             <p>Michael Maurer </p>
           </div>
   </div>
     
@@ -890,478 +892,385 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>All codes are here: <a href="https://github.com/sanatgp/bril/tree/main/lvn_dce_project">lvn_dce_project</a></p>
-<section id="part-1" class="level1">
-<h1>Part 1</h1>
-<section id="explanation-of-the-code" class="level2">
-<h2 class="anchored" data-anchor-id="explanation-of-the-code">Explanation of the Code</h2>
-<p>The code I wrote for this question implements a trivial dead code elimination (DCE) optimization for Bril programs. It works by iterating through the instructions in reverse order, maintaining a set of used variables. Instructions that define variables not in this set are eliminated. The algorithm adds variables used as arguments to the set and removes variables when their defining instruction is processed. This approach ensures that instructions defining unused variables are removed while preserving the program’s essential structure and functionality.</p>
-<p>Output of the code with Example 1 as the input:</p>
-<div id="f119d0a5" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tdce(func):</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    used_vars <span class="op">=</span> <span class="bu">set</span>()</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    instructions <span class="op">=</span> func[<span class="st">'instrs'</span>]</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    new_instructions <span class="op">=</span> []</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> instr <span class="kw">in</span> <span class="bu">reversed</span>(instructions):</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'dest'</span> <span class="kw">in</span> instr:</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> instr[<span class="st">'dest'</span>] <span class="kw">not</span> <span class="kw">in</span> used_vars:</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span>  <span class="co"># skip this instruction as its destination is never used</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            used_vars.remove(instr[<span class="st">'dest'</span>])</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'args'</span> <span class="kw">in</span> instr:</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            used_vars.update(instr[<span class="st">'args'</span>])</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        new_instructions.append(instr)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    func[<span class="st">'instrs'</span>] <span class="op">=</span> <span class="bu">list</span>(<span class="bu">reversed</span>(new_instructions))</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> func</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main(input_str):</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    prog <span class="op">=</span> json.loads(example1)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> func <span class="kw">in</span> prog[<span class="st">'functions'</span>]:</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        func <span class="op">=</span> tdce(func)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> json.dumps(prog, indent<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 1 as a JSON string (after bril2json conversion)</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>example1 <span class="op">=</span> <span class="st">'''</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="st">  "functions": [</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="st">      "name": "main",</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="st">      "instrs": [</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "a", "value": 4 },</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "b", "value": 2 },</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "c", "value": 1 },</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "add", "type": "int", "dest": "d", "args": ["a", "b"] },</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "print", "args": ["d"] }</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="st">      ]</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Original program:"</span>)</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(example1)</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Optimized program:"</span>)</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>optimized_prog <span class="op">=</span> main(example1)</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(optimized_prog)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Original program:
-
-{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        { "op": "const", "type": "int", "dest": "a", "value": 4 },
-        { "op": "const", "type": "int", "dest": "b", "value": 2 },
-        { "op": "const", "type": "int", "dest": "c", "value": 1 },
-        { "op": "add", "type": "int", "dest": "d", "args": ["a", "b"] },
-        { "op": "print", "args": ["d"] }
-      ]
-    }
-  ]
-}
-
-
-Optimized program:
-{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        {
-          "op": "const",
-          "type": "int",
-          "dest": "a",
-          "value": 4
-        },
-        {
-          "op": "const",
-          "type": "int",
-          "dest": "b",
-          "value": 2
-        },
-        {
-          "op": "add",
-          "type": "int",
-          "dest": "d",
-          "args": [
-            "a",
-            "b"
-          ]
-        },
-        {
-          "op": "print",
-          "args": [
-            "d"
-          ]
-        }
-      ]
-    }
-  ]
-}</code></pre>
-</div>
-</div>
+<section id="eece-7309-final-project" class="level1">
+<h1>EECE 7309: Final Project</h1>
 </section>
-<section id="testing-the-code" class="level2">
-<h2 class="anchored" data-anchor-id="testing-the-code">Testing the Code</h2>
-<p>As we can see in above output, line 3 ‘c: int = const 1;’ is removed because c is assigned and never used. we can also further test the code with a bigger input:</p>
-<p>example2:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="er">@main</span> <span class="fu">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="er">#</span> <span class="er">Variables</span> <span class="er">with</span> <span class="er">different</span> <span class="er">usage</span> <span class="er">patterns</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="er">a</span><span class="fu">:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">4</span><span class="er">;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="er">b:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">2</span><span class="er">;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="er">c:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">1</span><span class="er">;</span>  <span class="er">#</span> <span class="er">This</span> <span class="er">is</span> <span class="er">dead</span> <span class="er">code</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="er">d:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">b;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="er">e:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">c</span> <span class="er">d;</span>  <span class="er">#</span> <span class="er">'c'</span> <span class="er">is</span> <span class="er">used</span> <span class="er">here</span><span class="fu">,</span> <span class="er">but</span> <span class="er">'e'</span> <span class="er">is</span> <span class="er">never</span> <span class="er">used</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="er">#</span> <span class="er">Reassignment</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="er">a</span><span class="fu">:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">10</span><span class="er">;</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="er">a:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">200</span><span class="er">;</span>  <span class="er">#</span> <span class="er">This</span> <span class="er">overwrites</span> <span class="er">the</span> <span class="er">previous</span> <span class="er">'a'</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="er">#</span> <span class="er">Prints</span> <span class="er">to</span> <span class="er">mark</span> <span class="er">usage</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="er">print</span> <span class="er">a;</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="er">print</span> <span class="er">d;</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="84830670" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tdce(func):</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    used_vars <span class="op">=</span> <span class="bu">set</span>()</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    instructions <span class="op">=</span> func[<span class="st">'instrs'</span>]</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    new_instructions <span class="op">=</span> []</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> instr <span class="kw">in</span> <span class="bu">reversed</span>(instructions):</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'dest'</span> <span class="kw">in</span> instr:</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> instr[<span class="st">'dest'</span>] <span class="kw">not</span> <span class="kw">in</span> used_vars:</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span>  <span class="co"># skip this instruction as its destination is never used</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>            used_vars.remove(instr[<span class="st">'dest'</span>])</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'args'</span> <span class="kw">in</span> instr:</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>            used_vars.update(instr[<span class="st">'args'</span>])</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        new_instructions.append(instr)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    func[<span class="st">'instrs'</span>] <span class="op">=</span> <span class="bu">list</span>(<span class="bu">reversed</span>(new_instructions))</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> func</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main(input_str):</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    prog <span class="op">=</span> json.loads(example2)</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> func <span class="kw">in</span> prog[<span class="st">'functions'</span>]:</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        func <span class="op">=</span> tdce(func)</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> json.dumps(prog, indent<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 2 as a JSON string (after bril2json conversion)</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>example2 <span class="op">=</span> <span class="st">'''</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="st">  "functions": [</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="st">      "name": "main",</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="st">      "instrs": [</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "a", "value": 4 },</span></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "b", "value": 2 },</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "c", "value": 1 },</span></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "add", "type": "int", "dest": "e", "args": ["c", "d"] },</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "add", "type": "int", "dest": "d", "args": ["a", "b"] },</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "a", "value": 10 },</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "a", "value": 200 },</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "print", "args": ["a"] },</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "print", "args": ["d"] }</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="st">      ]</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Original program:"</span>)</span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(example2)</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Optimized program:"</span>)</span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>optimized_prog <span class="op">=</span> main(example2)</span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(optimized_prog)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Original program:
-
-{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        { "op": "const", "type": "int", "dest": "a", "value": 4 },
-        { "op": "const", "type": "int", "dest": "b", "value": 2 },
-        { "op": "const", "type": "int", "dest": "c", "value": 1 },
-        { "op": "add", "type": "int", "dest": "e", "args": ["c", "d"] },
-        { "op": "add", "type": "int", "dest": "d", "args": ["a", "b"] },
-        { "op": "const", "type": "int", "dest": "a", "value": 10 },
-        { "op": "const", "type": "int", "dest": "a", "value": 200 },
-        { "op": "print", "args": ["a"] },
-        { "op": "print", "args": ["d"] }
-      ]
-    }
-  ]
-}
-
-
-Optimized program:
-{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        {
-          "op": "const",
-          "type": "int",
-          "dest": "a",
-          "value": 4
-        },
-        {
-          "op": "const",
-          "type": "int",
-          "dest": "b",
-          "value": 2
-        },
-        {
-          "op": "add",
-          "type": "int",
-          "dest": "d",
-          "args": [
-            "a",
-            "b"
-          ]
-        },
-        {
-          "op": "const",
-          "type": "int",
-          "dest": "a",
-          "value": 200
-        },
-        {
-          "op": "print",
-          "args": [
-            "a"
-          ]
-        },
-        {
-          "op": "print",
-          "args": [
-            "d"
-          ]
-        }
-      ]
-    }
-  ]
-}</code></pre>
-</div>
-</div>
-<p>As we expect, we can see that line 3 ise removed, because <code>c</code> is assigned and used in line 5 for defining <code>e</code> but <code>e</code> is never used so these two lines are both dead code, also <code>a</code> is reassigned in line 6 and thus removed.</p>
+<section id="register-allocator" class="level1">
+<h1>Register Allocator</h1>
+<section id="code-availability" class="level2">
+<h2 class="anchored" data-anchor-id="code-availability">Code Availability</h2>
+<p>The code is available at https://github.com/maurermi/compilers-final-project</p>
+<p>To run the register allocator on a given Bril file, run the following:</p>
+<pre class="{bash}"><code>python relabel.py {filename}.bril &gt; {filename}-relabeled.bril
+bril2json &lt; {filename}-relabeled.bril &gt; {filename}.json
+python cfg.py {filename}.json</code></pre>
+<p>To generate results, run</p>
+<pre class="{bash}"><code>./test-all.sh</code></pre>
 </section>
-<section id="challenges-faced" class="level2">
-<h2 class="anchored" data-anchor-id="challenges-faced">Challenges Faced</h2>
-<p>One of the challenges that I can think of in this question, is that for large and complex programs, the reverse iteration and set operations might become a performance bottleneck. Addressing these challenges would involve extending the algorithm, careful consideration of Bril’s semantics, and developing more sophisticated testing strategies.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This project provides code which converts Bril programs to SSA, computes live variables by block, and then allocates registers to all instructions in the program. Two register allocation algorithms are implemented, a linear scan allocator, and a graph-coloring based allocator. Additionally, I developed a working backend for the RISC-V architecture, and can generate code which runs on a RISC-V simulator.</p>
+<p>This allocator is designed specifically for a RISC-V based system, namely RV32E (which has 32 32-bit register).</p>
+<p>The allocator here generates code which can be run directly in RISC-V, and was tested on this simulator: https://ascslab.org/research/briscv/simulator/simulator.html.</p>
+<p>One goal of this project was to compare head to head the time incurred by the two algorithms. Namely, I was interested in benchmarking the time elapsed by the graph coloring allocator as opposed to the linear scan allocator.</p>
+<p>Another goal was to implement a working backend for the RISC-V architecture, and to generate code which runs on a RISC-V simulator.</p>
+<section id="preface" class="level3">
+<h3 class="anchored" data-anchor-id="preface">Preface</h3>
+<p>A large reason I chose this course was because I have for a long time been interested in learning more about compilers, but namely because compilers were often a black box to me. In terms of the pipeline which goes from code to electrons, compilers were really the only part I had not yet explored. I chose a register allocator as this project because I feel that it completes the chain, and now I feel as though I can connect implementation ideas all the way through the chain, from high level language design to the hardware.</p>
+<p>When proposing this project, I actually had a seperate project in mind, which I worked on for a while, but realized that there was a very slim chance I complete it before the end of this semester. This was a transpiler of high level language into Circom, a language which defines a set of constraints for a proof. This project is still ongoing, however in a seperate capacity these days. When I realized that this wouldn’t be feasible for this project, I switched to this register allocator project as an alternative.</p>
 </section>
-<section id="part-2" class="level2">
-<h2 class="anchored" data-anchor-id="part-2">Part 2</h2>
 </section>
-<section id="explanation-of-the-code-1" class="level2">
-<h2 class="anchored" data-anchor-id="explanation-of-the-code-1">Explanation of the Code</h2>
-<p>The <code>lvn</code> code implements Local Value Numbering to optimize Bril programs by eliminating redundant computations within basic blocks. It processes each instruction, assigns value numbers to expressions based on their operations and operands, and maintains tables to track these values. When it encounters a redundant computation, it eliminates it by reusing the previously computed result, effectively reducing the number of instructions and optimizing the code.</p>
-<p>Example input:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="er">@main()</span> <span class="fu">{</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="er">a</span><span class="fu">:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">4</span><span class="er">;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="er">b:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">2</span><span class="er">;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="er">sum1:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">b;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="er">sum2:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">b;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="er">prod:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">mul</span> <span class="er">sum1</span> <span class="er">sum2;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="er">print</span> <span class="er">prod;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div id="30c63aea" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lvn(func):</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    new_instrs <span class="op">=</span> []</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    value_table <span class="op">=</span> {}  </span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    var_table <span class="op">=</span> {}   </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> instr <span class="kw">in</span> func[<span class="st">'instrs'</span>]:</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'op'</span> <span class="kw">in</span> instr:</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> instr[<span class="st">'op'</span>] <span class="op">==</span> <span class="st">'const'</span>:</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                value <span class="op">=</span> instr[<span class="st">'value'</span>]</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                value_num <span class="op">=</span> get_value_number(value_table, (<span class="st">'const'</span>, value))</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                value_table[value_num] <span class="op">=</span> (<span class="st">'const'</span>, value, instr[<span class="st">'dest'</span>])</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                var_table[instr[<span class="st">'dest'</span>]] <span class="op">=</span> value_num</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>                new_instrs.append(instr)</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> instr[<span class="st">'op'</span>] <span class="op">==</span> <span class="st">'print'</span>:</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>                new_instr <span class="op">=</span> instr.copy()</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="st">'args'</span> <span class="kw">in</span> new_instr:</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>                    new_instr[<span class="st">'args'</span>] <span class="op">=</span> [value_table[var_table[arg]][<span class="dv">2</span>] <span class="cf">for</span> arg <span class="kw">in</span> new_instr[<span class="st">'args'</span>]]</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>                new_instrs.append(new_instr)</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>                args <span class="op">=</span> [var_table.get(arg, arg) <span class="cf">for</span> arg <span class="kw">in</span> instr.get(<span class="st">'args'</span>, [])]</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>                value_num <span class="op">=</span> get_value_number(value_table, (instr[<span class="st">'op'</span>], <span class="bu">tuple</span>(args)))</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> value_num <span class="kw">in</span> value_table:</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>                    <span class="co"># Redundant computation found here!</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>                    canonical_op, canonical_args, canonical_var <span class="op">=</span> value_table[value_num]</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>                    var_table[instr[<span class="st">'dest'</span>]] <span class="op">=</span> value_num</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>                <span class="cf">else</span>:</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>                    new_instr <span class="op">=</span> instr.copy()</span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>                    new_instr[<span class="st">'args'</span>] <span class="op">=</span> [value_table[arg][<span class="dv">2</span>] <span class="cf">if</span> arg <span class="kw">in</span> value_table <span class="cf">else</span> arg <span class="cf">for</span> arg <span class="kw">in</span> args]</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>                    value_table[value_num] <span class="op">=</span> (instr[<span class="st">'op'</span>], <span class="bu">tuple</span>(args), instr[<span class="st">'dest'</span>])</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>                    var_table[instr[<span class="st">'dest'</span>]] <span class="op">=</span> value_num</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>                    new_instrs.append(new_instr)</span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>            new_instrs.append(instr)</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    func[<span class="st">'instrs'</span>] <span class="op">=</span> new_instrs</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> func</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>       </span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_value_number(value_table, key):</span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> num, (op, args, var) <span class="kw">in</span> value_table.items():</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> op <span class="op">==</span> key[<span class="dv">0</span>] <span class="kw">and</span> args <span class="op">==</span> key[<span class="dv">1</span>]:</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> num</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(value_table)</span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>        bril_input <span class="op">=</span> json.loads(example1)</span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> func <span class="kw">in</span> bril_input[<span class="st">'functions'</span>]:</span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>            lvn(func)</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>        json.dump(bril_input, sys.stdout, indent<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>        sys.stdout.flush()</span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"An error occurred: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>        sys.exit(<span class="dv">1</span>)</span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="co"># Example 1 as a JSON string (after bril2json conversion)</span></span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>example1 <span class="op">=</span> <span class="st">'''</span></span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a><span class="st">  "functions": [</span></span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
-<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a><span class="st">      "name": "main",</span></span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a><span class="st">      "instrs": [</span></span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "a", "value": 4 },</span></span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "const", "type": "int", "dest": "b", "value": 2 },</span></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "add", "type": "int", "dest": "sum1", "args": ["a", "b"] },</span></span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "add", "type": "int", "dest": "sum2", "args": ["a", "b"] },</span></span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "mul", "type": "int", "dest": "prod", "args": ["sum1", "sum2"] },</span></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a><span class="st">        { "op": "print", "args": ["prod"] }</span></span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a><span class="st">      ]</span></span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
-<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
-<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
-<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a><span class="st">'''</span></span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
-<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>    main()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{
-  "functions": [
-    {
-      "name": "main",
-      "instrs": [
-        {
-          "op": "const",
-          "type": "int",
-          "dest": "a",
-          "value": 4
-        },
-        {
-          "op": "const",
-          "type": "int",
-          "dest": "b",
-          "value": 2
-        },
-        {
-          "op": "add",
-          "type": "int",
-          "dest": "sum1",
-          "args": [
-            "a",
-            "b"
-          ]
-        },
-        {
-          "op": "mul",
-          "type": "int",
-          "dest": "prod",
-          "args": [
-            "sum1",
-            "sum1"
-          ]
-        },
-        {
-          "op": "print",
-          "args": [
-            "prod"
-          ]
-        }
-      ]
-    }
-  ]
-}</code></pre>
-</div>
-</div>
-<p>As we can see in the output above, line 5 has been changed to <code>prod: int = mul sum1 sum1;</code></p>
-</section>
-<section id="testing-the-code-1" class="level2">
-<h2 class="anchored" data-anchor-id="testing-the-code-1">Testing the Code</h2>
-<p>For testing the correctness of the code, I used <code>brench.py</code> code in bril, and for that we need to have a brench.toml file (or a configuration file for <code>brench.py</code>) configures the Brench tool to run a Bril benchmark through four different pipelines: baseline (no optimization), DCE only, LVN only, and LVN followed by DCE. It then extracts the total number of dynamic instructions executed for each run, allowing us to compare the effectiveness of these optimizations. We use <code>brench.toml</code> with <code>python3 ../brench/brench.py brench.toml &gt; results.csv</code></p>
-<p>example test:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="er">@main</span> <span class="fu">{</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="er">a</span><span class="fu">:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">1</span><span class="er">;</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="er">b:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">const</span> <span class="dv">2</span><span class="er">;</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="er">c:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">b;</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="er">d:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">b;</span>    <span class="er">#</span> <span class="er">Redundant</span> <span class="er">computation</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="er">e:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">b</span> <span class="er">a;</span>    <span class="er">#</span> <span class="er">Redundant</span> <span class="er">due</span> <span class="er">to</span> <span class="er">commutativity</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="er">f:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">mul</span> <span class="er">c</span> <span class="er">d;</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="er">g:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">mul</span> <span class="er">c</span> <span class="er">e;</span>    <span class="er">#</span> <span class="er">Redundant</span> <span class="er">computation</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="er">sum1:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">b;</span> <span class="er">#</span> <span class="er">Same</span> <span class="er">as</span> <span class="er">c</span><span class="fu">,</span> <span class="er">d</span><span class="fu">,</span> <span class="er">and</span> <span class="er">e</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="er">sum2</span><span class="fu">:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">b;</span> <span class="er">#</span> <span class="er">Same</span> <span class="er">as</span> <span class="er">c</span><span class="fu">,</span> <span class="er">d</span><span class="fu">,</span> <span class="er">e</span><span class="fu">,</span> <span class="er">and</span> <span class="er">sum1</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="er">prod</span><span class="fu">:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">mul</span> <span class="er">sum1</span> <span class="er">sum2;</span> <span class="er">#</span> <span class="er">Uses</span> <span class="er">two</span> <span class="er">identical</span> <span class="er">values</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="er">h:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">sub</span> <span class="er">f</span> <span class="er">g;</span>    <span class="er">#</span> <span class="er">Dead</span> <span class="er">code:</span> <span class="er">computed</span> <span class="er">but</span> <span class="er">never</span> <span class="er">used</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="er">i:</span> <span class="er">int</span> <span class="er">=</span> <span class="er">add</span> <span class="er">a</span> <span class="er">a;</span>    <span class="er">#</span> <span class="er">Dead</span> <span class="er">code:</span> <span class="er">computed</span> <span class="er">but</span> <span class="er">never</span> <span class="er">used</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="er">print</span> <span class="er">f;</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="er">print</span> <span class="er">g;</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="er">print</span> <span class="er">prod;</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>results.csv:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode css code-with-copy"><code class="sourceCode css"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>benchmark<span class="op">,</span>run<span class="op">,</span>result</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>test_lvn<span class="op">,</span>baseline<span class="op">,</span>15</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>test_lvn<span class="op">,</span>dce<span class="op">,</span>13</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>test_lvn<span class="op">,</span>lvn<span class="op">,</span>11</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>test_lvn<span class="op">,</span>lvn_dce<span class="op">,</span>9</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Based on this analysis, let’s count the instructions that should remain after each optimization:</p>
-<p>Baseline: 15 instructions (all original instructions)</p>
-<p>DCE: 13 instructions (removes h and i)</p>
-<p>LVN: 11 instructions (keeps a, b, c, f, prod, and the three print statements)</p>
-<p>LVN + DCE: 9 instructions (same as LVN, but also removes h and i)</p>
-<p>Therefore, We can confirm the correctness of the implementations.</p>
+<section id="goals" class="level2">
+<h2 class="anchored" data-anchor-id="goals">Goals</h2>
+<p>The main goal of this project is to gain hands-on familiarity with the algorithms used in compiler implementation, as well as to explore some of the topics discussed in class, not previously covered in assignments. As such, I felt that using Bril would be more educational than LLVM, as it required me to implement essentially everything from scratch. In a follow on work, I plan to do the same in LLVM, because it would be nice to have it around.</p>
 </section>
 <section id="challenges" class="level2">
 <h2 class="anchored" data-anchor-id="challenges">Challenges</h2>
-<p>The main challenges in <code>lvn.py</code> include handling commutative operations (like recognizing that add a b and add b a are equivalent) and ensuring that value numbering accurately tracks and replaces redundant computations without altering the program’s correct behavior.</p>
+<p>One unexpected challenge during this work was how tricky it was to convert to SSA. Adrian Sampson, in his lecture on SSA, does actually mention that converting to SSA is trickier than one may expect, and I can confirm that this is the case. Conceptually, it is not terribly challenging, but while implementing it, I developed a massive chunk of code, that was difficult to effectively partition, and this made it especially difficult to debug. Namely, the part which was challenging was not adding in phi nodes, but rather renaming variables properly. To me, it does not seem as though this was a conceptual issue, more of a software engineering one. The amount of code I wrote to support SSA is a significant chunk of this code, and got to the point at which I was spending more time debugging the SSA conversion than the register allocation, which is not what I was aiming for. So, that being said, the SSA conversion code in this project is not fully working, because of the rename step. However, I did write a significant amount of infrastructure to perform register allocation once SSA form is achieved.</p>
+<p>Another challenge in this project was determining whether I should do this work using LLVM or Bril. In retrospect, it would have been better to use LLVM as the main reason I wanted to use Bril was to force myself to better understand the algorithms at play here. However, given that the main advantage LLVM would have given is SSA formatted code, it may have been wiser (and admittedly, I’m more comfortable with C++ than Python). However given what I learned during this project, I have no concerns about taking this work and applying it to an LLVM based register allocator.</p>
+<p>One lesson is that I should get better at writing unit tests.</p>
+</section>
+<section id="implementation" class="level2">
+<h2 class="anchored" data-anchor-id="implementation">Implementation</h2>
+<section id="register-allocation-algorithms" class="level3">
+<h3 class="anchored" data-anchor-id="register-allocation-algorithms">Register Allocation Algorithms</h3>
+<p>There are two register allocation algorithms implemented here, a linear scan allocator, and a graph coloring allocator. Linear scan is a simpler algorithm, which is generally faster, but does not always perform as well as graph coloring. Previously, I have read and implemented a similar algorithm for scheduling tasks in a cloud computing environment, based on a paper from Northeastern’s Xue Lin.</p>
+<p>The basis of the linear scan algorithm is essentially two phases: 1. Computation of the interference graph 2. Register Assignment</p>
+<p>In the first phase, one must compute the liveness of variables by block, and determine which variables are live at the same time as one another. This analyisis is very similar to some of the data flow analyses we have done in class. Essentially, a worklist of basic blocks is created, in reverse post-order. Then, for each block we encounter, we compute the live out variables, which are the union of live in variables in all successors. Then, we compute the live in variables, which are the union of used variables, and the set difference between live out variables and defined variables in the block. In my implementation, I included some timing information for this analysis.</p>
+<div id="2a3a6aea" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> compute_liveness(<span class="va">self</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="im">import</span> time</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialize the blocks</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.blocks.values():</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>            block.compute_used_and_defined_vars()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            block.live_out <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            block.live_in <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create worklist</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        worklist <span class="op">=</span> <span class="va">self</span>.terminating_blocks</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        start_time <span class="op">=</span> time.time()</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Continue until no changes are made</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>            changed <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="co"># This prevents infinite loops</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            blocks_seen <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">while</span> <span class="bu">len</span>(worklist) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Work through blocks in reverse-post order</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>                block <span class="op">=</span> <span class="va">self</span>.blocks[worklist.pop()]</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>                old_live_in <span class="op">=</span> copy.deepcopy(block.live_in)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>                old_live_out <span class="op">=</span> copy.deepcopy(block.live_out)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                blocks_seen.add(block.name())</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Compute live out variables</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> succ <span class="kw">in</span> block.succs:</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                    block.live_out <span class="op">=</span> block.live_out.union(<span class="va">self</span>.blocks[succ].live_in)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Compute live in variables</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                block.live_in <span class="op">=</span> block.used_vars.union(block.live_out <span class="op">-</span> block.defined_vars)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Check if changes were made</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> old_live_in <span class="op">!=</span> block.live_in <span class="kw">or</span> old_live_out <span class="op">!=</span> block.live_out:</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>                    changed <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Add predecessors to worklist</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> pred <span class="kw">in</span> block.preds:</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                    <span class="co"># This prevents infinite loops</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> pred <span class="kw">not</span> <span class="kw">in</span> blocks_seen:</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>                        worklist.add(pred)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> changed:</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>                <span class="cf">break</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>        end_time <span class="op">=</span> time.time() </span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Computing Liveness Time taken: "</span>, end_time <span class="op">-</span> start_time)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The next step is register allocation. In the linear scan algorithm, we iterate through instructions and assign registers to the destinations. Further, at each instruction, we scan the allocated registers to see if any can be freed (whether the given instruction is past the last use). Allocation is done by choosing the first free register if there is one, and assigning a value to it. If there are none available, there must be a spill. Spilling is typically done based on certain heuristics. Here, I experimented with two heuristics, one being random choice, and the other being choosing the register which has the latest “last use”. Apparently, this is a popular heuristic.</p>
+<p>A shortcoming of the naive linear scan register allocation strategy is that it does do much in the way of wisely allocating registers. Namely, it’s possible that fewer registers are required than what the allocation scheme calls for. So if register pressure is a major concern, linear scan register allocation is not a great choice. However, it is reported to be quite a bit faster than many of the existing ahead of time register allocation strategies (namely graph coloring).</p>
+<p>One worthwhile note is that the linear scan register allocator requires the ability to iterate through blocks in order. My CFG class however uses a dictionary for storing blocks, which hashes entries, so either when initializing the CFG I would need to tag instructions with their order in the program, or I could preprocess the program to add labels before certain instructions. I ended up choosing the latter, so there is a tool with this work called <code>relabel.py</code> aimed at renaming labels by the number instruction they are in the program.</p>
+<p>The second register allocation strategy implemented was a graph coloring algorithm (Chiatin’s algorithm). This is a fairly famous technique, which we discussed in class and is also discussed heavily in the literature. The idea here is to treat the program as a graph, with each variable as a vertex. Then, each edge connects two verticies which are alive at the same time.</p>
+<p>The first step in this scheme is therefore, to create the interference graph. This work was inherited directly from the linear scan register allocation.</p>
+<p>Next, a copy of the graph is made, and is “simplified”. Simplificaiton refers to an iteritave process by which nodes and edges are removed from the graph. Verticies are removed by determining, first, whether there are any verticies that exist in the graph which have fewer than <code>k</code> edges, where <code>k</code> is the number of registers available to the program. If so, the first (in my implementation) vertex found meeting this criterion is removed from the graph, and it along with its outgoing edges are pushed onto a stack, with a flag indicating that this vertex is to be “colored”, or to have a register allocated to it. If no vertex exists meeting this criterion, then a vertex is chosen at random. This vertex and its edges are removed, and pushed onto the stack with a flag indicating that it should <em>not</em> be colored. This is continued until the fixed point when there are no remaining verticies in the graph copy, is reached.</p>
+<p>Next, verticies are added back into the graph, by popping them from the aforementioned stack. If the vertex popped is marked to be colored, it is assigned a color (register) which is different from any verticies with which it shares an edge. If it is marked to not be colored, first, it is checked whether there are any free registers (not in use by neighbors). If so, this register is assigned, and the variable does not actually need to be spilled. If not, then the variable is marked to be spilled to memory. If it is spilled, then it is not added back into the graph. If spills occur, this means that loads and stores must be inserted into the resultant code. This is handled in the actual register assignment code.</p>
+<p>One implementation note, is that these algorithms are implemented to operate on a set number of registers, but are not yet provided the actual register IDs. This is because I wanted these algorithms to be machine independent. In the next step, these register tags are converted to true physical registers, following the requirements of a given architecture.</p>
+<p>Another quirk is that the register allocation is done on a per-function basis. So there is no cross-function register allocation optimization done in this process. This would make the analysis much tricker (namely because of the control flow changes), but is an interesting avenue of future work.</p>
+</section>
+<section id="register-assignment-on-machine" class="level3">
+<h3 class="anchored" data-anchor-id="register-assignment-on-machine">Register Assignment on Machine</h3>
+<p>For this project, I focused on a RISC-V architecture, and this code, with some exceptions, can develop code which runs on a RISC-V simulator. This was not really part of my initial plan, but I found it quite exciting to be able to generate code that can actually run, and do what it claims to on a target machine.</p>
+<p>There are some exceptions, namely operations which are not supported natively by RISC-V (or by the limited instruction set provided by RV32I). For some operations (such as Bril’s <code>br</code> operation), I added support through the use of a mixture of non-equivalent operations. These were some common instructions used that have natural analog constructions in RISC-V. One example would be the <code>eq</code> instruction. This has no analog in RV32I, but an equivalent can be achieved with a subtraction and logical inverse. This is also commonly seen in tandem with <code>br</code>, so a branch based on the result of an <code>eq</code> can be replaced by a <code>sub</code> operation followed by <code>beq _ zero</code> in RISC-V. Some operations have no real equivalent, such as <code>print</code>, so those are translated directly for the time being.</p>
+<p>For the code generated, I reccomend giving it a try on BU’s RISC-V simulator. For workloads containing only instructions supported by RV32I, the code should run and produce results!</p>
+<p>I used the following register constraints in my setup: Argument Registers = [‘a0’, ‘a1’, ‘a2’, ‘a3’, ‘a4’, ‘a5’, ‘a6’, ‘a7’] Return Register = [‘ra’] General Purpose Registers = [‘t0’, ‘t1’, ‘t2’, ‘s1’, ‘s2’, ‘s3’, ‘s4’, ‘s5’, ‘s6’, ‘s7’, ‘s8’, ‘s9’, ‘s10’, ‘s11’, ‘t3’, ‘t4’, ‘t5’, ‘t6’] Special Registers = [‘fp’, ‘sp’, ‘gp’, ‘tp’, ‘zero’]</p>
+<p>The backend really only conisders the argument registers, return registers, and general purpose registers. The stack pointer is used for inserting load/store instructions, but otherwise is left alone.</p>
+</section>
+</section>
+<section id="evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation">Evaluation</h2>
+<p>I used SIGPLAN to help develop reasonable evaluation workloads for this project. For sufficient breadth of testing and number of trials, I evaluated this work on a large portion of Bril examples provided in the Bril repository (under benchmarks/core) totaling 35 different workloads. Those used are provided alongside this code.</p>
+<p>There are two forms of evaluation used hereafter. One is determining whether the code used assigns registers legally (i.e.&nbsp;does not double-assign a register, spills when appropriate). The other evaluation is a head to head comparison of the register assignment techniques used. Here, we compare the number of registers used by the assignment strategy (at maximum), and the number of spills for a given workload and number of available registers. Additionally, we measure the time taken to complete the register assignment operation. For graph coloring, I expect it to be on average slower than linear-scan, but I expect graph-coloring on average to have fewer spills and use fewer registers.</p>
+<p>** Note: I chose to manually pick the number of available registers rather than giving the system default to stress test the system. Further, in multithreaded applications this behavior could be useful.</p>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="performance-results" class="level3">
+<h3 class="anchored" data-anchor-id="performance-results">Performance Results</h3>
+<p>Here, we validate the perofrmance of the register allocator on systems with 5, 7, and 10 available genereal purpose registers.</p>
+<p>First, we confirm that all test cases produce valid register assignments. Using the provided test script (<code>test-all.sh</code>), we can confirm that all tests pass, and generate a set of test results to operate over.</p>
+<p>Next, we investigate performance differences between the linear scan register allocation and graph-coloring based register allocation.</p>
+<p>First, the top line numbers are as follows: - Linear Scan register allocation is on average, 9.75x faster than graph coloring - Graph coloring on average uses 84.4% of the registers used by linear scan - Graph coloring on average has 0.141 fewer spills than linear scan allocation</p>
+<p>These results tend to align with what I expected. Investigating the results further, it appears that generally, the linear scan-based register allocator and graph-coloring based allocator have a similar number of spills (often the same). The number of registers allocated by the linear-scan register allocator is often larger than the number of registers allocated by the graph-based allocator. Now most notably, the linear scan register allocator is nearly 10x as fast as the graph colloring allocator on average. This is clear evidence for why it is typically used in JIT systems, whereas graph coloring is really only used in ahead of time compilation.</p>
+<p>Another note is that randomly spilling registers (when a spill is required) appears to perform slightly worse than spilling the register that has the longest time to be free. The difference is not large however (on average, 0.02 more spills with random spillage).</p>
+</section>
+<section id="risc-v-code-generation" class="level3">
+<h3 class="anchored" data-anchor-id="risc-v-code-generation">RISC-V Code Generation</h3>
+<p>The other chunk of this program was implementing a backend to convert from bril to RISC-V. Admittedly, this addition was somewhat of an afterthought, and I was not able to automate the test infrastructure to determine correctness of these RISC-V programs. Additionally, the backend does not support all Bril instructions, so much of the testing here was done by hand on curated examples.</p>
+<p>In the future, I am hoping to further flesh this out, because I think this was quite fun and interesting. In hindsight, I would have preferred to focus more of my project on this aspect.</p>
+<p>To show that the code works, here is an example RISC-V program generated by my tools, and the corresponding Bril which gave rise to it.</p>
+<p>Sample RISC-V Program:</p>
+<pre class="{assembly}"><code>main:
+.l0:
+    li t1, 10
+.l1:
+    li t0, 1
+.l2:
+    li t2, 1
+.l3:
+    add t0, t1, t0
+.l4:
+    li s1, 50
+.l5:
+    beq s1, zero, .l6
+    j l7
+.l6:
+    j .l11
+.l7:
+    add t0, t0, t2
+.l11:
+    add t0, t2, t0
+.l8:
+    beq s1, zero, .l9
+    j l10
+.l9:
+    j .l11
+.l10:
+    mul t0, t0, t2
+.l12:
+    add t2, t2, t2
+.l13:
+    add t0, t0, t2
+.l14:
+    add t0, t0, t1
+.l15:
+    mv a0, t0
+    jr ra</code></pre>
+<p>Corresponding Bril:</p>
+<pre class="{bril}"><code>@main() {
+.l0:
+  n: int = const 10;
+.l1:
+  one: int = const 1;
+.l2:
+  a: int = const 1;
+.l3:
+  b: int = add n one;
+.l4:
+  magic: int = const 50;
+.l5:
+  branch: bool = gt b a;
+  br branch .l6 .l7;
+.l6:
+  b = id a;
+  jmp .l11;
+.l7:
+  b = add b a;
+.l8:
+  branch: bool = gt b magic;
+  br branch .l9 .l10;
+.l9:
+  b = sub b a;
+  jmp .l11;
+.l10:
+  b = mul b a;
+# There should be a 3-way phi node here.;
+.l11:
+  c: int = add a b;
+.l12:
+  d: int = add a a;
+.l13:
+  e: int = add c d;
+.l14:
+  f: int = add e n;
+.l15:
+  ret f;
+}</code></pre>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>This project implements two register allocation techniques, compares the results, and further creates a limited scope backend which generates actual, runnable RISC-V code. The results of this were as expected and line up with the literature, in that linear scan register allocation is much faster than graph-coloring based allocation, but generally speaking it performs worse. I found it interesting to verify this, because although it’s clear algorithmically, it’s nice to see that on actual workloads the behavior holds. I learned quite a bit throughout this project, and am glad I focused on a register allocator. Now I feel as though I have a good sense for every step going from high level code to hardware. Additionally, this work prompted some exploration of graph theory on my end, which I would like to pursue more.</p>
+<p>For this project, I would consider it largely a success, but there are notable shortcomings. One of these is that I was not able to compare against an SSA-based register allocator. I think this would have helped quite a bit. However, I was able to develop two working register allocators, and was able to evaluate the relative performance of each. Further, I was able to impement much of a RISC-V backend, which is a nice tool to use going forward. In summary, I would say this project was a success, but there is more I could have done to make it better.</p>
+</section>
+<section id="future-work" class="level2">
+<h2 class="anchored" data-anchor-id="future-work">Future Work</h2>
+<p>I would like to perform this exercise on LLVM instead of Bril in the future. I think leveraging the existing tooling would have allowed me to iterate much faster on this work, and possibly come up with more interesting results. However, I think that using Bril as the basis here really allowed me to get a good understanding of the algorithms and techniques at play.</p>
+<p>It would be interesting to expand the backend to support additional architectures, namely ones with more complex register behavior. One example would be x86. Additionally, adding more instruction support would be very helpful, as then arbitrary bril programs could be converted to RISC-V using this tool.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ol type="1">
+<li>https://ieeexplore.ieee.org/abstract/document/6985666</li>
+<li>https://www.youtube.com/watch?v=eeXk_ec1n6g&amp;t=1039s</li>
+<li>https://www.youtube.com/watch?v=eWp_-XCwN1A</li>
+<li>https://www.cs.cornell.edu/courses/cs6120/2023fa/lesson/6/</li>
+<li>https://www.cs.cornell.edu/courses/cs6120/2023fa/lesson/4/</li>
+<li>https://capra.cs.cornell.edu/bril/lang/ssa.html</li>
+<li>https://normrubin.github.io/lectures/04_data_flow.html</li>
+<li>https://normrubin.github.io/lectures/register_allocation.html</li>
+<li>https://anoopsarkar.github.io/compilers-class/assets/lectures/opt3-regalloc-linearscan.pdf</li>
+<li>https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/Questions/RegisterAllocation0.pdf</li>
+<li>https://compilers.cs.uni-saarland.de/papers/ssara.pdf</li>
+<li>https://en.wikipedia.org/wiki/Register_allocation</li>
+<li>https://web.stanford.edu/class/archive/cs/cs143/cs143.1128/lectures/17/Slides17.pdf</li>
+<li>https://github.com/riscv/riscv-isa-manual/blob/main/src/rv32.adoc</li>
+</ol>
+</section>
+<section id="appendix" class="level2">
+<h2 class="anchored" data-anchor-id="appendix">Appendix</h2>
+<section id="sample-graph-coloring-register-allocation-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="sample-graph-coloring-register-allocation-visualization">Sample Graph Coloring Register Allocation Visualization</h3>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD    
+    magic:0 --&gt; n:1
+    d:0 --&gt; n:1
+    e:0 --&gt; n:1
+    branch:2 --&gt; n:1
+    branch:2 --&gt; magic:0
+    b:3 --&gt; n:1
+    magic:0 --&gt; b:3
+    branch:2 --&gt; b:3
+    a:4 --&gt; n:1
+    b:3 --&gt; a:4
+    magic:0 --&gt; a:4
+    branch:2 --&gt; a:4
+    c:2 --&gt; n:1
+    c:2 --&gt; a:4
+    d:0 --&gt; c:2
+    one:0 --&gt; n:1
+    a:4 --&gt; one:0
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="sample-linear-scan-register-allocation-visualization" class="level3">
+<h3 class="anchored" data-anchor-id="sample-linear-scan-register-allocation-visualization">Sample Linear Scan Register Allocation Visualization</h3>
+<pre><code># tests/sample.bril
+0: n        1:          2:          3:          4:          5:          6:          
+0: n        1: one      2:          3:          4:          5:          6:          
+0: n        1: one      2: a        3:          4:          5:          6:          
+0: n        1:          2: a        3: b        4:          5:          6:          
+0: n        1: magic    2: a        3: b        4:          5:          6:          
+0: n        1: magic    2: a        3: b        4: branch   5:          6:          
+0: n        1: magic    2: a        3: b        4: branch   5:          6:          
+0: n        1: magic    2: a        3: b        4: branch   5:          6:          
+0: n        1: magic    2: a        3: b        4: branch   5:          6:          
+0: n        1: magic    2: a        3: b        4: branch   5:          6:          
+0: n        1:          2: a        3: b        4: branch   5: c        6:          
+0: n        1: d        2: a        3: b        4:          5: c        6:          
+0: n        1: d        2: a        3: b        4: e        5: c        6:          
+0: n        1: d        2: a        3: b        4: e        5: c        6: f        
+0: n        1: d        2: a        3: b        4: e        5: c        6: f        
+0: n        1: d        2: a        3:          4: e        5: c        6: f</code></pre>
+</section>
+<section id="sample-test-result-data" class="level3">
+<h3 class="anchored" data-anchor-id="sample-test-result-data">Sample Test Result Data</h3>
+<pre><code>Head to head comparison
+Name: ackermann_ack_10 Graph Execution Time:  0.00449681282043457 Linear Execution Time:  0.0001437664031982422 Speedup:  31.27860696517413
+Name: ackermann_ack_7 Graph Execution Time:  0.0022280216217041016 Linear Execution Time:  0.0002560615539550781 Speedup:  8.701117318435754
+Name: ackermann_ack_5 Graph Execution Time:  0.002377033233642578 Linear Execution Time:  0.00023508071899414062 Speedup:  10.111561866125761
+Name: ackermann_main_10 Graph Execution Time:  9.799003601074219e-05 Linear Execution Time:  3.0040740966796875e-05 Speedup:  3.261904761904762
+Name: ackermann_main_7 Graph Execution Time:  8.177757263183594e-05 Linear Execution Time:  2.288818359375e-05 Speedup:  3.5729166666666665
+Name: ackermann_main_5 Graph Execution Time:  7.414817810058594e-05 Linear Execution Time:  1.9788742065429688e-05 Speedup:  3.746987951807229
+Name: binary_main_10 Graph Execution Time:  5.412101745605469e-05 Linear Execution Time:  2.09808349609375e-05 Speedup:  2.5795454545454546
+Name: binary_main_7 Graph Execution Time:  4.506111145019531e-05 Linear Execution Time:  5.91278076171875e-05 Speedup:  0.7620967741935484
+Name: binary_main_5 Graph Execution Time:  3.409385681152344e-05 Linear Execution Time:  1.3113021850585938e-05 Speedup:  2.6
+Name: binary_printBinary_10 Graph Execution Time:  0.0008351802825927734 Linear Execution Time:  6.413459777832031e-05 Speedup:  13.022304832713754
+Name: binary_printBinary_7 Graph Execution Time:  0.0008020401000976562 Linear Execution Time:  0.00011515617370605469 Speedup:  6.9648033126294
+Name: binary_printBinary_5 Graph Execution Time:  0.0007398128509521484 Linear Execution Time:  9.799003601074219e-05 Speedup:  7.549878345498784
+...
+Name: totient_totient_10 Graph Execution Time:  0.0045719146728515625 Linear Execution Time:  0.0003387928009033203 Speedup:  13.494722026741732
+Name: totient_totient_7 Graph Execution Time:  0.00251007080078125 Linear Execution Time:  0.000286102294921875 Speedup:  8.773333333333333
+Name: totient_totient_5 Graph Execution Time:  0.0029671192169189453 Linear Execution Time:  0.00013017654418945312 Speedup:  22.793040293040292
+Name: totient_mod_10 Graph Execution Time:  0.0002512931823730469 Linear Execution Time:  4.100799560546875e-05 Speedup:  6.127906976744186
+Name: totient_mod_7 Graph Execution Time:  0.0002460479736328125 Linear Execution Time:  3.409385681152344e-05 Speedup:  7.216783216783217
+Name: totient_mod_5 Graph Execution Time:  0.0002429485321044922 Linear Execution Time:  3.0994415283203125e-05 Speedup:  7.838461538461538
+Name: up_main_10 Graph Execution Time:  0.0001239776611328125 Linear Execution Time:  3.409385681152344e-05 Speedup:  3.6363636363636362
+Name: up_main_7 Graph Execution Time:  0.00014209747314453125 Linear Execution Time:  2.7179718017578125e-05 Speedup:  5.228070175438597
+Name: up_main_5 Graph Execution Time:  0.00010538101196289062 Linear Execution Time:  2.4080276489257812e-05 Speedup:  4.376237623762377
+Name: up_up_arrow_10 Graph Execution Time:  0.0010821819305419922 Linear Execution Time:  0.00011086463928222656 Speedup:  9.761290322580646
+Name: up_up_arrow_7 Graph Execution Time:  0.0010287761688232422 Linear Execution Time:  8.916854858398438e-05 Speedup:  11.537433155080214
+Name: up_up_arrow_5 Graph Execution Time:  0.0010311603546142578 Linear Execution Time:  7.987022399902344e-05 Speedup:  12.91044776119403
+Average speedup of Linear:  9.752766747717136x
+Name: ackermann_ack_10 Graph Registers:  4 Linear Registers:  6 Ratio:  0.6666666666666666
+Name: ackermann_ack_7 Graph Registers:  4 Linear Registers:  6 Ratio:  0.6666666666666666
+Name: ackermann_ack_5 Graph Registers:  4 Linear Registers:  5 Ratio:  0.8
+Name: ackermann_main_10 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: ackermann_main_7 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: ackermann_main_5 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: binary_main_10 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: binary_main_7 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: binary_main_5 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: binary_printBinary_10 Graph Registers:  3 Linear Registers:  3 Ratio:  1.0
+Name: binary_printBinary_7 Graph Registers:  3 Linear Registers:  3 Ratio:  1.0
+Name: binary_printBinary_5 Graph Registers:  3 Linear Registers:  3 Ratio:  1.0
+...
+Name: totient_main_10 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: totient_main_7 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: totient_main_5 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: totient_totient_10 Graph Registers:  6 Linear Registers:  7 Ratio:  0.8571428571428571
+Name: totient_totient_7 Graph Registers:  6 Linear Registers:  7 Ratio:  0.8571428571428571
+Name: totient_totient_5 Graph Registers:  5 Linear Registers:  5 Ratio:  1.0
+Name: totient_mod_10 Graph Registers:  2 Linear Registers:  3 Ratio:  0.6666666666666666
+Name: totient_mod_7 Graph Registers:  2 Linear Registers:  3 Ratio:  0.6666666666666666
+Name: totient_mod_5 Graph Registers:  2 Linear Registers:  3 Ratio:  0.6666666666666666
+Name: up_main_10 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: up_main_7 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: up_main_5 Graph Registers:  1 Linear Registers:  1 Ratio:  1.0
+Name: up_up_arrow_10 Graph Registers:  4 Linear Registers:  6 Ratio:  0.6666666666666666
+Name: up_up_arrow_7 Graph Registers:  4 Linear Registers:  6 Ratio:  0.6666666666666666
+Name: up_up_arrow_5 Graph Registers:  4 Linear Registers:  5 Ratio:  0.8
+Average Registers used by Graph vs Linear:  0.8438802083333327x
+Name: ackermann_ack_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: ackermann_ack_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: ackermann_ack_5 Graph Spills:  0 Linear Spills:  1 Difference:  1
+Name: ackermann_main_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: ackermann_main_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: ackermann_main_5 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: binary_main_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: binary_main_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: binary_main_5 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: binary_printBinary_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: binary_printBinary_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: binary_printBinary_5 Graph Spills:  0 Linear Spills:  0 Difference:  0
+...
+Name: totient_main_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: totient_main_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: totient_main_5 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: totient_totient_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: totient_totient_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: totient_totient_5 Graph Spills:  1 Linear Spills:  1 Difference:  0
+Name: totient_mod_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: totient_mod_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: totient_mod_5 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: up_main_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: up_main_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: up_main_5 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: up_up_arrow_10 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: up_up_arrow_7 Graph Spills:  0 Linear Spills:  0 Difference:  0
+Name: up_up_arrow_5 Graph Spills:  0 Linear Spills:  1 Difference:  1
+Average Spills used by Linear vs Graph:  0.140625</code></pre>
 
 
+</section>
 </section>
 </section>
 
@@ -1785,13 +1694,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../blogs/rohit/paper_presentation_GPU_compiler_heuristics.html" class="pagination-link" aria-label="Paper Presentation">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Paper Presentation</span>
+      <a href="../../blogs/michael/11-26-2024-EATSS-Review.html" class="pagination-link" aria-label="Paper Presentation -- EATSS">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Paper Presentation – EATSS</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" class="pagination-link" aria-label="Homework3 - data flow">
-        <span class="nav-page-text">Homework3 - data flow</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../blogs/oscar/2024-09-20-HW1.html" class="pagination-link" aria-label="HW1 - Trying Out Bril">
+        <span class="nav-page-text">HW1 - Trying Out Bril</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
