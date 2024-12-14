@@ -1,0 +1,72 @@
+ ---
+author: Yashaswini Makaram
+execute:
+  enabled: false
+format:
+  html: default
+title: Paper Presentation - Yashaswini
+---
+
+# PROGRAML: Graph-based Deep Learning for Program Optimization and Analysis
+
+## Introduction
+
+This paper adresses the following issues:
+1. Hand-tuning Heuristics for changes in software or hardware is time consuming and never-ending
+2. Machine learning approaches do don’t capture the structure of programs and are unable to reason about program behaviour​
+- Unnessecary emphasis on naming conventions​
+- Using compilation to remove noise also omits information​
+- Related statemed separated sequentially fall to vanishing gradients and catastrophic forgetting​
+
+## Background
+
+Previous methods of representing IR code for input to ML algorithms:
+1. AST-code2vec
+- AST paths to embed programs​
+- highly effective at software engineering tasks such as algorithm classification, where the code was written by humans​
+- puts more weight on names rather than code structure
+2. Neural Code Comprehension
+- Encoder uses Contextual Flow Graphs (XFG) built from LLVM-IR statements to create inputs for neural networks​
+- Combining DFGs and CFGs, the XFG representation omits important information such as order of instruction operands​
+3. Control and Data Flow graphs
+- uses only instruction opcodes to compute latent representations​
+- Omits data types, the presence of variables and constants, and the ordering of operands
+
+## Main Contribution
+
+Programl offers a new graphical representation of IR that combines
+- control flow
+- data flow
+- call flow
+- input encoding
+
+to bypass issues mentioned earlier.
+
+They tested agains 3 main problem types
+ - Traditional compiler analysis
+ - Heterogeneous device mapping
+ - Algorithm classification
+with the caveat that this representation is not meant for these purposes
+and should not be used to substitute current methods, but need to be able to pass them in order to be a valid solution
+
+## Merits
+ - ProGraML aims to create a toolbox for eventual machine learning application in optimization compilers​.
+ - solver issues that other state of the art representations have not addresses
+ - May aid other endevours in the future.
+
+
+## Shortcomings
+- It does not replace any of the current tools and cannot stand alone in this task
+- It cannot currently be put to use as it is only a proof of concept
+- while it may be useful in the future, we cannot say for sure what changes may happen over the years.
+
+## Class Discussion
+- we disscussed the reason that the paper focused so much on telling us 
+that the ProGraML representation is not meant to replace current methods, and reasoned about its nature as a toolbox for the future.
+- we discussed its use in amchine learning and wherther it could be sed with large language models or other use cases.
+
+## Conclusion
+ - Overall the paper is well written ad they present their findings well.
+ - they have good data to back up thier conclutions
+ - they do not gloss over the shortcomings of their work
+ - however, the usefulness of the representation has not been fully showcased.  some more work may need to be done for a final product of this toolbox to be useful to users.
