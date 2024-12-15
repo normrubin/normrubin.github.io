@@ -155,7 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="lets-look-at-a-bril-program." class="level2">
 <h2 class="anchored" data-anchor-id="lets-look-at-a-bril-program.">Lets look at a bril program.</h2>
 <p>Bril is written in JSON format. Almost all programming languages have a way to read json.</p>
-<div id="eb6e03ce" class="cell" data-execution_count="1">
+<div id="4786fed2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os </span>
@@ -385,7 +385,7 @@ for each basic block
 <p>Given a list of Bril instructions, generate a sequence of instruction lists representing the basic blocks in the program.</p>
 <p>Every instruction in <code>instr</code> will show up in exactly one block. Jump and branch instructions may only appear at the end of a block, and control can transfer only to the top of a basic block—so labels can only appear at the <em>start</em> of a basic block. Basic blocks may not be empty.</p>
 <hr>
-<div id="fbfaf47e" class="cell" data-execution_count="2">
+<div id="25a1924f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Instructions that terminate a basic block.</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    TERMINATORS <span class="op">=</span> <span class="st">'br'</span>, <span class="st">'jmp'</span>, <span class="st">'ret'</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -420,7 +420,7 @@ for each basic block
 </section>
 <section id="as-a-test-lets-print-out-the-blocks" class="level2">
 <h2 class="anchored" data-anchor-id="as-a-test-lets-print-out-the-blocks">as a test, lets print out the blocks</h2>
-<div id="bc0aec63" class="cell" data-execution_count="3">
+<div id="a5ac6e9a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> print_blocks(bril):</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Given a Bril program, print out its basic blocks.</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
@@ -466,7 +466,7 @@ for each basic block
 <h2 class="anchored" data-anchor-id="running-commands-inside-python">running commands inside python</h2>
 <p>GitHub Copilot: subprocess.check_output is a function in Python’s subprocess module that runs a command with arguments and returns its output as a byte string. If the command exits with a non-zero exit status, it raises a CalledProcessError, which includes the exit status and output of the command. This function is useful for capturing the output of a command for further processing in Python.</p>
 <hr>
-<div id="35e6ee9a" class="cell" data-output-location="fragment" data-execution_count="4">
+<div id="14002f0f" class="cell" data-output-location="fragment" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Run a command and capture its output</span></span>
@@ -478,100 +478,100 @@ for each basic block
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(output_str)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>total 2288
--rw-r--r-- 1 runner docker  40732 Dec 15 13:34 010_compiler_overview.html
--rw-r--r-- 1 runner docker  11181 Dec 15 13:34 010_compiler_overview.qmd
--rw-r--r-- 1 runner docker  32547 Dec 15 13:34 01a1_performance_measurement.html
--rw-r--r-- 1 runner docker   3018 Dec 15 13:34 01a1_performance_measurement.qmd
-drwxr-xr-x 4 runner docker   4096 Dec 15 13:34 01a1_performance_measurement_files
--rw-r--r-- 1 runner docker  24184 Dec 15 13:34 01a2_performance_measurement.html
--rw-r--r-- 1 runner docker   3018 Dec 15 13:34 01a2_performance_measurement.qmd
--rw-r--r-- 1 runner docker  33835 Dec 15 13:34 01a_performance_measurement.html
--rw-r--r-- 1 runner docker   4152 Dec 15 13:34 01a_performance_measurement.qmd
-drwxr-xr-x 4 runner docker   4096 Dec 15 13:34 01a_performance_measurement_files
--rw-r--r-- 1 runner docker  40303 Dec 15 13:34 02a_representation.html
--rw-r--r-- 1 runner docker   7431 Dec 15 13:34 02a_representation.qmd
--rw-r--r-- 1 runner docker  13795 Dec 15 13:34 02b_bril.qmd
--rw-r--r-- 1 runner docker  23632 Dec 15 13:35 02b_bril.quarto_ipynb
--rw-r--r-- 1 runner docker  74899 Dec 15 13:34 03_local.html
--rw-r--r-- 1 runner docker  12760 Dec 15 13:34 03_local.qmd
--rw-r--r-- 1 runner docker  13285 Dec 15 13:34 03b_local_value_numbering.qmd
--rw-r--r-- 1 runner docker   9456 Dec 15 13:34 04_data_flow.qmd
--rw-r--r-- 1 runner docker  56505 Dec 15 13:35 05_global.html
--rw-r--r-- 1 runner docker   9992 Dec 15 13:34 05_global.qmd
--rw-r--r-- 1 runner docker   8730 Dec 15 13:34 05b_licm.qmd
--rw-r--r-- 1 runner docker  33395 Dec 15 13:35 05c_pre.html
--rw-r--r-- 1 runner docker   3166 Dec 15 13:34 05c_pre.qmd
--rw-r--r-- 1 runner docker  20202 Dec 15 13:34 06_ssa.qmd
--rwxr-xr-x 1 runner docker  25643 Dec 15 13:32 07_llvm.notebook
--rw-r--r-- 1 runner docker   5707 Dec 15 13:34 08_classic_loop_ops.qmd
--rw-r--r-- 1 runner docker  99019 Dec 15 13:35 09_poly.html
--rwxr-xr-x 1 runner docker  32475 Dec 15 13:34 09_poly.qmd
-drwxr-xr-x 4 runner docker   4096 Dec 15 13:35 09_poly_files
--rw-r--r-- 1 runner docker  20936 Dec 15 13:34 100_mlir.html
--rw-r--r-- 1 runner docker    320 Dec 15 13:34 100_mlir.qmd
--rw-r--r-- 1 runner docker  20970 Dec 15 13:34 110_whole_program.html
--rw-r--r-- 1 runner docker    338 Dec 15 13:34 110_whole_program.qmd
--rw-r--r-- 1 runner docker  21028 Dec 15 13:35 12_memory.html
--rw-r--r-- 1 runner docker    334 Dec 15 13:34 12_memory.qmd
--rw-r--r-- 1 runner docker 102297 Dec 15 13:34 13_dynamic_compilers.html
--rw-r--r-- 1 runner docker  31886 Dec 15 13:34 13_dynamic_compilers.qmd
--rw-r--r-- 1 runner docker  35314 Dec 15 13:35 14_gpu_compilers.html
--rw-r--r-- 1 runner docker  10135 Dec 15 13:34 14_gpu_compilers.qmd
--rw-r--r-- 1 runner docker   4682 Dec 15 13:32 a.json
--rw-r--r-- 1 runner docker    248 Dec 15 13:32 a.ts
-drwxr-xr-x 2 runner docker   4096 Dec 15 13:32 df
--rw-r--r-- 1 runner docker  71550 Dec 15 13:35 diverg.html
--rw-r--r-- 1 runner docker  27522 Dec 15 13:34 diverg.qmd
--rw-r--r-- 1 runner docker  26721 Dec 15 13:34 diverg1.html
--rw-r--r-- 1 runner docker   5001 Dec 15 13:34 diverg1.qmd
--rw-r--r-- 1 runner docker   4595 Dec 15 13:32 errors
--rw-r--r-- 1 runner docker   3623 Dec 15 13:32 foo.ll
--rw-r--r-- 1 runner docker   2296 Dec 15 13:32 identity.bc
-drwxr-xr-x 2 runner docker   4096 Dec 15 13:32 images
--rw-r--r-- 1 runner docker  30615 Dec 15 13:35 junk.html
--rw-r--r-- 1 runner docker   2152 Dec 15 13:34 junk.qmd
--rw-r--r-- 1 runner docker    905 Dec 15 13:32 junk.txt
--rw-r--r-- 1 runner docker  20731 Dec 15 13:34 llvm.qmd
--rw-r--r-- 1 runner docker   7659 Dec 15 13:32 llvm.qmd.next
--rw-r--r-- 1 runner docker  44411 Dec 15 13:35 mem_consistancy.html
--rw-r--r-- 1 runner docker  15878 Dec 15 13:34 mem_consistancy.qmd
--rw-r--r-- 1 runner docker  24125 Dec 15 13:34 mlir.html
--rw-r--r-- 1 runner docker   2278 Dec 15 13:34 mlir.qmd
-drwxr-xr-x 2 runner docker   4096 Dec 15 13:32 papers
--rwxr-xr-x 1 runner docker  30724 Dec 15 13:34 poly_final.qmd
-drwxr-xr-x 2 runner docker   4096 Dec 15 13:32 pytorch
-drwxr-xr-x 2 runner docker   4096 Dec 15 13:32 ra
--rw-r--r-- 1 runner docker  41702 Dec 15 13:34 ra-checking.html
--rw-r--r-- 1 runner docker  15172 Dec 15 13:34 ra-checking.qmd
--rw-r--r-- 1 runner docker   8032 Dec 15 13:34 register_allocation.qmd
--rw-r--r-- 1 runner docker  40546 Dec 15 13:34 revealjs_010_compiler_overview.qmd.html
--rw-r--r-- 1 runner docker  33435 Dec 15 13:34 revealjs_01a1_performance_measurement.qmd.html
--rw-r--r-- 1 runner docker  24507 Dec 15 13:34 revealjs_01a2_performance_measurement.qmd.html
--rw-r--r-- 1 runner docker  34770 Dec 15 13:34 revealjs_01a_performance_measurement.qmd.html
--rw-r--r-- 1 runner docker  39260 Dec 15 13:34 revealjs_02a_representation.qmd.html
--rw-r--r-- 1 runner docker  73582 Dec 15 13:34 revealjs_03_local.qmd.html
--rw-r--r-- 1 runner docker  51948 Dec 15 13:35 revealjs_05_global.qmd.html
--rw-r--r-- 1 runner docker  32916 Dec 15 13:35 revealjs_05c_pre.qmd.html
--rw-r--r-- 1 runner docker  86492 Dec 15 13:35 revealjs_09_poly.qmd.html
--rw-r--r-- 1 runner docker  21418 Dec 15 13:34 revealjs_100_mlir.qmd.html
--rw-r--r-- 1 runner docker  21445 Dec 15 13:34 revealjs_110_whole_program.qmd.html
--rw-r--r-- 1 runner docker  21468 Dec 15 13:35 revealjs_12_memory.qmd.html
--rw-r--r-- 1 runner docker  87753 Dec 15 13:34 revealjs_13_dynamic_compilers.qmd.html
--rw-r--r-- 1 runner docker  34449 Dec 15 13:35 revealjs_14_gpu_compilers.qmd.html
--rw-r--r-- 1 runner docker  70744 Dec 15 13:35 revealjs_diverg.qmd.html
--rw-r--r-- 1 runner docker  31673 Dec 15 13:34 revealjs_diverg1.qmd.html
--rw-r--r-- 1 runner docker  30291 Dec 15 13:35 revealjs_junk.qmd.html
--rw-r--r-- 1 runner docker  44717 Dec 15 13:35 revealjs_mem_consistancy.qmd.html
--rw-r--r-- 1 runner docker  28411 Dec 15 13:34 revealjs_mlir.qmd.html
--rw-r--r-- 1 runner docker  40196 Dec 15 13:34 revealjs_ra-checking.qmd.html
--rw-r--r-- 1 runner docker  22316 Dec 15 13:32 xx
+-rw-r--r-- 1 runner docker  40732 Dec 15 14:56 010_compiler_overview.html
+-rw-r--r-- 1 runner docker  11181 Dec 15 14:55 010_compiler_overview.qmd
+-rw-r--r-- 1 runner docker  32547 Dec 15 14:56 01a1_performance_measurement.html
+-rw-r--r-- 1 runner docker   3018 Dec 15 14:55 01a1_performance_measurement.qmd
+drwxr-xr-x 4 runner docker   4096 Dec 15 14:56 01a1_performance_measurement_files
+-rw-r--r-- 1 runner docker  24184 Dec 15 14:55 01a2_performance_measurement.html
+-rw-r--r-- 1 runner docker   3018 Dec 15 14:55 01a2_performance_measurement.qmd
+-rw-r--r-- 1 runner docker  33835 Dec 15 14:55 01a_performance_measurement.html
+-rw-r--r-- 1 runner docker   4152 Dec 15 14:55 01a_performance_measurement.qmd
+drwxr-xr-x 4 runner docker   4096 Dec 15 14:55 01a_performance_measurement_files
+-rw-r--r-- 1 runner docker  40303 Dec 15 14:56 02a_representation.html
+-rw-r--r-- 1 runner docker   7431 Dec 15 14:55 02a_representation.qmd
+-rw-r--r-- 1 runner docker  13795 Dec 15 14:55 02b_bril.qmd
+-rw-r--r-- 1 runner docker  23632 Dec 15 14:56 02b_bril.quarto_ipynb
+-rw-r--r-- 1 runner docker  74899 Dec 15 14:55 03_local.html
+-rw-r--r-- 1 runner docker  12760 Dec 15 14:55 03_local.qmd
+-rw-r--r-- 1 runner docker  13285 Dec 15 14:55 03b_local_value_numbering.qmd
+-rw-r--r-- 1 runner docker   9456 Dec 15 14:55 04_data_flow.qmd
+-rw-r--r-- 1 runner docker  56505 Dec 15 14:56 05_global.html
+-rw-r--r-- 1 runner docker   9992 Dec 15 14:55 05_global.qmd
+-rw-r--r-- 1 runner docker   8730 Dec 15 14:55 05b_licm.qmd
+-rw-r--r-- 1 runner docker  33395 Dec 15 14:56 05c_pre.html
+-rw-r--r-- 1 runner docker   3166 Dec 15 14:55 05c_pre.qmd
+-rw-r--r-- 1 runner docker  20202 Dec 15 14:55 06_ssa.qmd
+-rwxr-xr-x 1 runner docker  25643 Dec 15 14:54 07_llvm.notebook
+-rw-r--r-- 1 runner docker   5707 Dec 15 14:55 08_classic_loop_ops.qmd
+-rw-r--r-- 1 runner docker  99019 Dec 15 14:56 09_poly.html
+-rwxr-xr-x 1 runner docker  32475 Dec 15 14:55 09_poly.qmd
+drwxr-xr-x 4 runner docker   4096 Dec 15 14:56 09_poly_files
+-rw-r--r-- 1 runner docker  20936 Dec 15 14:56 100_mlir.html
+-rw-r--r-- 1 runner docker    320 Dec 15 14:55 100_mlir.qmd
+-rw-r--r-- 1 runner docker  20970 Dec 15 14:56 110_whole_program.html
+-rw-r--r-- 1 runner docker    338 Dec 15 14:55 110_whole_program.qmd
+-rw-r--r-- 1 runner docker  21028 Dec 15 14:56 12_memory.html
+-rw-r--r-- 1 runner docker    334 Dec 15 14:55 12_memory.qmd
+-rw-r--r-- 1 runner docker 102297 Dec 15 14:55 13_dynamic_compilers.html
+-rw-r--r-- 1 runner docker  31886 Dec 15 14:55 13_dynamic_compilers.qmd
+-rw-r--r-- 1 runner docker  35314 Dec 15 14:56 14_gpu_compilers.html
+-rw-r--r-- 1 runner docker  10135 Dec 15 14:55 14_gpu_compilers.qmd
+-rw-r--r-- 1 runner docker   4682 Dec 15 14:54 a.json
+-rw-r--r-- 1 runner docker    248 Dec 15 14:54 a.ts
+drwxr-xr-x 2 runner docker   4096 Dec 15 14:54 df
+-rw-r--r-- 1 runner docker  71550 Dec 15 14:56 diverg.html
+-rw-r--r-- 1 runner docker  27522 Dec 15 14:55 diverg.qmd
+-rw-r--r-- 1 runner docker  26721 Dec 15 14:56 diverg1.html
+-rw-r--r-- 1 runner docker   5001 Dec 15 14:55 diverg1.qmd
+-rw-r--r-- 1 runner docker   4595 Dec 15 14:54 errors
+-rw-r--r-- 1 runner docker   3623 Dec 15 14:54 foo.ll
+-rw-r--r-- 1 runner docker   2296 Dec 15 14:54 identity.bc
+drwxr-xr-x 2 runner docker   4096 Dec 15 14:54 images
+-rw-r--r-- 1 runner docker  30615 Dec 15 14:56 junk.html
+-rw-r--r-- 1 runner docker   2152 Dec 15 14:55 junk.qmd
+-rw-r--r-- 1 runner docker    905 Dec 15 14:54 junk.txt
+-rw-r--r-- 1 runner docker  20731 Dec 15 14:55 llvm.qmd
+-rw-r--r-- 1 runner docker   7659 Dec 15 14:54 llvm.qmd.next
+-rw-r--r-- 1 runner docker  44411 Dec 15 14:56 mem_consistancy.html
+-rw-r--r-- 1 runner docker  15878 Dec 15 14:55 mem_consistancy.qmd
+-rw-r--r-- 1 runner docker  24125 Dec 15 14:56 mlir.html
+-rw-r--r-- 1 runner docker   2278 Dec 15 14:55 mlir.qmd
+drwxr-xr-x 2 runner docker   4096 Dec 15 14:54 papers
+-rwxr-xr-x 1 runner docker  30724 Dec 15 14:55 poly_final.qmd
+drwxr-xr-x 2 runner docker   4096 Dec 15 14:54 pytorch
+drwxr-xr-x 2 runner docker   4096 Dec 15 14:54 ra
+-rw-r--r-- 1 runner docker  41702 Dec 15 14:56 ra-checking.html
+-rw-r--r-- 1 runner docker  15172 Dec 15 14:55 ra-checking.qmd
+-rw-r--r-- 1 runner docker   8032 Dec 15 14:55 register_allocation.qmd
+-rw-r--r-- 1 runner docker  40546 Dec 15 14:56 revealjs_010_compiler_overview.qmd.html
+-rw-r--r-- 1 runner docker  33435 Dec 15 14:56 revealjs_01a1_performance_measurement.qmd.html
+-rw-r--r-- 1 runner docker  24507 Dec 15 14:55 revealjs_01a2_performance_measurement.qmd.html
+-rw-r--r-- 1 runner docker  34770 Dec 15 14:55 revealjs_01a_performance_measurement.qmd.html
+-rw-r--r-- 1 runner docker  39260 Dec 15 14:56 revealjs_02a_representation.qmd.html
+-rw-r--r-- 1 runner docker  73582 Dec 15 14:55 revealjs_03_local.qmd.html
+-rw-r--r-- 1 runner docker  51948 Dec 15 14:56 revealjs_05_global.qmd.html
+-rw-r--r-- 1 runner docker  32916 Dec 15 14:56 revealjs_05c_pre.qmd.html
+-rw-r--r-- 1 runner docker  86492 Dec 15 14:56 revealjs_09_poly.qmd.html
+-rw-r--r-- 1 runner docker  21418 Dec 15 14:56 revealjs_100_mlir.qmd.html
+-rw-r--r-- 1 runner docker  21445 Dec 15 14:56 revealjs_110_whole_program.qmd.html
+-rw-r--r-- 1 runner docker  21468 Dec 15 14:56 revealjs_12_memory.qmd.html
+-rw-r--r-- 1 runner docker  87753 Dec 15 14:55 revealjs_13_dynamic_compilers.qmd.html
+-rw-r--r-- 1 runner docker  34449 Dec 15 14:56 revealjs_14_gpu_compilers.qmd.html
+-rw-r--r-- 1 runner docker  70744 Dec 15 14:56 revealjs_diverg.qmd.html
+-rw-r--r-- 1 runner docker  31673 Dec 15 14:56 revealjs_diverg1.qmd.html
+-rw-r--r-- 1 runner docker  30291 Dec 15 14:56 revealjs_junk.qmd.html
+-rw-r--r-- 1 runner docker  44717 Dec 15 14:56 revealjs_mem_consistancy.qmd.html
+-rw-r--r-- 1 runner docker  28411 Dec 15 14:56 revealjs_mlir.qmd.html
+-rw-r--r-- 1 runner docker  40196 Dec 15 14:56 revealjs_ra-checking.qmd.html
+-rw-r--r-- 1 runner docker  22316 Dec 15 14:54 xx
 </code></pre>
 </div>
 </div>
 </section>
 <section id="print-the-blocks" class="level2">
 <h2 class="anchored" data-anchor-id="print-the-blocks">print the blocks</h2>
-<div id="3064ee70" class="cell" data-output-location="fragment" data-execution_count="5">
+<div id="a12ee91d" class="cell" data-output-location="fragment" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json </span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
@@ -592,7 +592,7 @@ block somewhere
 </section>
 <section id="the-map-label-names-to-blocks" class="level2">
 <h2 class="anchored" data-anchor-id="the-map-label-names-to-blocks">the map (label names to blocks)</h2>
-<div id="a0bc551d" class="cell" data-execution_count="6">
+<div id="8846dd47" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> OrderedDict</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -652,7 +652,7 @@ for i,block in enumerate(blocks)  # blocks is a ordereddict
 </section>
 <section id="cfg" class="level2">
 <h2 class="anchored" data-anchor-id="cfg">cfg</h2>
-<div id="8a793f4e" class="cell" data-execution_count="7">
+<div id="3ecc7ba8" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_cfg(ordered_blocks):</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    cfg <span class="op">=</span> {}</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>

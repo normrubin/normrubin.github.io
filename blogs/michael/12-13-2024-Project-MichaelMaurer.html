@@ -186,6 +186,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/final_project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">final project pdf</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../blogs/aymane/mlir-transform-dialect.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Project Presentation - The MLIR Transform Dialect</span></a>
   </div>
@@ -1018,7 +1024,7 @@ python cfg.py {filename}.json</code></pre>
 <p>There are two register allocation algorithms implemented here, a linear scan allocator, and a graph coloring allocator. Linear scan is a simpler algorithm, which is generally faster, but does not always perform as well as graph coloring. Previously, I have read and implemented a similar algorithm for scheduling tasks in a cloud computing environment, based on a paper from Northeastern’s Xue Lin.</p>
 <p>The basis of the linear scan algorithm is essentially two phases: 1. Computation of the interference graph 2. Register Assignment</p>
 <p>In the first phase, one must compute the liveness of variables by block, and determine which variables are live at the same time as one another. This analyisis is very similar to some of the data flow analyses we have done in class. Essentially, a worklist of basic blocks is created, in reverse post-order. Then, for each block we encounter, we compute the live out variables, which are the union of live in variables in all successors. Then, we compute the live in variables, which are the union of used variables, and the set difference between live out variables and defined variables in the block. In my implementation, I included some timing information for this analysis.</p>
-<div id="a122e0e5" class="cell" data-execution_count="1">
+<div id="540cef66" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> compute_liveness(<span class="va">self</span>):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="im">import</span> time</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialize the blocks</span></span>
