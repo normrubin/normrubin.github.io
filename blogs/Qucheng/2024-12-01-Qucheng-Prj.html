@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.39">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Qucheng Jiang">
+
+<title>Project: Build non-intrusive Software Infrastructure of a GEMM HWACC using MLIR – EECE7398 Fall 2024</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../blogs/Qucheng/Qucheng-Paper-MLIR.html" rel="next">
+<link href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c098ae24f13dbac994136fcd8cf45278.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Project: Build non-intrusive Software Infrastructure of a GEMM HWACC using MLIR – EECE7398 Fall 2024">
+<meta property="og:description" content="Homepage EECS7398 - Special Topic: Compilers, Fall 2024.">
+<meta property="og:image" content="https://normrubin.github.io/blogs/Qucheng/img/prj/system-layout.png">
+<meta property="og:site_name" content="EECE7398 Fall 2024">
+<meta property="og:image:height" content="1003">
+<meta property="og:image:width" content="1183">
+</head>
+
+<body class="nav-sidebar docked fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item">Blogs</li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-12-01-Qucheng-Prj.html">Project: Build non-intrusive Software Infrastructure of a GEMM HWACC using MLIR</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-center sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">EECE7398 Fall 2024</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true">
+ <span class="menu-text">EECS 7398</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../weekly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Weekly Schedule</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Class_Overview/What_to_do.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to submit assignments</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Blogs</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Aymane</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/mlir-transform-dialect.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Project Presentation - The MLIR Transform Dialect</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1 – Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2 – Implementing DCE and LVN</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3 – Implementing Liveness Dataflow Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4 – Implementing Dominance Algorithms</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/aymane/readme5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5 – Implementing a simple LLVM pass</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Matin</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-09-28-HW2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2: Trivial Dead Code Elimination and Local Value Numbering Passes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-10-11-HW3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3: Dataflow Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-10-18-HW4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4: Dominance Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-11-01-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/matin/2024-12-12-Final-Project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Final Project- Lowering AMDGPU LLVM Intrinsics In Instrumentation Functions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Michael</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/09-20-2024-HW1-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 1 – Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/09-27-2024-HW2-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 2 – Local Optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/10-11-2024-HW3-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 3 – Data Flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/10-18-2024-HW4-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 4 – Dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/11-01-2024-HW5-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EECE7309 Homework 5 – LLVM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/11-26-2024-EATSS-Review.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation – EATSS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/michael/12-13-2024-Project-MichaelMaurer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Final Project Report – Register Allocator and minimal RISC-V Backend</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Oscar</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/oscar/2024-09-20-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HW1 - Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/oscar/2024-09-27-HW2-Kellner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HW2 - Minor Local Optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/oscar/2024-10-11-HW3-Kellner.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HW3 - Data Flow Analysis</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Qucheng</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth3 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1: Exploring Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-09-27-Qucheng-HW2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2: Optimizing with DCE and LVN</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3: Data Flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4: Dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5: LLVM - Spinning Up</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/2024-12-01-Qucheng-Prj.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Project: Build non-intrusive Software Infrastructure of a GEMM HWACC using MLIR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Qucheng/Qucheng-Paper-MLIR.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Discussion: SODA-OPT</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Rohit</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-09-20-Rohit-HW1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-09-28-Rohit-HW2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-10-17-Rohit-HW3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-10-18-Rohit-HW4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/2024-11-02-Rohit-HW5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/paper_presentation_GPU_compiler_heuristics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Project</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/rohit/project/Project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine Learning-Driven Memory Optimization for C++ Applications: A Python-Based Approach</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Samples</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/samples/junk_dir/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sample blog with an image and a graph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/samples/junk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sample blog</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sana</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/09-20-2024-HW1-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework1 - Sana</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/09-27-2024-HW2-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework2 - local optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/10-11-2024-HW3-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework3 - data flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/10-18-2024-HW4-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework4 - dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/11-1-2024-HW5-SanaTaghipourAnvari.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - LLVM</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/FinalProjectReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Layout Optimization and Loop Transformations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/Sana/PaperPresentation-LLMs-for-Compiler-Optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs for Code Optimization, A Promising Start or Overhyped Solution?</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sharmila</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-09-20-Sharmila-HW01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 01 - Trying Out Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-09-27-Sharmila-HW02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 02 - Local Optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-10-15-Sharmila-HW03.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 03 - Data Flow Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-10-18-Sharmila-HW04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 04 - Implementing Dominance Utilities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/2024-11-01-Sharmila-HW05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Homework 05 - LLVM Pass</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/paper_presentation_GPU_compiler_heuristics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Project</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth4 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/sharmila/project/Project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine Learning-Driven Memory Optimization for C++ Applications: A Python-Based Approach</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">Yashaswini</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth3 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/09-20-2024-HW1-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework1 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/09-27-2024-HW2-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework2 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/10-11-2024-HW3-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework3 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/10-18-2024-HW4-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework4 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/11-1-2024-HW5-YashaswiniMakaram.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework5 - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/FinalReport.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Final Project - Yashaswini</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../blogs/yashaswini/PaperPresentation-ProgaML.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Paper Presentation - Yashaswini</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false">
+ <span class="menu-text">Homework</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/1.hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 1 trying out bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/2_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 2 local optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/3_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 4 data flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/4_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework - dominance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/5_hw.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 5 ssa</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/6_extra_credit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Homework 6 loop optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/dynamic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework 7 dynamic compile</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/hw0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">homework 0</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/hw5_llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hw 5 llvm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../homework/project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">project</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lectures</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-15" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-15" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/010_compiler_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Compiler Overview</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/01a_performance_measurement.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance and Measurement</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/01a1_performance_measurement.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance and Measurement part 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/01a2_performance_measurement.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance and Measurement part 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/02a_representation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Representation of programs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/02b_bril.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Overview of Bril</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/03_local.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Local Analysis &amp; Optimization</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/03b_local_value_numbering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">local value numbering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/04_data_flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data Flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/05_global.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Global Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/05b_licm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">classic loop optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/05c_pre.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">_ partial_redundancy elimination</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/06_ssa.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Static Single Assignment</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/08_classic_loop_ops.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">classic loop optimizations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/09_poly.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polyhedral Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/100_mlir.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 MLIR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/110_whole_program.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Whole program</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/12_memory.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dynamic Memory Management</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/13_dynamic_compilers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dynamic Compilers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/14_gpu_compilers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">GPU Compilers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/diverg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">divergent flow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/diverg1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">divergent flow PART TWO</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/junk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">test</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/llvm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">using llvm</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/mem_consistancy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">memory consistancy</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/mlir.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Polyhedral Compilation Opportunities in MLIR</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/poly_final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction To Polyhedral Methods</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/ra-checking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Testing Register allocators</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../lectures/register_allocation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Register Allocation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://capra.cs.cornell.edu/bril/" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bril Documentation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://github.com/normrubin/bril" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bril github</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="https://github.com/normrubin/normrubin.github.io" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">class github</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../weekly.html">EECS 7398</a></li><li class="breadcrumb-item">Blogs</li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-09-20-Qucheng-HW1.html">Qucheng</a></li><li class="breadcrumb-item"><a href="../../blogs/Qucheng/2024-12-01-Qucheng-Prj.html">Project: Build non-intrusive Software Infrastructure of a GEMM HWACC using MLIR</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Project: Build non-intrusive Software Infrastructure of a GEMM HWACC using MLIR</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Qucheng Jiang </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="intro" class="level2">
+<h2 class="anchored" data-anchor-id="intro">Intro</h2>
+<p>This work presents the development of a software infrastructure for a Hardware GEMM Accelerator, utilizing MLIR to bridge the gap between high-level computational models and low-level hardware execution. The project implements a non-intrusive, robust framework. It seamlessly integrates with existing machine learning libraries, optimizing crucial matrix multiplication operations and enhancing model performance on custom hardware.</p>
+<section id="a-new-golden-age-for-computer-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="a-new-golden-age-for-computer-architecture">A New Golden Age for Computer Architecture</h3>
+<p>The rapid evolution of applications, such as machine learning, has significantly heightened the demand for high-quality computational power. As machine learning models continue to grow in complexity, and datasets increase in size, there is a sharp surge in the need for computational capabilities, energy efficiency, customization, and flexibility.</p>
+<p>This surge has compelled hardware manufacturers to develop specialized accelerators, including GPUs (Graphics Processing Units), TPUs (Tensor Processing Units), and FPGAs (Field-Programmable Gate Arrays), designed to provide more efficient computational power. These heterogeneous hardware platforms excel at achieving higher energy efficiency by striking a balance between computational task allocation, energy consumption, and computational performance, consequently improving the power efficiency ratio. These platforms also excel in offering increased customization and flexibility to meet the diverse requirements of various applications.</p>
+<p>In the realm of machine learning, different tasks often demand distinct computational resources. For instance, image-related deep learning applications frequently rely on parallel processing, while U-Net structure-based Transformer models, such as those used in large language models, may place more emphasis on the sequential processing capabilities of CPUs.</p>
+<p>Moreover, with Moore’s Law nearing its limit, traditional hardware upgrades are no longer as effective in contributing to overall system performance speedup as they once were. In light of this, the significance of optimizing software implementation, the compilation process, and intermediate abstract layers becomes evident. Researchers and developers are actively exploring various approaches to application optimization, including Intermediate Representation (IR), Single Instruction Multiple Data (SIMD), and the eco-system of CUDA (Compute Unified Device Architecture).</p>
+</section>
+<section id="gap-between-hardware-and-software" class="level3">
+<h3 class="anchored" data-anchor-id="gap-between-hardware-and-software">Gap between Hardware and Software</h3>
+<p>However, it is important to note that while hardware capabilities have advanced significantly, software adaptation has not kept pace. Hardware manufacturers provide features, but software applications often need to be adapted to leverage these features, leading to increased development costs.</p>
+<p>In the embedded systems domain, a usual approach for chip manufacturers is to provide their customized build-up toolchain. For instance, to embed neural network models on chipset, ST provides the STM32Cube.AI tool for its STM32 series, and Rockchip provides RKNN-SDK to support the integrated NPU. Both toolsets attached detailed documentations about how to migrate the code. In this case, software developers often need to invest considerable effort in adapting their applications to utilize these features efficiently. This adaptation process can be time-consuming and costly, highlighting the need for more seamless integration between hardware and software.</p>
+<p>In response to these challenges, a growing trend is the adoption of unified heterogeneous development architectures. One such example is OpenACC, an open standard for parallel programming of heterogeneous systems, which aims to simplify the process of optimizing applications for different hardware accelerators.</p>
+</section>
+<section id="mlir-and-this-work-approach" class="level3">
+<h3 class="anchored" data-anchor-id="mlir-and-this-work-approach">MLIR and this work Approach</h3>
+<p>In this context, we propose a software and hardware co-design method, where optimization occurs at multiple layers, and a portion of computationally intensive instructions is migrated to hardware accelerators using Multi-Level Intermediate Representation (<a href="https://mlir.llvm.org/">MLIR</a>). MLIR presents an innovative approach to building reusable and extensible compiler infrastructure. Its goal is to reduce software fragmentation and enhance compilation for heterogeneous hardware, thereby significantly reducing the cost of developing domain-specific compilers and facilitating their integration with existing frameworks. This approach enables efficient utilization of hardware capabilities while reducing the burden of manual adaptation, ultimately enhancing development efficiency and lowering costs. Our aim is that the end users can easily adopt those machine learning models written in standard language and libraries, with the minimum effort to learn how to interact with our hardware.</p>
+<p>The primary challenge addressed in this project is the efficient utilization of a Hardware GEMM Accelerator using a software infrastructure based on MLIR. The solution involves the implementation of a non-intrusive framework that integrates seamlessly with existing technologies, optimizing the performance of matrix multiplication operations crucial in many machine learning algorithms.</p>
+<p>The integration of MLIR with GEMM Acceleration hardware brings several benefits:</p>
+<ul>
+<li>Enhanced performance optimization for machine learning models on customized hardware.</li>
+<li>Flexibility in representing, analyzing, and transforming graphs at multiple levels of abstraction, including Torch operations and hardware operations (torch-mlir).</li>
+<li>Facilitation of connections between hardware and high-level frameworks like PyTorch. The same approach may cater to various hardware configurations including TPUs and custom ASICs once the corresponding backend is added.</li>
+</ul>
+</section>
+</section>
+<section id="detail-design" class="level2">
+<h2 class="anchored" data-anchor-id="detail-design">Detail Design</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./img/prj/system-layout.png" class="img-fluid figure-img"></p>
+<figcaption>System Diagram</figcaption>
+</figure>
+</div>
+<p>The system diagram illustrates the overall framework of this project.</p>
+<p>To be clear, blocks with grey backgrounds are not supported or tested in this project. Grey dot lines illustrate the structure of the relative components but are not used in this work. The circled number located on each arrow represents the sequence of execution flow. Dash lines with numbers attached also represent the data flow.</p>
+<p>We separate the toolchain into 4 layers, which are High-Level Framework, torch-mlir, llvm-mlir, and system with hardware.</p>
+<p>High-Level Framework is the interface for end users, usually, in this project, this layer is programmed in Python with PyTorch library defining the model. Torch-mlir layer is based on torch-mlir project from the LLVM community. It contains the definition of torch dialect, the opt tool, and several backends. Backends defined the lowering sequence and the outcome from mlir layer. Their role is to instruct mlir layer to convert high-level model representation into code that can be executed on specific hardware. The llvm-mlir layer is based on the LLVM project. The pipelined lowering process utilizes a bunch of conversions from dialect to dialect to get the final result in progressive descent. At the bottom, the system and hardware layer is the actual component to execute all instructions.</p>
+<p>For this project, we use the structure of <code>LinalgOnTensor</code> Backend. It focuses on converting linear algebra operations in MLIR into low-level code that can operate directly on tensors. This backend optimizes these operations so that they can be mapped more efficiently to accelerator hardware that supports linear algebra operations. During the progressive lowering sequence, we insert our passes to redirect the behavior of execution before a <a href="ttps://mlir.llvm.org/docs/PatternRewriter/">pattern</a> we recognize is broken down into pieces that may be hard to identify.</p>
+<section id="step-by-step-design-explanation" class="level3">
+<h3 class="anchored" data-anchor-id="step-by-step-design-explanation">Step-by-Step Design Explanation</h3>
+<p>Here’s how this system operates, following the execution flow shown in the system diagram:</p>
+<ul>
+<li>User defined a PyTorch model and passed it to torch-mlir library. The library compiles the torch model into mlir script in torch dialect by a pybinded <a href="ttps://mlir.llvm.org/docs/Bindings/Python/">torch-mlir-opt</a> execution call. The user gets the handle to the mlir model.</li>
+<li>User chooses to use our customized <code>HwaccLinalgOnTensor</code> Backend. The handle of the torch dialect model is passed into our backend implementation.</li>
+<li><code>HwaccLinalgOnTensor</code> backend lowers the torch dialect operations into other dialects that are officially supported by MLIR. Then the backend generates the sequence of optimizing and lowering towards LLVM IR for MLIR toolset.</li>
+<li>Opt tool inside MLIR gets the pipeline sequence from the layer above and iteratively lowers the user script. During this step, our redirection of <a href="ttps://mlir.llvm.org/docs/Dialects/Linalg/"><code>linalg.matmul</code></a> is applied. The matmul operation will turn into a C function call instead of nested loops of ALU instructions with loads and stores.</li>
+<li>The final outcome after the pipeline lowering is recognizable for LLVM Jit. Therefore, the instructions are stored in the Execution Engine, with a C-typed function call style wrapped, waiting for a user call from the High-Level Framework.</li>
+<li>At this moment, the matmul operation is required but not implemented. Torch backend needs to get the executable function and register it to the Execution Engine.</li>
+<li>User starts the inference / training of the pytorch model. Causing the execution of CPU Runner Jit.</li>
+<li>When the LLVM IR script reaches its end, a return call is executed, which pushes the data descriptor to the upper levels of this system. The processed data rises step by step and becomes runtime output by a numpy library call which converts the descriptor into numpy.ndarray and return to the user. At this stage, the cycle from high-level model specification to low-level hardware execution is completed.</li>
+</ul>
+<p>This workflow is designed to efficiently translate high-level machine learning models into optimized, executable code that can run on various hardware, including specialized accelerators.</p>
+</section>
+</section>
+<section id="experimental-explore" class="level2">
+<h2 class="anchored" data-anchor-id="experimental-explore">Experimental Explore</h2>
+<section id="technical-problem-and-solution" class="level3">
+<h3 class="anchored" data-anchor-id="technical-problem-and-solution">Technical problem and solution</h3>
+<p>During the exploration of the existing MLIR and Torch-Mlir project, it is easy to get lost of function definition, especially for beginners. The fast-paced evolution of the project led to discrepancies between the provided documentation and the actual implementation. The inadequate and scattered documentation for MLIR and torch-mlir makes the understanding of code even harder. For most of the cases, the explanation of code and errors are documented in the MLIR discourse forum. Therefore, the learning curve is steep in the beginning.</p>
+<section id="lack-of-systematic-up-to-date-documentation" class="level4">
+<h4 class="anchored" data-anchor-id="lack-of-systematic-up-to-date-documentation">Lack of systematic up-to-date documentation</h4>
+<p>One typical case is the Python package location documented inside <code>development.md</code>. The actual location of outcomes that the environment variable <code>PYTHONPATH</code> needs to store has been changed multiple times in recent history. Till the time of writing this report, the path issue is still not fixed.</p>
+</section>
+<section id="limited-explanation-about-memref-interoperability-and-solution" class="level4">
+<h4 class="anchored" data-anchor-id="limited-explanation-about-memref-interoperability-and-solution">Limited explanation about memref interoperability and solution</h4>
+<p>Another example of a problem I was facing is the C interpretation format of memref type in MLIR. Although memref dialect is relatively stable. Limited documentation for interaction outer the scope of MLIR. This problem stuck me for quite a long time, seeking where is the data located after the pointer I received.</p>
+<p>It turns out that the array of data that the memref represents is not directly sent to the C interface. Instead, the memref object delivers a pointer to a descriptor structure that contains the information about the tensor. This was found by reading the numpy interfacing source code for return value handling. Based on the numpy library-defined name of the memref descriptor, I found the relative online discussion about the memref C interface.</p>
+<p>By the way, it is worth noticing that the ranked memref object and the unranked one use totally different descriptor structures. Also, the descriptor size of memref objects is different based on rank. In my observation, the element type is not included in the descriptor, which makes it hard for the C library to handle all types of memref input in one function interface.</p>
+<p>Luckily, we got the backend written in Python. This is the key to solving this problem. As the instructions are lowered to LLVM IR level, the func call name can be accessed by Python at this stage. I implemented a function name parser referencing how the numpy interface did. After extracting the call name with the input and output memref type, the Python code links the call to a type-matched C library symbol by the redirection ability of the function lookup table in Python.</p>
+</section>
+</section>
+<section id="testbench" class="level3">
+<h3 class="anchored" data-anchor-id="testbench">Testbench</h3>
+<p>To test whether our HWACC-MLIR structure is executing correctly or not, we introduced a testbench. It is a MNIST handwritten digit classification task. The convolutional neural network is written as a class inherited from torch.nn.Module.</p>
+<p>Its architecture is as follows:</p>
+<ul>
+<li><strong>Input Layer</strong>: The network accepts a single-channel (grayscale) image of size 28x28 pixels.</li>
+<li><strong>First Convolutional Layer</strong>: This layer expands the depth of the input from 1 channel to 16 channels using a 3x3 convolutional kernel with a stride of 1 and padding of 1. The output remains at 28x28 pixels.</li>
+<li><strong>ReLU Activation</strong>: Following the first convolutional operation, a ReLU activation function is applied to introduce non-linearity, enabling the network to learn more complex patterns.</li>
+<li><strong>Second Convolutional Layer</strong>: The second convolutional layer further increases the depth from 16 to 32 channels, with the same kernel size, stride, and padding as the first layer. The output size remains 28x28 pixels.</li>
+<li><strong>ReLU Activation</strong>: A second ReLU activation function is applied after the second convolutional layer.</li>
+<li><strong>Max Pooling Layer</strong>: This layer performs a 2x2 max pooling operation with a stride of 2, reducing the spatial dimensions from 28x28 to 14x14 pixels while retaining the 32 channels.</li>
+<li><strong>Flatten Operation</strong>: Before entering the fully connected layers, the 32x14x14 tensor is flattened into a 1D tensor of 6272 elements (32 * 14 * 14).</li>
+<li><strong>First Fully Connected (Dense) Layer</strong>: The flattened tensor is passed through a fully connected layer reducing its size to 1024 nodes.</li>
+<li><strong>ReLU Activation</strong>: A ReLU activation is applied after the fully connected layer.</li>
+<li><strong>Dropout</strong>: A dropout layer with a dropout rate of 30 percent is used to prevent overfitting during training.</li>
+<li><strong>Second Fully Connected (Dense) Layer</strong>: The final fully connected layer reduces the size from 1024 nodes to 10 nodes, corresponding to the number of classes for classification.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./img/prj/ImageClassifier.onnx.png" class="img-fluid figure-img"></p>
+<figcaption>ImgClassifier-demo: Torch NN Structure</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="testing-results" class="level2">
+<h2 class="anchored" data-anchor-id="testing-results">Testing / Results</h2>
+<section id="env-setup" class="level3">
+<h3 class="anchored" data-anchor-id="env-setup">Env Setup</h3>
+<section id="pyvenv-and-dependencies" class="level4">
+<h4 class="anchored" data-anchor-id="pyvenv-and-dependencies">PyVenv and dependencies</h4>
+<p>Follow the official development instruction from <a href="https://github.com/llvm/torch-mlir/blob/main/docs/development.md"><code>torch-mlir</code></a>.</p>
+<p>To build the whole project in-tree with JIT modules enabled, add the following paramenters to CMake:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="ex">-DTORCH_MLIR_ENABLE_PYTORCH_EXTENSIONS=ON</span> <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-DTORCH_MLIR_ENABLE_JIT_IR_IMPORTER</span><span class="op">=</span>ON <span class="dt">\</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="runtime-env-activation" class="level4">
+<h4 class="anchored" data-anchor-id="runtime-env-activation">Runtime Env activation</h4>
+<p>Additional command line variables are required to run the whole JIT toolchain:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">__TORCH_MLIR_PATH__</span><span class="op">=&lt;</span>PRJ_PATH<span class="op">&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate <span class="op">&lt;</span>PRJ_CONDA_ENV<span class="op">&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PYTHONPATH</span><span class="op">=</span><span class="va">$__TORCH_MLIR_PATH__</span>/build/python_packages/torch_mlir:<span class="va">$__TORCH_MLIR_PATH__</span>/projects/pt1/examples:<span class="va">$__TORCH_MLIR_PATH__</span>/build/tools/torch-mlir/python_packages/torch_mlir</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">TORCH_MLIR_PREFIX</span><span class="op">=</span><span class="va">$__TORCH_MLIR_PATH__</span>/build/bin</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LD_LIBRARY_PATH</span><span class="op">=</span><span class="va">$LD_LIBRARY_PATH</span>:<span class="va">$__TORCH_MLIR_PATH__</span>/build/lib</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Use 'conda deactivate' to exit this venv"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The reason for adding additional <code>LD_LIBRARY_PATH</code> is that we encapsulate our <code>HWACC-GEMM</code> func interface as a HAL lib call towards the JIT toolchain. Therefore, each time when the LLVM JIT runs into such a command of <code>llvm.call @linalg_matmul_*()</code> it needs to be remapped into some registered functions that are provided by the shared library. And we provided such func call in <code>LD_LIBRARY_PATH</code>, and operation binding in <code>hwaccBackendLibCall.py</code>.</p>
+</section>
+</section>
+<section id="unit-test" class="level3">
+<h3 class="anchored" data-anchor-id="unit-test">Unit Test</h3>
+<section id="adding-removing-w-matchandrewritematmulop" class="level4">
+<h4 class="anchored" data-anchor-id="adding-removing-w-matchandrewritematmulop">Adding / Removing w/ <code>MatchAndRewrite(MatmulOp)</code></h4>
+<p>A <code>MatchAndRewrite(MatmulOp)</code> pattern is added to the Hwacc Pass. In this pattern match test, operations that can be successfully cast into <code>MatmulOp</code> will be substituted by a <code>CallOp</code> as shown below:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>LogicalResult matchAndRewrite<span class="op">(</span>Operation <span class="op">*</span>op<span class="op">,</span> PatternRewriter <span class="op">&amp;</span>rewriter<span class="op">)</span> <span class="at">const</span> <span class="kw">override</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  SingletonLogger<span class="op">::</span>getInstance<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="st">"Test:["</span> <span class="op">&lt;&lt;</span> op<span class="op">-&gt;</span>getName<span class="op">().</span>getStringRef<span class="op">().</span>str<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="st">"]</span><span class="sc">\t</span><span class="st">"</span><span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">auto</span> matmulOp <span class="op">=</span> dyn_cast<span class="op">&lt;</span>MatmulOp<span class="op">&gt;(</span>op<span class="op">);</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>isa<span class="op">&lt;</span>MatmulOp<span class="op">&gt;(</span>op<span class="op">)</span> <span class="op">||</span> <span class="op">!</span>matmulOp<span class="op">.</span>hasPureBufferSemantics<span class="op">())</span> <span class="op">{</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    SingletonLogger<span class="op">::</span>getInstance<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="st">"Fail To Match!"</span> <span class="op">&lt;&lt;</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span><span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> rewriter<span class="op">.</span>notifyMatchFailure<span class="op">(</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        op<span class="op">,</span> <span class="st">"expected matmul op with buffer semantics"</span><span class="op">);</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  SingletonLogger<span class="op">::</span>getInstance<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="st">"Capture! "</span> <span class="op">&lt;&lt;</span> matmulOp<span class="op">-&gt;</span>getName<span class="op">().</span>getStringRef<span class="op">().</span>str<span class="op">()</span> <span class="op">&lt;&lt;</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span><span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To replicate the capture process use the command line of:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>prj<span class="op">&gt;</span>/build/bin/mlir-opt  <span class="ex">-pass-pipeline=</span><span class="st">'builtin.module(func.func(convert-linalg-to-hwacc))'</span> ./my_torch_jit_app1.mlir_lowering_pipeline.before_linalg_matmul_lowering.mlir </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After the optimization process, the filter matches correctly to its rule. the following debug log is documented:</p>
+<pre class="log"><code># debug.log
+...
+Test:[scf.for]        Fail To Match!
+Test:[memref.alloc]   Fail To Match!
+Test:[arith.addf]     Fail To Match!
+Test:[linalg.matmul]  Capture! linalg.matmul
+Test:[linalg.yield]   Fail To Match!
+...</code></pre>
+</section>
+<section id="adding-removing--convert-linalg-to-hwacc-pass" class="level4">
+<h4 class="anchored" data-anchor-id="adding-removing--convert-linalg-to-hwacc-pass">Adding / Removing <code>-convert-linalg-to-hwacc</code> pass</h4>
+<p>A new pass was added to <code>linalg/passes.td</code> called <code>convert-linalg-to-hwacc</code>. Its corresponding C implementation is <code>createConvertLinalgToHwaccPass()</code>. Complete the rest part of the implementation of this pass, rebuild, and test. Changing the pipeline lowering sequence in <code>refbackend.py</code>.</p>
+<p>Before adding <code>-convert-linalg-to-hwacc</code>, the lowered mlir instructions until <code>-refback-munge-memref-copy</code> is shown in below. The linalg operation is not expanded.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode llvm code-with-copy"><code class="sourceCode llvm"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>alloc_15 = memref.alloc() {alignment = <span class="dv">64</span> : <span class="dt">i64</span>} : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>linalg.generic {indexing_maps = [#map2, #map2], iterator_types = [<span class="st">"parallel"</span>, <span class="st">"parallel"</span>]} ins(alloc_14 : memref&lt;<span class="dv">64</span>x1024xf32&gt;) outs(alloc_15 : memref&lt;<span class="dv">64</span>x1024xf32&gt;) {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  ^bb0(<span class="fu">in:</span> f32, <span class="fu">out:</span> f32):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    linalg.yield in : f32</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>memref.dealloc alloc_14 : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>// Not yet expanded, whole op showing as a matmul sementic. </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>linalg.matmul ins(collapse_shape, <span class="dv">1</span> : memref&lt;<span class="dv">64</span>x6272xf32&gt;, memref&lt;<span class="dv">6272</span>x1024xf32&gt;) outs(alloc_15 : memref&lt;<span class="dv">64</span>x1024xf32&gt;)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>memref.dealloc alloc_13 : memref&lt;<span class="dv">64</span>x32x14x14xf32&gt;</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>alloc_16 = memref.alloc() {alignment = <span class="dv">64</span> : <span class="dt">i64</span>} : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>linalg.generic {indexing_maps = [#map2, #map3, #map2], iterator_types = [<span class="st">"parallel"</span>, <span class="st">"parallel"</span>]} ins(alloc_15, <span class="dv">3</span> : memref&lt;<span class="dv">64</span>x1024xf32&gt;, memref&lt;<span class="dv">1024</span>xf32&gt;) outs(alloc_16 : memref&lt;<span class="dv">64</span>x1024xf32&gt;) {</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  ^bb0(<span class="fu">in:</span> f32, <span class="fu">in_21:</span> f32, <span class="fu">out:</span> f32):</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">8</span> = arith.addf in, in_21 : f32</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">9</span> = arith.cmpf <span class="kw">ugt</span>, <span class="dv">8</span>, cst_0 : f32</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The <code>linalg</code> operation is changed to <code>scf.for</code> loop. Remember the implementation of match and rewrite is referencing from <code>Loops.cpp</code>, this is the reason for observing such behavior here.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode llvm code-with-copy"><code class="sourceCode llvm"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>alloc_15 = memref.alloc() {alignment = <span class="dv">64</span> : <span class="dt">i64</span>} : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>linalg.generic {indexing_maps = [#map2, #map2], iterator_types = [<span class="st">"parallel"</span>, <span class="st">"parallel"</span>]} ins(alloc_14 : memref&lt;<span class="dv">64</span>x1024xf32&gt;) outs(alloc_15 : memref&lt;<span class="dv">64</span>x1024xf32&gt;) {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>^bb0(<span class="fu">in:</span> f32, <span class="fu">out:</span> f32):</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  linalg.yield in : f32</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>memref.dealloc alloc_14 : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>// Matmul expanded into scf.for loops. </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>scf.for arg1 = c0 <span class="kw">to</span> c64 step c1 {</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  scf.for arg2 = c0 <span class="kw">to</span> c1024 step c1 {</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    scf.for arg3 = c0 <span class="kw">to</span> c6272 step c1 {</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>      <span class="dv">8</span> = memref.load collapse_shape[arg1, arg3] : memref&lt;<span class="dv">64</span>x6272xf32&gt;</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>      <span class="dv">9</span> = memref.load <span class="dv">1</span>[arg3, arg2] : memref&lt;<span class="dv">6272</span>x1024xf32&gt;</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      <span class="dv">10</span> = memref.load alloc_15[arg1, arg2] : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>      <span class="dv">11</span> = arith.mulf <span class="dv">8</span>, <span class="dv">9</span> : f32</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>      <span class="dv">12</span> = arith.addf <span class="dv">10</span>, <span class="dv">11</span> : f32</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>      memref.store <span class="dv">12</span>, alloc_15[arg1, arg2] : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>memref.dealloc alloc_13 : memref&lt;<span class="dv">64</span>x32x14x14xf32&gt;</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>alloc_16 = memref.alloc() {alignment = <span class="dv">64</span> : <span class="dt">i64</span>} : memref&lt;<span class="dv">64</span>x1024xf32&gt;</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>linalg.generic {indexing_maps = [#map2, #map3, #map2], iterator_types = [<span class="st">"parallel"</span>, <span class="st">"parallel"</span>]} ins(alloc_15, <span class="dv">3</span> : memref&lt;<span class="dv">64</span>x1024xf32&gt;, memref&lt;<span class="dv">1024</span>xf32&gt;) outs(alloc_16 : memref&lt;<span class="dv">64</span>x1024xf32&gt;) {</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>^bb0(<span class="fu">in:</span> f32, <span class="fu">in_21:</span> f32, <span class="fu">out:</span> f32):</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="dv">8</span> = arith.addf in, in_21 : f32</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="dv">9</span> = arith.cmpf <span class="kw">ugt</span>, <span class="dv">8</span>, cst_0 : f32</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After adding our pass indicator to the lowering sequence, the lowered mlir instructions script is shown as the following.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode llvm code-with-copy"><code class="sourceCode llvm"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">%1479</span> = llvm.getelementptr <span class="fu">%1457</span>[<span class="fu">%1478</span>] : (!llvm.ptr, <span class="dt">i64</span>) -&gt; !llvm.ptr, f32 loc(#loc21)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>llvm.store <span class="fu">%1475</span>, <span class="fu">%1479</span> : f32, !llvm.ptr loc(#loc21)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">%1480</span> = llvm.add <span class="fu">%1469</span>, <span class="fu">%5</span>  : <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>llvm.br ^bb255(<span class="fu">%1480</span> : <span class="dt">i64</span>) loc(#loc21)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>^<span class="fu">bb257:</span>  // <span class="fu">pred:</span> ^bb255</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">%1481</span> = llvm.add <span class="fu">%1467</span>, <span class="fu">%5</span>  : <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>llvm.br ^bb253(<span class="fu">%1481</span> : <span class="dt">i64</span>) loc(#loc21)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>^<span class="fu">bb258:</span>  // <span class="fu">pred:</span> ^bb253</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>llvm.call <span class="fu">@free</span>(<span class="fu">%1414</span>) : (!llvm.ptr) -&gt; () loc(#loc21)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>// Kept as a C style func <span class="kw">call</span>, that can be preserved into HAL lib tiling optimization. </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>llvm.call <span class="fu">@linalg_matmul_view64x1024xf32_view1024x10xf32_view64x10xf32</span>(<span class="fu">%1368</span>, <span class="fu">%1375</span>, <span class="fu">%1379</span>, <span class="fu">%1359</span>, <span class="fu">%1360</span>, <span class="fu">%1360</span>, <span class="fu">%1361</span>, <span class="fu">%29</span>, <span class="fu">%27</span>, <span class="fu">%33</span>, <span class="fu">%19</span>, <span class="fu">%20</span>, <span class="fu">%20</span>, <span class="fu">%21</span>, <span class="fu">%1450</span>, <span class="fu">%1457</span>, <span class="fu">%1461</span>, <span class="fu">%1441</span>, <span class="fu">%1442</span>, <span class="fu">%1442</span>, <span class="fu">%1443</span>) : (!llvm.ptr, !llvm.ptr, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, !llvm.ptr, !llvm.ptr, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, !llvm.ptr, !llvm.ptr, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>, <span class="dt">i64</span>) -&gt; () loc(#loc21)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>llvm.call <span class="fu">@free</span>(<span class="fu">%1368</span>) : (!llvm.ptr) -&gt; () loc(#loc25)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="fu">%1482</span> = llvm.mlir.constant(<span class="dv">64</span> : index) : <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">%1483</span> = llvm.mlir.constant(<span class="dv">10</span> : index) : <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="fu">%1484</span> = llvm.mlir.constant(<span class="dv">1</span> : index) : <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">%1485</span> = llvm.mlir.constant(<span class="dv">640</span> : index) : <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">%1486</span> = llvm.mlir.zero : !llvm.ptr loc(#loc21)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="fu">%1487</span> = llvm.getelementptr <span class="fu">%1486</span>[<span class="dv">640</span>] : (!llvm.ptr) -&gt; !llvm.ptr, f32 loc(#loc21)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="fu">%1488</span> = llvm.ptrtoint <span class="fu">%1487</span> : !llvm.ptr <span class="kw">to</span> <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="fu">%1489</span> = llvm.mlir.constant(<span class="dv">64</span> : index) : <span class="dt">i64</span> loc(#loc21)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="system-test" class="level3">
+<h3 class="anchored" data-anchor-id="system-test">System Test</h3>
+<p>After activating the customed Python virtual environment. Import the MNIST Handwritten Digit Testbench from the previous section. Attach the Torch-Milr backend with our HWACC pass integrated into the PyTorch model. The demo code showing in below is the basic outline of the test application.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ... </span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch_mlir</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch_mlir_e2e_test.hwacc_linalg_on_tensors_backends <span class="im">import</span> refbackend</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ... </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>my_nn_in_torch_mlir <span class="op">=</span> torch_mlir.<span class="bu">compile</span>(my_model, torch.ones(<span class="dv">64</span>, <span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>), output_type<span class="op">=</span><span class="st">"Linalg-on-Tensors"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>hwacc_backend <span class="op">=</span> refbackend.RefBackendHwaccLinalgOnTensorsBackend()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>my_nn_llvm_ir <span class="op">=</span> hwacc_backend.<span class="bu">compile</span>(my_nn_in_torch_mlir)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>exec_jit_handle <span class="op">=</span> hwacc_backend.load(my_nn_llvm_ir)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Run inference</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"PyTorch Native: "</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> img, label <span class="kw">in</span> test_data_loader:</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    img, label <span class="op">=</span> Variable(img), Variable(label)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    outputs <span class="op">=</span> my_model(img)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    _, pred <span class="op">=</span> torch.<span class="bu">max</span>(outputs.data, <span class="dv">1</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    test_count<span class="op">+=</span>img.size()[<span class="dv">0</span>]</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    test_correct <span class="op">+=</span> torch.<span class="bu">sum</span>(pred <span class="op">==</span> label.data)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"  Test Correct </span><span class="sc">{:4d}</span><span class="st">/</span><span class="sc">{:4d}</span><span class="st"> --&gt; </span><span class="sc">{:.4f}</span><span class="st">"</span>.<span class="bu">format</span>(</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        test_correct, test_count, <span class="fl">100.0</span><span class="op">*</span>test_correct<span class="op">/</span>test_count))</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> MAX_TEST_COUNT <span class="op">&lt;=</span> test_count: <span class="cf">break</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Test Accuracy is:</span><span class="sc">{:.4f}</span><span class="st">"</span>.<span class="bu">format</span>(  <span class="dv">100</span> <span class="op">*</span> test_correct <span class="op">/</span> test_count  ))</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"torch-mlir: "</span>)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> img, label <span class="kw">in</span> test_data_loader:</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    img, label <span class="op">=</span> Variable(img), Variable(label)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    outputs <span class="op">=</span> exec_jit_handle.forward(img.numpy())</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    outputs <span class="op">=</span> torch.from_numpy(outputs)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    _, pred <span class="op">=</span> torch.<span class="bu">max</span>(outputs.data, <span class="dv">1</span>)</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    test_count<span class="op">+=</span>img.size()[<span class="dv">0</span>]</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    test_correct <span class="op">+=</span> torch.<span class="bu">sum</span>(pred <span class="op">==</span> label.data)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"  Test Correct </span><span class="sc">{:4d}</span><span class="st">/</span><span class="sc">{:4d}</span><span class="st"> --&gt; </span><span class="sc">{:.4f}</span><span class="st">"</span>.<span class="bu">format</span>(</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        test_correct, test_count, <span class="fl">100.0</span><span class="op">*</span>test_correct<span class="op">/</span>test_count))</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> MAX_TEST_COUNT <span class="op">&lt;=</span> test_count: <span class="cf">break</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Test Accuracy is:</span><span class="sc">{:.4f}</span><span class="st">"</span>.<span class="bu">format</span>(  <span class="dv">100</span> <span class="op">*</span> test_correct <span class="op">/</span> test_count  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="data-accuracy" class="level4">
+<h4 class="anchored" data-anchor-id="data-accuracy">Data Accuracy</h4>
+<p>After execution, the accuracy of result overtime from both implementations are shown in below. There’s no difference between the pure <code>pytorch</code> backend, and our implementation. Which means our method of remapping such <code>matmul</code> function to HWACC HAL lib call is success in simulation.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./img/prj/accuracy_plot.png" class="img-fluid figure-img"></p>
+<figcaption>Result Accuracy</figcaption>
+</figure>
+</div>
+</section>
+<section id="timing" class="level4">
+<h4 class="anchored" data-anchor-id="timing">Timing</h4>
+<p>We are curious about how the performances are between different configurations. After testing each configuration 20 times, we averaged the timing result and summarized the timing result as listed in following.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Class</th>
+<th>Exec Item</th>
+<th>Item Time (sec)</th>
+<th>Required (orig_pytorch)</th>
+<th>Required (mlir_hwacc)</th>
+<th>Required (mlir_cfloop)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Init</td>
+<td>pytorch nn model loading</td>
+<td>1.7</td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+</tr>
+<tr class="even">
+<td>Init</td>
+<td>torch_mlir compile+load</td>
+<td>0.8</td>
+<td></td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+</tr>
+<tr class="odd">
+<td>Inference</td>
+<td>original pytorch calc (orig)</td>
+<td>1.7</td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Inference</td>
+<td>mlir using hwacc (hwacc)</td>
+<td>6.4</td>
+<td></td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Inference</td>
+<td>mlir using scf.loop (loop)</td>
+<td>29.5</td>
+<td></td>
+<td></td>
+<td><span class="math inline">\(\checkmark\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td>Time Cost</td>
+<td></td>
+<td><strong>3.4</strong></td>
+<td><strong>8.9</strong></td>
+<td><strong>32</strong></td>
+</tr>
+</tbody>
+</table>
+<p>As we observed in this table, the original pytorch calculation is the fastest, then our implementation using HWACC, and the official torch-mlir solution is the slowest. It is not surprising that the original pytorch implementation reaches the best score since it utilizes the BLAS library to do the calculations, and BLAS will try to adapt all kinds of localized accelerating methods such as multicore parallel, loop unrolling, SIMD instructions, e.g.&nbsp;AVX on X86 or NEON on ARM machine.</p>
+<p>An exciting finding is that our HWACC implementation is about <em>4.6 times</em> faster than the loop solution based on Amdahl’s Law.</p>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<section id="summary" class="level3">
+<h3 class="anchored" data-anchor-id="summary">Summary</h3>
+<p>The project successfully demonstrates the integration of a Hardware GEMM Accelerator with an MLIR-based software infrastructure, showing significant improvements in computational efficiency. Despite challenges such as inconsistent documentation and evolving MLIR implementations, the project culminates in a versatile system capable of translating high-level neural network models into optimized code for diverse hardware architectures. This infrastructure promises to simplify the adoption of machine learning models, reducing the effort required to achieve efficient hardware acceleration.</p>
+</section>
+<section id="future-outlook" class="level3">
+<h3 class="anchored" data-anchor-id="future-outlook">Future outlook</h3>
+<p>In the future, the project aims to expand the capabilities of the MLIR-based software infrastructure for Hardware GEMM Accelerators. We envision enhancing support for a wider range of machine learning models and computational patterns, thus fostering broader adoption across various domains. Also, our approach is now limited to C-interfaced call mapping, we hope to find a better and more elegant way to interact with our hardware implementation.</p>
+</section>
+</section>
+<section id="code-repo" class="level2">
+<h2 class="anchored" data-anchor-id="code-repo">Code Repo</h2>
+<p>Code are distributed in different sections. To get the starting point, check out the <code>Torch-MLIR</code> repo, this is the root repo that has submodules as link to other two repos used below.</p>
+<ul>
+<li>Torch-MLIR toolchain: <code>https://github.com/jiangquchengpeter/torch-mlir-hwacc</code></li>
+<li>HWACC HAL Shared Lib: <code>https://github.com/jiangquchengpeter/gemm-hwacc-backend</code></li>
+<li>LLVM with HWACC pass: <code>https://github.com/jiangquchengpeter/llvm-project-hwacc</code></li>
+</ul>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/normrubin\.github\.io\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../blogs/Qucheng/2024-10-11-Qucheng-HW5.html" class="pagination-link" aria-label="Homework 5: LLVM - Spinning Up">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Homework 5: LLVM - Spinning Up</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../blogs/Qucheng/Qucheng-Paper-MLIR.html" class="pagination-link" aria-label="Paper Discussion: SODA-OPT">
+        <span class="nav-page-text">Paper Discussion: SODA-OPT</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><a href="https://normrubin.github.io/">EECS 7398 website</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions"><ul><li><a href="https://github.com/normrubin/normrubin.github.io/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>This page is built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
